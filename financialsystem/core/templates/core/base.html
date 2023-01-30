@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    <!-- Estilos -->
+    <link href="{% static 'core/vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'core/css/main.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <body>
+        <!-- Navegación -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container p-0">
+                <a class="navbar-brand" href="#"><img src="{% static 'core/img/isotipo.png' %}" width="200px" alt="logotipo"></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ned" aria-controls="ned" aria-expanded="false">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="ned">
+                    <ul class="navbar-nav">
+                        {% if not request.user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Salir</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+            <div class="container p-0 d-flex justify-content-end">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nep" aria-controls="nep" aria-expanded="false">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                <div class="collapse navbar-collapse" id="nep">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i>Inicio</i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i>Empleados</i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i>Movimientos de Caja</i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i>Clientes</i></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#"><i>Consultas</i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Contenido -->
+        {% block content %}{% endblock %}
+        <!-- Javascript -->
+        <script src="{% static 'core/vendor/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'core/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'core/js/main.js' %}"></script>
+    </body>
+
+</html>
