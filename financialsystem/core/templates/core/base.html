@@ -10,6 +10,11 @@
     <link href="{% static 'core/vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
     <link href="{% static 'core/css/main.css' %}" rel="stylesheet">
 
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+
+
 </head>
 
 <body>
@@ -62,8 +67,49 @@
                 </div>
             </div>
         </nav>
+
         <!-- Contenido -->
+        <main>
+            <div class="container py-4">
+                <div class="p-5 mb-4 bg-light rounded-3">
+                    <div class="container-fluid py-5">
+                        <h1 class="display-5 fw-bold">A Modo De Ejemplo</h1>
+                        <p class="col-md-8 fs-4">Se esta usando esto a modo de ejemplo para empujar el footer y visualizarlo de una mejor manera </p>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fringilla sodales gravida. Morbi elementum non odio quis efficitur. Curabitur eros justo, mollis et placerat ut, suscipit vitae dui. Vestibulum auctor volutpat est
+                            ac aliquam. Proin eget enim faucibus, pretium nulla sit amet, posuere libero. Nulla in erat dui. Praesent hendrerit nunc sit amet tellus tempor, vel bibendum dolor pharetra.</p>
+                        <button class="btn btn-primary btn-lg" type="button">Example button</button>
+                    </div>
+                </div>
+            </div>
+        </main>
         {% block content %}{% endblock %}
+
+        <!-- Footer -->
+
+        <footer class="d-flex flex-column justify-content-center align-items-center py-3 border-top bg-primary m-0">
+            <div class="col-md-4 d-flex flex-column align-items-center">
+                <a href="/" class="mb-3 me-2 mb-md-0 text-decoration-none lh-1 text-light">
+                    Logotipo-Desarrollador
+                </a>
+                <span class="mb-3 mb-md-0 text-light">© 2022 Company, Inc</span>
+            </div>
+
+            <ul class="nav col-md-4 justify-content-center align-items-center list-unstyled d-flex">
+                <li class="m-2">
+                    <a class="text-light" href="#"><i class="fa-brands fa-facebook"></i></a>
+                </li>
+                <li class="m-2">
+                    <a class="text-light" href="#"><i class="fa-brands fa-twitter"></i></a>
+                </li>
+                <li class="m-2">
+                    <a class="text-light" href="#"><i class="fa-brands fa-linkedin"></i></a>
+                </li>
+                <li class="m-2">
+                    <a class="text-light" href="#"><i class="fa-brands fa-instagram"></i></a>
+                </li>
+            </ul>
+        </footer>
+
         <!-- Javascript -->
         <script src="{% static 'core/vendor/jquery/jquery.min.js' %}"></script>
         <script src="{% static 'core/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
