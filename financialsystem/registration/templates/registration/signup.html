@@ -1,8 +1,4 @@
-{% extends 'core/base.html' %}
-{% load static %}
-{% block title %}Registrar Asesor{% endblock %}
-{% load crispy_forms_tags %}
-{% block content %}
+{% extends 'core/base.html' %} {% load static %} {% block title %}Registrar Asesor{% endblock %} {% load crispy_forms_tags %} {% block content %}
 
 <main role="main">
     <div class="container">
@@ -11,8 +7,8 @@
                 {% if 'register' in request.GET %}
                 <div class="alert alert-success alert-dismissible" role="alert">
                     <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
-                        Asesor <strong>Registrado Correctamente</strong> ya puede identificarse satisfactoriamente
-                  </div>
+                    Asesor <strong>Registrado Correctamente</strong> ya puede identificarse satisfactoriamente
+                </div>
                 {% endif %}
                 <form action="" method="post">
                     {% csrf_token %}
@@ -24,5 +20,4 @@
         </div>
     </div>
 </main>
-<link rel="stylesheet" href="{% static 'registration/css/signup.css' %}" type="text/css">
-{% endblock %}
+<link rel="stylesheet" href="{% static 'registration/css/signup.css' %}" type="text/css"> {% endblock %}
