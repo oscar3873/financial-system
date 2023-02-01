@@ -6,11 +6,11 @@ from django import forms
 # Create your views here.
 class SignupView(CreateView):
     form_class = UserCreationFormWithEmail
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('signup')
     template_name = 'registration/signup.html'
     
     def get_success_url(self) -> str:
-        return reverse_lazy('login') + '?register'
+        return reverse_lazy('signup') + '?register'
     
     def get_form(self, form_class=None):
         form = super(SignupView, self).get_form()

@@ -29,12 +29,12 @@
                 </button>
                 <div class="collapse navbar-collapse justify-content-end" id="ned">
                     <ul class="navbar-nav">
-                        {% if not request.user.is_authenticated %}
+                        {% if request.user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="#">Perfil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Salir</a>
+                            <a class="nav-link" href="{% url 'logout' %}">Salir</a>
                         </li>
                         {% endif %}
                     </ul>

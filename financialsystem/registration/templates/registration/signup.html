@@ -1,24 +1,28 @@
-{% extends 'core/base.html' %} {% load static %} {% block title %}Registrarse{% endblock %} {% block content %}
-<style>
-    .errorlist {
-        color: red;
-    }
-    
-    label {
-        display: none;
-    }
-</style>
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Registrar Asesor{% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+
 <main role="main">
     <div class="container">
         <div class="row mt-3">
-            <div class="col-md-9 mx-auto mb-5">
-                <form action="" method="post">{% csrf_token %}
-                    <h3 class="mb-4">Registrarse</h3>
-                    {{form.as_p}}
-                    <p><input type="submit" class="btn btn-primary btn-block" value="Confirmar"></p>
+            <div class="col-md-6 mx-auto mb-5">
+                {% if 'register' in request.GET %}
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+                        Asesor <strong>Registrado Correctamente</strong> ya puede identificarse satisfactoriamente
+                  </div>
+                {% endif %}
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <h3 class="mb-4 text-center">Registrar Asesor</h3>
+                    {{ form|crispy}}
+                    <p><input type="submit" class="btn btn-success btn-block" value="Confirmar"></p>
                 </form>
             </div>
         </div>
     </div>
 </main>
+<link rel="stylesheet" href="{% static 'registration/css/signup.css' %}" type="text/css">
 {% endblock %}

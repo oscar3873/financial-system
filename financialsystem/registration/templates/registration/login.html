@@ -18,13 +18,10 @@
                     <img src="{% static 'registration/img/isotipo.png' %}" width="400px" class="img-fluid" alt="logotipo" />
                 </h3>
                 <div class="col-lg-4 col-md-6 mx-auto">
-                    {% if 'register' in request.GET %}
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <P>Usuario registrado correctamente, ya puedes identificarte.</P>
-                    </div>
-                    {% endif %}
-                    <form action="" method="post">{% csrf_token %} {% if form.non_field_errors %}
-                        <p style="color:red">Usuario o contraseña incorrectos, prueba de nuevo.</p>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <p class="text-danger">Usuario o contraseña incorrectos, prueba de nuevo.</p>
                         {% endif %}
                         <p>
                             <input type="text" name="username" autofocus maxlength="254" required id="id_username" class="form-control" placeholder="Nombre de usuario" />
