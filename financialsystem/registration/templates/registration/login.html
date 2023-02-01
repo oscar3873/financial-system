@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> {% load static %}
+    <!-- Estilos -->
+    <link href="{% static 'core/vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'registration/css/login.css' %}" rel="stylesheet" type='text/css'>
+    <title>Login</title>
+</head>
+
+<body class="body">
+    <main role="main">
+        <div class="container my-5">
+            <div class="d-flex flex-column">
+                <h3 class="m-0 text-center">
+                    <img src="{% static 'registration/img/isotipo.png' %}" width="400px" class="img-fluid" alt="logotipo" />
+                </h3>
+                <div class="col-lg-4 col-md-6 mx-auto">
+                    {% if 'register' in request.GET %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <P>Usuario registrado correctamente, ya puedes identificarte.</P>
+                    </div>
+                    {% endif %}
+                    <form action="" method="post">{% csrf_token %} {% if form.non_field_errors %}
+                        <p style="color:red">Usuario o contraseña incorrectos, prueba de nuevo.</p>
+                        {% endif %}
+                        <p>
+                            <input type="text" name="username" autofocus maxlength="254" required id="id_username" class="form-control" placeholder="Nombre de usuario" />
+                        </p>
+                        <p>
+                            <input type="password" name="password" required id="id_password" class="form-control" placeholder="Contraseña" />
+                        </p>
+                        <p><input type="submit" class="btn btn-success btn-block" value="Acceder"></p>
+                    </form>
+                    <p class="text-white">
+                        ¿Ha olvidado su clave? Puede restaurarla <a class="text-warning" href="{% url 'password_reset' %}">aqui</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>
