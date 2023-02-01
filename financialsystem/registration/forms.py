@@ -12,6 +12,14 @@ class UserCreationFormWithEmail(UserCreationForm):
          label = 'Nombre de Usuario',
          required=True,
     )
+    first_name = forms.CharField(
+         label = 'Nombre/s',
+         required=True,
+    )
+    last_name = forms.CharField(
+         label = 'Apellido/s',
+         required=True,
+    )
     password1 = forms.CharField(
          label = "Contraseña",
          required=True
@@ -22,7 +30,7 @@ class UserCreationFormWithEmail(UserCreationForm):
     )
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
