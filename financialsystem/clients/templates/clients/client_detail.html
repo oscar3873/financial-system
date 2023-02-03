@@ -1,0 +1,41 @@
+{% extends "core/base.html" %} {% block content %}
+<h1>{{ client.first_name }}, {{client.last_name}}</h1>
+<p>
+    <span>
+        <strong>Domicilio: </strong>{{client.address}}
+    </span>
+</p>
+<p>
+    <span>
+        <strong>Correo electronico: </strong>{{client.email}}
+    </span>
+</p>
+<p>
+    <span>
+        <strong>Estado Civil: </strong>{{client.get_civil_status_display}}
+    </span>
+</p>
+<p>
+    <span>
+        <strong>Profesion: </strong>{{client.profession}}
+    </span>
+</p>
+<p>
+    <span>
+        <strong>DNI: </strong>{{client.dni}}
+    </span>
+</p>
+<p>
+    <span>
+        <strong>Numeros de Telefono: </strong>
+        {% for phone_number in client.phone_numbers.all %}
+            {{ phone_number }}, 
+        {% endfor %}
+    </span>
+</p>
+<p>
+    <span>
+        <strong>Domicilio Laboral: </strong>{{client.job_address}}
+    </span>
+</p>
+{% endblock content %}

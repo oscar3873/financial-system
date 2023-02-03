@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from clients.urls import clients_patterns
 
 urlpatterns = [
     # Paths de Nucleo del proyecto
@@ -23,4 +24,5 @@ urlpatterns = [
     # Paths de Auth
     path('accounts/', include('django.contrib.auth.urls')),
     path("accounts/", include("registration.urls")),
+    path("clients/", include(clients_patterns)),
 ]
