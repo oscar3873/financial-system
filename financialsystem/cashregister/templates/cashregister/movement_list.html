@@ -1,0 +1,16 @@
+{% extends "core/base.html" %} {% block content %}
+<h1>Movimientos</h1>
+<ul>
+    {% for movement in movements %}
+    <li><strong>Monto: </strong>{{movement.amount}} <strong>{{movement.money_type}}</strong></li>
+    {% if movement.operation_mode == "I" %}
+    <li><strong class="text-success">{{movement.get_operation_mode_display}}</strong></li>
+    {% else %}
+    <li><strong class="text-danger">{{movement.get_operation_mode_display}}</strong></li>
+    {% endif %}
+    <p class="text-info">{{movement.description}}</p>
+    {% empty %}
+    <li>No articles yet.</li>
+    {% endfor %}
+</ul>
+{% endblock content %}

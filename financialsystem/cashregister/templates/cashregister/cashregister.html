@@ -1,0 +1,24 @@
+{% extends "core/base.html" %} {% block content %}
+<div class="container">
+    <h1 class="display-3 text-center">Caja</h1>
+    <h1 class="text-center">Balance</h1>
+    <h4 class="text-center">{{cashregister.total_balanceARS}}<strong> ARS</strong></h4>
+    <h4 class="text-center">{{cashregister.total_balanceUSD}}<strong> USD</strong></h4>
+    <h4 class="text-center">{{cashregister.total_balanceEUR}}<strong> EUR</strong></h4>
+    <h4 class="text-center">{{cashregister.total_balanceTRANSFER}}<strong> TRANSFER</strong></h4>
+    <ul>
+        {% for movement in movements %}
+        <li><strong>Monto: </strong>{{movement.amount}} <strong>{{movement.money_type}}</strong></li>
+        {% if movement.operation_mode == "I" %}
+        <li><strong class="text-success">{{movement.get_operation_mode_display}}</strong></li>
+        {% else %}
+        <li><strong class="text-danger">{{movement.get_operation_mode_display}}</strong></li>
+        {% endif %}
+        <p class="text-info">{{movement.description}}</p>
+        <li><small><em class="">{{movement.created_at}}</em>    </small></li>
+        {% empty %}
+        <li>No articles yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock content %}
