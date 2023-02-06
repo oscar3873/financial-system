@@ -23,7 +23,7 @@
         <!-- Navegación -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container p-0">
-                <a class="navbar-brand" href="#"><img src="{% static 'core/img/isotipo.png' %}" width="200px" alt="logotipo"></a>
+                <a class="navbar-brand" href="#"><img src="{% static 'core/img/isotipo.png' %}" width="80px" alt="logotipo"></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ned" aria-controls="ned" aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </nav>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-info p-0">
             <div class="container p-0 d-flex justify-content-end">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nep" aria-controls="nep" aria-expanded="false">
                         <span class="navbar-toggler-icon"></span>
@@ -49,21 +49,21 @@
                 <div class="collapse navbar-collapse" id="nep">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="#"><i>Consultas</i></a>
+                            <a class="nav-link font-weight-light" href="#"><i>Consultas</i></a>
                         </li>
                         {% if request.user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home' %}"><i>Inicio</i></a>
+                            <a class="nav-link font-weight-light" href="{% url 'home' %}"><i>Inicio</i></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#"><i>Movimientos de Caja</i></a>
+                            <a class="nav-link font-weight-light" href="#"><i>Movimientos de Caja</i></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'clients:list' %}"><i>Clientes</i></a>
+                            <a class="nav-link font-weight-light" href="{% url 'clients:list' %}"><i>Clientes</i></a>
                         </li>
                         {% endif %} {% if user.is_superuser %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#"><i>Empleados</i></a>
+                            <a class="nav-link font-weight-light" href="#"><i>Empleados</i></a>
                         </li>
                         {% endif %}
                     </ul>
