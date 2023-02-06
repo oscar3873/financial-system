@@ -1,24 +1,283 @@
-{% extends "core/base.html" %} {% block content %}
-<div class="container">
-    <h1 class="display-3 text-center">Caja</h1>
-    <h1 class="text-center">Balance</h1>
-    <h4 class="text-center">{{cashregister.total_balanceARS}}<strong> ARS</strong></h4>
-    <h4 class="text-center">{{cashregister.total_balanceUSD}}<strong> USD</strong></h4>
-    <h4 class="text-center">{{cashregister.total_balanceEUR}}<strong> EUR</strong></h4>
-    <h4 class="text-center">{{cashregister.total_balanceTRANSFER}}<strong> TRANSFER</strong></h4>
-    <ul>
-        {% for movement in movements %}
-        <li><strong>Monto: </strong>{{movement.amount}} <strong>{{movement.money_type}}</strong></li>
-        {% if movement.operation_mode == "I" %}
-        <li><strong class="text-success">{{movement.get_operation_mode_display}}</strong></li>
-        {% else %}
-        <li><strong class="text-danger">{{movement.get_operation_mode_display}}</strong></li>
-        {% endif %}
-        <p class="text-info">{{movement.description}}</p>
-        <li><small><em class="">{{movement.created_at}}</em>    </small></li>
-        {% empty %}
-        <li>No articles yet.</li>
-        {% endfor %}
-    </ul>
-</div>
+{% extends "core/base.html" %} {% block content %} {% load static %}
+<!--Main-->
+<link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
+<main class="container my-4">
+
+    <h3 class="title font-weight-normal">Movimientos de Caja</h3>
+    <!--Seccion 1-->
+    <section id="minimal-statistics">
+        <div class="row my-4">
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="fa-solid fa-money-bill icon-lg text-warning"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h5>{{cashregister.total_balanceARS}}</h5>
+                                    <span>ARS</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="fa-solid fa-money-bill icon-lg text-warning"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h5>{{cashregister.total_balanceUSD}}</h5>
+                                    <span>USD</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="fa-solid fa-money-bill icon-lg text-warning"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h5>{{cashregister.total_balanceEUR}}</h5>
+                                    <span>EUR</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="fa-solid fa-money-bill-transfer icon-lg text-warning"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h5>{{cashregister.total_balanceTRANSFER}}</h5>
+                                    <span>TRANSFER</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="fa-solid fa-credit-card icon-lg text-warning"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h5>{{cashregister.total_balanceCREDITO}}</h5>
+                                    <span>CREDITO</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="fa-solid fa-credit-card icon-lg text-warning"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h5>{{cashregister.total_balanceDEBITO}}</h5>
+                                    <span>DEBITO</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+    </section>
+    <section class="row">
+        <div class="col-12 col-lg-8 col-md-8">
+            <!--Caja-->
+            <article class="container p-0 my-4">
+                <div class="row">
+                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                        <div class="card">
+                            <div class="card-body border-bottom-0">
+                                <h4 class="card-title">Caja</h4>
+                                <p class="card-text font-weight-light">Balances en Caja</p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item border-0"><i class="fa-solid fa-money-bill"></i> {{cashregister.total_balanceARS}} <strong>ARS</strong></li>
+                                <li class="list-group-item border-0"><i class="fa-solid fa-money-bill"></i> {{cashregister.total_balanceUSD}} <strong>USD</strong></li>
+                                <li class="list-group-item border-0"><i class="fa-solid fa-money-bill"></i> {{cashregister.total_balanceEUR}} <strong>EUR</strong></li>
+                                <li class="list-group-item border-0"><i class="fa-solid fa-money-bill-transfer"></i> {{cashregister.total_balanceTRANSFER}} <strong>TRANSFER</strong></li>
+                                <li class="list-group-item border-top-0"><i class="fa-solid fa-credit-card"></i>{{cashregister.total_balanceCREDITO}}<strong>CREDITO</strong></li>
+                                <li class="list-group-item border-0"><i class="fa-solid fa-credit-card"></i>{{cashregister.total_balanceDEBITO}}<strong>DEBITO</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                        <div class="alert alert-warning" role="alert">
+                            <h4 class="alert-heading"><i class="fa-solid fa-circle-info"></i> Operar</h4>
+                            <p>Ingrese un monto, luego realice una descripcion del la operacion</p>
+                            <p>Seleccione la divisa correspondiente</p>
+                            <hr>
+                            <p class="mb-0">Indique si quiere ingresar o retirar</p>
+                        </div>
+                        <div class="mb-3 row flex-column justify-content-lg-start">
+                            <input type="text" name="" id="" class="form-control mx-4 p-2 w-50" placeholder="Ingresar Monto $" aria-describedby="helpId">
+                            <div class="m-4 ">
+                                <textarea name="" id="textarea" class="form-control" rows="3" required="required" placeholder="Descripcion"></textarea>
+                            </div>
+                            <div class="m-4">
+                                <select class="form-select form-select-lg" name="" id="">
+                                    <option selected class="">Seleccione Divisa</option>
+                                    <option value="1">ARS</option>
+                                    <option value="2">USD</option>
+                                    <option value="3">EUR</option>
+                                    <option value="3">TRANSFER</option>
+                                    <option value="3">CREDITO</option>
+                                    <option value="3">DEBITO</option>
+                                </select>
+                            </div>
+                            <div class="m-4">
+                                <select class="form-select form-select-lg" name="" id="">
+                                    <option selected class="">Seleccione el tipo de operacion</option>
+                                    <option value="1">Ingreso</option>
+                                    <option value="2">Egreso</option>
+                                </select>
+                            </div>
+                            <div class="btn-group d-flex flex-sm-row flex-column justify-content-start mx-4" role="group" aria-label="Basic example">
+                                <button name="" id="" class="btn btn-success ml-sm-1 m-2 rounded p-3" href="#" role="button">
+                                    <span>Realizar Operacion</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <!--Lista de Notas-->
+        <aside class="col-12 col-lg-4 col-md-4 my-4">
+            <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-white box-shadow rounded border" style="width: 350px;">
+                <a href="/" class="d-flex align-items-center justify-content-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+                    <i class="fa-solid fa-down-left-and-up-right-to-center"></i> &nbsp;
+                    <h4 class="fs-5 fw-semibold m-0 text-primary"> Movimientos</h4>
+                </a>
+                <div class="list-group list-group-flush border-bottom scrollarea">
+                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
+                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
+                            <strong class="mb-1 text-primary"><i class="fa-solid fa-money-bill"></i> Monto: $1500</strong>
+                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
+                        </div>
+                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+                        <div class="col-10 mb-1 small">
+                            <small class="text-info">Por Otto</small>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
+                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
+                            <strong class="mb-1 text-primary"><i class="fa-solid fa-money-bill"></i> Monto: $1500</strong>
+                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
+                        </div>
+                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+                        <div class="col-10 mb-1 small">
+                            <small class="text-info">Por Otto</small>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
+                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
+                            <strong class="mb-1 text-primary"><i class="fa-solid fa-money-bill"></i> Monto: $1500</strong>
+                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
+                        </div>
+                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+                        <div class="col-10 mb-1 small">
+                            <small class="text-info">Por Otto</small>
+                        </div>
+                    </a>
+                </div>
+                <div class="card-footer p-1 bg-info rounded-bottom"></div>
+            </div>
+        </aside>
+    </section>
+    <!--Seccion 2-->
+</main>
+
 {% endblock content %}
+
+<section class="row mt-4">
+    <!--Tabla de Clientes-->
+    <div class="container">
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col"><i class="fa-solid fa-down-left-and-up-right-to-center"></i> Movimientos</th>
+                    <th scope="col"><i class="fa-solid fa-money-bill"></i> Monto</th>
+                    <th scope="col"><i class="fa-solid fa-user-tie"></i> Por</th>
+                    <th scope="col"><i class="fa-solid fa-quote-left"></i> Descripcion</th>
+                    <th scope="col"><i class="fa-solid fa-calendar-days"></i> Fecha</th>
+                    <!-- <th scope="col">Acciones</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>$1500.67</td>
+                    <td>Otto</td>
+                    <td>Lorem Ipsum is simply...</td>
+                    <td>12/03/2023</td>
+                    <!-- <td>
+                        <i class="fas fa-trash-alt"></i> &nbsp;
+                        <i class="fas fa-edit"></i>
+                    </td> -->
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>$1500.67</td>
+                    <td>Thornton</td>
+                    <td>Lorem Ipsum is simply...</td>
+                    <td>12/03/2023</td>
+                    <!-- <td>
+                        <i class="fas fa-trash-alt"></i> &nbsp;
+                        <i class="fas fa-edit"></i>
+                    </td> -->
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>$1500.67</td>
+                    <td>Norman Otto</td>
+                    <td>Lorem Ipsum is simply...</td>
+                    <td>12/03/2023</td>
+                    <!-- <td>
+                        <i class="fas fa-trash-alt"></i> &nbsp;
+                        <i class="fas fa-edit"></i>
+                    </td> -->
+                </tr>
+            </tbody>
+        </table>
+        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+    </div>
+</section>

@@ -1,0 +1,4 @@
+.icon-lg::after,
+.icon-lg::before {
+    font-size: 3rem !important;
+}

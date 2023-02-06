@@ -22,7 +22,9 @@ class CashRegisterAdmin(admin.ModelAdmin):
         'total_balanceARS',
         'total_balanceUSD',
         'total_balanceEUR',
-        'total_balanceTRANSFER'
+        'total_balanceTRANSFER',
+        'total_balanceCREDITO',
+        'total_balanceDEBITO',
     )
     inlines = [MovementInline]    
 

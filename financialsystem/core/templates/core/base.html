@@ -31,10 +31,10 @@
                     <ul class="navbar-nav">
                         {% if request.user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">{{user.email}}</a>
+                            <a class="nav-link font-weight-light" href="#"><i class="fa-solid fa-envelope"></i> {{user.email}}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Salir</a>
+                            <a class="nav-link font-weight-light" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -53,7 +53,7 @@
                             <a class="nav-link font-weight-light m-2" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-money-bill-transfer"></i> Movimientos de Caja</a>
+                            <a class="nav-link font-weight-light m-2" href="{% url 'cashregister:list' %}"><i class="fa-solid fa-money-bill-transfer"></i> Movimientos de Caja</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="{% url 'clients:list' %}"><i class="fa-solid fa-users"></i> Clientes</a>
@@ -65,6 +65,9 @@
                         {% endif %}
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-circle-info"></i> Consultas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-note-sticky"></i> Recordatorios</a>
                         </li>
                     </ul>
                 </div>

@@ -1,6 +1,7 @@
 from django.db import models
 from django.forms import ValidationError
 from django.db.models.signals import post_save, post_delete, pre_save
+import math
 
 # Create your models here.
 class CashRegister(models.Model):
@@ -9,6 +10,8 @@ class CashRegister(models.Model):
     total_balanceUSD = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)
     total_balanceEUR = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)
     total_balanceTRANSFER = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)
+    total_balanceCREDITO = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)
+    total_balanceDEBITO = models.DecimalField(max_digits=8, decimal_places=2, default=0.0)
     
     #Name of the admin site
     def __str__(self) -> str:
@@ -19,20 +22,30 @@ class CashRegister(models.Model):
         #Total balance calculation
         #ARS
         listMovARS = list(self.movement_cash.filter(money_type='PESO'))
-        listARS = [int(mov.amount) for mov in listMovARS]
-        self.total_balanceARS = sum(listARS)
+        listARS = [float(mov.amount) for mov in listMovARS]
+        self.total_balanceARS = math.fsum(listARS)
         #USD
         listMovUSD = list(self.movement_cash.filter(money_type='USD'))
-        listUSD = [int(mov.amount) for mov in listMovUSD]
-        self.total_balanceUSD = sum(listUSD)
+        listUSD = [float(mov.amount) for mov in listMovUSD]
+        self.total_balanceUSD = math.fsum(listUSD)
         #EUR
         listMovEUR = list(self.movement_cash.filter(money_type='EUR'))
-        listEUR = [int(mov.amount) for mov in listMovEUR]
-        self.total_balanceEUR = sum(listEUR)
+        listEUR = [float(mov.amount) for mov in listMovEUR]
+        self.total_balanceEUR = math.fsum(listEUR)
         #TRANSFER
         listMovTRANSFER = list(self.movement_cash.filter(money_type='TRANSFER'))
-        listTRANSFER = [int(mov.amount) for mov in listMovTRANSFER]
-        self.total_balanceTRANSFER = sum(listTRANSFER)
+        listTRANSFER = [float(mov.amount) for mov in listMovTRANSFER]
+        self.total_balanceTRANSFER = math.fsum(listTRANSFER)
+        #CREDITO
+        listMovCREDITO = list(self.movement_cash.filter(money_type='CREDITO'))
+        listCREDITO = [float(mov.amount) for mov in listMovCREDITO]
+        self.total_balanceCREDITO = math.fsum(listCREDITO)
+        #DEBITO
+        listMovDEBITO = list(self.movement_cash.filter(money_type='DEBITO'))
+        listDEBITO = [float(mov.amount) for mov in listMovDEBITO]
+        self.total_balanceDEBITO = math.fsum(listDEBITO)
+        
+        
         
         #Unique instance of the register cash    
         # if not self.pk and CashRegister.objects.exists():
@@ -52,7 +65,9 @@ class Movement(models.Model):
         ('PESO', 'PESO'),
         ('USD', 'USD'),
         ('EUR', 'EUR'),
-        ('TRANSFER', 'TRANSFER')
+        ('TRANSFER', 'TRANSFER'),
+        ('CREDITO', 'CREDITO'),
+        ('DEBITO', 'DEBITO'),
     )
     
     amount = models.DecimalField(decimal_places=2, max_digits=8, help_text="Amount of transaction")
