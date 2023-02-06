@@ -23,7 +23,7 @@
         <!-- Navegación -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container p-0">
-                <a class="navbar-brand" href="#"><img src="{% static 'core/img/isotipo.png' %}" width="80px" alt="logotipo"></a>
+                <a class="navbar-brand mx-3" href="#"><img src="{% static 'core/img/isotipo.png' %}" width="80px" alt="logotipo"></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ned" aria-controls="ned" aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -42,30 +42,30 @@
             </div>
         </nav>
         <nav class="navbar navbar-expand-lg navbar-dark bg-info p-0">
-            <div class="container p-0 d-flex justify-content-end">
+            <div class="container p-3 p-sm-0 d-flex justify-content-end">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nep" aria-controls="nep" aria-expanded="false">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                 <div class="collapse navbar-collapse" id="nep">
                     <ul class="navbar-nav mr-auto">
-                        <li class="nav-item">
-                            <a class="nav-link font-weight-light" href="#"><i>Consultas</i></a>
-                        </li>
                         {% if request.user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light" href="{% url 'home' %}"><i>Inicio</i></a>
+                            <a class="nav-link font-weight-light m-2" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light" href="#"><i>Movimientos de Caja</i></a>
+                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-money-bill-transfer"></i> Movimientos de Caja</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light" href="{% url 'clients:list' %}"><i>Clientes</i></a>
+                            <a class="nav-link font-weight-light m-2" href="{% url 'clients:list' %}"><i class="fa-solid fa-users"></i> Clientes</a>
                         </li>
                         {% endif %} {% if user.is_superuser %}
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light" href="#"><i>Empleados</i></a>
+                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-users-gear"></i> Empleados</a>
                         </li>
                         {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-circle-info"></i> Consultas</a>
+                        </li>
                     </ul>
                 </div>
             </div>
