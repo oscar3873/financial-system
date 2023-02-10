@@ -28,8 +28,12 @@
 <p>
     <span>
         <strong>Numeros de Telefono: </strong>
-        {% for phone_number in client.phone_numbers.all %}
-            {{ phone_number }}, 
+        {% for phone_number in client.phonenumber_set.all %}
+        {% if not forloop.last %}
+        {{ phone_number }},
+        {% else %}
+        {{ phone_number }}.
+        {% endif %}
         {% endfor %}
     </span>
 </p>

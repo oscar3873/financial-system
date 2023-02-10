@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     "clients",
     "cashregister",
+    "django_tables2",
 ]
 
 MIDDLEWARE = [
