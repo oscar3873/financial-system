@@ -1,0 +1,88 @@
+{% load crispy_forms_tags %}
+<form method="post" id="client_form">
+    {% csrf_token %}
+    <h4 class="card-title">Añadir Cliente</h4>
+    {{ form|crispy}} {% with named_formsets.phone_numbers as formset %} {{ formset.management_form }}
+    <script type="text/html" id="phone_numbers-template"> // id="inlineformsetname-template"
+        <tr id="phone_numbers-__prefix__" class=h ide_all> // id="inlineformsetname-__prefix__" {% for fields in formset.empty_form.hidden_fields %} {{ fields }} {% endfor %} {% for fields in formset.empty_form.visible_fields %} {% if not forloop.last %}
+            <td>{{fields}}</td>
+            {% endif %} {% endfor %}
+        </tr>
+    </script>
+
+    <div class="table-responsive card mt-4">
+        <div class="card-header bg-info text-white">
+            <h4 class="card-title">Agregar Numeros de Contacto</h4>
+        </div>
+        <table class="table card-body">
+            <thead class="">
+                <th>
+                    <span class="font-weight-normal">Numero de Telefonos</span><span style="color: red;" class="required">*</span></th>
+                <th><span class="font-weight-normal">Tipo</span></th>
+            </thead>
+            <tbody id="item-phone_numbers">
+                <!-- id="item-inlineformsetname" -->
+                <!-- formset non forms errors -->
+                {% for error in formset.non_form_errors %}
+                <span style="color: red">{{ error }}</span> {% endfor %} {% for formss in formset %} {{ formss.management_form }}
+                <tr id="phone_numbers-{{ forloop.counter0 }}" class=h ide_all>
+                    <!-- id="inlineformsetname-counter" -->
+                    {{ formss.id }} {% for field in formss.visible_fields %} {% if not forloop.last %}
+                    <td>
+                        {{field}} {% for error in field.errors %}
+                        <span style="color: red">{{ error }}</span> {% endfor %}
+                    </td>
+                    {% endif %} {% endfor %}
+                    <!-- delete code -->
+                    {% if formss.instance.pk %}
+                    <td>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal{{formss.instance.pk}}">
+                                    Borrar
+                                </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <p class="modal-title font-weight-normal" id="exampleModalLabel{{formss.instance.pk}}">¿Estas seguro que quieres borrar este numero?</p>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a href="{% url 'clients:delete_phone_number' formss.instance.pk %}" type="button" class="btn btn-danger m-2 rounded p-2">Si, Borrar</a>
+                                        <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="#" id="add-phone_number-button" class="btn btn-info m-2 rounded p-3 add-phone_numbers">Añadir</a>
+        <!-- id="add-inlineformsetname-button" -->
+    </div>
+    {% endwith %}
+    <!-- inline form for phone_numbers end -->
+    <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
+</form>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+<script>
+    $(document).ready(function() {
+        // when user clicks add more btn of phone_numbers
+        $('.add-phone_numbers').click(function(ev) {
+            ev.preventDefault();
+            var count = $('#item-phone_numbers').children().length;
+            var tmplMarkup = $('#phone_numbers-template').html();
+            var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+            $('#item-phone_numbers').append(compiledTmpl);
+
+            // update form count
+            $('#id_phone_numbers-TOTAL_FORMS').attr('value', count + 1);
+        });
+    });
+</script>

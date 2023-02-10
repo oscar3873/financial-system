@@ -25,18 +25,29 @@ SECRET_KEY = "django-insecure-y%fmoimj#+tghon04@h0@at_z@6mdef%+vc1j#js!sxa+lgv-+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    #registration Priority 1 for other applications
+    "registration",
+    "fontawesomefree",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "ckeditor",
+    "core",
+    "crispy_forms",
+    "crispy_bootstrap5",
+    'widget_tweaks',
+    "clients",
+    "cashregister",
+    "django_tables2",
 ]
 
 MIDDLEWARE = [
@@ -103,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "es"
 
 TIME_ZONE = "UTC"
 
@@ -121,3 +132,20 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+#Formularios con Bootstrap 
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+LOGOUT_REDIRECT_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_HOST_USER = 'postmaster@sandboxc3ae65cb4e5d49999e00c8d7f96ee9f7.mailgun.org'
+EMAIL_HOST_PASSWORD = '218726616d90ea05ca451bd864db89b2-75cd784d-1846b1af'
+DEFAULT_FROM_EMAIL = 'postmaster@sandboxc3ae65cb4e5d49999e00c8d7f96ee9f7.mailgun.org'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

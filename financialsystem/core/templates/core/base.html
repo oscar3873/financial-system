@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    <!-- Estilos -->
+    <link href="{% static 'core/vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'core/css/main.css' %}" rel="stylesheet">
+
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+    <body>
+        <!-- Navegación -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container p-0">
+                <a class="navbar-brand mx-3" href="#"><img src="{% static 'core/img/isotipo.png' %}" width="80px" alt="logotipo"></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ned" aria-controls="ned" aria-expanded="false">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="ned">
+                    <ul class="navbar-nav">
+                        {% if request.user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light" href="#"><i class="fa-solid fa-envelope"></i> {{user.email}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-info p-0">
+            <div class="container p-3 p-sm-0 d-flex justify-content-end">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nep" aria-controls="nep" aria-expanded="false">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                <div class="collapse navbar-collapse" id="nep">
+                    <ul class="navbar-nav mr-auto">
+                        {% if request.user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="{% url 'cashregister:list' %}"><i class="fa-solid fa-money-bill-transfer"></i> Movimientos de Caja</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="{% url 'clients:list' %}"><i class="fa-solid fa-users"></i> Clientes</a>
+                        </li>
+                        {% endif %} {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-users-gear"></i> Empleados</a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-circle-info"></i> Consultas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-note-sticky"></i> Recordatorios</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contenido -->
+        {% block content %}{% endblock %}
+
+        <!-- Footer -->
+
+        <footer class="d-flex flex-column justify-content-center align-items-center py-3 border-top bg-primary m-0">
+            <div class="col-md-4 d-flex flex-column align-items-center">
+                <a href="/" class="mb-3 me-2 mb-md-0 text-decoration-none lh-1 text-light">
+                    Logotipo-Desarrollador
+                </a>
+                <span class="mb-3 mb-md-0 text-light">© 2022 Company, Inc</span>
+            </div>
+
+            <ul class="nav col-md-4 justify-content-center align-items-center list-unstyled d-flex">
+                <li class="m-2">
+                    <a class="text-light" href="#"><i class="fa-brands fa-facebook"></i></a>
+                </li>
+                <li class="m-2">
+                    <a class="text-light" href="#"><i class="fa-brands fa-twitter"></i></a>
+                </li>
+                <li class="m-2">
+                    <a class="text-light" href="#"><i class="fa-brands fa-linkedin"></i></a>
+                </li>
+                <li class="m-2">
+                    <a class="text-light" href="#"><i class="fa-brands fa-instagram"></i></a>
+                </li>
+            </ul>
+        </footer>
+
+        <!-- Javascript -->
+        <script src="{% static 'core/vendor/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'core/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'core/js/main.js' %}"></script>
+    </body>
+
+</html>

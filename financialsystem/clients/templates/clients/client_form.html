@@ -1,0 +1,30 @@
+{% extends "core/base.html" %} {% block content %} {% load static %}
+<!--Main-->
+<link href="{% static 'clients/css/client_form.css' %}" rel="stylesheet">
+<main class="container my-4">
+    <h3 class="title font-weight-normal">Clientes</h3>
+    {% if 'register' in request.GET %}
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+            Cliente <strong>Registrado</strong> Correctamente !
+        </div>
+    {% endif %}
+    <!--Seccion 1-->
+    <section>
+        <div class="row mt-4">
+            <div class="col-12 col-lg-8 col-md-8 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            {% include "clients/includes/form.html" %}
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--Seccion 2-->
+</main>
+
+{% endblock content %}
