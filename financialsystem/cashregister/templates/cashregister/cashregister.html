@@ -1,4 +1,4 @@
-{% extends "core/base.html" %} {% block content %} {% load static %}
+{% extends "core/base.html" %} {% block content %} {% load static %}{% load crispy_forms_tags %}
 <!--Main-->
 <link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
 <main class="container my-4">
@@ -148,33 +148,9 @@
                             <p class="mb-0">Indique si quiere ingresar o retirar</p>
                         </div>
                         <div class="mb-3 row flex-column justify-content-lg-start">
-                            <input type="text" name="" id="" class="form-control mx-4 p-2 w-50" placeholder="Ingresar Monto $" aria-describedby="helpId">
-                            <div class="m-4 ">
-                                <textarea name="" id="textarea" class="form-control" rows="3" required="required" placeholder="Descripcion"></textarea>
-                            </div>
-                            <div class="m-4">
-                                <select class="form-select form-select-lg" name="" id="">
-                                    <option selected class="">Seleccione Divisa</option>
-                                    <option value="1">ARS</option>
-                                    <option value="2">USD</option>
-                                    <option value="3">EUR</option>
-                                    <option value="3">TRANSFER</option>
-                                    <option value="3">CREDITO</option>
-                                    <option value="3">DEBITO</option>
-                                </select>
-                            </div>
-                            <div class="m-4">
-                                <select class="form-select form-select-lg" name="" id="">
-                                    <option selected class="">Seleccione el tipo de operacion</option>
-                                    <option value="1">Ingreso</option>
-                                    <option value="2">Egreso</option>
-                                </select>
-                            </div>
-                            <div class="btn-group d-flex flex-sm-row flex-column justify-content-start mx-4" role="group" aria-label="Basic example">
-                                <button name="" id="" class="btn btn-success ml-sm-1 m-2 rounded p-3" href="#" role="button">
-                                    <span>Realizar Operacion</span>
-                                </button>
-                            </div>
+                            <form method="post">{% csrf_token %} {{ form|crispy}}
+                                <input class="btn btn-info m-2 rounded p-2" type="submit" value="Realizar Operacion">
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -183,41 +159,25 @@
         <!--Lista de Notas-->
         <aside class="col-12 col-lg-4 col-md-4 my-4">
             <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-white box-shadow rounded border" style="width: 350px;">
-                <a href="/" class="d-flex align-items-center justify-content-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+                <a href="{% url 'cashregister:list' %}" class="d-flex align-items-center justify-content-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
                     <i class="fa-solid fa-down-left-and-up-right-to-center"></i> &nbsp;
-                    <h4 class="fs-5 fw-semibold m-0 text-primary"> Movimientos</h4>
+                    <h4 class="fs-5 fw-semibold m-0 text-primary"> Ver Movimientos</h4>
                 </a>
                 <div class="list-group list-group-flush border-bottom scrollarea">
-                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
+                    {% for movement in movements %}
+                    <a href="{% url 'cashregister:update' movement.pk  %}" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
                         <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
-                            <strong class="mb-1 text-primary"><i class="fa-solid fa-money-bill"></i> Monto: $1500</strong>
-                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
+                            {% if movement.operation_mode == "Ingreso" %}
+                            <strong class="mb-1 text-success"><i class="fa-solid fa-money-bill"></i> Monto: ${{movement.amount}}</strong> {% else %}
+                            <strong class="mb-1 text-danger"><i class="fa-solid fa-money-bill"></i> Monto: ${{movement.amount}}</strong> {% endif %}
+                            <small class="text-info"><i class="fa-solid fa-calendar"></i> {{movement.created_at}}</small>
                         </div>
-                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+                        <div class="col-10 mb-1 small">{{movement.description}}</div>
                         <div class="col-10 mb-1 small">
                             <small class="text-info">Por Otto</small>
                         </div>
                     </a>
-                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
-                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
-                            <strong class="mb-1 text-primary"><i class="fa-solid fa-money-bill"></i> Monto: $1500</strong>
-                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
-                        </div>
-                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-                        <div class="col-10 mb-1 small">
-                            <small class="text-info">Por Otto</small>
-                        </div>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
-                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
-                            <strong class="mb-1 text-primary"><i class="fa-solid fa-money-bill"></i> Monto: $1500</strong>
-                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
-                        </div>
-                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-                        <div class="col-10 mb-1 small">
-                            <small class="text-info">Por Otto</small>
-                        </div>
-                    </a>
+                    {% endfor %}
                 </div>
                 <div class="card-footer p-1 bg-info rounded-bottom"></div>
             </div>

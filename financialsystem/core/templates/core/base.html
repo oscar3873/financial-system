@@ -21,7 +21,7 @@
         <!-- Navegación -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container p-0">
-                <a class="navbar-brand mx-3" href="#"><img src="{% static 'core/img/isotipo.png' %}" width="80px" alt="logotipo"></a>
+                <a class="navbar-brand mx-3" href="#"><img src="{% static 'core/img/isotipo.png' %}" width="120px" alt="logotipo"></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ned" aria-controls="ned" aria-expanded="false">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -51,22 +51,22 @@
                             <a class="nav-link font-weight-light m-2" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="{% url 'cashregister:list' %}"><i class="fa-solid fa-money-bill-transfer"></i> Movimientos de Caja</a>
+                            <a class="nav-link font-weight-light m-2" href="{% url 'cashregister:home' %}"><i class="fa-solid fa-money-bill-transfer"></i> Movimientos de Caja</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="{% url 'clients:list' %}"><i class="fa-solid fa-users"></i> Clientes</a>
                         </li>
-                        {% endif %} {% if user.is_superuser %}
-                        <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-users-gear"></i> Empleados</a>
-                        </li>
-                        {% endif %}
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-circle-info"></i> Consultas</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-note-sticky"></i> Recordatorios</a>
                         </li>
+                        {% endif %} {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-users-gear"></i> Empleados</a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
