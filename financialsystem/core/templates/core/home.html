@@ -2,7 +2,7 @@
 <!--Main-->
 <main class="container my-4">
 
-    <h3 class="title font-weight-normal">Panel de Control</h3>
+    <h3 class="title font-weight-normal">Inicio</h3>
     <!--Seccion 1-->
     <section class="row">
         <div class="col-12 col-lg-8 col-md-8">
@@ -110,40 +110,20 @@
         <!--Lista de Notas-->
         <aside class="col-12 col-lg-4 col-md-4 my-4">
             <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-white box-shadow rounded border" style="width: 350px;">
-                <a href="/" class="d-flex align-items-center justify-content-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+                <a href="{% url 'notes:list' %}" class="d-flex align-items-center justify-content-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
                     <i class="fa-solid fa-list-check text-warning"></i> &nbsp;
-                    <h5 class="fs-5 fw-semibold m-0 text-primary"> Lista de Notas Recordatorias</h5>
+                    <h5 class="fs-5 fw-semibold m-0 text-primary"> Tus Notas Recordatorias</h5>
                 </a>
                 <div class="list-group list-group-flush border-bottom scrollarea">
-                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
+                    {% for note in notes %}
+                    <a href="{% url 'notes:update' note.pk %}" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
                         <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
-                            <strong class="mb-1 text-primary"> <i class="fa-solid fa-note-sticky"></i> Recordatorio: Nombre</strong>
-                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
+                            <strong class="mb-1 text-primary"> <i class="fa-solid fa-note-sticky"></i> {{note.title}}</strong>
+                            <small class="text-info"><i class="fa-solid fa-calendar"></i> {{note.created_at}}</small>
                         </div>
-                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
+                        <div class="col-10 mb-1 small">{{note.content}}</div>
                     </a>
-
-                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
-                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
-                            <strong class="mb-1 text-primary"><i class="fa-solid fa-note-sticky"></i> Recordatorio: Nombre</strong>
-                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
-                        </div>
-                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight">
-                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
-                            <strong class="mb-1 text-primary"><i class="fa-solid fa-note-sticky"></i> Recordatorio: Nombre</strong>
-                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
-                        </div>
-                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action p-4 lh-tight border-bottom-0">
-                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
-                            <strong class="mb-1 text-primary"><i class="fa-solid fa-note-sticky"></i> Recordatorio: Nombre</strong>
-                            <small class="text-info"><i class="fa-solid fa-calendar"></i> 12/03/20</small>
-                        </div>
-                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and date.</div>
-                    </a>
+                    {% endfor %}
                 </div>
                 <div class="card-footer p-1 bg-info rounded-bottom"></div>
             </div>

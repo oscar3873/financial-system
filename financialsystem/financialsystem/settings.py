@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     "clients",
     "cashregister",
     "django_tables2",
+    "note",
+    "adviser",
 ]
 
 MIDDLEWARE = [

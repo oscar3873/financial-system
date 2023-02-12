@@ -1,0 +1,31 @@
+{% extends "core/base.html" %} {% block content %} {% load static %}
+<!--Main-->
+<link href="{% static 'note/css/note.css' %}" rel="stylesheet">
+<main class="container my-4">
+    {% load crispy_forms_tags %}
+    <form method="post" id="client_form">
+        {% csrf_token %}
+        <h4 class="card-title">Modificar Nota</h4>
+        {{ form|crispy}}
+        <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+            // when user clicks add more btn of phone_numbers
+            $('.add-phone_numbers').click(function(ev) {
+                ev.preventDefault();
+                var count = $('#item-phone_numbers').children().length;
+                var tmplMarkup = $('#phone_numbers-template').html();
+                var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+                $('#item-phone_numbers').append(compiledTmpl);
+
+                // update form count
+                $('#id_phone_numbers-TOTAL_FORMS').attr('value', count + 1);
+            });
+        });
+    </script>
+</main>
+
+{% endblock content %}

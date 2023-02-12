@@ -60,7 +60,7 @@
                             <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-circle-info"></i> Consultas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-note-sticky"></i> Recordatorios</a>
+                            <a class="nav-link font-weight-light m-2" href="{% url 'notes:list' %}"><i class="fa-solid fa-note-sticky"></i> Notas</a>
                         </li>
                         {% endif %} {% if user.is_superuser %}
                         <li class="nav-item">

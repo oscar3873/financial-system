@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 from clients.urls import clients_patterns
 from cashregister.urls import cashregister_patterns
+from note.urls import note_patterns
 
 urlpatterns = [
     # Paths de Nucleo del proyecto
@@ -27,4 +28,5 @@ urlpatterns = [
     path("accounts/", include("registration.urls")),
     path("clients/", include(clients_patterns)),
     path("cashregister/", include(cashregister_patterns)),
+    path("notes/", include(note_patterns)),
 ]

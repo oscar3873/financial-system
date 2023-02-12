@@ -54,7 +54,7 @@ class MovementListView(LoginRequiredMixin, ListView):
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         context["count_movements"] = self.model.objects.all().count()
-        context["movements"] = self.model
+        context["movements"] = self.model.objects.all()
         #VALIDACION DE EXISTENCIA PARA AL MENOS UN CLIENTE
         if self.model.objects.all().count() > 0:
             context["properties"] = self.model.objects.all()[0].all_properties()
