@@ -1,13 +1,13 @@
+a {
+    text-decoration: none !important;
+}
+
 .icon-lg::after,
 .icon-lg::before {
     font-size: 3rem !important;
 }
 
 .asteriskField {
-    display: none;
-}
-
-#div_id_cashregister {
     display: none;
 }
 

@@ -2,6 +2,7 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from django.forms import inlineformset_factory
 from clients.models import Client, PhoneNumber
+from django.contrib.auth.models import User
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
 class ClientForm(forms.ModelForm):
@@ -20,6 +21,12 @@ class ClientForm(forms.ModelForm):
     last_name = forms.CharField(
         label = 'Apellido/s',
         required=True,
+    )
+    user = forms.ModelChoiceField(
+        queryset= User.objects.all(),
+        initial= 1,
+        required= True,
+        label= 'Por',
     )
     email = forms.EmailField(
         label= 'Correo Electrónico',
@@ -53,6 +60,7 @@ class ClientForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper
+        self.fields["user"].initial = kwargs["instance"].id
     #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
 
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO

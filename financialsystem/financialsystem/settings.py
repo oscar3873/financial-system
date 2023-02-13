@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "django_tables2",
     "note",
     "adviser",
+    'django_filters',
 ]
 
 MIDDLEWARE = [

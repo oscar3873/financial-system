@@ -64,7 +64,7 @@
                         </li>
                         {% endif %} {% if user.is_superuser %}
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="#"><i class="fa-solid fa-users-gear"></i> Empleados</a>
+                            <a class="nav-link font-weight-light m-2" href="{% url 'advisers:list' %}"><i class="fa-solid fa-users-gear"></i> Asesores</a>
                         </li>
                         {% endif %}
                     </ul>

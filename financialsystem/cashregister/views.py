@@ -31,6 +31,13 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         context["movements"] = self.second_model.objects.all().order_by('-created_at')[0:4]
         return context
     
+    def get_form_kwargs(self):
+        
+        kwargs = super(CashRegisterListView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+    
+    
     def form_valid(self, form):
         
         if self.request.method == 'POST':
@@ -86,6 +93,12 @@ class MovementUpdateView(UpdateView):
     model = Movement
     form_class = MovementForm
     template_name_suffix = '_update_form'
+    
+    def get_form_kwargs(self):
+        
+        kwargs = super(MovementUpdateView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
     
     def get_success_url(self) -> str:
         messages.success(self.request, 'Movimiento actualizado satisfactoriamente', "info")

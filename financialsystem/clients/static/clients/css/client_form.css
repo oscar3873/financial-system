@@ -22,3 +22,7 @@
 .asteriskField {
     display: none;
 }
+
+#div_id_user {
+    display: none !important;
+}

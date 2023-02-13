@@ -4,7 +4,7 @@
     <h3 class="title font-weight-normal">Crear Nota</h3>
     <section>
         <form method="post">{% csrf_token %} {{ form|crispy }}
-            <input type="submit" value="Save">
+            <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
         </form>
     </section>
 </main>

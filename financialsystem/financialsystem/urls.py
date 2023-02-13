@@ -18,6 +18,7 @@ from django.urls import include, path
 from clients.urls import clients_patterns
 from cashregister.urls import cashregister_patterns
 from note.urls import note_patterns
+from adviser.urls import advisers_patterns
 
 urlpatterns = [
     # Paths de Nucleo del proyecto
@@ -29,4 +30,5 @@ urlpatterns = [
     path("clients/", include(clients_patterns)),
     path("cashregister/", include(cashregister_patterns)),
     path("notes/", include(note_patterns)),
+    path("asesors/", include(advisers_patterns)),
 ]

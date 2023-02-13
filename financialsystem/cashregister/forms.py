@@ -2,6 +2,7 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from django.forms import inlineformset_factory
 from cashregister.models import CashRegister, Movement
+from django.contrib.auth.models import User
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
 class MovementForm(forms.ModelForm):
@@ -45,12 +46,20 @@ class MovementForm(forms.ModelForm):
         required= True,
         label= 'Caja',
     )
+    user = forms.ModelChoiceField(
+        queryset= User.objects.all(),
+        initial= 0,
+        required= True,
+        label= 'Caja',
+    )
     
     class Meta:
         model = Movement
-        fields = ["amount", "description", "money_type", "operation_mode", "cashregister"]
+        fields = ["amount", "description", "money_type", "operation_mode", "cashregister", "user"]
         
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        self.request = kwargs.pop('request')
+        super(MovementForm, self).__init__(*args, **kwargs)
+        self.fields["user"].initial = self.request.user.id
         self.helper = FormHelper

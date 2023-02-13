@@ -8,12 +8,14 @@
         <div class="col-12 col-lg-8 col-md-8">
             <!--Buscador de Clientes-->
             <article class="container p-0 my-4">
-                <div class="form-group m-auto d-flex w-100">
-                    <input type="text" class="form-control rounded-0 box-shadow p-3 " name="" id="" aria-describedby="helpId" placeholder="Buscar Cliente ">
-                    <button type="submit" class="btn btn-info rounded-0 box-shadow">
-                                    <i class="fa fa-search" aria-hidden="true"></i>
-                                </button>
-                </div>
+                <form action="{% url 'clients:list' %}">
+                    <div class="form-group m-auto d-flex w-100">
+                        <input type="search" class="form-control rounded-0 box-shadow p-3 " name="search_client" id="search_client" aria-describedby="helpId" placeholder="Buscar Cliente ">
+                        <button type="submit" class="btn btn-info rounded-0 box-shadow">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </form>
             </article>
             <!--Botones de  Carga-->
             <article class="container p-0 my-4">
@@ -24,7 +26,7 @@
                     </a>
                     <a name="" id="" class="btn btn-info m-2 rounded p-3" href="{% url 'signup' %}" role="button">
                         <i class="fa fa-user-plus" aria-hidden="true"></i>
-                        <span>Agregar Nuevo Empleado</span>
+                        <span>Agregar Nuevo Asesor</span>
                     </a>
                 </div>
             </article>
@@ -34,49 +36,46 @@
                     <!--Movimientos de Caja-->
                     <div class="card box-shadow border rounded mx-2">
                         <div class="card-body">
-                            <h5 class="card-title p-4">
-                                <i class="fa-solid fa-cash-register text-warning"></i> Movimientos de Caja
-                            </h5>
+                            <a href="{% url 'cashregister:list' %}">
+                                <h5 class="card-title p-4">
+                                    <i class="fa-solid fa-cash-register text-warning"></i> Tus Movimientos de Caja
+                                </h5>
+                            </a>
                             <p class="card-subtitle p-2">
-                                <span class="font-weight-bold text-primary">$10000</span>
+                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceARS}}</span>
                                 <span class="font-weight-light text-primary"><small><strong>ARS</strong></small></span>
                                 <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">$10000</span>
+                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceUSD}}</span>
                                 <span class="font-weight-bold text-primary"><small><strong>USD</strong></small></span>
                                 <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">$10000</span>
+                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceEUR}}</span>
                                 <span class="font-weight-bold text-primary"><small><strong>EUR</strong></small></span>
                                 <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">$10000</span>
+                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceTRANSFER}}</span>
                                 <span class="font-weight-bold text-primary"><small><strong>TRANSFER</strong></small></span>
+                                <span class="text-warning"> | </span>
+                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceCREDITO}}</span>
+                                <span class="font-weight-bold text-primary"><small><strong>CREDITO</strong></small></span>
+                                <span class="text-warning"> | </span>
+                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceDEBITO}}</span>
+                                <span class="font-weight-bold text-primary"><small><strong>DEBITO</strong></small></span>
                             </p>
-                            <div class="card-text p-2">
-                                <small class="text-success"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> $1000</small>
-                                <small class="font-weight-light"> Lorem ipsum dolor sit amet </small>
-                                <small class="font-weight-bold">Por <a href="#" class="text-warning">Asesor</a></small>
-                            </div>
-                            <div class="card-text p-2">
-                                <small class="text-danger"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> $1000</small>
-                                <small class="font-weight-light"> Lorem ipsum dolor sit amet </small>
-                                <small class="font-weight-bold">Por <a href="#" class="text-warning">Asesor</a></small>
-                            </div>
-                            <div class="card-text p-2">
-                                <small class="text-success"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> $1000</small>
-                                <small class="font-weight-light"> Lorem ipsum dolor sit amet </small>
-                                <small class="font-weight-bold">Por <a href="#" class="text-warning">Asesor</a></small>
-                            </div>
-                            <div class="card-text p-2">
-                                <small class="text-danger"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> $1000</small>
-                                <small class="font-weight-light"> Lorem ipsum dolor sit amet </small>
-                                <small class="font-weight-bold">Por <a href="#" class="text-warning">Asesor</a></small>
-                            </div>
+                            {% for movement in movements %}
+                            <a href="{% url 'cashregister:detail' movement.id %}" class="card-text d-block p-2">
+                                {% if movement.operation_mode == 'Egreso' %}
+                                <small class="text-danger"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> ${{movement.amount}}</small> {% else %}
+                                <small class="text-success"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> ${{movement.amount}}</small> {% endif %}
+                                <small class="font-weight-light"> {{movement.description|truncatewords:2}} </small>
+                                <span class="font-weight-bold">Por <span href="#" class="text-warning">{{movement.user}}</></span>
+                            </a> {% empty %}
+                            <small class="font-weight-light">No hay movimientos registrados</small> {% endfor %}
                         </div>
                         <div class="card-footer p-1 bg-info rounded-bottom"></div>
                     </div>
                     <!--Proximos Vencimientos-->
                     <div class="card box-shadow border rounded mx-2">
                         <div class="card-body">
-                            <h5 class="card-title p-4"><i class="fa-solid fa-calendar text-warning"></i> Proximos Vencimientos</h5>
+                            <h5 class="card-title p-4"><i class="fa-solid fa-calendar text-warning"></i> Tus Proximos Cobros</h5>
                             <div class="card-text p-2">
                                 <small class="font-weight-bold text-primary"><i class="fa-solid fa-hourglass-end"></i> 10/03/2022</small>
                                 <small class="font-weight-normal"> Cuota 1</small>

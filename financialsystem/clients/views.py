@@ -45,6 +45,14 @@ class ClientDetailView(DetailView):
     model = Client
     template_name = 'clients/client_detail.html'
     
+    def get_context_data(self, **kwargs):
+        
+        context = super().get_context_data(**kwargs)
+        print(context)
+        return context
+    
+    
+    
     def get_object(self):
         return get_object_or_404(Client, id=self.kwargs['pk'])
 
@@ -89,6 +97,12 @@ class ClientInline(LoginRequiredMixin):
 #CREACION DE UN CLIENTE
 #------------------------------------------------------------------
 class ClientCreate(ClientInline, CreateView):
+    
+    def get_form_kwargs(self):
+        kwargs = super(ClientCreate, self).get_form_kwargs()
+        kwargs['instance'] = self.request.user
+        return kwargs
+    
     
     def get_context_data(self, **kwargs):
         ctx = super(ClientCreate, self).get_context_data(**kwargs)
