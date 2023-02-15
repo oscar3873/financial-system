@@ -19,6 +19,7 @@ from clients.urls import clients_patterns
 from cashregister.urls import cashregister_patterns
 from note.urls import note_patterns
 from adviser.urls import advisers_patterns
+from credit.urls import credits_patterns
 
 urlpatterns = [
     # Paths de Nucleo del proyecto
@@ -31,4 +32,5 @@ urlpatterns = [
     path("cashregister/", include(cashregister_patterns)),
     path("notes/", include(note_patterns)),
     path("asesors/", include(advisers_patterns)),
+    path("credits/", include(credits_patterns)),
 ]

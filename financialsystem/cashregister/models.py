@@ -1,6 +1,6 @@
 from django.db import models
 from django.forms import ValidationError
-from django.db.models.signals import post_save, post_delete, pre_save
+from django.db.models.signals import post_save, post_delete, pre_save, post_init
 from django.contrib.auth.models import User
 import math
 
@@ -92,27 +92,27 @@ class Movement(models.Model):
 def refresh_cashregister(instance, *args, **kwargs):
     #Total balance calculation
     #ARS
-    listMovARS = list(instance.cashregister.movement_cash.filter(money_type='PESO'))
+    listMovARS = list(instance.cashregister.cash.filter(money_type='PESO'))
     listARS = [float(mov.amount) for mov in listMovARS]
     instance.cashregister.total_balanceARS = math.fsum(listARS)
     #USD
-    listMovUSD = list(instance.cashregister.movement_cash.filter(money_type='USD'))
+    listMovUSD = list(instance.cashregister.cash.filter(money_type='USD'))
     listUSD = [float(mov.amount) for mov in listMovUSD]
     instance.cashregister.total_balanceUSD = math.fsum(listUSD)
     #EUR
-    listMovEUR = list(instance.cashregister.movement_cash.filter(money_type='EUR'))
+    listMovEUR = list(instance.cashregister.cash.filter(money_type='EUR'))
     listEUR = [float(mov.amount) for mov in listMovEUR]
     instance.cashregister.total_balanceEUR = math.fsum(listEUR)
     #TRANSFER
-    listMovTRANSFER = list(instance.cashregister.movement_cash.filter(money_type='TRANSFER'))
+    listMovTRANSFER = list(instance.cashregister.cash.filter(money_type='TRANSFER'))
     listTRANSFER = [float(mov.amount) for mov in listMovTRANSFER]
     instance.cashregister.total_balanceTRANSFER = math.fsum(listTRANSFER)
     #CREDITO
-    listMovCREDITO = list(instance.cashregister.movement_cash.filter(money_type='CREDITO'))
+    listMovCREDITO = list(instance.cashregister.cash.filter(money_type='CREDITO'))
     listCREDITO = [float(mov.amount) for mov in listMovCREDITO]
     instance.cashregister.total_balanceCREDITO = math.fsum(listCREDITO)
     #DEBITO
-    listMovDEBITO = list(instance.cashregister.movement_cash.filter(money_type='DEBITO'))
+    listMovDEBITO = list(instance.cashregister.cash.filter(money_type='DEBITO'))
     listDEBITO = [float(mov.amount) for mov in listMovDEBITO]
     instance.cashregister.total_balanceDEBITO = math.fsum(listDEBITO)
 
@@ -126,6 +126,13 @@ def operation_type_validate(instance, *args, **kwargs):
     if instance.operation_mode == 'Egreso':
         instance.amount = -instance.amount
 
+def unique_instance_cashregister(instance, *args, **kwargs):
+    
+    cashregister = instance
+    cashregister.create()
+    cashregister.save()
+
+post_init.connect(unique_instance_cashregister, sender=CashRegister)
 pre_save.connect(operation_type_validate, sender=Movement)
 post_save.connect(refresh_cashregister, sender= Movement)
 post_delete.connect(refresh_cashregister, sender= Movement)

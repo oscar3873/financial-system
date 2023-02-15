@@ -27,7 +27,7 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
     def get_context_data(self, **kwargs):
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
-        context["cashregister"] = self.model.objects.all()[0]
+        context["cashregister"] = self.model.objects.all().first()
         context["movements"] = self.second_model.objects.all().order_by('-created_at')[0:4]
         return context
     

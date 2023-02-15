@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     #registration Priority 1 for other applications
+    "braces",
     "registration",
     "fontawesomefree",
     "django.contrib.admin",
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     "note",
     "adviser",
     'django_filters',
+    "credit",
 ]
 
 MIDDLEWARE = [

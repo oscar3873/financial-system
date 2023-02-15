@@ -1,0 +1,11 @@
+{% extends "core/base.html" %} {% load crispy_forms_tags %}{% load static %} {% block content %}
+<link href="{% static 'note/css/note.css' %}" rel="stylesheet">
+<main class="container my-4">
+    <h3 class="title font-weight-normal">Crear Credito</h3>
+    <section>
+        <form method="post">{% csrf_token %} {{ form|crispy }}
+            <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
+        </form>
+    </section>
+</main>
+{% endblock content %}}

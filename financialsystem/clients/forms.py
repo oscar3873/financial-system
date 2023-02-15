@@ -22,12 +22,6 @@ class ClientForm(forms.ModelForm):
         label = 'Apellido/s',
         required=True,
     )
-    user = forms.ModelChoiceField(
-        queryset= User.objects.all(),
-        initial= 1,
-        required= True,
-        label= 'Por',
-    )
     email = forms.EmailField(
         label= 'Correo Electrónico',
         required=True,
@@ -52,15 +46,23 @@ class ClientForm(forms.ModelForm):
         label= "Domicilio Laboral",
         required= True,
     )
+    
+    user = forms.ModelChoiceField(
+        label= "Por",
+        queryset= User.objects.all(),
+        initial= 0
+    )
+    
     class Meta:
         model = Client
         fields = "__all__"
         
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request')
         super().__init__(*args, **kwargs)
         self.helper = FormHelper
-        self.fields["user"].initial = kwargs["instance"].id
+        self.fields['user'].initial = request.user.id
     #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
 
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO

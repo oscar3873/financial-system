@@ -48,12 +48,12 @@
             <tbody>
                 {% for movement in page_obj %}
                 <tr>
-                    <td><a href="{% url 'cashregister:detail' movement.pk %}">{{movement.amount}}</a></td>
+                    <td><a href="{% url 'cashregister:update' movement.pk %}">{{movement.amount}}</a></td>
                     <td>{{movement.get_operation_mode_display}}</td>
                     <td>{{movement.description}}</td>
                     <td>{{movement.money_type}}</td>
                     <td>{{movement.created_at}}</td>
-                    <td>{{user}}</td>
+                    <td>{{movement.user}}</td>
                     {% if user.is_superuser %}
                     <td>
                         <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>

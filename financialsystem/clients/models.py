@@ -20,12 +20,14 @@ class Client(models.Model):
     profession = models.CharField(max_length=50, help_text="Profession", verbose_name="Profesion")
     address = models.CharField(max_length=250, help_text="Address", verbose_name="Direccion")
     job_address = models.CharField(max_length=250, help_text="Job address", verbose_name="Direccion laboral")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return self.first_name + " " + self.last_name
     
     def all_properties(self):
-        return ["Nombre Completo","Correo","Estado Civil","DNI","Numero de Telefono","Profesion","Domicilio","Domicilio Laboral", "Por"]
+        return ["Nombre Completo","Correo","Estado Civil","DNI","Numero de Telefono","Profesion","Domicilio","Domicilio Laboral", "Por", "Creado"]
     
 class PhoneNumber(models.Model):
     

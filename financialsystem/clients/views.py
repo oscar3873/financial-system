@@ -21,15 +21,13 @@ from .models import Client, PhoneNumber
 class ClientListView(LoginRequiredMixin, ListView):
     model = Client
     template_name = 'clients/client_list.html'
-    ordering = ['id']
+    ordering = ['created_at']
     paginate_by = 2
-    
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
-        
         context = super().get_context_data(**kwargs)
         context["count_clients"] = self.model.objects.all().count()
         context["clients"] = self.model.objects.all()
@@ -50,9 +48,7 @@ class ClientDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         print(context)
         return context
-    
-    
-    
+
     def get_object(self):
         return get_object_or_404(Client, id=self.kwargs['pk'])
 
@@ -67,6 +63,12 @@ class ClientInline(LoginRequiredMixin):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
+    def get_form_kwargs(self):
+        
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+    
     def form_valid(self, form):
         named_formsets = self.get_named_formsets()
         if not all((x.is_valid() for x in named_formsets.values())):
@@ -79,6 +81,7 @@ class ClientInline(LoginRequiredMixin):
                 formset_save_func(formset)
             else:
                 formset.save()
+        
         return super().form_valid(form)
     
     def formset_phone_numbers_valid(self, formset):
@@ -96,13 +99,7 @@ class ClientInline(LoginRequiredMixin):
 
 #CREACION DE UN CLIENTE
 #------------------------------------------------------------------
-class ClientCreate(ClientInline, CreateView):
-    
-    def get_form_kwargs(self):
-        kwargs = super(ClientCreate, self).get_form_kwargs()
-        kwargs['instance'] = self.request.user
-        return kwargs
-    
+class ClientCreate(ClientInline, CreateView):    
     
     def get_context_data(self, **kwargs):
         ctx = super(ClientCreate, self).get_context_data(**kwargs)

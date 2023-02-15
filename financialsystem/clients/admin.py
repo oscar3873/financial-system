@@ -11,6 +11,8 @@ class ClientAdmin(admin.ModelAdmin):
         'profession', 
         'dni', 
         'job_address',
+        'created_at',
+        'updated_at',
     )
 class PhoneNumberAdmin(admin.ModelAdmin):
     list_display = (
