@@ -9,7 +9,7 @@ class CreditForm(forms.ModelForm):
     
     is_paid_credit = forms.BooleanField(
         label = 'Esta pagado?',
-        required= True,
+        required= False,
     )
     
     credit_interest = forms.IntegerField(
@@ -25,7 +25,7 @@ class CreditForm(forms.ModelForm):
     client = forms.ModelChoiceField(
         label="Seleccione Cliente",
         queryset= Client.objects.all(),
-        initial= 1,
+        initial= Client.objects.last().id,
         required= True,
     )
     

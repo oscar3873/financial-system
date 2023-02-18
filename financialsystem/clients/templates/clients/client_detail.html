@@ -1,45 +1,166 @@
-{% extends "core/base.html" %} {% block content %}
-<h1>{{ client.first_name }}, {{client.last_name}}</h1>
-<p>
-    <span>
-        <strong>Domicilio: </strong>{{client.address}}
-    </span>
-</p>
-<p>
-    <span>
-        <strong>Correo electronico: </strong>{{client.email}}
-    </span>
-</p>
-<p>
-    <span>
-        <strong>Estado Civil: </strong>{{client.get_civil_status_display}}
-    </span>
-</p>
-<p>
-    <span>
-        <strong>Profesion: </strong>{{client.profession}}
-    </span>
-</p>
-<p>
-    <span>
-        <strong>DNI: </strong>{{client.dni}}
-    </span>
-</p>
-<p>
-    <span>
-        <strong>Numeros de Telefono: </strong>
-        {% for phone_number in client.phonenumber_set.all %}
-        {% if not forloop.last %}
-        {{ phone_number }},
-        {% else %}
-        {{ phone_number }}.
-        {% endif %}
-        {% endfor %}
-    </span>
-</p>
-<p>
-    <span>
-        <strong>Domicilio Laboral: </strong>{{client.job_address}}
-    </span>
-</p>
+{% extends "core/base.html" %} {% block content %} {% load static %}
+<!--Main-->
+<link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
+<main class="container my-4">
+    <!--Seccion 1-->
+    <h3 class="title font-weight-normal">{{client.first_name}} {{client.last_name}}</h3>
+    {% if messages %} {% for message in messages %}
+    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
+        <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+        <span class="font-weight-light">{{ message }}</span>
+    </div>
+    {% endfor %} {% endif %}
+    <section>
+        <div class="row mt-4">
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="fa-sharp fa-solid fa-credit-card text-warning icon-lg"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h5>{{count_clients}}</h5>
+                                    <h5>Score</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+            <div class="col-xl-5 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <h5 class="title pt-3 text-center">Datos Personales</h5>
+                    <div class="d-flex justify-content-around">
+                        <div class="px-2">
+                            <p>Domicilio: <strong>{{client.address}}</strong></p>
+                            <p>Estado civil: <strong>{{client.get_civil_status_display}}</strong></p>
+                            <p>Profesion: <strong>{{client.profession}}</strong></p>
+                        </div>
+                        <div>
+                            <p>DNI: <strong>{{client.dni}}</strong></p>
+                            <p>Domicilio Laboral: <strong>{{client.job_address}}</strong></p>
+                        </div>
+                    </div>
+                    <p class="px-4">Correo: <strong>{{client.email}}</strong></p>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <h5 class="title pt-3 text-center">Datos Garante</h5>
+                    <div class="d-flex justify-content-around">
+                        <div class="px-2">
+                            <p>Domicilio: <strong>{{client.address}}</strong></p>
+                            <p>Estado civil: <strong>{{client.get_civil_status_display}}</strong></p>
+                            <p>Profesion: <strong>{{client.profession}}</strong></p>
+                        </div>
+                        <div class="px-1">
+                            <p>DNI: <strong>{{client.dni}}</strong></p>
+                            <p>Domicilio Laboral: <strong>{{client.job_address}}</strong></p>
+                        </div>
+                    </div>
+                    <p class="px-2">Correo: <strong>{{client.email}}</strong></p>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card bg-primary text-white media p-4">
+                    <h5 class="title py-3">Registro</h5>
+                    <p class="m-0">Asesor Financiero</p>
+                    <p><a class="text-warning" href="{% url 'advisers:detail' client.user.adviser.pk %}"><strong>{{client.user.adviser}}</strong></a></p>
+                    <p class="m-0">Fecha de Entrada al sistema</p>
+                    <p><strong>{{client.created_at|date}}</strong></p>
+                    <h5 class="title pt-3">Creditos</h5>
+                    {% if credits %}
+                    <p>Cantidad de Creditos </p>
+                    <p>Tiene un credito activo</p>
+                    {% else %}
+                    <p>No se registraron Creditos</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% if credit_active %}
+            <div class="col-xl-9 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <h5 class="title pt-3 text-start pl-4">Credito Activo</h5>
+                    <div class="d-flex justify-content-start">
+                        <div class="px-4">
+                            <p class="text-start">Monto solicitado:</p>
+                            <p class="text-start">Monto a devolver:</p>
+                            <p class="text-start">Numero de Cuotas:</p>
+                        </div>
+                        <div class="px-4">
+                            <p class="text-start"><strong>${{credit_active.amount}}</strong></p>
+                            <p class="text-start"><strong>{{credit_active.credit_repayment_amount}}</strong></p>
+                            <p class="text-start"><strong>{{credit_active.number_installment}}</strong></p>
+                        </div>
+                        <div class="form-group">
+                            <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'clients:create' %}" role="button">
+                                <i class="fa-solid fa-receipt"></i>
+                                <span>Registrar un Pago</span>
+                            </a>
+                        </div>
+                    </div>
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Numero de cuota</th>
+                                <th scope="col">Monto de la cuota</th>
+                                <th scope="col">Fecha de vencimiento</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Refinanciacion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for installment in installments %}
+                            <tr>
+                                <td>{{installment.installment_number}}</td>
+                                <td>{{installment.amount_installment}}</td>
+                                <td>{{installment.payment_date}}</td>
+                                {% if installment.is_paid_installment %}
+                                <td>
+                                    <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
+                                        <strong>●pagada</strong>
+                                    </div>
+                                </td>
+                                {% elif installment.is_caduced_installment %}
+                                <td>
+                                    <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
+                                        <strong>●vencida</strong>
+                                    </div>
+                                </td>
+                                {% else %}
+                                <td>
+                                    <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
+                                        <strong>●no pagada</strong>
+                                    </div>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-xl-9 col-sm-6 col-12 p-3 text-center">
+                <h5 class="title pt-3">Sin credito activo</h5>
+            </div>
+            {% endif %}
+
+        </div>
+        <div class="row mb-4">
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+            </div>
+        </div>
+
+    </section>
+</main>
+
 {% endblock content %}

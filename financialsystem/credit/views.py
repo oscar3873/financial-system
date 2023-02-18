@@ -3,6 +3,10 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic import UpdateView, DeleteView, CreateView
 
+from django.urls import reverse_lazy
+
+from django.contrib import messages 
+
 from .forms import CreditForm
 
 from .models import Credit
@@ -17,6 +21,10 @@ class CreditDetailView(DetailView):
 class CreditCreateView(CreateView):
     model = Credit
     form_class = CreditForm
+    
+    def get_success_url(self) -> str:
+        messages.success(self.request, 'Credito creado correctamente', "success")
+        return  reverse_lazy('notes:list')
 
 class CreditUpdateView(UpdateView):
     model = Credit

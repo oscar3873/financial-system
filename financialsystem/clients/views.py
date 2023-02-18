@@ -14,6 +14,7 @@ from django.urls import reverse_lazy
 from clients.forms import ClientForm, PhoneNumberFormSet
 #MODEL
 from .models import Client, PhoneNumber
+from credit.models import Credit
 # Create your views here.
 
 #LISTA DE CLIENTES
@@ -22,7 +23,7 @@ class ClientListView(LoginRequiredMixin, ListView):
     model = Client
     template_name = 'clients/client_list.html'
     ordering = ['created_at']
-    paginate_by = 2
+    paginate_by = 4
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
@@ -46,7 +47,10 @@ class ClientDetailView(DetailView):
     def get_context_data(self, **kwargs):
         
         context = super().get_context_data(**kwargs)
-        print(context)
+        context["credits"] = Credit.objects.all().filter(client = context["client"])
+        if context["credits"]:
+            context["credit_active"] = Credit.objects.all().filter(client = context["client"]).filter(is_active = True).last()
+            context["installments"] = context["credit_active"].installment.all()
         return context
 
     def get_object(self):
@@ -107,7 +111,10 @@ class ClientCreate(ClientInline, CreateView):
         return ctx
     
     def get_success_url(self) -> str:
-        messages.success(self.request, 'Cliente dado de alta correctamente', "success")
+        messages.success(
+            self.request, 
+            'El cliente dado de alta correctamente', 
+            "success")
         return  reverse_lazy('clients:list')
     
     def get_named_formsets(self):
@@ -127,10 +134,11 @@ class ClientUpdate(ClientInline, UpdateView):
     def get_context_data(self, **kwargs):
         ctx = super(ClientUpdate, self).get_context_data(**kwargs)
         ctx['named_formsets'] = self.get_named_formsets()
+        print(ctx)
         return ctx
     
     def get_success_url(self) -> str:
-        messages.success(self.request, 'Cliente modificado satisfactoriamente', "info")
+        messages.success(self.request, 'Los datos de modificado satisfactoriamente', "info")
         return  reverse_lazy('clients:list')
 
     def get_named_formsets(self):

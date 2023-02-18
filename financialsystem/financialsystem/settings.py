@@ -53,6 +53,9 @@ INSTALLED_APPS = [
     "adviser",
     'django_filters',
     "credit",
+    "payment",
+    "guarantor",
+    "warranty",
 ]
 
 MIDDLEWARE = [

@@ -9,7 +9,7 @@ import datetime
 #CREDITO
 
 class Credit(models.Model):
-    
+    is_active = models.BooleanField(default=False)
     is_paid_credit = models.BooleanField(default=False, help_text="El credito esta pagado")
     credit_interest = models.PositiveIntegerField(default=40, help_text="Intereses de credito")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto del Credito")
@@ -20,7 +20,11 @@ class Credit(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self) -> str:
-        return "Credito de {}, {}".format(self.client.first_name, self.client.last_name)
+        
+        if self.client:
+            return "Credito de {}, {}".format(self.client.first_name, self.client.last_name)
+        else:
+            return super().__str__()
 #CUOTA DE CREDITO
 class Installment(models.Model):
     

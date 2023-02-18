@@ -126,13 +126,6 @@ def operation_type_validate(instance, *args, **kwargs):
     if instance.operation_mode == 'Egreso':
         instance.amount = -instance.amount
 
-def unique_instance_cashregister(instance, *args, **kwargs):
-    
-    cashregister = instance
-    cashregister.create()
-    cashregister.save()
-
-post_init.connect(unique_instance_cashregister, sender=CashRegister)
 pre_save.connect(operation_type_validate, sender=Movement)
 post_save.connect(refresh_cashregister, sender= Movement)
 post_delete.connect(refresh_cashregister, sender= Movement)
