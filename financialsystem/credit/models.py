@@ -9,13 +9,17 @@ import datetime
 #CREDITO
 
 class Credit(models.Model):
+    
     is_active = models.BooleanField(default=False)
     is_paid_credit = models.BooleanField(default=False, help_text="El credito esta pagado")
+    is_old_credit = models.BooleanField(default=False, help_text="Es un credito antiguo")
+    
     credit_interest = models.PositiveIntegerField(default=40, help_text="Intereses de credito")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto del Credito")
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
     client = models.ForeignKey(Client, on_delete=models.SET_DEFAULT, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="client_credits")
     number_installment = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
+    created = models.DateTimeField(default=datetime.datetime.now, null=True, help_text="Cuando fue otorgado el credito")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
