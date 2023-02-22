@@ -50,7 +50,7 @@ class Refinancing(models.Model):
     
     is_paid_refinancing = models.BooleanField(default=False, help_text="La refinanciacion esta pagada")
     
-    refinancing_interest = models.PositiveIntegerField(default=40, help_text="Intereses de la refinanciacion")
+    refinancing_interest = models.PositiveIntegerField(default=48, help_text="Intereses de la refinanciacion")
     amount_refinancing = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto a refinanciar")
     refinancing_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolver de la Refinanciacion")
     installment = models.OneToOneField(Installment, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cuota de la Refinanciacion", related_name="refinancing")
@@ -79,7 +79,7 @@ class InstallmentRefinancing(models.Model):
 def repayment_amount_auto(instance, *args, **kwargs):
 
         credit = instance
-        interests_amount = Decimal(float(credit.amount) * (float(credit.credit_interest) / 100))
+        interests_amount = Decimal(float(credit.amount) * (float(credit.credit_interest) / 100))/ Decimal(1 - pow((1+Decimal(float(credit.credit_interest) / 100)), -credit.number_installment))
         repayment_amount = credit.amount + interests_amount
         credit.credit_repayment_amount = Decimal(repayment_amount)
 

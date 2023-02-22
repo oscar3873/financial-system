@@ -14,3 +14,11 @@
 #div_id_user {
     display: none;
 }
+
+input[type="text"]::-webkit-search-cancel-button {
+    -webkit-appearance: none !important;
+    height: 20px !important;
+    width: 20px !important;
+    border-radius: 50% !important;
+    background: url(https://pro.fontawesome.com/releases/v5.10.0/svgs/solid/times-circle.svg) no-repeat 50% 50% !important;
+}

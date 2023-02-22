@@ -31,7 +31,7 @@ class CreditForm(forms.ModelForm):
     client = forms.ModelChoiceField(
         label= "Seleccione Cliente",
         queryset= Client.objects.all(),
-        initial= Client.objects.last().id,
+        initial= 1,
         required= True,
     )
     

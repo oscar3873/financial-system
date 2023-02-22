@@ -79,7 +79,7 @@ class Movement(models.Model):
     operation_mode = models.CharField(max_length=10, choices=OPERATION_CHOISE, help_text="Operation mode")
     description = models.TextField(blank=True, max_length=500, help_text="description of the operation")
     money_type = models.CharField(max_length=20, choices=MONEY_TYPE, help_text="money type")
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def all_properties(self):

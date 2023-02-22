@@ -16,6 +16,8 @@ from .models import Movement, CashRegister
 from .forms import MovementForm
 from django.views.generic.edit import FormView
 
+from .filters import ListingFilter, MoneyTypeFilter, AmountFilter, UserFilter
+
 # Create your views here.
 class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
     
@@ -62,11 +64,26 @@ class MovementListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["count_movements"] = self.model.objects.all().count()
         context["movements"] = self.model.objects.all()
+        context["listing_filter"] = ListingFilter(self.request.GET, context['movements'])
+        context["money_filter"] = MoneyTypeFilter(self.request.GET, context['movements'])
+        context["amount_filter"] = AmountFilter(self.request.GET, context['movements'])
+        context["user_filter"] = UserFilter(self.request.GET, context['movements'])
         #VALIDACION DE EXISTENCIA PARA AL MENOS UN CLIENTE
         if self.model.objects.all().count() > 0:
             context["properties"] = self.model.objects.all()[0].all_properties()
         
         return context
+    #DEFINICION DEL TIPO DE FILTRO ULTILIZADO
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if "user" in self.request.GET and len(self.request.GET) == 1:
+            return UserFilter(self.request.GET, queryset=queryset).qs
+        elif "amount" in self.request.GET and len(self.request.GET) == 1:
+            return AmountFilter(self.request.GET, queryset=queryset).qs
+        elif "money_type" in self.request.GET and len(self.request.GET) == 1:
+            return MoneyTypeFilter(self.request.GET, queryset=queryset).qs
+        else:
+            return ListingFilter(self.request.GET, queryset=queryset).qs
 
 class MovementDetailView(LoginRequiredMixin, DetailView):
     model = Movement
@@ -84,7 +101,7 @@ class MovementDeleteView(DeleteView):
     model = Movement
     
     def get_success_url(self) -> str:
-        messages.success(self.request, 'Movimiento eliminado correctamente', "danger")
+        messages.success(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()), "danger")
         return  reverse_lazy('cashregister:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -101,5 +118,5 @@ class MovementUpdateView(UpdateView):
         return kwargs
     
     def get_success_url(self) -> str:
-        messages.success(self.request, 'Movimiento actualizado satisfactoriamente', "info")
+        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
         return  reverse_lazy('cashregister:list')
