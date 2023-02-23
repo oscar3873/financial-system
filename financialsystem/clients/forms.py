@@ -1,8 +1,10 @@
+from datetime import date
 from django import forms
 from crispy_forms.helper import FormHelper
 from django.forms import inlineformset_factory
 from clients.models import Client, PhoneNumber
 from django.contrib.auth.models import User
+from credit.models import Credit
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
 class ClientForm(forms.ModelForm):
@@ -47,22 +49,18 @@ class ClientForm(forms.ModelForm):
         required= True,
     )
     
-    user = forms.ModelChoiceField(
-        label= "Por",
-        queryset= User.objects.all(),
-        initial= 0
-    )
     
     class Meta:
         model = Client
         fields = "__all__"
+        exclude = ["adviser"]
         
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        request = kwargs.pop('request')
+        # request = kwargs.pop('request')
         super().__init__(*args, **kwargs)
         self.helper = FormHelper
-        self.fields['user'].initial = request.user.id
+        # self.fields['user'].initial = request.user.id
     #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
 
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO
@@ -102,3 +100,52 @@ PhoneNumberFormSet = inlineformset_factory(
     can_delete= True,
     can_delete_extra= True,
 )
+
+#FORMULARIO PARA LA CREACION DE CREDITOS
+#------------------------------------------------------------------
+class CreditForm(forms.ModelForm):
+
+    amount = forms.DecimalField(
+        label= 'Monto',
+        required=True,
+    )
+
+    installment_num = forms.IntegerField(
+        label='Cuotas',
+        required=True,
+        max_value=12,
+        min_value=1
+    )
+
+    interest = forms.IntegerField(
+        label='Interes',
+        required=True,
+    )
+
+    start_date = forms.DateField(
+        label='Fecha de Inicio',
+        required=True,
+        widget=forms.DateTimeInput(
+            attrs={'type': 'date', 'value': '%s' % date.today()}
+        )
+    )
+    
+    class Meta:
+        model = Credit
+        fields = ('amount', 'installment_num','interest', 'start_date')
+
+    #ASOCIACION DE CRYSPY FORM
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper
+
+
+#------------------------------------------------------------------
+CreditFormSet = inlineformset_factory(
+    Client,
+    Credit,
+    form = CreditForm,
+    extra= 1,
+    can_delete=True,
+    can_delete_extra= True,
+    )

@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 class MovementForm(forms.ModelForm):
     
     MONEY_TYPE = (
-        ('PESO', 'PESO'),
+        ('PESOS', 'PESOS'),
         ('USD', 'USD'),
         ('EUR', 'EUR'),
         ('TRANSFER', 'TRANSFER'),
@@ -17,8 +17,8 @@ class MovementForm(forms.ModelForm):
     )
     
     OPERATION_CHOISE = (
-        ('Ingreso', 'Ingreso'),
-        ('Egreso', 'Egreso')
+        ('INGRESO', 'INGRESO'),
+        ('EGRESO', 'EGRESO')
     )
     
     amount = forms.DecimalField(
@@ -26,7 +26,7 @@ class MovementForm(forms.ModelForm):
         required=True,
     )
     description = forms.CharField(
-        widget=forms.Textarea,
+        widget=forms.Textarea(attrs={'style':"height: 90px;"}),
         label = 'Descripcion de la operacion',
         required=True,
     )

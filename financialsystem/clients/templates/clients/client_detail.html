@@ -21,7 +21,7 @@
                                     <i class="fa-sharp fa-solid fa-credit-card text-warning icon-lg"></i>
                                 </div>
                                 <div class="media-body text-right">
-                                    <h5>{{count_clients}}</h5>
+                                    <h5>{{client.score}}</h5>
                                     <h5>Score</h5>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                 <div class="card bg-primary text-white media p-4">
                     <h5 class="title py-3">Registro</h5>
                     <p class="m-0">Asesor Financiero</p>
-                    <p><a class="text-warning" href="{% url 'advisers:detail' client.user.adviser.pk %}"><strong>{{client.user.adviser}}</strong></a></p>
+                    <p><a class="text-warning" href="{% url 'advisers:detail' client.adviser.pk %}"><strong>{{client.adviser}}</strong></a></p>
                     <p class="m-0">Fecha de Entrada al sistema</p>
                     <p><strong>{{client.created_at|date}}</strong></p>
                     <h5 class="title pt-3">Creditos</h5>
@@ -95,9 +95,9 @@
                             <p class="text-start">Numero de Cuotas:</p>
                         </div>
                         <div class="px-4">
-                            <p class="text-start"><strong>${{credit_active.amount}}</strong></p>
-                            <p class="text-start"><strong>{{credit_active.credit_repayment_amount}}</strong></p>
-                            <p class="text-start"><strong>{{credit_active.number_installment}}</strong></p>
+                            <p class="text-start"><strong>$ {{credit_active.amount}}</strong></p>
+                            <p class="text-start"><strong>$ {{credit_active.credit_repayment_amount}}</strong></p>
+                            <p class="text-start"><strong>{{credit_active.installment_num}}</strong></p>
                         </div>
                         <div class="form-group">
                             <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'clients:create' %}" role="button">
@@ -122,22 +122,28 @@
                                 <td>{{installment.installment_number}}</td>
                                 <td>{{installment.amount_installment}}</td>
                                 <td>{{installment.payment_date}}</td>
-                                {% if installment.is_paid_installment %}
+                                {% if installment.condition == 'Pagada' %}
                                 <td>
                                     <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>●pagada</strong>
+                                        <strong>● Pagada</strong>
                                     </div>
                                 </td>
-                                {% elif installment.is_caduced_installment %}
+                                {% elif installment.condition == 'Vencida' %}
                                 <td>
                                     <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>●vencida</strong>
+                                        <strong>● Vencida</strong>
+                                    </div>
+                                </td>
+                                {% elif installment.condition == 'Refinanciada' %}
+                                <td>
+                                    <div class="alert alert-secondary m-0 p-1 text-center rounded-pill" role="alert">
+                                        <strong>● Refinanciada</strong>
                                     </div>
                                 </td>
                                 {% else %}
                                 <td>
                                     <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>●no pagada</strong>
+                                        <strong>● A Tiempo</strong>
                                     </div>
                                 </td>
                                 {% endif %}

@@ -62,14 +62,17 @@
                     <td>{{client.get_civil_status_display}}</td>
                     <td>{{client.dni}}</td>
                     <td>
+                        {% if not client.phonenumber_set.all %}
+                        <p> - </p>
+                        {% endif %}
                         {% for phone_number in client.phonenumber_set.all %}
                         <P>{{phone_number}}</P>
                         {% endfor %}
                     </td>
                     <td>{{client.profession}}</td>
                     <td>{{client.address}}</td>
-                    <td>{{client.job_address}}</td>
-                    <td>{{client.user}}</td>
+                    <!-- <td>{{client.job_address}}</td> -->
+                    <td>{{client.adviser}}</td>
                     <td>{{client.created_at}}</td>
                     {% if user.is_superuser %}
                     <td>

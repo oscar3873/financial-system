@@ -1,31 +1,37 @@
 {% load crispy_forms_tags %}
-<form method="post" id="client_form">
+
     {% csrf_token %}
-    <h4 class="card-title">Añadir Cliente</h4>
-    {{ form|crispy}} {% with named_formsets.phone_numbers as formset %} {{ formset.management_form }}
-    <script type="text/html" id="phone_numbers-template"> // id="inlineformsetname-template"
-        <tr id="phone_numbers-__prefix__" class=h ide_all> // id="inlineformsetname-__prefix__" {% for fields in formset.empty_form.hidden_fields %} {{ fields }} {% endfor %} {% for fields in formset.empty_form.visible_fields %} {% if not forloop.last %}
-            <td>{{fields}}</td>
-            {% endif %} {% endfor %}
+     {% with named_formsets.credit as formset %} {{ formset.management_form }}
+    <script type="text/html" id="credit-template"> // id="inlineformsetname-template"
+        <tr id="credit-__prefix__" class=h ide_all> // id="inlineformsetname-__prefix__" 
+            {% for fields in formset.empty_form.hidden_fields %} 
+                {{ fields }}
+            {% endfor %} 
+                {% for fields in formset.empty_form.visible_fields %} 
+                    {% if not forloop.last %}
+                        <td>{{fields}}</td>
+                    {% endif %} 
+                {% endfor %}
         </tr>
     </script>
 
     <div class="table-responsive card mt-4">
         <div class="card-header bg-info text-white">
-            <h4 class="card-title">Agregar Numeros de Contacto</h4>
+            <h4 class="card-title">Credito</h4>
         </div>
         <table class="table card-body">
             <thead class="">
-                <th>
-                    <span class="font-weight-normal">Numero de Telefonos</span><span style="color: red;" class="required">*</span></th>
-                <th><span class="font-weight-normal">Tipo</span></th>
+                <th><span class="font-weight-normal">Monto</span><span style="color: red;" class="required">*</span></th>
+                <th><span class="font-weight-normal">Cuotas</span><span style="color: red;" class="required">*</span></th>
+                <th><span class="font-weight-normal">Interes</span><span style="color: red;" class="required">*</span></th>
+                <th><span class="font-weight-normal">Fecha de credito</span><span style="color: red;" class="required">*</span></th>
             </thead>
-            <tbody id="item-phone_numbers">
+            <tbody id="item-credit">
                 <!-- id="item-inlineformsetname" -->
                 <!-- formset non forms errors -->
                 {% for error in formset.non_form_errors %}
                 <span style="color: red">{{ error }}</span> {% endfor %} {% for formss in formset %} {{ formss.management_form }}
-                <tr id="phone_numbers-{{ forloop.counter0 }}" class=h ide_all>
+                <tr id="credit-{{ forloop.counter0 }}" class=h ide_all>
                     <!-- id="inlineformsetname-counter" -->
                     {{ formss.id }} {% for field in formss.visible_fields %} {% if not forloop.last %}
                     <td>
@@ -34,12 +40,12 @@
                     </td>
                     {% endif %} {% endfor %}
                     <!-- delete code -->
-                    {% if formss.instance.pk %}
+                    <!-- {% if formss.instance.pk %}
                     <td>
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal{{formss.instance.pk}}">
                                     Borrar
                                 </button>
-                        <!-- Modal -->
+                         Modal 
                         <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -57,33 +63,33 @@
                             </div>
                         </div>
                     </td>
-                    {% endif %}
+                    {% endif %} -->
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="#" id="add-phone_number-button" class="btn btn-info m-2 rounded p-3 add-phone_numbers">Añadir</a>
+        <!-- <a href="#" id="add-phone_number-button" class="btn btn-info m-2 rounded p-3 add-credit">Añadir</a> -->
         <!-- id="add-inlineformsetname-button" -->
     </div>
     {% endwith %}
-    {% include "form/form.html" %}
-    <!-- inline form for phone_numbers end -->
-    <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
-</form>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 
-<script>
+    <!-- inline form for credit end -->
+    <!-- <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p> -->
+
+<!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+
+<!-- <script>
     $(document).ready(function() {
-        // when user clicks add more btn of phone_numbers
-        $('.add-phone_numbers').click(function(ev) {
+        // when user clicks add more btn of credit
+        $('.add-credit').click(function(ev) {
             ev.preventDefault();
-            var count = $('#item-phone_numbers').children().length;
-            var tmplMarkup = $('#phone_numbers-template').html();
+            var count = $('#item-credit').children().length;
+            var tmplMarkup = $('#credit-template').html();
             var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
-            $('#item-phone_numbers').append(compiledTmpl);
+            $('#item-credit').append(compiledTmpl);
 
             // update form count
-            $('#id_phone_numbers-TOTAL_FORMS').attr('value', count + 1);
+            $('#id_credit-TOTAL_FORMS').attr('value', count + 1);
         });
     });
-</script>
+</script> -->

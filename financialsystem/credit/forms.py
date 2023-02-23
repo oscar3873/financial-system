@@ -35,7 +35,7 @@ class CreditForm(forms.ModelForm):
         required= True,
     )
     
-    number_installment = forms.IntegerField(
+    installment_num = forms.IntegerField(
         label= "Numero de Cuotas",
         required= True,
     )
@@ -47,7 +47,7 @@ class CreditForm(forms.ModelForm):
     
     class Meta:
         model = Credit
-        fields = ["amount", "credit_interest", "number_installment", "client", "is_old_credit", "created", "is_paid_credit"]
+        fields = ["amount", "credit_interest", "installment_num", "client", "is_old_credit", "created", "is_paid_credit"]
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super(CreditForm, self).__init__(*args, **kwargs)

@@ -6,7 +6,7 @@ class CreditAdmin(admin.ModelAdmin):
     list_display = (
         'client',
         'amount',
-        'number_installment', 
+        'installment_num', 
         'credit_interest',
         'credit_repayment_amount', 
         'is_paid_credit',
@@ -34,7 +34,7 @@ class RefinancingAdmin(admin.ModelAdmin):
             'refinancing_interest', 
             'amount_refinancing', 
             'refinancing_repayment_amount', 
-            'number_installment_refinancing',
+            'installment_num_refinancing',
             'created_at',
             'updated_at'
     )

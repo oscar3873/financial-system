@@ -11,14 +11,21 @@ class Client(models.Model):
         ('D', 'Divorciado')
     )
     
+    SCORE = [
+        (600 , 'Bueno (600)'),
+        (400 , 'Regular (400)'),
+        (200 , 'Riesgoso (200)')
+    ]
+
     first_name = models.CharField(max_length=50, help_text="First name", verbose_name="Nombre")
     last_name = models.CharField(max_length=50, help_text="Last name", verbose_name="Apellido")
-    user = models.ForeignKey(User, on_delete=models.SET_DEFAULT, blank=True, null=True, default=None, help_text="Clientes del usuario", related_name="user_clients")
+    adviser = models.ForeignKey(User, on_delete=models.SET_DEFAULT, blank=True, null=True, default=None, help_text="Clientes del usuario", related_name="user_clients")
     email = models.EmailField(max_length=254, blank=False, help_text="Email address", verbose_name="Correo electronico")
     civil_status = models.CharField(blank=True, choices=CivilStatus, max_length=10, verbose_name="Estado civil")
     dni = models.PositiveIntegerField(null=False, help_text="dni number", blank=False, verbose_name="DNI")
     profession = models.CharField(max_length=50, help_text="Profession", verbose_name="Profesion")
     address = models.CharField(max_length=250, help_text="Address", verbose_name="Direccion")
+    score = models.PositiveIntegerField(choices=SCORE, default=200 , null=True)
     job_address = models.CharField(max_length=250, help_text="Job address", verbose_name="Direccion laboral")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -26,9 +33,7 @@ class Client(models.Model):
     def __str__(self):
         return self.first_name + " " + self.last_name
     
-    def all_properties(self):
-        return ["Nombre Completo","Correo","Estado Civil","DNI","Numero de Telefono","Profesion","Domicilio","Domicilio Laboral", "Por", "Creado"]
-    
+ 
 class PhoneNumber(models.Model):
     
     PHONETYPE = (

@@ -99,9 +99,9 @@
                     <td>{{movement.user}}</td>
                     {% if user.is_superuser %}
                     <td>
-                        <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
+                        <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{movement.pk}}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
                         <!--Modal-->
-                        <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
+                        <div class="modal fade" id="exampleModal{{movement.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{movement.pk}}" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <form action="{% url 'cashregister:delete' movement.pk %}" method="POST">

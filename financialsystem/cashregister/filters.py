@@ -9,7 +9,7 @@ OPERATION_CHOISE = (
 )
 
 MONEY_TYPE = (
-    ('PESO', 'PESO'),
+    ('PESOS', 'PESOS'),
     ('USD', 'USD'),
     ('EUR', 'EUR'),
     ('TRANSFER', 'TRANSFER'),
@@ -18,7 +18,6 @@ MONEY_TYPE = (
 )
 
 class ListingFilter(django_filters.FilterSet):
-    
     description = filters.CharFilter(label="Descripción", lookup_expr="contains")
     operation_mode = filters.ChoiceFilter(choices=OPERATION_CHOISE, label="Tipo de Operación", empty_label="Limpiar filtro")
     created_at = filters.DateFromToRangeFilter(
@@ -31,8 +30,8 @@ class ListingFilter(django_filters.FilterSet):
         model = Movement
         fields = ['description', 'operation_mode', 'created_at', 'created_at']
 
+
 class MoneyTypeFilter(django_filters.FilterSet):
-    
     money_type = filters.ChoiceFilter(choices= MONEY_TYPE, label="Divisa", empty_label="Limpiar filtro")
     
     class Meta:
@@ -41,18 +40,16 @@ class MoneyTypeFilter(django_filters.FilterSet):
             'money_type': ['exact']
         }
 
+
 class AmountFilter(django_filters.FilterSet):
-    
-    amount = filters.CharFilter(label="Monto")
+    amount = filters.RangeFilter()
     
     class Meta:
         model = Movement
-        fields = {
-            'amount': ['exact']
-        }
+        fields = ['amount']
+
 
 class UserFilter(django_filters.FilterSet):
-    
     user = filters.CharFilter(label="Por", field_name='user__username', lookup_expr='iexact')
     
     class Meta:

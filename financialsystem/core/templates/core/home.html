@@ -8,14 +8,7 @@
         <div class="col-12 col-lg-8 col-md-8">
             <!--Buscador de Clientes-->
             <article class="container p-0 my-4">
-                <form action="{% url 'clients:list' %}">
-                    <div class="form-group m-auto d-flex w-100">
-                        <input type="search" class="form-control rounded-0 box-shadow p-3 " name="search_client" id="search_client" aria-describedby="helpId" placeholder="Buscar Cliente ">
-                        <button type="submit" class="btn btn-info rounded-0 box-shadow">
-                        <i class="fa fa-search" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                </form>
+                {% include "cashregister/search.html" %}
             </article>
             <!--Botones de  Carga-->
             <article class="container p-0 my-4">
@@ -62,7 +55,7 @@
                             </p>
                             {% for movement in movements %}
                             <a href="{% url 'cashregister:detail' movement.id %}" class="card-text d-block p-2">
-                                {% if movement.operation_mode == 'Egreso' %}
+                                {% if movement.operation_mode == 'EGRESO' %}
                                 <small class="text-danger"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> ${{movement.amount}}</small> {% else %}
                                 <small class="text-success"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> ${{movement.amount}}</small> {% endif %}
                                 <small class="font-weight-light"> {{movement.description|truncatewords:2}} </small>

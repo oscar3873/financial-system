@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     "payment",
     "guarantor",
     "warranty",
-    "bootstrap_datepicker_plus",
+    'djmoney',
 ]
 
 MIDDLEWARE = [
