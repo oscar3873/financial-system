@@ -77,3 +77,6 @@ def total_to_ref(amount, interest, pk, user, operation_mode):
             ref.payment = payment
             ref._adviser = user
             ref.save()
+
+def all_properties_credit():
+        return ["Monto solicitado", "Monto a devolver", "Numero de cuotas", "Monto de las cuotas", "Estado", "Cliente", "Asesor", "Fecha de registro", "Fecha de Finalizacion"]

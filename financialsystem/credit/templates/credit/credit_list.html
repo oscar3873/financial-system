@@ -55,22 +55,29 @@
                 </tr>
             </thead>
             <tbody>
-                {% for credit in page_obj %}
+                {% for credit in credits %}
                 <tr>
-                    <td><a href="{% url 'credits:detail' client.pk %}">{{credit.first_name}} {{credit.last_name}}</a></td>
-                    <td>{{client.email}}</td>
-                    <td>{{credit.get_civil_status_display}}</td>
-                    <td>{{client.dni}}</td>
+                    <td>{{credit.amount}}</td>
+                    <td>{{credit.credit_repayment_amount}}</td>
+                    <td>{{credit.installment_num}}</td>
+                    <td>{{credit.installment}}</td>
+                    {% if credit.is_active %}
                     <td>
-                        {% for phone_number in credit.phonenumber_set.all %}
-                        <P>{{phone_number}}</P>
-                        {% endfor %}
+                        <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
+                            <strong>Activo</strong>
+                        </div>
                     </td>
-                    <td>{{client.profession}}</td>
-                    <td>{{credit.address}}</td>
-                    <td>{{client.job_address}}</td>
-                    <td>{{credit.user}}</td>
-                    <td>{{client.created_at}}</td>
+                    {% endif %} {% if credit.is_old_credit %}
+                    <td>
+                        <div class="alert alert-info m-0 p-1 text-center rounded-pill" role="alert">
+                            <strong>No activo</strong>
+                        </div>
+                    </td>
+                    {% endif %}
+                    <td><a href="{% url 'clients:detail' credit.client.pk %}">{{credit.client}}</a></td>
+                    <td>None</td>
+                    <td>{{credit.start_date|date}}</td>
+                    <td>{{credit.end_date|date}}</td>
                     {% if user.is_superuser %}
                     <td>
                         <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
@@ -99,7 +106,7 @@
                             </div>
                         </div>
                         <!--End Modal-->
-                        <a href="{% url 'credits:update' client.pk  %}"><i class="fas fa-edit text-info"></i></a>
+                        <a href="{% url 'credits:update' credit.client.pk  %}"><i class="fas fa-edit text-info"></i></a>
                     </td>
                     {% endif %}
                 </tr>

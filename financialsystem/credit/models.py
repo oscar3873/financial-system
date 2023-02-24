@@ -28,6 +28,7 @@ class Credit(models.Model):
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
     mov = models.ForeignKey(Movement, on_delete=models.CASCADE, null=True)
     start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=datetime.now, null=True)
+    end_date = models.DateTimeField(verbose_name='Fecha de Finalizacion del Credito', null=True)
     due_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
