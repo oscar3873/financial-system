@@ -12,7 +12,7 @@ def actualizar_fechas():
         installments_ref_vencidas = InstallmentRefinancing.objects.exclude(condition = 'Pagada').filter(due_date__date__lt=date.today())
 
         for installment_ven in cred_with_vencidas:                                                 
-            for installment in installment_ven.installment_set.filter(due_date__date__lt=date.today()):
+            for installment in installment_ven.installment.filter(due_date__date__lt=date.today()):
                 if installment.condition != 'Refinanciada':  
                     installment.condition = 'Vencida'
                     if installment.lastup.date() != date.today(): 
@@ -40,7 +40,7 @@ def actualizar_fechas():
                 credito.condition = 'Vencido'
                 credito.save()                                                ## ACTUALIZACION DE condition DE CREDITO
 
-            cred = credito.installment_set.filter(condition= 'Vencida')
+            cred = credito.installment.filter(condition= 'Vencida')
             if cred.count() >= 2 and cred.due_date.date()+timedelta(days=10) < date.today():
                 credito.condition = 'Legales'
                 credito.save() 

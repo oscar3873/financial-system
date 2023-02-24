@@ -19,7 +19,7 @@ class Client(models.Model):
 
     first_name = models.CharField(max_length=50, help_text="First name", verbose_name="Nombre")
     last_name = models.CharField(max_length=50, help_text="Last name", verbose_name="Apellido")
-    adviser = models.ForeignKey(User, on_delete=models.SET_DEFAULT, blank=True, null=True, default=None, help_text="Clientes del usuario", related_name="user_clients")
+    adviser = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Clientes del usuario", related_name="user_clients")
     email = models.EmailField(max_length=254, blank=False, help_text="Email address", verbose_name="Correo electronico")
     civil_status = models.CharField(blank=True, choices=CivilStatus, max_length=10, verbose_name="Estado civil")
     dni = models.PositiveIntegerField(null=False, help_text="dni number", blank=False, verbose_name="DNI")

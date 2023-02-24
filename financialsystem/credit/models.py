@@ -4,7 +4,7 @@ from django.db import models
 from clients.models import Client
 from adviser.models import Comission
 from cashregister.models import Movement, CashRegister
-from django.db.models.signals import post_save, post_delete, pre_save
+from django.db.models.signals import post_save, pre_save
 from datetime import datetime, date, timedelta
 # Create your models here.
 #CREDITO
@@ -24,7 +24,7 @@ class Credit(models.Model):
     credit_interest = models.PositiveIntegerField(default=40, help_text="Intereses de credito")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto del Credito")
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
-    client = models.ForeignKey(Client, on_delete=models.SET_DEFAULT, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="client_credits")
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="client_credits")
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
     mov = models.ForeignKey(Movement, on_delete=models.CASCADE, null=True)
     start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=datetime.now, null=True)
@@ -110,7 +110,7 @@ class InstallmentRefinancing(models.Model):
     refinancing = models.ForeignKey(Refinancing, on_delete=models.CASCADE, related_name="installment_refinancing", help_text="Refinanciacion de la cuota")
     amount_installment = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota de refinanciacion")
     payment_date = models.DateField(help_text="Fecha de pago de la cuota de refinanciacion")
-    start_date = models.DateTimeField(default=datetime.today, verbose_name='Fecha de Inicio')
+    start_date = models.DateTimeField(default=datetime.now, verbose_name='Fecha de Inicio')
     due_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -121,12 +121,10 @@ class InstallmentRefinancing(models.Model):
 #-------------------- SEÑALES PARA CREDITOS Y CUOTAS --------------------
 def repayment_amount_auto(instance, *args, **kwargs):
         credit = instance
-        print(instance.installment_num)
         repayment_amount = credit.installment_num*(Decimal(credit.credit_interest/100)*credit.amount)/(1-pow((1+Decimal(credit.credit_interest/100)),(- credit.installment_num)))
-        print(repayment_amount)
         credit.credit_repayment_amount = Decimal(repayment_amount)
         create_movement(credit)
-        # comission_create(credit)
+        comission_create(credit)
 
 
 def create_installments_auto(instance, created, *args, **kwargs):
@@ -136,8 +134,9 @@ def create_installments_auto(instance, created, *args, **kwargs):
         amount_installment = Decimal(credit.credit_repayment_amount/credit.installment_num)
         for numberInstallments in range(credit.installment_num):
             payment_date = instance.created_at + timedelta(days=days)
+            due_date = credit.start_date + timedelta(days=days)*credit.installment_num
             numberInstms = numberInstallments + 1
-            credit.installment.create(installment_number=numberInstms, credit= credit, amount_installment= amount_installment, payment_date=payment_date)
+            credit.installment.create(installment_number=numberInstms, credit= credit, amount_installment= amount_installment, payment_date=payment_date, due_date=due_date)
             days += 30
 
 
@@ -151,28 +150,24 @@ def create_movement(instance):
         money_type = 'PESOS',
         )
 
+
 def comission_create(instance, *args, **kwargs):
     if instance is Credit:
-        c_type = 'COBRO'
+        type = 'COBRO'
         comission = 0.05
     else: 
-        c_type = 'REGISTRO'
+        type = 'REGISTRO'
         comission = 0.075
         
     amount = instance.amount*Decimal(comission)
     Comission.objects.create(
+        adviser = instance.client.adviser,
         amount = amount,
-        c_type = c_type,
+        type = type,
         create_date = instance.start_date,
-        mov = Movement.objects.create(
-            user = instance.client.adviser,
-            amount = amount,
-            cashregister = CashRegister.objects.last(),
-            operation_mode = 'EGRESO',
-            description = 'COMISION %s - CREDITO DE %s' % (instance.client.adviser, instance.client),
-            money_type = 'PESOS',
-            ),
-    )
+        commission_charged_to = instance.client,
+        )
+
 
 pre_save.connect(repayment_amount_auto, sender= Credit)
 post_save.connect(create_installments_auto, sender= Credit)
@@ -185,7 +180,7 @@ def refinancing_repayment_amount_auto(instance, *args, **kwargs):
         repayment_amount = refinancing.amount_refinancing + interests_amount
         refinancing.refinancing_repayment_amount = Decimal(repayment_amount)
 
-def create_installments_auto(instance, created, *args, **kwargs):
+def create_installmentsR_auto(instance, created, *args, **kwargs):
 
     if created:
         refinancing = instance
@@ -196,5 +191,6 @@ def create_installments_auto(instance, created, *args, **kwargs):
             numberInstms = numberInstallments + 1
             refinancing.installment_refinancing.create(installment_number=numberInstms, refinancing= refinancing, amount_installment=amount_installment, payment_date=payment_date)
             days += 30
+
 pre_save.connect(refinancing_repayment_amount_auto, sender= Refinancing)
-post_save.connect(create_installments_auto, sender= Refinancing)
+post_save.connect(create_installmentsR_auto, sender= Refinancing)

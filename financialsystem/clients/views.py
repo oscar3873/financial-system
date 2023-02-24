@@ -9,13 +9,15 @@ from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 
 #CRUD CLIENT
+from django.views import View
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
 
 from django.urls import reverse_lazy
 #FORMS
-from clients.forms import ClientForm, PhoneNumberFormSet, CreditForm, CreditFormSet
+from .forms import ClientForm, PhoneNumberFormSet, CreditForm, CreditFormSet, PaymentForm
 #MODEL
 from .models import Client, PhoneNumber
 from credit.models import Credit
@@ -57,22 +59,6 @@ class ClientListView(LoginRequiredMixin, ListView):
             context["clients"] = search
         return context
     
-#DETALLE DE CLIENTE
-#------------------------------------------------------------------
-class ClientDetailView(DetailView):
-    model = Client
-    template_name = 'clients/client_detail.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["credits"] = Credit.objects.all().filter(client = context["client"])
-        if context["credits"]:
-            context["credit_active"] = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
-            context["installments"] = context["credit_active"].installment.all()
-        return context
-
-    def get_object(self):
-        return get_object_or_404(Client, id=self.kwargs['pk'])
 
 #CLASE PARA NO REPETIR CODIGO
 #------------------------------------------------------------------
@@ -195,7 +181,7 @@ class ClientDelete(DeleteView):
 #CONSULTA
 #------------------------------------------------------------------
 class QueryView(ListView):
-    template_name = 'clients/query.html'
+    template_name = 'clients/query/query.html'
     model = Client
     
     def get(self, request, *args, **kwargs):
@@ -209,3 +195,56 @@ class QueryView(ListView):
             else:
                 self.extra_context = {"found": False}
         return super().get(request, *args, **kwargs)
+
+# #FORM PARA PAGOS DE CLIENTE
+# #------------------------------------------------------------------
+class PaymentFormView(FormView):
+    template_name = 'clients/includes/payment_form.html'
+    form_class = PaymentForm
+
+    def get_context_data(self, **kwargs) :
+        context = super().get_context_data()
+        context['pay'] = PaymentForm(get_object_or_404(Client, pk = self.kwargs['pk']))
+        return context
+    
+    
+    def get_form_kwargs(self):
+        kwargs = super(PaymentFormView,self).get_form_kwargs()
+        kwargs['object']=get_object_or_404(Client, pk = self.kwargs['pk'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('clients:detail', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form) :
+        client = get_object_or_404(Client, pk = self.kwargs['pk'])
+        excludes = ['Pagada','Refinanciada']
+        installments = list(client.client_credits.last().installment.exclude(condition__in=excludes))
+        if self.request.method == 'POST':
+            qp = list(form.cleaned_data.values())
+            qp.pop(0)
+            pack = dict(zip(installments, qp))
+            for crumble in pack:
+                if pack[crumble]:
+                    crumble.condition = 'Pagada'
+                    crumble._adviser = self.request.user
+                    crumble.payment_type = form.cleaned_data['operation_mode']
+                    crumble.save()
+        return super().form_valid(form)
+
+#DETALLE DE CLIENTE
+#------------------------------------------------------------------
+class ClientDetailView(DetailView):
+    model = Client
+    template_name = 'clients/client_detail.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["credits"] = Credit.objects.all().filter(client = context["client"])
+        if context["credits"]:
+            context["credit_active"] = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
+            context["installments"] = context["credit_active"].installment.all()
+        return context
+
+    def get_object(self):
+        return get_object_or_404(Client, id=self.kwargs['pk'])

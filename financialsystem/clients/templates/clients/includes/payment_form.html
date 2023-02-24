@@ -1,0 +1,8 @@
+{% extends 'core/base.html' %}{% block content %}{% load crispy_forms_tags %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ pay|crispy }}
+    <button type="submit" >PAGAR</button>
+</form>
+{% endblock %}

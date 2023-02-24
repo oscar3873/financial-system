@@ -88,6 +88,7 @@ class PhoneNumberForm(forms.ModelForm):
         fields = "__all__"
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
+        print(kwargs)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper
 
@@ -117,7 +118,7 @@ class CreditForm(forms.ModelForm):
         min_value=1
     )
 
-    interest = forms.IntegerField(
+    credit_interest = forms.IntegerField(
         label='Interes',
         required=True,
     )
@@ -132,7 +133,7 @@ class CreditForm(forms.ModelForm):
     
     class Meta:
         model = Credit
-        fields = ('amount', 'installment_num','interest', 'start_date')
+        fields = ('amount', 'installment_num','credit_interest', 'start_date')
 
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
@@ -149,3 +150,30 @@ CreditFormSet = inlineformset_factory(
     can_delete=True,
     can_delete_extra= True,
     )
+
+#----------------------------------------------------------------
+class PaymentForm(forms.Form):
+    MONEY_TYPE = [
+        ('PESOS','PESOS'),
+        ('USD','USD'),
+        ('EUR', 'EUR'),
+        ('TRANSFER','TRANSFERENCIA'),
+        ]
+    
+    operation_mode = forms.ChoiceField(
+        choices= MONEY_TYPE,
+        required=True,
+        label='Medio de Pago',
+    )
+
+    def __init__(self, object, *args, **kwargs):
+        super(PaymentForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper
+        excludes = ['Refinanciada', 'Pagada']
+        installments = object.client_credits.last().installment.exclude(condition__in=excludes)
+        if installments.count() > 0:
+            for installment in installments:
+                if installment == installments.first():
+                    self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(label='Cuota %s' % (installment.installment_number),required=True)
+                else:
+                    self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(label='Cuota %s' % (installment.installment_number),required=False)
