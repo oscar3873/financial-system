@@ -3,13 +3,6 @@ import django_filters
 from django_filters import filters
 from .models import Guarantor
 
-CivilStatus = (
-    ('S','Soltero'),
-    ('C', 'Casado'),
-    ('V', 'Viudo'),
-    ('D', 'Divorciado')
-    )
-
 
 class ListingFilter(django_filters.FilterSet):
     dni = filters.CharFilter(label="DNI", lookup_expr="exact")

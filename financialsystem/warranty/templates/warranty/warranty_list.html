@@ -1,0 +1,155 @@
+{% extends "core/base.html" %} {% block content %} {% load static %}
+<!--Main-->
+<link href="{% static 'note/css/note.css' %}" rel="stylesheet">
+<main class="container my-4">
+    <h3 class="title font-weight-normal">Empeños</h3>
+    <!--Seccion 1-->
+    {% if messages %} {% for message in messages %}
+    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
+        <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+        <span class="font-weight-light">{{ message }}</span>
+    </div>
+    {% endfor %} {% endif %}
+    <section>
+        <div class="row mt-4">
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="fa-solid fa-note-sticky text-warning icon-lg"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h5>{{count_warrantys}}</h5>
+                                    <span>Total de Empeños</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-xl-3 col-sm-6 col-12 p-3">
+                <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'warrantys:create' %}" role="button">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    <span>Ingresar Nuevo Empeño</span>
+                </a>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <h5 class=" p-4 pt-2 m-0 title">Busqueda/s</h5>
+            <div class="container p-0 mx-3 d-xl-flex bg-white border mt-4">
+                <form class="form-inline">
+                    <div class="form-group col-xl-12">
+                        <span class="p-2 d-block">{{ listing_filter.form.article.label}}</span>
+                        <span class="p-2">{{ listing_filter.form.article}}</span>
+                        <span class="p-2 d-block">{{ listing_filter.form.model.label}}</span>
+                        <span class="p-2">{{ listing_filter.form.model}}</span>
+                        <span class="p-2 d-block">{{ listing_filter.form.brand.label}}</span>
+                        <span class="p-2">{{ listing_filter.form.brand}}</span>
+                        <span class="p-2 d-block">{{ listing_filter.form.state.label}}</span>
+                        <span class="p-2">{{ listing_filter.form.state}}</span>
+                        <span class="p-2 d-block">{{ listing_filter.form.purchase_papers.label}}</span>
+                        <span class="p-2">{{ listing_filter.form.purchase_papers}}</span>
+                        <span class="p-2 d-block">{{ listing_filter.form.created_at.label}}</span>
+                        <span class="p-2">{{ listing_filter.form.created_at}}</span>
+                        <button class="d-block btn btn-info m-2" type="submit">Buscar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer p-0 mx-3 w-100 p-1 bg-info rounded-bottom"></div>
+        </div>
+
+    </section>
+    <section>
+        {% if warrantys %}
+        <h4>Empeños Generales</h4>
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    {% for name_prop in properties %}
+                    <th scope="col">{{name_prop}}</th>
+                    {% endfor %} {% if user.is_superuser %}
+                    <th scope="col">Acciones</th>
+                    {% endif %}
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for warranty in page_obj %}
+                <tr>
+                    <td><a href="{% url 'warrantys:detail' warranty.pk %}">{{warranty.article}}</a></td>
+                    <td>{{warranty.brand}}</td>
+                    <td>{{warranty.model}}</td>
+                    <td>{{warranty.get_state_display}}</td>
+                    <td>{{warranty.client}}</td>
+                    <td>{{warranty.accessories}}</td>
+                    {% if warranty.purchase_papers %}
+                    <td>Si</td>
+                    {% else %}
+                    <td>No</td>
+                    {% endif %}
+                    <td>{{warranty.created_at}}</td>
+                    {% if user.is_superuser %}
+                    <td>
+                        <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{warranty.pk}}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
+                        <!--Modal-->
+                        <div class="modal fade" id="exampleModal{{warranty.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{warranty.pk}}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <form action="{% url 'warrantys:delete' warranty.pk %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel">Eliminar Empeño</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <span>Esta seguro que desea borrar </span>
+                                            <strong>{{ warranty }} </strong>?
+                                            <p>creada el {{warranty.created_at}}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-danger">Si, borrar</button>
+                                            <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!--End Modal-->
+                        <a href="{% url 'warrantys:update' warranty.pk  %}"><i class="fas fa-edit text-info"></i></a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; primero</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">anterior</a></li> {% endif %}
+
+                <li class="page-item">
+                    <a class="page-link">
+                        {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </a> {% if page_obj.has_next %}
+                </li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">siguiente</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">ultimo &raquo;</a> {% endif %}</li>
+            </ul>
+        </div>
+        {% else %}
+        <h5 class="title font-weight-normal">No hay Empeños Registradas</h5>
+        {% endif %}
+    </section>
+    <!--Seccion 2-->
+</main>
+
+{% endblock content %}

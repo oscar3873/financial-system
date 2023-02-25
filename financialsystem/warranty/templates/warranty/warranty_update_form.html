@@ -1,0 +1,15 @@
+{% extends "core/base.html" %} {% block content %} {% load static %}
+<!--Main-->
+<link href="{% static 'note/css/note.css' %}" rel="stylesheet">
+<main class="container my-4">
+    {% load crispy_forms_tags %}
+    <form method="post" id="client_form">
+        {% csrf_token %}
+        <h4 class="card-title">Modificar datos de Empeño</h4>
+        {{ form|crispy}}
+        <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+</main>
+
+{% endblock content %}
