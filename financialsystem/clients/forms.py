@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from django import forms
 from crispy_forms.helper import FormHelper
 from django.forms import inlineformset_factory
@@ -50,7 +50,6 @@ class ClientForm(forms.ModelForm):
     )
     
     def clean_email(self):
-        print(self.instance)
         if self.instance:
             email = self.cleaned_data["email"]
             try:
@@ -74,7 +73,7 @@ class ClientForm(forms.ModelForm):
         
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        print(kwargs)
+        # print(kwargs)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper
     #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
@@ -142,7 +141,7 @@ class CreditForm(forms.ModelForm):
         label='Fecha de Inicio',
         required=True,
         widget=forms.DateTimeInput(
-            attrs={'type': 'date', 'value': '%s' % date.today()}
+            attrs={'type': 'date', 'value': '%s' % datetime.now().date()}
         )
     )
     

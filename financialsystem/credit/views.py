@@ -37,8 +37,13 @@ class CreditListView(LoginRequiredMixin, ListView):
         return context
     
     
-#DETALLE DE CREDITO
-#------------------------------------------------------------------
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["count_credits"] = self.model.objects.all().count()
+        context["credits"] = self.model.objects.all()
+        context["properties"] = all_properties_credit()
+        return context
+    
 class CreditDetailView(DetailView):
     model = Credit
     template_name = 'credits/credit_detail.html'

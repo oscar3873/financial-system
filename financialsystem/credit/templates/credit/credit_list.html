@@ -72,6 +72,9 @@
                         <div class="alert alert-info m-0 p-1 text-center rounded-pill" role="alert">
                             <strong>No activo</strong>
                         </div>
+                        <div class="alert alert-info m-0 p-1 text-center rounded-pill" role="alert">
+                            <strong>No activo</strong>
+                        </div>
                     </td>
                     {% endif %}
                     <td>{{credit.condition}}</td>
@@ -106,6 +109,7 @@
                             </div>
                         </div>
                         <!--End Modal-->
+                        <a href="{% url 'credits:update' credit.client.pk  %}"><i class="fas fa-edit text-info"></i></a>
                         <a href="{% url 'credits:update' credit.client.pk  %}"><i class="fas fa-edit text-info"></i></a>
                     </td>
                     {% endif %}

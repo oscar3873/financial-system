@@ -164,7 +164,7 @@
                     <h4 class="fs-5 fw-semibold m-0 text-primary"> Ver Movimientos</h4>
                 </a>
                 <div class="list-group list-group-flush border-bottom scrollarea">
-                    {% for movement in movements %}
+                    {% if movements %} {% for movement in movements %}
                     <a href="{% url 'cashregister:update' movement.pk %}" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
                         <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
                             {% if movement.operation_mode == "INGRESO" %}
@@ -177,7 +177,8 @@
                             <small class="text-info">{{movement.user}}</small>
                         </div>
                     </a>
-                    {% endfor %}
+                    {% endfor %} {% else %}
+                    <small class="text-info text-center">No hay movimientos registrados</small> {% endif %}
                 </div>
                 <div class="card-footer p-1 bg-info rounded-bottom"></div>
             </div>
