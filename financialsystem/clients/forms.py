@@ -49,7 +49,24 @@ class ClientForm(forms.ModelForm):
         required= True,
     )
     
+    def clean_email(self):
+        print(self.instance)
+        if self.instance:
+            email = self.cleaned_data["email"]
+            try:
+                Client.objects.get(email=email)
+            except Client.DoesNotExist:
+                return email
+            raise forms.ValidationError('Email ya registrado')
     
+    def clean_dni(self):
+        dni = self.cleaned_data["dni"]
+        try:
+            Client.objects.get(dni=dni)
+        except Client.DoesNotExist:
+            return dni
+        raise forms.ValidationError('DNI ya registrado')
+
     class Meta:
         model = Client
         fields = "__all__"
@@ -57,10 +74,9 @@ class ClientForm(forms.ModelForm):
         
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        # request = kwargs.pop('request')
+        print(kwargs)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper
-        # self.fields['user'].initial = request.user.id
     #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
 
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO
@@ -88,7 +104,6 @@ class PhoneNumberForm(forms.ModelForm):
         fields = "__all__"
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        print(kwargs)
         super().__init__(*args, **kwargs)
         self.helper = FormHelper
 

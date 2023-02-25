@@ -8,17 +8,17 @@ def actualizar_fechas():
     if Credit.objects.exists():
         creditos_a_tiempo = Credit.objects.filter(condition = 'A Tiempo')       # TODOS LOS CREDITOS QUE 'ESTEN A TIEMPO'
         ###### __lt = (<) 'less-than sign' | __gt = (>) 'greater-than sign' and with e, like __lte or __gte, are 'less/greater-or equal-than sign'
-        cred_with_vencidas = creditos_a_tiempo.filter(installment__due_date__date__lt=date.today())      ## OBTIENE TODOS LOS CREDITOS CON CUOTAS VENCIDAS (ej: 2/3 installments vencidas)
-        installments_ref_vencidas = InstallmentRefinancing.objects.exclude(condition = 'Pagada').filter(due_date__date__lt=date.today())
+        cred_with_vencidas = creditos_a_tiempo.filter(installment__end_date__date__lt=date.today())      ## OBTIENE TODOS LOS CREDITOS CON CUOTAS VENCIDAS (ej: 2/3 installments vencidas)
+        installments_ref_vencidas = InstallmentRefinancing.objects.exclude(condition = 'Pagada').filter(end_date__date__lt=date.today())
 
         for installment_ven in cred_with_vencidas:                                                 
-            for installment in installment_ven.installment.filter(due_date__date__lt=date.today()):
+            for installment in installment_ven.installment.filter(end_date__date__lt=date.today()):
                 if installment.condition != 'Refinanciada':  
                     installment.condition = 'Vencida'
                     if installment.lastup.date() != date.today(): 
                         dates = installment.lastup
                     else:
-                        dates = installment.due_date
+                        dates = installment.end_date
                     resto = (date.today() - dates.date()).days
                     installment.acc_int += resto*installment.amount*decimal.Decimal(0.02)
                     installment.lastup = datetime.today()
@@ -29,25 +29,21 @@ def actualizar_fechas():
             if installment_ven.lastup.date() != date.today(): 
                 dates = installment_ven.lastup
             else:
-                dates = installment_ven.due_date
+                dates = installment_ven.end_date
             resto = (date.today() - dates.date()).days
             installment_ven.acc_int += resto*installment_ven.amount*decimal.Decimal(0.02)
             installment_ven.lastup = datetime.today()
             installment_ven.save()
 
         for credito in creditos_a_tiempo:
-            if credito.due_date.date() < date.today():
+            if credito.end_date.date() < date.today():
                 credito.condition = 'Vencido'
                 credito.save()                                                ## ACTUALIZACION DE condition DE CREDITO
 
             cred = credito.installment.filter(condition= 'Vencida')
-            if cred.count() >= 2 and cred.due_date.date()+timedelta(days=10) < date.today():
+            if cred.count() >= 2 and cred.end_date.date()+timedelta(days=10) < date.today():
                 credito.condition = 'Legales'
                 credito.save() 
-
-
-def all_properties_cred():
-        return ["Cliente","Monto","Vencimiento","Cuotas", "Estado"]
 
 
 def total_to_ref(amount, interest, pk, user, operation_mode):
@@ -69,7 +65,7 @@ def total_to_ref(amount, interest, pk, user, operation_mode):
         ref = InstallmentRefinancing.objects.create(
             amount=decimal.Decimal(amount/installments)+interest,
             installment_num = i+1,
-            due_date = datetime.today() + (relativedelta(months=1)*(i+1)),
+            end_date = datetime.today() + (relativedelta(months=1)*(i+1)),
             condition = condition,
             installment = pk,
             )
@@ -77,3 +73,6 @@ def total_to_ref(amount, interest, pk, user, operation_mode):
             ref.payment = payment
             ref._adviser = user
             ref.save()
+
+def all_properties_credit():
+        return ["Monto solicitado", "Monto a devolver", "Numero de cuotas", "Monto de las cuotas", "Estado", "Cliente", "Asesor", "Fecha de registro", "Fecha de Finalizacion"]

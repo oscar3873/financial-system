@@ -18,7 +18,8 @@ class HomePageView(LoginRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["cashregister"] = CashRegister.objects.last()
+        Caja = CashRegister.objects.get_or_create()
+        context["cashregister"] = Caja[0]
         context["notes"] = Note.objects.all().filter(user = self.request.user).order_by("-created_at")[0:4]
         context["movements"] = Movement.objects.all().filter(user = self.request.user).order_by("-created_at")[0:4]
         context['next_maturities'] = Installment.objects.filter(credit__client__adviser= self.request.user).filter(condition='A Tiempo')[0:4]

@@ -10,8 +10,8 @@
     <title>Login</title>
 </head>
 
-<body class="body">
-    <main role="main">
+<body class="body py-5">
+    <main class="container py-5" role="main">
         <div class="container my-5">
             <div class="d-flex flex-column">
                 <h3 class="m-0 text-center">
@@ -19,9 +19,8 @@
                 </h3>
                 <div class="col-lg-4 col-md-6 mx-auto">
                     <form action="" method="post">
-                        {% csrf_token %}
-                        {% if form.non_field_errors %}
-                            <p class="text-danger">Usuario o contraseña incorrectos, prueba de nuevo.</p>
+                        {% csrf_token %} {% if form.non_field_errors %}
+                        <p class="text-danger">Usuario o contraseña incorrectos, prueba de nuevo.</p>
                         {% endif %}
                         <p>
                             <input type="text" name="username" autofocus maxlength="254" required id="id_username" class="form-control" placeholder="Nombre de usuario" />

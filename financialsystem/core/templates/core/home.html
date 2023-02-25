@@ -59,7 +59,7 @@
                                 <small class="text-danger"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> ${{movement.amount}}</small> {% else %}
                                 <small class="text-success"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> ${{movement.amount}}</small> {% endif %}
                                 <small class="font-weight-light"> {{movement.description|truncatewords:2}} </small>
-                                <span class="font-weight-bold">Por <span href="#" class="text-warning">{{movement.user}}</></span>
+                                <span class="font-weight-bold">Por <span class="text-warning">{{movement.user}}</span></span>
                             </a> {% empty %}
                             <small class="font-weight-light">No hay movimientos registrados</small> {% endfor %}
                         </div>
@@ -68,16 +68,19 @@
                     <!--Proximos Vencimientos-->
                     <div class="card box-shadow border rounded mx-2">
                         <div class="card-body">
-                            <h5 class="card-title p-4"><i class="fa-solid fa-calendar text-warning"></i> Tus Proximos Cobros</h5>
-                            {% for i in obj %}
-                            <div class="card-text p-2">
-                                <small class="font-weight-bold text-primary"><i class="fa-solid fa-hourglass-end"></i> 10/03/2022</small>
-                                <small class="font-weight-normal"> Cuota 1</small>
-                                <small class="font-weight-bold">De <a href="#" class="text-warning">Cliente</a></small>
-                                <small class="font-weight-bold">Por <a href="#" class="text-warning">Asesor</a></small>
-                            </div>
-                            {% empty %}
-                            <small class="font-weight-light">No hay registro de pagos</small> {% endfor %}
+                            <h5 class="card-title p-4"><i class="fa-solid fa-calendar text-warning"></i> Proximos Vencimientos</h5>
+                            {% if next_maturities.count > 0 %}
+                                {% for next_maturitie in next_maturities %}
+                                <div class="card-text p-2">
+                                    <small class="font-weight-bold text-primary"><i class="fa-solid fa-hourglass-end"></i> {{next_maturitie.due_date|date}} </small>
+                                    <small class="font-weight-normal"> Cuota {{next_maturitie.installment_num}}</small>
+                                    <small class="font-weight-bold">De <a href="{% url 'clients:detail' next_maturitie.credit.client.id %}" class="text-warning">{{next_maturitie.credit.client}}</a></small>
+                                    <small class="font-weight-bold">Por <a href="{% url 'advisers:detail' next_maturitie.credit.client.adviser.pk %}" class="text-warning">{{next_maturitie.credit.client.adviser}}</a></small>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <strong class="font-weight-bold text-primary">Wow! Que insólito </strong>
+                            {% endif %}
                         </div>
                         <div class="card-footer p-1 bg-info rounded-bottom"></div>
                     </div>

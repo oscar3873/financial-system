@@ -71,7 +71,7 @@ class ClientInline(LoginRequiredMixin):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
-    
+
     def form_valid(self, form):
         named_formsets = self.get_named_formsets()
         if not all((x.is_valid() for x in named_formsets.values())):
@@ -145,9 +145,8 @@ class ClientCreate(ClientInline, CreateView):
 class ClientUpdate(ClientInline, UpdateView):
 
     def get_context_data(self, **kwargs):
-        ctx = super(ClientUpdate, self).get_context_data(**kwargs)
+        ctx = super(ClientUpdate, self).get_context_data(**kwargs) 
         ctx['named_formsets'] = self.get_named_formsets()
-        print(ctx)
         return ctx
     
     def get_success_url(self) -> str:
@@ -187,13 +186,12 @@ class QueryView(ListView):
     def get(self, request, *args, **kwargs):
         found = self.request.GET.get("search")
         if found != None and found != '':
-            search = self.model.objects.filter(
-                Q(dni__iexact = self.request.GET.get("search"))
-                )
-            if search.count() > 0:
-               return redirect('clients:detail', pk=search.last().pk)
-            else:
-                self.extra_context = {"found": False}
+            try: 
+                search = self.model.objects.get(dni=found)
+                return redirect('clients:detail', pk=search.pk)
+            except :
+               self.extra_context = {"found": False}
+                
         return super().get(request, *args, **kwargs)
 
 # #FORM PARA PAGOS DE CLIENTE
@@ -214,7 +212,7 @@ class PaymentFormView(FormView):
         return kwargs
 
     def get_success_url(self):
-        return reverse_lazy('clients:detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('clients:detail', kwargs={'pk': self.kwargs['pk']})
 
     def form_valid(self, form) :
         client = get_object_or_404(Client, pk = self.kwargs['pk'])
@@ -228,7 +226,7 @@ class PaymentFormView(FormView):
                 if pack[crumble]:
                     crumble.condition = 'Pagada'
                     crumble._adviser = self.request.user
-                    crumble.payment_type = form.cleaned_data['operation_mode']
+                    crumble.payment_method = form.cleaned_data['operation_mode']
                     crumble.save()
         return super().form_valid(form)
 
@@ -240,7 +238,7 @@ class ClientDetailView(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["credits"] = Credit.objects.all().filter(client = context["client"])
+        context["credits"] = Credit.objects.filter(client = context["client"])
         if context["credits"]:
             context["credit_active"] = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
             context["installments"] = context["credit_active"].installment.all()

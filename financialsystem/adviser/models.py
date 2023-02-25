@@ -48,7 +48,6 @@ class Comission(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 def set_mov(instance, *args, **kwargs):
-    print(instance.checked)
     if instance.checked:
         instance.mov = Movement.objects.create(
             user = instance.adviser,
@@ -58,5 +57,4 @@ def set_mov(instance, *args, **kwargs):
             description = 'COMISION %s - %s CREDITO DE %s' % (instance.adviser, instance.type, instance.commission_charged_to)
         )
 
-# post_save.connect(set_mov, sender=Comission)
 pre_save.connect(set_mov, sender=Comission)

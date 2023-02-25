@@ -61,6 +61,5 @@ class MovementForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
         super(MovementForm, self).__init__(*args, **kwargs)
-        print(self.request.user.id)
         self.fields["user"].initial = self.request.user.id
         self.helper = FormHelper

@@ -3,13 +3,18 @@
     {% csrf_token %}
     <h4 class="card-title">Añadir Cliente</h4>
     {{ form|crispy}} {% with named_formsets.phone_numbers as formset %} {{ formset.management_form }}
-    <script type="text/html" id="phone_numbers-template"> // id="inlineformsetname-template"
-        <tr id="phone_numbers-__prefix__" class=h ide_all> // id="inlineformsetname-__prefix__" {% for fields in formset.empty_form.hidden_fields %} {{ fields }} {% endfor %} {% for fields in formset.empty_form.visible_fields %} {% if not forloop.last %}
-            <td>{{fields}}</td>
-            {% endif %} {% endfor %}
+ <script type="text/html" id="phone_numbers-template"> // id="inlineformsetname-template"
+        <tr id="phone_numbers-__prefix__" class=h ide_all> // id="inlineformsetname-__prefix__" 
+            {% for fields in formset.empty_form.hidden_fields %} 
+                {{ fields }}
+            {% endfor %} 
+                {% for fields in formset.empty_form.visible_fields %} 
+                    {% if not forloop.last %}
+                        <td>{{fields}}</td>
+                    {% endif %} 
+                {% endfor %}
         </tr>
     </script>
-
     <div class="table-responsive card mt-4">
         <div class="card-header bg-info text-white">
             <h4 class="card-title">Agregar Numeros de Contacto</h4>
@@ -65,8 +70,7 @@
         <a href="#" id="add-phone_number-button" class="btn btn-info m-2 rounded p-3 add-phone_numbers">Añadir</a>
         <!-- id="add-inlineformsetname-button" -->
     </div>
-    {% endwith %}
-    {% include "form/form.html" %}
+    {% endwith %} {% include "form/form.html" %}
     <!-- inline form for phone_numbers end -->
     <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
 </form>

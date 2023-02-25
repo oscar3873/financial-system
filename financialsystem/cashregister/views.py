@@ -64,7 +64,6 @@ class MovementListView(LoginRequiredMixin, ListView, MovementTable):
     
     def get_context_data(self, **kwargs):
         self.object_list = self.get_queryset()
-        print(self.object_list)
         context = super().get_context_data(**kwargs)
         context["count_movements"] = self.model.objects.all().count()
         context["movements"] = self.model.objects.all()

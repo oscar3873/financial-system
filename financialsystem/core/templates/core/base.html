@@ -13,6 +13,7 @@
     <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+
 </head>
 
 <body>
@@ -85,7 +86,24 @@
         </nav>
 
         <!-- Contenido -->
-        {% block content %}{% endblock %}
+        <div class="body-loading no-display" id="spinner">
+            <div class="waviy">
+                <span class="font-weight-bold" style="--i:1">F</span>
+                <span class="font-weight-bold" style="--i:2">i</span>
+                <span class="font-weight-bold" style="--i:3">n</span>
+                <span class="font-weight-bold" style="--i:4">a</span>
+                <span class="font-weight-bold" style="--i:5">n</span>
+                <span class="font-weight-bold" style="--i:6">
+                    <img src="{% static 'core/img/icon-png.png' %}" width="80px" alt="logotipo">
+                </span>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                </div>
+            </div>
+        </div>
+        <div id="content">
+            {% block content %} {% endblock %}
+        </div>
 
         <!-- Footer -->
 
@@ -117,6 +135,20 @@
         <script src="{% static 'core/vendor/jquery/jquery.min.js' %}"></script>
         <script src="{% static 'core/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
         <script src="{% static 'core/js/main.js' %}"></script>
+
+        <!-- <script>
+            const spinner = document.getElementById('spinner');
+            const content = document.getElementById('content');
+            $.ajax({
+                type: 'GET',
+                url: '/',
+                success: function(res) {
+                    spinner.classList.add("no-display");
+                    console.log("Success!");
+                }
+            })
+        </script> -->
+
     </body>
 
 </html>

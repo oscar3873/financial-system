@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.contrib import messages
-from .utils import actualizar_fechas, all_properties_cred
+from .utils import actualizar_fechas, all_properties_credit
 
 
 from .forms import CreditForm
@@ -32,7 +32,7 @@ class CreditListView(LoginRequiredMixin, ListView):
         context["count_credits"] = self.model.objects.all().count()
         context["credits"] = self.model.objects.all()
         if self.model.objects.all().count() > 0:
-            context["properties"] = all_properties_cred()
+            context["properties"] = all_properties_credit()
         
         return context
     

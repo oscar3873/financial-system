@@ -1,0 +1,34 @@
+.body-loading {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    padding: 100px;
+    display: flex;
+    justify-content: center;
+    background-color: #F5F7FA;
+}
+
+.no-display {
+    display: none;
+}
+
+.waviy {
+    font-family: 'Josefin Sans', sans-serif;
+    position: relative;
+}
+
+.waviy span {
+    position: relative;
+    display: inline-block;
+    font-size: 60px;
+    color: black;
+    animation: flip 2s infinite;
+    animation-delay: calc(.1s * var(--i))
+}
+
+@keyframes flip {
+    0%,
+    20% {
+        transform: rotateY(360deg)
+    }
+}
