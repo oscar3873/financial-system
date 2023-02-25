@@ -1,3 +1,4 @@
+from datetime import datetime
 from django import forms
 from crispy_forms.helper import FormHelper
 from .models import Credit
@@ -15,7 +16,7 @@ class CreditForm(forms.ModelForm):
     
     is_old_credit = forms.BooleanField(
         label= "Es un Credito antiguo?",
-        required= True,
+        required= False,
     )
     
     credit_interest = forms.IntegerField(
@@ -42,7 +43,10 @@ class CreditForm(forms.ModelForm):
     
     created = forms.DateField(
         label="Ingresar fecha del Credito",
-        widget=  NumberInput(attrs={'type': 'date'})
+        widget=  NumberInput(attrs={
+            'type': 'date',
+            'value': datetime.now().date()
+            })
     )
     
     class Meta:

@@ -70,7 +70,7 @@
                             <a class="nav-link font-weight-light m-2" href="{% url 'credits:list' %}"><i class="fa-sharp fa-solid fa-receipt"></i> Pagos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="{% url 'credits:list' %}"><i class="fa-solid fa-user-check"></i></i> Garantes</a>
+                            <a class="nav-link font-weight-light m-2" href="{% url 'guarantors:list' %}"><i class="fa-solid fa-user-check"></i></i> Garantes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="{% url 'credits:list' %}"><i class="fa-solid fa-landmark"></i> Empeños</a>
@@ -102,7 +102,7 @@
             </div>
         </div>
         <div id="content">
-            {% block content %} {% endblock %}
+            {% block content %} {% endblock content %}
         </div>
 
         <!-- Footer -->
@@ -143,12 +143,14 @@
                 type: 'GET',
                 url: '/',
                 success: function(res) {
-                    spinner.classList.add("no-display");
-                    console.log("Success!");
+                    setTimeout(() => {
+                        spinner.classList.add("no-display");
+                        content.innerHTML = ``
+                        console.log("Success!");
+                    }, 1200);
                 }
             })
         </script> -->
-
     </body>
 
 </html>

@@ -60,10 +60,16 @@ class CreditCreateView(CreateView):
     
     def get_success_url(self) -> str:
         messages.success(self.request, 'Credito creado correctamente', "success")
-        return  reverse_lazy('notes:list')
+        return  reverse_lazy('credits:list')
 
 class CreditUpdateView(UpdateView):
     model = Credit
+    form_class = CreditForm
     
 class CreditDeleteView(DeleteView):
     model = Credit
+    
+    def get_success_url(self) -> str:
+        messages.success(self.request, 'Credito borrado correctamente', "danger")
+        return  reverse_lazy('credits:list')
+    

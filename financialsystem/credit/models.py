@@ -148,7 +148,7 @@ def create_movement(instance):
         amount = instance.amount,
         cashregister = CashRegister.objects.last(),
         operation_mode = 'EGRESO',
-        description = 'CREDITO PARA %s \nCUOTAS: %s - RESPONSABLE: %s' % (instance.client, instance.installment_num, instance.client.adviser),
+        description = 'CREDITO PARA %s \nCUOTAS: %s' % (instance.client, instance.installment_num),
         money_type = 'PESOS',
         )
 

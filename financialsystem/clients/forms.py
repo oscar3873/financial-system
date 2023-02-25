@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from django import forms
 from crispy_forms.helper import FormHelper
 from django.forms import inlineformset_factory
