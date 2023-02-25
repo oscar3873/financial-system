@@ -18,7 +18,7 @@ from .models import Movement, CashRegister
 from .forms import MovementForm
 from django.views.generic.edit import FormView
 
-from .filters import ListingFilter, MoneyTypeFilter, AmountFilter, UserFilter
+from .filters import DescriptionFilter, ListingFilter, MoneyTypeFilter, AmountFilter, UserFilter
 
 # Create your views here.
 class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
@@ -64,29 +64,33 @@ class MovementListView(LoginRequiredMixin, ListView, MovementTable):
     
     def get_context_data(self, **kwargs):
         self.object_list = self.get_queryset()
-        print(self.object_list)
         context = super().get_context_data(**kwargs)
         context["count_movements"] = self.model.objects.all().count()
         context["movements"] = self.model.objects.all()
         context["listing_filter"] = ListingFilter(self.request.GET, context['movements'])
         context["money_filter"] = MoneyTypeFilter(self.request.GET, context['movements'])
         context["amount_filter"] = AmountFilter(self.request.GET, context['movements'])
+        context["description_filter"] = DescriptionFilter(self.request.GET, context['movements'])
         context["user_filter"] = UserFilter(self.request.GET, context['movements'])
         context["properties"] = all_properties_mov()
 
         return context
+    
     #DEFINICION DEL TIPO DE FILTRO ULTILIZADO
     def get_queryset(self):
-        print(self.request.GET)
         queryset = super().get_queryset()
         if "user" in self.request.GET and len(self.request.GET) == 1:
             return UserFilter(self.request.GET, queryset=queryset).qs
-        elif "amount_min" or "amount_max" in self.request.GET :
+        elif ("amount_min" or "amount_max") in self.request.GET :
             return AmountFilter(self.request.GET, queryset=queryset).qs
         elif "money_type" in self.request.GET and len(self.request.GET) == 1:
             return MoneyTypeFilter(self.request.GET, queryset=queryset).qs
+        elif "description" in self.request.GET and len(self.request.GET) == 1:
+            return DescriptionFilter(self.request.GET, queryset=queryset).qs
         else:
+            print(ListingFilter(self.request.GET, queryset=queryset).qs)
             return ListingFilter(self.request.GET, queryset=queryset).qs
+
 
 class MovementDetailView(LoginRequiredMixin, DetailView):
     model = Movement

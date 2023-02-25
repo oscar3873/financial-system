@@ -35,22 +35,19 @@
                                 </h5>
                             </a>
                             <p class="card-subtitle p-2">
-                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceARS}}</span>
-                                <span class="font-weight-light text-primary"><small><strong>ARS</strong></small></span>
+                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceARS}}</span>
                                 <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceUSD}}</span>
-                                <span class="font-weight-bold text-primary"><small><strong>USD</strong></small></span>
+                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceUSD}}</span>
                                 <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceEUR}}</span>
-                                <span class="font-weight-bold text-primary"><small><strong>EUR</strong></small></span>
+                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceEUR}}</span>
                                 <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceTRANSFER}}</span>
+                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceTRANSFER}}</span>
                                 <span class="font-weight-bold text-primary"><small><strong>TRANSFER</strong></small></span>
                                 <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceCREDITO}}</span>
+                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceCREDITO}}</span>
                                 <span class="font-weight-bold text-primary"><small><strong>CREDITO</strong></small></span>
                                 <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">${{cashregister.total_balanceDEBITO}}</span>
+                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceDEBITO}}</span>
                                 <span class="font-weight-bold text-primary"><small><strong>DEBITO</strong></small></span>
                             </p>
                             {% for movement in movements %}

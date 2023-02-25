@@ -4,8 +4,8 @@ from django_filters import filters
 from .models import Movement
 
 OPERATION_CHOISE = (
-    ('Ingreso', 'Ingreso'),
-    ('Egreso', 'Egreso')
+    ('INGRESO', 'INGRESO'),
+    ('EGRESO', 'EGRESO')
 )
 
 MONEY_TYPE = (
@@ -18,7 +18,7 @@ MONEY_TYPE = (
 )
 
 class ListingFilter(django_filters.FilterSet):
-    description = filters.CharFilter(label="Descripción", lookup_expr="contains")
+    money_type = filters.ChoiceFilter(choices= MONEY_TYPE, label="Divisa", empty_label="Limpiar filtro")
     operation_mode = filters.ChoiceFilter(choices=OPERATION_CHOISE, label="Tipo de Operación", empty_label="Limpiar filtro")
     created_at = filters.DateFromToRangeFilter(
         label= "Desde - Hasta",
@@ -28,7 +28,7 @@ class ListingFilter(django_filters.FilterSet):
     
     class Meta:
         model = Movement
-        fields = ['description', 'operation_mode', 'created_at', 'created_at']
+        fields = ['money_type', 'operation_mode', 'created_at', 'created_at']
 
 
 class MoneyTypeFilter(django_filters.FilterSet):
@@ -42,7 +42,7 @@ class MoneyTypeFilter(django_filters.FilterSet):
 
 
 class AmountFilter(django_filters.FilterSet):
-    amount = filters.RangeFilter()
+    amount = filters.RangeFilter(label="Monto")
     
     class Meta:
         model = Movement
@@ -57,3 +57,10 @@ class UserFilter(django_filters.FilterSet):
         fields = {
             'user': ['exact']
         }
+        
+class DescriptionFilter(django_filters.FilterSet):
+    description = filters.CharFilter(label="Descripción", lookup_expr="contains")
+    
+    class Meta:
+        model = Movement
+        fields = ['description']
