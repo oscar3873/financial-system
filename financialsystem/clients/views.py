@@ -149,6 +149,11 @@ class ClientUpdate(ClientInline, UpdateView):
         ctx['named_formsets'] = self.get_named_formsets()
         return ctx
     
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["is_update"] = True
+        return kwargs
+
     def get_success_url(self) -> str:
         messages.success(self.request, 'Los datos de modificado satisfactoriamente', "info")
         return  reverse_lazy('clients:list')

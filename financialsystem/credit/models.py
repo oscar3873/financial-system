@@ -126,7 +126,6 @@ def repayment_amount_auto(instance, *args, **kwargs):
         repayment_amount = credit.installment_num*(Decimal(credit.credit_interest/100)*credit.amount)/(1-pow((1+Decimal(credit.credit_interest/100)),(- credit.installment_num)))
         credit.credit_repayment_amount = Decimal(repayment_amount)
         create_movement(credit)
-        comission_create(credit)
 
 
 def create_installments_auto(instance, created, *args, **kwargs):
@@ -154,13 +153,8 @@ def create_movement(instance):
 
 
 def comission_create(instance, *args, **kwargs):
-    if instance is Credit:
-        type = 'COBRO'
-        comission = 0.05
-    else: 
-        type = 'REGISTRO'
-        comission = 0.075
-        
+    type = 'REGISTRO'
+    comission = 0.075
     amount = instance.amount*Decimal(comission)
     Comission.objects.create(
         adviser = instance.client.adviser,

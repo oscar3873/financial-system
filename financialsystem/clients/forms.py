@@ -50,21 +50,24 @@ class ClientForm(forms.ModelForm):
     )
     
     def clean_email(self):
-        if self.instance:
-            email = self.cleaned_data["email"]
+        email = self.cleaned_data["email"]
+        if not self.is_update:
             try:
                 Client.objects.get(email=email)
             except Client.DoesNotExist:
                 return email
             raise forms.ValidationError('Email ya registrado')
+        return email
     
     def clean_dni(self):
         dni = self.cleaned_data["dni"]
-        try:
-            Client.objects.get(dni=dni)
-        except Client.DoesNotExist:
-            return dni
-        raise forms.ValidationError('DNI ya registrado')
+        if not self.is_update:
+            try:
+                Client.objects.get(dni=dni)
+            except Client.DoesNotExist:
+                return dni
+            raise forms.ValidationError('DNI ya registrado')
+        return dni
 
     class Meta:
         model = Client
@@ -72,8 +75,8 @@ class ClientForm(forms.ModelForm):
         exclude = ["adviser"]
         
     #ASOCIACION DE CRYSPY FORM
-    def __init__(self, *args, **kwargs):
-        # print(kwargs)
+    def __init__(self, is_update = False, *args, **kwargs):
+        self.is_update = is_update
         super().__init__(*args, **kwargs)
         self.helper = FormHelper
     #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
