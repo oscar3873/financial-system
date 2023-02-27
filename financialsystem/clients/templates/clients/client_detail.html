@@ -101,7 +101,7 @@
                             <p class="text-start"><strong>{{credit_active.installment_num}}</strong></p>
                         </div>
                         <div class="form-group">
-                            <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'clients:payment' client.pk %}" role="button">
+                            <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'payments:create' credit_active.pk %}" role="button">
                                 <i class="fa-solid fa-receipt"></i>
                                 <span>Registrar un Pago</span>
                             </a>

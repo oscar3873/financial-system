@@ -1,5 +1,4 @@
 from datetime import date, datetime, timedelta
-from dateutil.relativedelta import relativedelta
 import decimal
 
 from .models import Credit, InstallmentRefinancing
@@ -65,7 +64,7 @@ def total_to_ref(amount, interest, pk, user, operation_mode):
         ref = InstallmentRefinancing.objects.create(
             amount=decimal.Decimal(amount/installments)+interest,
             installment_num = i+1,
-            end_date = datetime.today() + (relativedelta(months=1)*(i+1)),
+            end_date = datetime.today() + (timedelta(days=30)*(i+1)),
             condition = condition,
             installment = pk,
             )

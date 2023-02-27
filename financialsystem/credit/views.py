@@ -157,4 +157,3 @@ class CreditDeleteView(DeleteView):
     def get_success_url(self) -> str:
         messages.success(self.request, 'Credito borrado correctamente', "danger")
         return  reverse_lazy('credits:list')
-    

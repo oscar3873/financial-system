@@ -22,6 +22,7 @@ from adviser.urls import advisers_patterns
 from credit.urls import credits_patterns
 from guarantor.urls import guarantor_patterns
 from warranty.urls import warranty_patterns
+from payment.urls import payment_patterns
 
 urlpatterns = [
     # Paths de Nucleo del proyecto
@@ -37,4 +38,5 @@ urlpatterns = [
     path("credits/", include(credits_patterns)),
     path("guarantors/", include(guarantor_patterns)),
     path("warrantys/", include(warranty_patterns)),
+    path("payments/", include(payment_patterns)),
 ]
