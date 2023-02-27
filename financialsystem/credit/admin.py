@@ -4,6 +4,7 @@ from .models import Credit, Installment, Refinancing, InstallmentRefinancing
 # Register your models here.
 class CreditAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'client',
         'amount',
         'installment_num', 

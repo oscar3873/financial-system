@@ -138,6 +138,7 @@ class CreditForm(forms.ModelForm):
     credit_interest = forms.IntegerField(
         label='Interes',
         required=True,
+        initial=48, 
     )
 
     start_date = forms.DateField(

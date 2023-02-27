@@ -1,5 +1,6 @@
 from decimal import Decimal
 import math
+import uuid
 from django.db import models
 from clients.models import Client
 from adviser.models import Comission
@@ -20,13 +21,14 @@ class Credit(models.Model):
     is_paid_credit = models.BooleanField(default=False, help_text="El credito esta pagado")
     is_old_credit = models.BooleanField(default=False, help_text="Es un credito antiguo")
     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
     credit_interest = models.PositiveIntegerField(default=40, help_text="Intereses de credito")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto del Credito")
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="client_credits")
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
-    mov = models.ForeignKey(Movement, on_delete=models.CASCADE, null=True)
+    mov = models.ForeignKey(Movement, on_delete=models.SET_NULL, null=True)
     start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=datetime.now, null=True)
     end_date = models.DateTimeField(verbose_name='Fecha de Finalizacion del Credito', null=True)
     # due_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True)
@@ -89,7 +91,7 @@ class Refinancing(models.Model):
     refinancing_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolver de la Refinanciacion")
     installment = models.OneToOneField(Installment, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cuota de la Refinanciacion", related_name="refinancing")
     installment_num_refinancing = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
-    mov = models.ForeignKey(Movement, on_delete=models.CASCADE, null=True)
+    mov = models.ForeignKey(Movement, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -127,6 +129,17 @@ def repayment_amount_auto(instance, *args, **kwargs):
         credit.credit_repayment_amount = Decimal(repayment_amount)
         create_movement(credit)
 
+def create_movement(instance, *args, **kwargs):
+    if not instance._isup:
+        instance.mov = Movement.objects.create(
+            user = instance.client.adviser,
+            amount = instance.amount,
+            cashregister = CashRegister.objects.last(),
+            operation_mode = 'EGRESO',
+            description = 'CREDITO PARA %s \nCUOTAS: %s' % (instance.client, instance.installment_num),
+            money_type = 'PESOS',
+            )
+
 
 def create_installments_auto(instance, created, *args, **kwargs):
     if created:
@@ -139,18 +152,6 @@ def create_installments_auto(instance, created, *args, **kwargs):
             numberInstms = numberInstallments + 1
             credit.installment.create(installment_number=numberInstms, credit= credit, amount= amount_installment, payment_date=payment_date, end_date=end_date)
             days += 30
-
-
-def create_movement(instance):
-    instance.mov = Movement.objects.create(
-        user = instance.client.adviser,
-        amount = instance.amount,
-        cashregister = CashRegister.objects.last(),
-        operation_mode = 'EGRESO',
-        description = 'CREDITO PARA %s \nCUOTAS: %s' % (instance.client, instance.installment_num),
-        money_type = 'PESOS',
-        )
-
 
 def comission_create(instance, *args, **kwargs):
     type = 'REGISTRO'

@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -17,9 +18,10 @@ class Client(models.Model):
         (200 , 'Riesgoso (200)')
     ]
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=50, help_text="First name", verbose_name="Nombre")
     last_name = models.CharField(max_length=50, help_text="Last name", verbose_name="Apellido")
-    adviser = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Clientes del usuario", related_name="user_clients")
+    adviser = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Clientes del usuario")
     email = models.EmailField(max_length=254, blank=False, help_text="Email address", verbose_name="Correo electronico")
     civil_status = models.CharField(blank=True, choices=CivilStatus, max_length=10, verbose_name="Estado civil")
     dni = models.PositiveIntegerField(null=False, help_text="dni number", blank=False, verbose_name="DNI")

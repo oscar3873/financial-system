@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from djmoney.models.fields import MoneyField
 from django.forms import ValidationError
@@ -37,6 +38,7 @@ class Movement(models.Model):
         ('DEBITO', 'DEBITO'),
     )
     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Amount of transaction")
     cashregister = models.ForeignKey(CashRegister, on_delete=models.CASCADE, help_text="Cash register", related_name="cash")
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, default=None, null=True, help_text="Usuario Operator", related_name="user_movements")

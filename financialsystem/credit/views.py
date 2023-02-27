@@ -65,6 +65,17 @@ class CreditCreateView(CreateView):
 class CreditUpdateView(UpdateView):
     model = Credit
     form_class = CreditForm
+
+    def form_valid(self, form):
+        if form.is_valid():
+            form.instance.mov.amount = form.instance.amount
+            form.instance.mov.save()
+            form.instance._isup = True
+        return super().form_valid(form)
+    
+    def get_success_url(self) -> str:
+        messages.success(self.request, 'Credito actualizado correctamente', "success")
+        return  reverse_lazy('credits:list')
     
 class CreditDeleteView(DeleteView):
     model = Credit

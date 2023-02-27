@@ -21,7 +21,8 @@ class CreditForm(forms.ModelForm):
     
     credit_interest = forms.IntegerField(
         label= "Intereses del Credito",
-        required= True,    
+        required= True,  
+        initial=48,  
     )
     
     amount = forms.DecimalField(
