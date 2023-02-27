@@ -140,7 +140,6 @@ def create_movement(instance, *args, **kwargs):
             money_type = 'PESOS',
             )
 
-
 def create_installments_auto(instance, created, *args, **kwargs):
     if created:
         credit = instance
