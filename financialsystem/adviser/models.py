@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from cashregister.models import Movement, CashRegister
-from clients.models import Client
 
 # Create your models here.
 class Adviser(models.Model):
@@ -39,7 +38,6 @@ class Comission(models.Model):
         ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    commission_charged_to = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True)
     checked = models.BooleanField(default=False)
     adviser = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=20)
@@ -57,7 +55,7 @@ def set_mov(instance, *args, **kwargs):
             amount = instance.amount,
             cashregister = CashRegister.objects.last(),
             operation_mode = 'EGRESO',
-            description = 'COMISION %s - %s CREDITO DE %s' % (instance.adviser, instance.type, instance.commission_charged_to)
+            description = 'COMISION %s - %s' % (instance.adviser, instance.type)
         )
 
 pre_save.connect(set_mov, sender=Comission)

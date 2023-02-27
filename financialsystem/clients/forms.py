@@ -9,11 +9,17 @@ from credit.models import Credit
 #------------------------------------------------------------------
 class ClientForm(forms.ModelForm):
     
-    CivilStatus = (
+    CIVIL_STATUS = (
         ('S','Soltero'),
         ('C', 'Casado'),
         ('V', 'Viudo'),
         ('D', 'Divorciado')
+    )
+    
+    SCORE = (
+        (600 , 'Bueno (600)'),
+        (400 , 'Regular (400)'),
+        (200 , 'Riesgoso (200)')
     )
     
     first_name = forms.CharField(
@@ -29,55 +35,38 @@ class ClientForm(forms.ModelForm):
         required=True,
     )
     civil_status = forms.ChoiceField(
-        choices= CivilStatus,
+        label="Estado Civil",
+        choices= CIVIL_STATUS,
         required=True,
     )
     dni = forms.IntegerField(
         label= "DNI",
-        required= True,
+        required=True,
     )
     profession = forms.CharField(
         label= "Profesion",
-        required= True,
+        required=True,
     )
     address = forms.CharField(
         label= "Domicilio",
-        required= True,
+        required=True,
     )
     job_address = forms.CharField(
         label= "Domicilio Laboral",
-        required= True,
+        required=True,
     )
-    
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if not self.is_update:
-            try:
-                Client.objects.get(email=email)
-            except Client.DoesNotExist:
-                return email
-            raise forms.ValidationError('Email ya registrado')
-        return email
-    
-    def clean_dni(self):
-        dni = self.cleaned_data["dni"]
-        if not self.is_update:
-            try:
-                Client.objects.get(dni=dni)
-            except Client.DoesNotExist:
-                return dni
-            raise forms.ValidationError('DNI ya registrado')
-        return dni
-
     class Meta:
         model = Client
         fields = "__all__"
         exclude = ["adviser"]
-        
+          
     #ASOCIACION DE CRYSPY FORM
-    def __init__(self, is_update = False, *args, **kwargs):
-        self.is_update = is_update
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})
+        
         self.helper = FormHelper
     #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
 
@@ -92,13 +81,13 @@ class PhoneNumberForm(forms.ModelForm):
     )
     
     phone_number = forms.CharField(
-        label = 'Nombre/s',
-        required=True,
+        label = 'Telefono',
+        required=False
     )
     
     phone_type = forms.ChoiceField(
+        label="Tipo",
         choices= PhoneType,
-        required=True,
     )
     
     class Meta:
@@ -107,6 +96,9 @@ class PhoneNumberForm(forms.ModelForm):
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})  
         self.helper = FormHelper
 
 #------------------------------------------------------------------
@@ -114,7 +106,7 @@ PhoneNumberFormSet = inlineformset_factory(
     Client, 
     PhoneNumber, 
     form = PhoneNumberForm,
-    extra= 0,
+    extra= 2,
     can_delete= True,
     can_delete_extra= True,
 )

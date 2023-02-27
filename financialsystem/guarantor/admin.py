@@ -8,7 +8,7 @@ class GuarantorAdmin(admin.ModelAdmin):
         'first_name', 
         'last_name', 
         'email', 
-        'client', 
+        'credit', 
         'email', 
         'civil_status', 
         'dni', 

@@ -1,6 +1,6 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import User
+from adviser.models import Adviser
 
 # Create your models here.    
 class Client(models.Model):
@@ -21,7 +21,7 @@ class Client(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=50, help_text="First name", verbose_name="Nombre")
     last_name = models.CharField(max_length=50, help_text="Last name", verbose_name="Apellido")
-    adviser = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Clientes del usuario")
+    adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Clientes del usuario")
     email = models.EmailField(max_length=254, blank=False, help_text="Email address", verbose_name="Correo electronico")
     civil_status = models.CharField(blank=True, choices=CivilStatus, max_length=10, verbose_name="Estado civil")
     dni = models.PositiveIntegerField(null=False, help_text="dni number", blank=False, verbose_name="DNI")
@@ -46,7 +46,7 @@ class PhoneNumber(models.Model):
     
     phone_number = models.CharField(null=True, blank=True, max_length=50, help_text="Phone number", verbose_name="Numero de Telefono")
     phone_type = models.CharField(max_length=20, help_text="Type of phone", choices=PHONETYPE, verbose_name="Tipo de Telefono")
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, default="Some String",)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default="Some String",)
     
     def __str__(self) -> str:
         return self.phone_number

@@ -18,44 +18,30 @@ class WarrantyForm(forms.ModelForm):
     
     article = forms.CharField(
         label = 'Articulo',
-        required=True,
     )
     
     purchase_papers = forms.BooleanField(
-        label= 'Papeles',
-        required=False,
+        label= 'Papeles de compra',
         initial= False,
     )
     
-    client = forms.ModelChoiceField(
-        queryset= Client.objects.all(),
-        initial= Client.objects.last(),
-        required= True,
-        label= "Cliente"
-    )
-
     state = forms.ChoiceField(
         choices= ARTICLE_STATE,
-        required=True,
         label= "Estado"
     )
     
     brand = forms.CharField(
         label= "Marca",
-        required= True,
     )
 
     model = forms.CharField(
         label= "Modelo",
-        required= True,
     ) 
     
     accessories = forms.CharField(
         label= "Accesorios",
-        required= True,
     )
 
-    
     class Meta:
         model = Warranty
         fields = "__all__"
@@ -63,4 +49,12 @@ class WarrantyForm(forms.ModelForm):
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})
+                
+        for field in self.fields.values():
+            field.required = False
+            
         self.helper = FormHelper

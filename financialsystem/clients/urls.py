@@ -10,5 +10,4 @@ clients_patterns = ([
     path('delete-phone-number/<pk>/', delete_phone_number, name='delete_phone_number'),
     path('<pk>/payment', PaymentFormView.as_view(), name='payment'),
     path('query/', QueryView.as_view(), name ='query'),
-
 ], "clients")

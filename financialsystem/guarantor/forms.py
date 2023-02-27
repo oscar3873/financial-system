@@ -9,7 +9,9 @@ from clients.models import Client
 #------------------------------------------------------------------
 class GuarantorForm(forms.ModelForm):
     
-    CivilStatus = (
+    prefix = 'guarantor'
+    
+    CIVIL_STATUS = (
         ('S','Soltero'),
         ('C', 'Casado'),
         ('V', 'Viudo'),
@@ -18,50 +20,35 @@ class GuarantorForm(forms.ModelForm):
     
     first_name = forms.CharField(
         label = 'Nombre/s',
-        required=True,
-    )
-    
-    client = forms.ModelChoiceField(
-        queryset= Client.objects.all(),
-        initial= Client.objects.last(),
-        required= True,
-        label= "Cliente"
     )
     
     last_name = forms.CharField(
         label = 'Apellido/s',
-        required=True,
     )
     
     email = forms.EmailField(
         label= 'Correo Electrónico',
-        required=True,
     )
     
     civil_status = forms.ChoiceField(
-        choices= CivilStatus,
-        required=True,
+        choices= CIVIL_STATUS,
         label= "Estado Civil"
     )
     
     dni = forms.IntegerField(
         label= "DNI",
-        required= True,
     )
     
     profession = forms.CharField(
         label= "Profesion",
-        required= True,
     )
     
     address = forms.CharField(
         label= "Domicilio",
-        required= True,
     )
     
     job_address = forms.CharField(
         label= "Domicilio Laboral",
-        required= True,
     )
     
     class Meta:
@@ -72,12 +59,22 @@ class GuarantorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         # print(kwargs)
         super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})
+        
+        # Eliminar validación requerida
+        for field in self.fields.values():
+            field.required = False    
+        
         self.helper = FormHelper
     #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
 
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO
 #------------------------------------------------------------------
 class PhoneNumberForm(forms.ModelForm):
+    
+    prefix = 'guarantor'
     
     PhoneType = (
         ('C', 'Celular'), 
@@ -86,13 +83,12 @@ class PhoneNumberForm(forms.ModelForm):
     )
     
     phone_number = forms.CharField(
-        label = 'Nombre/s',
-        required=True,
+        label = 'Telefono',
     )
     
     phone_type = forms.ChoiceField(
         choices= PhoneType,
-        required=True,
+        label="Tipo"
     )
     
     class Meta:
@@ -101,6 +97,13 @@ class PhoneNumberForm(forms.ModelForm):
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})
+        # Eliminar validación requerida
+        for field in self.fields.values():
+            field.required = False                
+
         self.helper = FormHelper
 
 #------------------------------------------------------------------
@@ -108,7 +111,7 @@ PhoneNumberFormSet = inlineformset_factory(
     Guarantor, 
     PhoneNumber, 
     form = PhoneNumberForm,
-    extra= 0,
+    extra= 2,
     can_delete= True,
     can_delete_extra= True,
 )

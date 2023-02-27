@@ -130,9 +130,8 @@ def repayment_amount_auto(instance, *args, **kwargs):
         create_movement(credit)
 
 def create_movement(instance, *args, **kwargs):
-    if not instance._isup:
         instance.mov = Movement.objects.create(
-            user = instance.client.adviser,
+            user = instance.client.adviser.user,
             amount = instance.amount,
             cashregister = CashRegister.objects.last(),
             operation_mode = 'EGRESO',

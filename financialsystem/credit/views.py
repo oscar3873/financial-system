@@ -2,17 +2,91 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic import UpdateView, DeleteView, CreateView
-
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-
 from django.contrib import messages
-from .utils import actualizar_fechas, all_properties_credit
-
-
+from .utils import all_properties_credit
 from .forms import CreditForm
-
 from .models import Credit
+
+from clients.forms import ClientForm, PhoneNumberFormSet
+from warranty.forms import WarrantyForm
+from guarantor.forms import GuarantorForm, PhoneNumberFormSet as PhoneNumberFormG
+
+
+#CREAR UN CREDITO CON TODOS LOS FORMULARIOS ANIDADOS
+def crear_credito(request):
+    client_form = ClientForm()
+    credit_form = CreditForm()
+    phone_number_form = PhoneNumberFormSet(request.POST or None)
+    phone_number_formG = PhoneNumberFormG(request.POST or None)
+    warranty_form = WarrantyForm()
+    guarantor_form = GuarantorForm()
+    
+    if request.method == 'POST':
+        print("La solicitud contiene................", request.POST)
+        client_form = ClientForm(request.POST)
+        credit_form = CreditForm(request.POST)
+        phone_number_form = PhoneNumberFormSet(request.POST or None)
+        phone_number_formG = PhoneNumberFormG(request.POST or None)
+        print("Numero de telefono de client", phone_number_form)
+        print("Numero de telefono de garante", phone_number_formG)
+        warranty_form = WarrantyForm(request.POST)
+        guarantor_form = GuarantorForm(request.POST)
+        print(client_form.is_valid())
+        print(credit_form.is_valid())
+        print(warranty_form.is_valid())
+        print(guarantor_form.is_valid())
+        
+        if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid() and guarantor_form.is_valid():
+            print("Los formularios son validos")
+            client = client_form.save(commit=False)
+            client.adviser = request.user.adviser
+            client = client_form.save()
+            
+            print(PhoneNumberFormSet)
+            phone_numbers = phone_number_form.save(commit=False)
+            for phone_number in phone_numbers:
+                print(phone_number)
+                phone_number.client = client
+                phone_number.save()
+            phone_number_form.save_m2m()
+            
+            credit = credit_form.save(commit=False)
+            credit.client = client
+            credit.save()
+            
+            guarantor = guarantor_form.save(commit=False)
+            if guarantor_form.cleaned_data['dni']:
+                guarantor.credit = credit
+                guarantor.save()
+                phone_numbers = phone_number_formG.save(commit=False)
+                for phone_number in phone_numbers:
+                    phone_number.guarantor = guarantor
+                    phone_number.save()
+                    
+                phone_number_formG.save_m2m()
+            else:
+                print("No entro amigo..... !!!!!!")
+            
+            warranty = warranty_form.save(commit=False)
+            if warranty_form.cleaned_data['article']:
+                warranty.credit = credit
+                warranty.save()
+        else:
+            print(client_form.errors)
+    
+    context = {
+        'cliente_form': client_form,
+        'phone_number_form': phone_number_form,
+        'phone_number_formG': phone_number_formG,
+        'credito_form': credit_form,
+        'empeno_form': warranty_form,
+        'garante_form': guarantor_form
+    }
+    
+    return render(request, 'credit/create_credit.html', context)
+            
 
 #LISTA DE CREDITOS
 #------------------------------------------------------------------
@@ -49,7 +123,7 @@ class CreditDetailView(DetailView):
     template_name = 'credits/credit_detail.html'
 
     def get_object(self):
-        return get_object_or_404(Credit, id=self.kwargs['id'])
+        return get_object_or_404(Credit, pk=self.kwargs['pk'])
 
 
 #CREACION DE UN CREDITO

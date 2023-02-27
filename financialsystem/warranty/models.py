@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 from django.db import models
-from clients.models import Client
+from credit.models import Credit
 # Create your models here.
 class Warranty(models.Model):
     
@@ -22,7 +22,7 @@ class Warranty(models.Model):
     model = models.CharField(max_length=50, help_text="Modelo", verbose_name="Modelo")
     accessories = models.CharField(max_length=50, help_text="Accesorios", verbose_name="Accesorios")
     state = models.CharField(blank=True, choices=ARTICLE_STATE, max_length=30, verbose_name="Estado")
-    client = models.ForeignKey(Client, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Empeño del usuario", related_name="warranty_clients")
+    credit = models.ForeignKey(Credit, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Empeño del usuario", related_name="warranty_clients")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

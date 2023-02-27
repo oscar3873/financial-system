@@ -79,7 +79,7 @@
                     <td>{{guarantor.email}}</td>
                     <td>{{guarantor.get_civil_status_display}}</td>
                     <td>{{guarantor.dni}}</td>
-                    <td>{{guarantor.client}}</td>
+                    <td><a href="{% url 'clients:detail' guarantor.credit.client.pk %}">{{guarantor.credit}}</a></td>
                     <td>
                         {% if not guarantor.phonenumber_set.all %}
                         <p> - </p>

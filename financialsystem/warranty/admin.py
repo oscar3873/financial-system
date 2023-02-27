@@ -8,7 +8,7 @@ class WarrantyAdmin(admin.ModelAdmin):
         'article', 
         'brand', 
         'model', 
-        'client', 
+        'credit', 
         'state', 
         'accessories', 
         'purchase_papers',
