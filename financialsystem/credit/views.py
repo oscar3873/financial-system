@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -8,6 +9,8 @@ from django.contrib import messages
 from .utils import all_properties_credit
 from .forms import CreditForm
 from .models import Credit
+from cashregister.models import CashRegister, Movement
+from adviser.models import Comission
 
 from clients.forms import ClientForm, PhoneNumberFormSet
 from warranty.forms import WarrantyForm
@@ -54,6 +57,9 @@ def crear_credito(request):
             
             credit = credit_form.save(commit=False)
             credit.client = client
+            if not credit.is_old_credit:
+                create_movement(credit, request.user.adviser)
+                comission_create(credit, request.user.adviser)
             credit.save()
             
             guarantor = guarantor_form.save(commit=False)
@@ -87,7 +93,26 @@ def crear_credito(request):
     
     return render(request, 'credit/create_credit.html', context)
             
+def create_movement(instance, adviser):
+    Movement.objects.create(
+        user = adviser.user,
+        amount = instance.amount,
+        cashregister = CashRegister.objects.last(),
+        operation_mode = 'EGRESO',
+        description = 'CREDITO PARA %s \nCUOTAS: %s' % (instance.client, instance.installment_num),
+        money_type = 'PESOS',
+        )
 
+
+def comission_create(instance, adviser):
+    amount = instance.amount*Decimal(0.075)
+    Comission.objects.create(
+        adviser = adviser,
+        amount = amount,
+        type = 'REGISTRO',
+        create_date = instance.start_date,
+        ) 
+    
 #LISTA DE CREDITOS
 #------------------------------------------------------------------
 class CreditListView(LoginRequiredMixin, ListView):

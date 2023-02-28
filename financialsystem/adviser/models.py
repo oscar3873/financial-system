@@ -39,19 +39,19 @@ class Comission(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     checked = models.BooleanField(default=False)
-    adviser = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
+    adviser = models.ForeignKey(Adviser,on_delete=models.SET_NULL,null=True)
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=20)
-    type = models.CharField(max_length=20, null=True,choices=REG, default='Registro')
+    type = models.CharField(max_length=20, null=True,choices=REG, default='REGISTRO')
     money_type = models.CharField(max_length=20 , null=True, choices=MONEY_TYPE, default= MONEY_TYPE[0])
     create_date = models.DateTimeField(default=datetime.now)
-    mov = models.ForeignKey(Movement, on_delete=models.CASCADE,null=True, blank=True)
+    # mov = models.ForeignKey(Movement, on_delete=models.CASCADE,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 def set_mov(instance, *args, **kwargs):
     if instance.checked:
-        instance.mov = Movement.objects.create(
-            user = instance.adviser,
+        Movement.objects.create(
+            user = instance.adviser.user,
             amount = instance.amount,
             cashregister = CashRegister.objects.last(),
             operation_mode = 'EGRESO',

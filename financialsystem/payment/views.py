@@ -48,6 +48,13 @@ class PaymentCreateView(CreateView):
     def get_success_url(self) -> str:
         messages.success(self.request, 'Nota creada correctamente', "success")
         return  reverse_lazy('payments:list')
+    
+    def form_valid(self, form):
+        if form.is_valid():
+            payment = form.save(commit=False)
+            payment._user = self.request.user
+            payment.save()
+        return super().form_valid(form)
 
 #BORRADO DE UNA NOTA
 #------------------------------------------------------------------

@@ -3,9 +3,41 @@
 <main class="container my-4">
     <h3 class="title font-weight-normal">Registrar Pago</h3>
     <section>
-        <form method="post">{% csrf_token %} {{ form|crispy }}
+        <form method="post">
+            {% csrf_token %}
+            <p>Total: <span name="total" id="total">0</span></p>
+             {{ form|crispy }}
+
             <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
         </form>
     </section>
 </main>
+
+<script>
+    // Obtener referencias a los elementos HTML
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    var totalElement = document.getElementsByName("total")[0];
+    var amountElement = document.getElementById("id_amount");
+
+    // Crear la función para sumar los valores
+    function sumar() {
+      var total = 0;
+
+      // Recorrer todos los checkboxes para verificar cuáles están seleccionados
+      checkboxes.forEach(function(checkbox) {
+        if (checkbox.checked) {
+          total += parseInt(checkbox.value);
+        }
+      });
+
+      // Actualizar los valores en la página web
+      totalElement.innerHTML = total;
+      amountElement.value = total;
+    }
+
+    // Agregar un detector de eventos para cuando se haga clic en un checkbox
+    checkboxes.forEach(function(checkbox) {
+      checkbox.addEventListener("click", sumar);
+    });
+  </script>
 {% endblock content %}}

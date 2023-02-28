@@ -37,17 +37,10 @@ class CreditForm(forms.ModelForm):
             })
     )
     
-    end_date = forms.DateField(
-        label="Fecha de Vto.",
-        widget=  NumberInput(attrs={
-            'type': 'date',
-            })
-    )
-    
     
     class Meta:
         model = Credit
-        fields = ["amount", "credit_interest", "installment_num", "start_date", "end_date"]
+        fields = ["amount", "credit_interest", "installment_num", "start_date"]
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super(CreditForm, self).__init__(*args, **kwargs)

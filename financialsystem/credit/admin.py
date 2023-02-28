@@ -20,7 +20,6 @@ class InstallmentAdmin(admin.ModelAdmin):
         'credit',
         'installment_number', 
         'amount', 
-        'payment_date',
         'is_caduced_installment', 
         'is_paid_installment', 
         'is_refinancing_installment', 

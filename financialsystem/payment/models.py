@@ -20,7 +20,7 @@ class Payment(models.Model):
 
     is_refinancing_pay = models.BooleanField(default=False)
     
-    amount = models.PositiveIntegerField(help_text="Monto de Pago")
+    amount = models.DecimalField(help_text="Monto de Pago", default=0,max_digits=15,decimal_places=2)
     paid_date = models.DateTimeField(default=datetime.now, help_text="Fecha de Pago")
     installment = models.ForeignKey(Installment, on_delete=models.SET_NULL, null=True, blank=True)
     adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, null=True, blank=True)
@@ -39,11 +39,11 @@ class Payment(models.Model):
 def up_installmet(instance, *args, **kwargs):
     user = instance._user
     Movement.objects.create(
-        amount = user.amount,
+        amount = instance.amount,
         user = user,
         cashregister = CashRegister.objects.last(),
         operation_mode = 'INGRESO',
-        description= 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (instance.installment_number, instance.credit.client, user),
+        description= 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (instance.installment.installment_number, instance.credit.client, user),
         money_type = instance.payment_method
         )
     Payment.objects.create(
