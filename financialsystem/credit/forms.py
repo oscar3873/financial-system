@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from django import forms
 from crispy_forms.helper import FormHelper
 from .models import Credit
@@ -29,13 +29,20 @@ class CreditForm(forms.ModelForm):
         max_value=12,
     )
     
-    start_date = forms.DateField(
+    start_date = forms.DateTimeField(
         label="Fecha de Entrada",
-        widget=  NumberInput(attrs={
+        required=True,
+        widget=  forms.DateInput(attrs={
             'type': 'date',
             'value': datetime.now().date()
             })
     )
+
+    # client = forms.ModelChoiceField(
+    #     queryset= Client.objects.all(),
+    #     initial=Client.objects.last(),
+    #     required= True
+    # )
     
     
     class Meta:
@@ -43,7 +50,7 @@ class CreditForm(forms.ModelForm):
         fields = ["amount", "credit_interest", "installment_num", "start_date"]
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        super(CreditForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})

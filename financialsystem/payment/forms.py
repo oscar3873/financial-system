@@ -37,12 +37,10 @@ class PaymentForm(forms.ModelForm):
         model = Payment
         fields = [ "paid_date", "payment_method","amount"]
     
-    def __init__(self, credit,*args, **kwargs):
-        # credit = kwargs.pop("credit", None)
+    def __init__(self,installments,*args, **kwargs):
+
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper
-        excludes = ['Refinanciada', 'Pagada']
-        installments = credit.installment.exclude(condition__in=excludes)
         if installments.count() > 0:
             for installment in installments:
                 if installment == installments.first():

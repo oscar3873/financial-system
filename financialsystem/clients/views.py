@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Q
+from django.forms import inlineformset_factory
 from .utils import all_properties_client
 
 
@@ -10,11 +11,11 @@ from django.shortcuts import redirect
 #CRUD CLIENT
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from django.urls import reverse_lazy
 #FORMS
-from .forms import ClientForm
+from .forms import ClientForm, PhoneNumberForm
 #MODEL
 from .models import Client, PhoneNumber
 from credit.models import Credit
@@ -49,38 +50,34 @@ class ClientListView(LoginRequiredMixin, ListView):
         return context
     
 
-#CREACION DE UN CLIENTE
-#------------------------------------------------------------------
-class ClientCreate(LoginRequiredMixin, CreateView):    
-    form_class = ClientForm
-    model = Client
-    template_name = 'clients/client_form.html'
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
-    
-    
-    def get_success_url(self) -> str:
-        messages.success(
-            self.request, 
-            'El cliente dado de alta correctamente', 
-            "success")
-        return  reverse_lazy('clients:list')
-
 #ACTUALIZACION DE UN CLIENTE
 #------------------------------------------------------------------
-class ClientUpdate(LoginRequiredMixin, UpdateView):
-    form_class = ClientForm
-    model = Client
-    template_name = 'clients/client_update_form.html'
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
-    
+def update_client(request, pk):
+    client = get_object_or_404(Client, pk=pk)
+    client_form = ClientForm(instance=client)
+    PhoneNumberFormSet = inlineformset_factory(Client, PhoneNumber, form=PhoneNumberForm, extra=0)
+    phone_number_formset = PhoneNumberFormSet(instance=client)
 
-    def get_success_url(self) -> str:
-        messages.success(self.request, 'Los datos de modificado satisfactoriamente', "info")
-        return  reverse_lazy('clients:list')
+    if request.method == 'POST':
+        client_form = ClientForm(request.POST, instance=client)
+        phone_number_formset = PhoneNumberFormSet(request.POST, instance=client)
+
+        if client_form.is_valid():
+            print("VALID")
+            client = client_form.save(commit=False)
+            client.adviser = request.user.adviser
+            client.save()
+            phone_number_formset.save()
+            print()
+        else:
+            print(phone_number_formset.errors)
+    
+    context = {
+        'cliente_form': client_form,
+        'phone_number_form': phone_number_formset,
+    }
+    
+    return render(request, 'clients/client_update.html', context)
         
 #BORRADO DE NUMEROS DE UN CLIENTE
 #------------------------------------------------------------------

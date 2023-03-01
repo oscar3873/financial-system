@@ -5,5 +5,8 @@ from .models import Adviser, Comission
 class NameAdmin(admin.ModelAdmin):
     list_display = ('user','created_at')
 
+class NameAdmin(admin.ModelAdmin):
+    list_display = ['created_at']
+
 admin.site.register(Adviser, NameAdmin)
-admin.site.register(Comission)
+admin.site.register(Comission, NameAdmin)

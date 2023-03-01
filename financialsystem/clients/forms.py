@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from django import forms
 from crispy_forms.helper import FormHelper
-from django.forms import inlineformset_factory
+from django.forms import HiddenInput, inlineformset_factory
 from clients.models import Client, PhoneNumber
 from django.contrib.auth.models import User
 from credit.models import Credit
@@ -55,6 +55,7 @@ class ClientForm(forms.ModelForm):
         label= "Domicilio Laboral",
         required=True,
     )
+    
     class Meta:
         model = Client
         fields = "__all__"
@@ -88,18 +89,24 @@ class PhoneNumberForm(forms.ModelForm):
     phone_type = forms.ChoiceField(
         label="Tipo",
         choices= PhoneType,
+        required=False,
     )
-    
+
     class Meta:
         model = PhoneNumber
-        fields = "__all__"
+        fields = ["id","phone_number","phone_type"]
+        widgets = {
+            'id': HiddenInput(),
+        }
+        
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(PhoneNumberForm,self).__init__(*args, **kwargs)
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})  
         self.helper = FormHelper
+
 
 #------------------------------------------------------------------
 PhoneNumberFormSet = inlineformset_factory(

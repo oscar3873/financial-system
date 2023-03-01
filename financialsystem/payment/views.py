@@ -29,8 +29,8 @@ class PaymentListView(LoginRequiredMixin, ListView):
         context["count_payments"] = self.model.objects.all().count()
         context["payments"] = self.model.objects.all()
         #VALIDACION DE EXISTENCIA PARA AL MENOS UN CLIENTE
-        if self.model.objects.all().count() > 0:
-            context["properties"] = self.model.objects.all()[0].all_properties()
+        # if self.model.objects.all().count() > 0:
+        #     context["properties"] = self.model.objects.all()[0].all_properties()
         
         return context
 
@@ -42,18 +42,31 @@ class PaymentCreateView(CreateView):
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["credit"] = get_object_or_404(Credit, pk = self.kwargs["pk"])
+        self.objet = get_object_or_404(Credit, pk = self.kwargs["pk"])
+        excludes = ['Refinanciada', 'Pagada']
+        self.installments = self.objet.installment.exclude(condition__in=excludes)
+        kwargs["installments"] = self.installments
         return kwargs
     
     def get_success_url(self) -> str:
         messages.success(self.request, 'Nota creada correctamente', "success")
-        return  reverse_lazy('payments:list')
+        return  reverse_lazy('clients:detail', pk = self.objet)
     
     def form_valid(self, form):
+        installments = list(self.installments.all())
+        cuotas = {key: True for key, value in self.request.POST.items() if key.startswith('Cuota')}
+
+        pack = dict(zip(installments, cuotas.values()))
+        
         if form.is_valid():
             payment = form.save(commit=False)
             payment._user = self.request.user
-            payment.save()
+            for payed in pack.keys():
+                payed.condition = 'Pagada'
+                payed.save()
+                payment.installment = payed
+                payment.save()
+            
         return super().form_valid(form)
 
 #BORRADO DE UNA NOTA

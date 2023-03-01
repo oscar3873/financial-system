@@ -63,74 +63,16 @@
                 <div class="form-row">
                     {{phone_number_form.management_form}} {% for phone_form in phone_number_form %}
                     <div class="form-group col-md-3">
-                        {{phone_form.phone_number.label}} {{phone_form.phone_number}}
+                        {{phone_form.phone_number.label}} {{phone_form.phone_number}}  {{phone_form.phone_number.id}}
                     </div>
                     <div class="form-group col-md-2">
                         {{phone_form.phone_type.label}} {{phone_form.phone_type}}
                     </div>
                     {% endfor %}
+                <div>
+                    <button type="submit" class="btn btn-info d-block mx-auto my-4 rounded p-2">Registrar Credito</button>
                 </div>
-                <h4 class="title p-2">Garante</h4>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{garante_form.first_name.label}} {{garante_form.first_name}}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{garante_form.last_name.label}} {{garante_form.last_name}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{garante_form.email.label}} {{garante_form.email}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{garante_form.dni.label}} {{garante_form.dni}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{garante_form.civil_status.label}} {{garante_form.civil_status}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{garante_form.address.label}} {{garante_form.address}}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{garante_form.job_address.label}} {{garante_form.job_address}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{garante_form.profession.label}} {{garante_form.profession}}
-                    </div>
-                </div>
-                <div class="form-row">
-                        {% csrf_token %}
-                        {{ phone_number_formG.as_p }}
-                </div>
-                <h4 class="title p-2">Articulo</h4>
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        {{empeno_form.article.label}} {{empeno_form.article}}
-                    </div>
-                    <div class="form-group col-md-4">
-                        {{empeno_form.brand.label}} {{empeno_form.brand}}
-                    </div>
-                    <div class="form-group col-md-4">
-                        {{empeno_form.model.label}} {{empeno_form.model}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        {{empeno_form.state.label}} {{empeno_form.state}}
-                    </div>
-                    <div class="form-group col-md-4">
-                        {{empeno_form.accessories.label}} {{empeno_form.accessories}}
-                    </div>
-                    <div class="form-group col-md-2">
-                        {{empeno_form.purchase_papers.label}} {{empeno_form.purchase_papers}}
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-info d-block mx-auto my-4 rounded p-2">Registrar Credito</button>
+                
             </form>
         </div>
     </section>

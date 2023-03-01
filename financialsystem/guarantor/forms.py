@@ -1,10 +1,7 @@
-from datetime import date, datetime
 from django import forms
 from crispy_forms.helper import FormHelper
 from django.forms import inlineformset_factory
-from django.contrib.auth.models import User
 from guarantor.models import Guarantor, PhoneNumber
-from clients.models import Client
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
 class GuarantorForm(forms.ModelForm):
@@ -73,9 +70,6 @@ class GuarantorForm(forms.ModelForm):
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO
 #------------------------------------------------------------------
 class PhoneNumberForm(forms.ModelForm):
-    
-    prefix = 'guarantor'
-    
     PhoneType = (
         ('C', 'Celular'), 
         ('F', 'Fijo'),
@@ -96,18 +90,18 @@ class PhoneNumberForm(forms.ModelForm):
         fields = "__all__"
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(PhoneNumberForm,self).__init__(*args, **kwargs)
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
         # Eliminar validación requerida
         for field in self.fields.values():
             field.required = False                
-
+        self.prefix = "guarantor"
         self.helper = FormHelper
 
 #------------------------------------------------------------------
-PhoneNumberFormSet = inlineformset_factory(
+PhoneNumberFormSetG = inlineformset_factory(
     Guarantor, 
     PhoneNumber, 
     form = PhoneNumberForm,

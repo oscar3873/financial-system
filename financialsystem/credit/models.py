@@ -25,6 +25,7 @@ class Credit(models.Model):
     condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
     credit_interest = models.PositiveIntegerField(default=40, help_text="Intereses de credito")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto del Credito")
+    mov = models.OneToOneField(Movement,on_delete=models.SET_NULL,null=True)
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="client_credits")
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
@@ -120,7 +121,9 @@ def repayment_amount_auto(instance, *args, **kwargs):
         credit.credit_repayment_amount = Decimal(repayment_amount)
 
 def create_installments_auto(instance, created, *args, **kwargs):
-    if created and not instance.is_old_credit:
+    if not instance.is_old_credit:
+        if not created:
+            instance.installment.all().delete()
         credit = instance
         days = 30
         amount_installment = Decimal(credit.credit_repayment_amount/credit.installment_num)
@@ -135,16 +138,6 @@ def create_installments_auto(instance, created, *args, **kwargs):
                 end_date=end_date
                 )
             days += 30
-
-def comission_create(instance, *args, **kwargs):
-    amount = instance.amount*Decimal(0.075)
-    Comission.objects.create(
-        adviser = instance.client.adviser,
-        amount = amount,
-        type = 'REGISTRO',
-        create_date = instance.start_date,
-        commission_charged_to = instance.client,
-        )
 
 pre_save.connect(repayment_amount_auto, sender= Credit)
 post_save.connect(create_installments_auto, sender= Credit)

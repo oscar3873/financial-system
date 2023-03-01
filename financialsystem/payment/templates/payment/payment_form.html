@@ -5,7 +5,6 @@
     <section>
         <form method="post">
             {% csrf_token %}
-            <p>Total: <span name="total" id="total">0</span></p>
              {{ form|crispy }}
 
             <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
@@ -16,7 +15,6 @@
 <script>
     // Obtener referencias a los elementos HTML
     var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    var totalElement = document.getElementsByName("total")[0];
     var amountElement = document.getElementById("id_amount");
 
     // Crear la función para sumar los valores
@@ -31,7 +29,7 @@
       });
 
       // Actualizar los valores en la página web
-      totalElement.innerHTML = total;
+      amountElement.innerHTML = total;
       amountElement.value = total;
     }
 
