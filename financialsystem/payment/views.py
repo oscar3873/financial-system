@@ -50,7 +50,7 @@ class PaymentCreateView(CreateView):
     
     def get_success_url(self) -> str:
         messages.success(self.request, 'Nota creada correctamente', "success")
-        return  reverse_lazy('clients:detail', pk = self.objet)
+        return  reverse_lazy('clients:detail', pk=self.objet.client.pk)
     
     def form_valid(self, form):
         installments = list(self.installments.all())
@@ -63,6 +63,7 @@ class PaymentCreateView(CreateView):
             payment._user = self.request.user
             for payed in pack.keys():
                 payed.condition = 'Pagada'
+                payed.is_paid_installment = True
                 payed.save()
                 payment.installment = payed
                 payment.save()
