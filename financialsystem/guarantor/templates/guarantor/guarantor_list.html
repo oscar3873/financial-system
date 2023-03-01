@@ -73,7 +73,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for guarantor in page_obj %}
+                {% for guarantor in guarantors %}
                 <tr>
                     <td><a href="{% url 'guarantors:detail' guarantor.pk %}">{{guarantor.first_name}} {{guarantor.last_name}}</a></td>
                     <td>{{guarantor.email}}</td>

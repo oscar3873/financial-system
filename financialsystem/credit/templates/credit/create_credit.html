@@ -104,8 +104,14 @@
                     </div>
                 </div>
                 <div class="form-row">
-                        {% csrf_token %}
-                        {{ phone_number_formG.as_p }}
+                    {{phone_number_formG.management_form}} {% for phone_formG in phone_number_formG %}
+                    <div class="form-group col-md-3">
+                        {{phone_formG.phone_number.label}} {{phone_formG.phone_number}}
+                    </div>
+                    <div class="form-group col-md-2">
+                        {{phone_formG.phone_type.label}} {{phone_formG.phone_type}}
+                    </div>
+                    {% endfor %}
                 </div>
                 <h4 class="title p-2">Articulo</h4>
                 <div class="form-row">

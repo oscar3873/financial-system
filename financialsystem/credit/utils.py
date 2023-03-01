@@ -3,7 +3,7 @@ import decimal
 
 from .models import Credit, InstallmentRefinancing
 
-def actualizar_fechas():
+def refresh_condition_exp():
     if Credit.objects.exists():
         creditos_a_tiempo = Credit.objects.filter(condition = 'A Tiempo')       # TODOS LOS CREDITOS QUE 'ESTEN A TIEMPO'
         ###### __lt = (<) 'less-than sign' | __gt = (>) 'greater-than sign' and with e, like __lte or __gte, are 'less/greater-or equal-than sign'
@@ -42,7 +42,14 @@ def actualizar_fechas():
             cred = credito.installment.filter(condition= 'Vencida')
             if cred.count() >= 2 and cred.end_date.date()+timedelta(days=10) < date.today():
                 credito.condition = 'Legales'
-                credito.save() 
+                credito.save()
+
+def refresh_condition_paid():
+    credit_ok = Credit.objects.filter(is_paid_credit=False).filter(installment__is_paid_installment=True)
+
+    for credit in credit_ok:
+        if credit.installment.count() == credit.installment.filter(is_paid_installment=True).count():
+            credit.is_paid_credit=True
 
 
 def total_to_ref(amount, interest, pk, user, operation_mode):

@@ -52,8 +52,7 @@ def crear_credito(request):
             credit = credit_form.save(commit=False)
             credit.client = client
             if not credit.is_old_credit:
-                create_movement(credit, request.user.adviser)
-                comission_create(credit, request.user.adviser)
+                credit.mov = create_movement(credit, request.user.adviser)
             credit.save()
             
             guarantor = guarantor_form.save(commit=False)
@@ -135,7 +134,6 @@ class CreditCreateView(CreateView):
     
     def get_success_url(self) -> str:
         print(self.kwargs)
-        # create_movement(self.kwargs['object'])
         messages.success(self.request, 'Credito creado correctamente', "success")
         return  reverse_lazy('credits:list')
     
@@ -144,7 +142,6 @@ class CreditCreateView(CreateView):
 class CreditUpdateView(UpdateView):
     model = Credit
     form_class = CreditForm
-
 
     def form_valid(self, form):
         if form.is_valid():
@@ -176,6 +173,7 @@ def create_movement(instance, adviser):
         description = 'CREDITO PARA %s \nCUOTAS: %s' % (instance.client, instance.installment_num),
         money_type = 'PESOS',
         )
+    comission_create(instance, adviser)
     return mov
 
 
