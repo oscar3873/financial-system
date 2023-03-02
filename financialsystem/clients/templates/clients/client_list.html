@@ -71,8 +71,7 @@
                     </td>
                     <td>{{client.profession}}</td>
                     <td>{{client.address}}</td>
-                    <!-- <td>{{client.job_address}}</td> -->
-                    <td>{{client.adviser}}</td>
+                    <td><a href="{% url 'advisers:detail' client.adviser.pk %}">{{client.adviser}}</a></td>
                     <td>{{client.created_at}}</td>
                     {% if user.is_superuser %}
                     <td>

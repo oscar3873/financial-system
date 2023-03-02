@@ -7,8 +7,9 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from .utils import all_properties_credit
-from .forms import CreditForm
-from .models import Credit
+
+from .forms import CreditForm, RefinancingForm
+from .models import Credit, Installment, Refinancing
 from cashregister.models import CashRegister, Movement
 from adviser.models import Comission
 
@@ -166,7 +167,7 @@ class CreditDeleteView(DeleteView):
 
 def create_movement(instance, adviser):
     mov = Movement.objects.create(
-        user = adviser.user,
+        user = adviser,
         amount = instance.amount,
         cashregister = CashRegister.objects.last(),
         operation_mode = 'EGRESO',
@@ -185,3 +186,5 @@ def comission_create(instance, adviser):
         type = 'REGISTRO',
         create_date = instance.start_date,
         ) 
+    
+

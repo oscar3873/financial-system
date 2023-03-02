@@ -1,9 +1,7 @@
 from decimal import Decimal
-import math
 import uuid
 from django.db import models
 from clients.models import Client
-from adviser.models import Comission
 from cashregister.models import Movement
 from django.db.models.signals import post_save, pre_save
 from datetime import datetime, timedelta
@@ -78,7 +76,7 @@ class Refinancing(models.Model):
     is_paid_refinancing = models.BooleanField(default=False, help_text="La refinanciacion esta pagada")
     
     refinancing_interest = models.PositiveIntegerField(default=48, help_text="Intereses de la refinanciacion")
-    amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto a refinanciar")
+    amount = models.DecimalField(decimal_places=2, max_digits=15)
     refinancing_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolver de la Refinanciacion")
     installment = models.OneToOneField(Installment, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cuota de la Refinanciacion", related_name="refinancing")
     installment_num_refinancing = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
@@ -145,14 +143,20 @@ post_save.connect(create_installments_auto, sender= Credit)
 
 #-------------------- SEÑALES PARA REFINANCIACION Y CUOTAS --------------------
 def refinancing_repayment_amount_auto(instance, *args, **kwargs):
+    refinancing = instance
 
-        refinancing = instance
-        interests_amount = Decimal(float(refinancing.amount_refinancing) * (float(refinancing.refinancing_interest) / 100))
-        repayment_amount = refinancing.amount_refinancing + interests_amount
-        refinancing.refinancing_repayment_amount = Decimal(repayment_amount)
+    match (int (refinancing.installment_num_refinancing)):
+        case 3: refinancing.refinancing_interest = 25
+        case 6: refinancing.refinancing_interest = 50
+        case 9: refinancing.refinancing_interest = 75
+        case _: refinancing.refinancing_interest = 100
+    
+    print((refinancing.amount))
+    interests_amount = Decimal(float(refinancing.amount) * (float(refinancing.refinancing_interest+100) / 100))
+    repayment_amount = refinancing.amount + interests_amount
+    refinancing.refinancing_repayment_amount = Decimal(repayment_amount)
 
 def create_installmentsR_auto(instance, created, *args, **kwargs):
-
     if created:
         refinancing = instance
         days = 30

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CreditListView, CreditDetailView, CreditUpdateView, CreditDeleteView, CreditCreateView, crear_credito
+from .views import *
 
 credits_patterns = ([
     path('createcredit/', crear_credito, name='create_credit'),

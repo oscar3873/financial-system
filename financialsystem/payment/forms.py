@@ -1,6 +1,5 @@
 from datetime import datetime
 from django import forms
-from crispy_forms.helper import FormHelper
 
 from payment.models import Payment
 
@@ -14,8 +13,8 @@ class PaymentForm(forms.ModelForm):
         ('DEBITO', 'DEBITO'),
     )
 
-    amount = forms.TextInput(
-        attrs={'value': '0', "class": "numberinput form-control sin-borde"}
+    amount = forms.NumberInput(
+        attrs={'value': '0'}
     )
 
     paid_date = forms.DateField(
@@ -40,7 +39,6 @@ class PaymentForm(forms.ModelForm):
     def __init__(self,installments,*args, **kwargs):
 
         super(PaymentForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper
         if installments.count() > 0:
             for installment in installments:
                 if installment == installments.first():

@@ -47,7 +47,7 @@
                         <span class="p-2 d-block">{{ listing_filter.form.dni.label}}</span>
                         <span class="p-2">{{ listing_filter.form.dni}}</span>
                         <span class="p-2 d-block">{{ listing_filter.form.client.label}}</span>
-                        <span class="p-2">{{ listing_filter.form.client}}</span>
+                        <span class="p-2">{{ listing_filter.form.client|default_if_none:'-'}}</span>
                         <span class="p-2 d-block">{{ listing_filter.form.created_at.label}}</span>
                         <span class="p-2">{{ listing_filter.form.created_at}}</span>
                         <button class="d-block btn btn-info m-2" type="submit">Buscar</button>
@@ -79,7 +79,11 @@
                     <td>{{guarantor.email}}</td>
                     <td>{{guarantor.get_civil_status_display}}</td>
                     <td>{{guarantor.dni}}</td>
+                    {% if guarantor.credit.client %}
                     <td><a href="{% url 'clients:detail' guarantor.credit.client.pk %}">{{guarantor.credit}}</a></td>
+                    {% else %}
+                    <td>-</td>
+                    {% endif %}
                     <td>
                         {% if not guarantor.phonenumber_set.all %}
                         <p> - </p>

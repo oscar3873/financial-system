@@ -20,6 +20,6 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         Caja = CashRegister.objects.get_or_create()
         context["cashregister"] = Caja[0]
-        context["notes"] = Note.objects.all().filter(user = self.request.user).order_by("-created_at")[0:4]
-        context["movements"] = Movement.objects.all().filter(user = self.request.user).order_by("-created_at")[0:4]
+        context["notes"] = Note.objects.all().filter(user = self.request.user.adviser).order_by("-created_at")[0:4]
+        context["movements"] = Movement.objects.all().filter(user = self.request.user.adviser).order_by("-created_at")[0:4]
         return context

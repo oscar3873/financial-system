@@ -24,7 +24,7 @@
       // Recorrer todos los checkboxes para verificar cuáles están seleccionados
       checkboxes.forEach(function(checkbox) {
         if (checkbox.checked) {
-          total += parseInt(checkbox.value);
+          total += parseFloat(checkbox.value);
         }
       });
 

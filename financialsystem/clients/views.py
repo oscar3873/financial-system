@@ -2,8 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Q
 from django.forms import inlineformset_factory
-from .utils import all_properties_client
 
+from .utils import all_properties_client
 
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
@@ -18,7 +18,8 @@ from django.urls import reverse_lazy
 from .forms import ClientForm, PhoneNumberForm
 #MODEL
 from .models import Client, PhoneNumber
-from credit.models import Credit
+from credit.models import Credit, Refinancing, Installment
+from credit.forms import RefinancingForm
 
 # Create your views here.
 
@@ -127,7 +128,19 @@ class ClientDetailView(DetailView):
         if context["credits"]:
             context["credit_active"] = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
             context["installments"] = context["credit_active"].installment.all()
+            context["form_ref"]= RefinancingForm(credit=context["credit_active"])
         return context
 
     def get_object(self):
         return get_object_or_404(Client, id=self.kwargs['pk'])
+    
+
+#------------------------------------------------------------------   
+def refinance_installment (request, pk):
+    credit = get_object_or_404(Credit, id = pk)
+    form = RefinancingForm(credit, request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            refinancing = form.save(commit=False)
+            refinancing.save()
+            return redirect('clients:detail', pk=credit.client.id)

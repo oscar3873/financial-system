@@ -1,9 +1,7 @@
-from datetime import datetime, date
+from datetime import datetime
 from django import forms
 from crispy_forms.helper import FormHelper
-from .models import Credit
-from clients.models import Client
-from django.forms import NumberInput
+from .models import Credit, Refinancing
 
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
@@ -37,14 +35,6 @@ class CreditForm(forms.ModelForm):
             'value': datetime.now().date()
             })
     )
-
-    # client = forms.ModelChoiceField(
-    #     queryset= Client.objects.all(),
-    #     initial=Client.objects.last(),
-    #     required= True
-    # )
-    
-    
     class Meta:
         model = Credit
         fields = ["amount", "credit_interest", "installment_num", "start_date"]
@@ -55,3 +45,50 @@ class CreditForm(forms.ModelForm):
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
         self.helper = FormHelper
+
+#-----------------------------------------------------------------
+class RefinancingForm(forms.ModelForm):
+    CHOICES = [
+        (3,"3 Cuotas"),
+        (6,"6 Cuotas"),
+        (9,"9 Cuotas"),
+        (12,"12 Cuotas"),
+    ]
+    
+    amount = forms.CharField(
+        label= "Total a Pagar $",
+        widget=forms.TextInput(
+            attrs={'readonly': 'readonly', 'style': 'border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'}
+        )
+    )
+
+
+    installment_num_refinancing = forms.ChoiceField(
+        label= "Numero de Cuotas",
+        choices=CHOICES,
+        initial=CHOICES[0],
+        required= True,
+    )
+
+    class Meta:
+        model = Refinancing
+        fields = ["installment_num_refinancing","amount"]
+
+
+    def __init__(self,credit,*args, **kwargs):
+        super().__init__(*args, **kwargs)
+        excludes = ['Refinanciada', 'Pagada']
+        installments = credit.installment.exclude(condition__in=excludes)
+
+        for installment in installments:
+            if installment == credit.installment.first():
+                self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
+                    label='Cuota %s (intereses acumulados $ %s)' % (installment.installment_number, installment.daily_interests),required=True,
+                    widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests})
+                )
+            else:
+                self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
+                    label='Cuota %s (intereses acumulados $ %s)' % (installment.installment_number, installment.daily_interests),required=False,
+                    widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests})
+                )
+        
