@@ -13,11 +13,11 @@
             <!--Botones de  Carga-->
             <article class="container p-0 my-4">
                 <div class="btn-group d-flex flex-sm-row flex-column justify-content-center" role="group" aria-label="Basic example">
-                    <a name="" id="" class="btn btn-info m-2 rounded p-3" href="{% url 'credits:create_credit' %}" role="button">
+                    <a name="" id="" class="btn btn-secondary m-2 rounded box-shadow p-3" href="{% url 'credits:create_credit' %}" role="button">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                         <span>Nuevo Credito</span>
                     </a>
-                    <a name="" id="" class="btn btn-info m-2 rounded p-3" href="{% url 'signup' %}" role="button">
+                    <a name="" id="" class="btn btn-secondary m-2 box-shadow rounded p-3" href="{% url 'signup' %}" role="button">
                         <i class="fa fa-user-plus" aria-hidden="true"></i>
                         <span>Nuevo Asesor</span>
                     </a>
@@ -60,7 +60,7 @@
                             </a> {% empty %}
                             <small class="font-weight-light">No hay movimientos registrados</small> {% endfor %}
                         </div>
-                        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
                     </div>
                     <!--Proximos Vencimientos-->
                     <div class="card box-shadow border rounded mx-2">
@@ -76,7 +76,7 @@
                             {% endfor %} {% else %}
                             <strong class="font-weight-bold text-primary">Wow! Que insólito </strong> {% endif %}
                         </div>
-                        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
                     </div>
                 </div>
             </article>
@@ -100,7 +100,7 @@
                     {% empty %}
                     <small class="text-info text-center">No hay notas disponibles</small> {% endfor %}
                 </div>
-                <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
             </div>
         </aside>
     </section>
@@ -108,7 +108,7 @@
     <section class="row mt-4">
         <!--Tabla de Clientes-->
         <div class="container">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped m-0 box-shadow table-hover">
                 <thead class="table-light">
                     <tr>
                         <th scope="col"><i class="fa-solid fa-user"></i> Cliente</th>
@@ -166,7 +166,7 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="card-footer p-1 bg-info rounded-bottom"></div>
+            <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
         </div>
     </section>
     <!--Seccion 3-->
@@ -205,7 +205,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
                     </div>
                 </div>
                 <!--Card Asesor 2-->
@@ -240,7 +240,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
                     </div>
                 </div>
                 <!--Card Asesor 3-->
@@ -275,7 +275,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
                     </div>
                 </div>
             </div>

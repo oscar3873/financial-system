@@ -10,7 +10,7 @@
             <div class="col-xl-3 col-sm-6 col-12 p-3">
                 <div class="card">
                     <div class="card-content">
-                        <div class="card-body">
+                        <div class="card-body box-shadow">
                             <div class="media d-flex">
                                 <div class="align-self-center">
                                     <i class="fa-solid fa-money-bill icon-lg text-warning"></i>
@@ -22,13 +22,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
             <div class="col-xl-3 col-sm-6 col-12 p-3">
                 <div class="card">
                     <div class="card-content">
-                        <div class="card-body">
+                        <div class="card-body box-shadow">
                             <div class="media d-flex">
                                 <div class="align-self-center">
                                     <i class="fa-solid fa-money-bill icon-lg text-warning"></i>
@@ -40,13 +40,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
             <div class="col-xl-3 col-sm-6 col-12 p-3">
                 <div class="card">
                     <div class="card-content">
-                        <div class="card-body">
+                        <div class="card-body box-shadow">
                             <div class="media d-flex">
                                 <div class="align-self-center">
                                     <i class="fa-solid fa-money-bill icon-lg text-warning"></i>
@@ -58,13 +58,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
             <div class="col-xl-3 col-sm-6 col-12 p-3">
                 <div class="card">
                     <div class="card-content">
-                        <div class="card-body">
+                        <div class="card-body box-shadow">
                             <div class="media d-flex">
                                 <div class="align-self-center">
                                     <i class="fa-solid fa-money-bill-transfer icon-lg text-warning"></i>
@@ -76,7 +76,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
         </div>
@@ -84,7 +84,7 @@
             <div class="col-xl-3 col-sm-6 col-12 p-3">
                 <div class="card">
                     <div class="card-content">
-                        <div class="card-body">
+                        <div class="card-body box-shadow">
                             <div class="media d-flex">
                                 <div class="align-self-center">
                                     <i class="fa-solid fa-credit-card icon-lg text-warning"></i>
@@ -96,13 +96,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
             <div class="col-xl-3 col-sm-6 col-12 p-3">
                 <div class="card">
                     <div class="card-content">
-                        <div class="card-body">
+                        <div class="card-body box-shadow">
                             <div class="media d-flex">
                                 <div class="align-self-center">
                                     <i class="fa-solid fa-credit-card icon-lg text-warning"></i>
@@ -114,7 +114,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
     </section>
@@ -124,8 +124,8 @@
             <article class="container p-0 my-4">
                 <div class="row">
                     <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
-                        <div class="card">
-                            <div class="card-body border-bottom-0">
+                        <div class="card box-shadow">
+                            <div class="card-body box-shadow border-bottom-0">
                                 <h4 class="card-title">Caja</h4>
                                 <p class="card-text font-weight-light">Balances en Caja</p>
                             </div>
@@ -140,7 +140,7 @@
                         </div>
                     </div>
                     <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-warning box-shadow" role="alert">
                             <h4 class="alert-heading"><i class="fa-solid fa-circle-info"></i> Operar</h4>
                             <p>Ingrese un monto, luego realice una descripcion del la operacion</p>
                             <p>Seleccione la divisa correspondiente</p>
@@ -149,7 +149,7 @@
                         </div>
                         <div class="mb-3 row flex-column justify-content-lg-start">
                             <form method="post">{% csrf_token %} {{ form|crispy}}
-                                <input class="btn btn-info m-2 rounded p-2" type="submit" value="Realizar Operacion">
+                                <input class="btn btn-secondary m-2 rounded box-shadow p-2" type="submit" value="Realizar Operacion">
                             </form>
                         </div>
                     </div>
@@ -180,7 +180,7 @@
                     {% endfor %} {% else %}
                     <small class="text-info text-center">No hay movimientos registrados</small> {% endif %}
                 </div>
-                <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
             </div>
         </aside>
     </section>
@@ -239,6 +239,6 @@
                 </tr>
             </tbody>
         </table>
-        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+        <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
     </div>
 </section>

@@ -62,10 +62,9 @@
                     <td>{{client.get_civil_status_display}}</td>
                     <td>{{client.dni}}</td>
                     <td>
-                        {% if not client.phonenumber_set.all %}
-                        <p> - </p>
-                        {% endif %}
-                        {% for phone_number in client.phonenumber_set.all %}
+                        {% if not client.phonenumberclient_set.all %}
+                        <p>Sin contacto</p>
+                        {% endif %} {% for phone_number in client.phonenumberclient_set.all %}
                         <P>{{phone_number}}</P>
                         {% endfor %}
                     </td>

@@ -40,7 +40,7 @@
                 </div>
             </div>
         </nav>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-info p-0">
+        <nav class="navbar navbar-expand-lg box-shadow navbar-dark bg-secondary p-0">
             <div class="container p-3 p-sm-0 d-flex justify-content-end">
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nep" aria-controls="nep" aria-expanded="false">
                         <span class="navbar-toggler-icon"></span>
@@ -52,7 +52,7 @@
                             <a class="nav-link font-weight-light m-2" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="{% url 'cashregister:home' %}"><i class="fa-solid fa-money-bill-transfer"></i> Movimientos de Caja</a>
+                            <a class="nav-link font-weight-light m-2" href="{% url 'cashregister:home' %}"><i class="fa-solid fa-money-bill-transfer"></i> Caja</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="{% url 'clients:list' %}"><i class="fa-solid fa-users"></i> Clientes</a>
@@ -143,11 +143,8 @@
                 type: 'GET',
                 url: '/',
                 success: function(res) {
-                    setTimeout(() => {
-                        spinner.classList.add("no-display");
-                        content.innerHTML = ``
-                        console.log("Success!");
-                    }, 1200);
+                    spinner.classList.add("no-display");
+                    content.innerHTML = ``
                 }
             })
         </script> -->

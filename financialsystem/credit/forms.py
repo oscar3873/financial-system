@@ -12,7 +12,7 @@ class CreditForm(forms.ModelForm):
         required= True,
         initial= 40,
         min_value= 0,
-        max_value= 100    
+        max_value= 100
     )
     
     amount = forms.DecimalField(
@@ -21,7 +21,7 @@ class CreditForm(forms.ModelForm):
     )
     
     installment_num = forms.IntegerField(
-        label= "Numero de Cuotas",
+        label= "Cuotas",
         required= True,
         min_value=1,
         max_value=12,

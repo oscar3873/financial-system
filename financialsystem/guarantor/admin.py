@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from guarantor.models import Guarantor, PhoneNumber
+from guarantor.models import Guarantor, PhoneNumberGuarantor
 
 # Register your models here.
 class GuarantorAdmin(admin.ModelAdmin):
@@ -21,10 +21,10 @@ class GuarantorAdmin(admin.ModelAdmin):
 
 class PhoneNumberAdmin(admin.ModelAdmin):
     list_display = (
-        'phone_number', 
-        'phone_type',
+        'phone_number_g', 
+        'phone_type_g',
         'guarantor',
     )   
 
 admin.site.register(Guarantor, GuarantorAdmin)
-admin.site.register(PhoneNumber, PhoneNumberAdmin)
+admin.site.register(PhoneNumberGuarantor, PhoneNumberAdmin)

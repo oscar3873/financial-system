@@ -1,0 +1,8 @@
+{% load crispy_forms_tags %}
+<form method="post" id="client_form">
+    {% csrf_token %}
+    <h4 class="card-title">Añadir Cliente</h4>
+    {{ form|crispy}} {% with named_formsets as formset %} {{ formset.management_form }} {{formset}} {% endwith %}
+    <!-- inline form for phone_numbers end -->
+    <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
+</form>

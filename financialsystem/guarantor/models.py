@@ -28,7 +28,7 @@ class Guarantor(models.Model):
         return self.first_name + " " + self.last_name
 
 
-class PhoneNumber(models.Model):
+class PhoneNumberGuarantor(models.Model):
     
     PHONETYPE = (
         ('C', 'Celular'), 
@@ -36,9 +36,9 @@ class PhoneNumber(models.Model):
         ('A', 'Alternativo')
     )
     
-    phone_number = models.CharField(null=True, blank=True, max_length=50, help_text="Phone number", verbose_name="Numero de Telefono")
-    phone_type = models.CharField(max_length=20, help_text="Type of phone", choices=PHONETYPE, verbose_name="Tipo de Telefono")
+    phone_number_g = models.CharField(null=True, blank=True, max_length=50, help_text="Phone number", verbose_name="Numero de Telefono")
+    phone_type_g = models.CharField(max_length=20, help_text="Type of phone", choices=PHONETYPE, verbose_name="Tipo de Telefono")
     guarantor = models.ForeignKey(Guarantor, on_delete=models.CASCADE, blank=True, default="Some String",)
     
     def __str__(self) -> str:
-        return self.phone_number
+        return self.phone_number_g

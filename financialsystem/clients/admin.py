@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Client, PhoneNumber
+from .models import Client, PhoneNumberClient
 # Register your models here.
 class ClientAdmin(admin.ModelAdmin):
     list_display = (
@@ -16,10 +16,10 @@ class ClientAdmin(admin.ModelAdmin):
     )
 class PhoneNumberAdmin(admin.ModelAdmin):
     list_display = (
-        'phone_number', 
-        'phone_type',
+        'phone_number_c', 
+        'phone_type_c',
         'client',
     )   
 
 admin.site.register(Client, ClientAdmin)
-admin.site.register(PhoneNumber, PhoneNumberAdmin)
+admin.site.register(PhoneNumberClient, PhoneNumberAdmin)

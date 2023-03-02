@@ -1,144 +1,301 @@
 <!-- crear_credito.html -->
 {% extends 'core/base.html' %} {% load crispy_forms_tags %} {% block content %}
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Registrar un Cliente</h3>
+    <h3 class="title font-weight-normal">Formulario de solicitud de servicios</h3>
     <section>
-        <div class="my-4">
-            <form method="post">
+        <div class="my-4 py-2">
+            <form class="form" method="post">
                 {% csrf_token %}
-                <h4 class="title p-2">Credito</h4>
-                <div class="form-row">
-                    <div class="form-group col-md-3">
-                        {{credito_form.start_date.label}} {{credito_form.start_date}}
+                <div class="row justify-content-center align-items-start">
+                    <div class="col-md-9">
+                        <div class="card box-shadow mb-3">
+                            <div class="card-body">
+                                <h4 class="title p-2">
+                                    <i class="fa-solid fa-user"></i> &nbsp; Titular
+                                </h4>
+                                <h5 class="title p-2">Informacion basica</h5>
+
+                                <div class="form-row">
+                                    {% if garante_form.errors or formsetPhoneGuarantor.errors %}
+                                    <ul class="error-list">
+                                        <li class="text-danger">Hay errores en el formulario de garantes, por favor corríjalos.</li>
+                                    </ul>
+                                    {% endif %} {% for field in cliente_form %} {% if field.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in field.errors %}
+                                        <li class="text-danger">{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %} {% endfor %}
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.first_name.label}} {{cliente_form.first_name}}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.email.label}} {{cliente_form.email}}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        {{cliente_form.dni.label}} {{cliente_form.dni}}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.address.label}} {{cliente_form.address}}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.profession.label}} {{cliente_form.profession}}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        {{cliente_form.score.label}}{{cliente_form.score}}
+                                    </div>
+                                </div>
+                                <h5 class="title p-2"><i class="fa-solid fa-phone"></i>&nbsp;Datos de Contacto</h5>
+                                <div class="form-row">
+                                    <ul class="error-list">
+                                        {% for form in formsetPhoneClient %} {% for field in form %} {% for error in field.errors %}
+                                        <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
+                                    </ul> {{ formsetPhoneClient.non_form_errors }}
+                                </div>
+                                <p>
+                                    <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
+                                      Añadir numeros de contacto
+                                    </button>
+                                </p>
+                                <div class="collapse" id="collapsePNC">
+                                    <div class="form-row">
+                                        {{formsetPhoneClient.management_form}} {% for phone_form in formsetPhoneClient %}
+                                        <div class="form-group col-md-3">
+                                            {{phone_form.phone_number_c.label}} {{phone_form.phone_number_c}}
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            {{phone_form.phone_type_c.label}} {{phone_form.phone_type_c}}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                        </div>
                     </div>
-                    <!-- <div class="form-group col-md-3">
-                        {{credito_form.end_date.label}} {{credito_form.end_date}}
-                    </div> -->
-                    <div class="form-group col-md-2">
-                        {{credito_form.amount.label}} {{credito_form.amount}}
-                    </div>
-                    <div class="form-group col-md-2">
-                        {{credito_form.installment_num.label}} {{credito_form.installment_num}}
-                    </div>
-                    <div class="form-group col-md-1">
-                        {{credito_form.credit_interest.label}} {{credito_form.credit_interest}}
-                    </div>
-                </div>
-                <h4 class="title p-2">Titular</h4>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{cliente_form.first_name.label}} {{cliente_form.first_name}}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{cliente_form.email.label}} {{cliente_form.email}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{cliente_form.dni.label}} {{cliente_form.dni}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{cliente_form.address.label}} {{cliente_form.address}}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{cliente_form.profession.label}} {{cliente_form.profession}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{cliente_form.score.label}}{{cliente_form.score}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    {{phone_number_form.management_form}} {% for phone_form in phone_number_form %}
-                    <div class="form-group col-md-3">
-                        {{phone_form.phone_number.label}} {{phone_form.phone_number}}
-                    </div>
-                    <div class="form-group col-md-2">
-                        {{phone_form.phone_type.label}} {{phone_form.phone_type}}
-                    </div>
-                    {% endfor %}
-                </div>
-                <h4 class="title p-2">Garante</h4>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{garante_form.first_name.label}} {{garante_form.first_name}}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{garante_form.last_name.label}} {{garante_form.last_name}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{garante_form.email.label}} {{garante_form.email}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{garante_form.dni.label}} {{garante_form.dni}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{garante_form.civil_status.label}} {{garante_form.civil_status}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{garante_form.address.label}} {{garante_form.address}}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{garante_form.job_address.label}} {{garante_form.job_address}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{garante_form.profession.label}} {{garante_form.profession}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    {{phone_number_formG.management_form}} {% for phone_formG in phone_number_formG %}
-                    <div class="form-group col-md-3">
-                        {{phone_formG.phone_number.label}} {{phone_formG.phone_number}}
-                    </div>
-                    <div class="form-group col-md-2">
-                        {{phone_formG.phone_type.label}} {{phone_formG.phone_type}}
-                    </div>
-                    {% endfor %}
-                </div>
-                <h4 class="title p-2">Articulo</h4>
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        {{empeno_form.article.label}} {{empeno_form.article}}
-                    </div>
-                    <div class="form-group col-md-4">
-                        {{empeno_form.brand.label}} {{empeno_form.brand}}
-                    </div>
-                    <div class="form-group col-md-4">
-                        {{empeno_form.model.label}} {{empeno_form.model}}
+                    <div class="col-md-3">
+                        <div class="card box-shadow mb-3">
+                            <div class="card-body">
+                                <h4 class="title p-2">
+                                    <i class="fa-solid fa-landmark"></i> &nbsp; Credito
+                                </h4>
+                                <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        {{credito_form.start_date.label}} {{credito_form.start_date}}
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        {{credito_form.amount.label}} {{credito_form.amount}}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        {{credito_form.installment_num.label}} {{credito_form.installment_num}}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        {{credito_form.credit_interest.label}} {{credito_form.credit_interest}}
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label class="m-0" for="monto">Monto a Devolver:</label>
+                                        <h4 class="d-block mt-1 text-success" id="monto_valor" name="monto_valor"></h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group col-md-4">
-                        {{empeno_form.state.label}} {{empeno_form.state}}
-                    </div>
-                    <div class="form-group col-md-4">
-                        {{empeno_form.accessories.label}} {{empeno_form.accessories}}
-                    </div>
-                    <div class="form-group col-md-2">
-                        {{empeno_form.purchase_papers.label}} {{empeno_form.purchase_papers}}
+                <p>
+                    <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseG" aria-expanded="false" aria-controls="collapseG">
+                      Añadir Garante
+                    </button>
+                </p>
+                <div class="collapse" id="collapseG">
+                    <div class="card box-shadow mb-3">
+                        <div class="card-body">
+                            <h4 class="title p-2"><i class="fa-solid fa-user"></i> &nbsp; Garante</h4>
+                            <h5 class="title p-2">Informacion basica</h5>
+                            <div class="form-row">
+                                {% for field in garante_form %} {% if field.errors %}
+                                <ul class="errorlist">
+                                    {% for error in field.errors %}
+                                    <li class="text-danger">{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %} {% endfor %}
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {{garante_form.first_name.label}} {{garante_form.first_name}}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    {{garante_form.last_name.label}} {{garante_form.last_name}}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {{garante_form.email.label}} {{garante_form.email}}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    {{garante_form.dni.label}} {{garante_form.dni}}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    {{garante_form.civil_status.label}} {{garante_form.civil_status}}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {{garante_form.address.label}} {{garante_form.address}}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    {{garante_form.job_address.label}} {{garante_form.job_address}}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {{garante_form.profession.label}} {{garante_form.profession}}
+                                </div>
+                            </div>
+                            <h5 class="title p-2"><i class="fa-solid fa-phone"></i>&nbsp;Datos de Contacto</h5>
+                            <div class="form-row">
+                                <ul class="error-list">
+                                    {% for form in formsetPhoneGuarantor %} {% for field in form %} {% for error in field.errors %}
+                                    <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
+                                </ul> {{ formsetPhoneGuarantor.non_form_errors }}
+                            </div>
+                            <p>
+                                <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNG" aria-expanded="false" aria-controls="collapsePNG">
+                                  Añadir numeros de contacto
+                                </button>
+                            </p>
+                            <div class="collapse" id="collapsePNG">
+                                <div class="form-row">
+                                    {{formsetPhoneGuarantor.management_form}} {% for phone_formG in formsetPhoneGuarantor %}
+                                    <div class="form-group col-md-3">
+                                        {{phone_formG.phone_number_g.label}} {{phone_formG.phone_number_g}}
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        {{phone_formG.phone_type_g.label}} {{phone_formG.phone_type_g}}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-info d-block mx-auto my-4 rounded p-2">Registrar Credito</button>
+                <p>
+                    <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseA" aria-expanded="false" aria-controls="collapseA">
+                      Añadir Articulo
+                    </button>
+                </p>
+                <div class="collapse" id="collapseA">
+                    <div class="card box-shadow mb-4">
+                        <div class="card-body">
+                            <h4 class="title p-2"><i class="fa-solid fa-cube"></i>&nbsp;Articulo</h4>
+                            <div class="form-row">
+                                {% for field in empeno_form %} {% if field.errors %}
+                                <ul class="errorlist">
+                                    {% for error in field.errors %}
+                                    <li class="text-danger">{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %} {% endfor %}
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    {{empeno_form.article.label}} {{empeno_form.article}}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{empeno_form.brand.label}} {{empeno_form.brand}}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{empeno_form.model.label}} {{empeno_form.model}}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    {{empeno_form.state.label}} {{empeno_form.state}}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{empeno_form.accessories.label}} {{empeno_form.accessories}}
+                                </div>
+                                <div class="form-group col-md-2">
+                                    {{empeno_form.purchase_papers.label}} {{empeno_form.purchase_papers}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Registrar Crédito</button>
+                <!-- Agregar el modal -->
+                <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmacionModalLabel">Confirmar registro de servicio</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Está seguro de que desea enviar el formulario del servicio?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
+                            </div>
+                            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
     </section>
 </main>
+
+<script>
+    numero_cuota = document.getElementById("id_installment_num")
+    interes = document.getElementById("id_credit_interest")
+    monto = document.getElementById("id_amount")
+    monto_a_devolver = document.getElementById("monto_valor").textContent = "Calculando ...";
+    numero_cuota.addEventListener("change", calcularMonto);
+    interes.addEventListener("change", calcularMonto);
+    monto.addEventListener("change", calcularMonto);
+
+
+    function calcularMonto() {
+        var installmentNum = parseInt(document.getElementById("id_installment_num").value);
+        var creditInterest = parseFloat(document.getElementById("id_credit_interest").value);
+        var amount = parseFloat(document.getElementById("id_amount").value);
+
+        var monto = installmentNum * (creditInterest / 100 * amount) / (1 - Math.pow((1 + creditInterest / 100), (-installmentNum)));
+
+        if (isNaN(monto)) {
+            monto = "Caculando ..."
+            document.getElementById("monto_valor").textContent = monto;
+        } else {
+            document.getElementById("monto_valor").textContent = monto.toLocaleString("es-AR", {
+                style: "currency",
+                currency: "ARS"
+            });
+        }
+    }
+</script>
+
 {% endblock %}

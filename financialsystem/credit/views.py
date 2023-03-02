@@ -1,11 +1,15 @@
 from decimal import Decimal
 from django.shortcuts import get_object_or_404, render
+
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic import UpdateView, DeleteView, CreateView
+
 from django.urls import reverse_lazy
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+
 from .utils import all_properties_credit
 
 from .forms import CreditForm, RefinancingForm
@@ -13,43 +17,36 @@ from .models import Credit, Installment, Refinancing
 from cashregister.models import CashRegister, Movement
 from adviser.models import Comission
 
+from clients.models import Client
 from clients.forms import ClientForm, PhoneNumberFormSet
+
 from warranty.forms import WarrantyForm
+
+from guarantor.models import Guarantor
 from guarantor.forms import GuarantorForm, PhoneNumberFormSetG
 
-
 #CREAR UN CREDITO CON TODOS LOS FORMULARIOS ANIDADOS
+
 def crear_credito(request):
-    client_form = ClientForm()
-    credit_form = CreditForm()
-    phone_number_formC = PhoneNumberFormSet(request.POST or None)
-    phone_number_formG = PhoneNumberFormSetG(request.POST or None)
-    warranty_form = WarrantyForm()
-    guarantor_form = GuarantorForm()
+    client_form = ClientForm(request.POST or None)
+    guarantor_form = GuarantorForm(request.POST or None)
+    warranty_form = WarrantyForm(request.POST or None)
+    credit_form = CreditForm(request.POST or None)
+    formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
+    formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
     
     if request.method == 'POST':
-        # print("La solicitud contiene................", request.POST)
-        client_form = ClientForm(request.POST)
-        credit_form = CreditForm(request.POST)
-        print("Numero de telefono de client", phone_number_formC)
-        print("Numero de telefono de garante", phone_number_formG)
-        warranty_form = WarrantyForm(request.POST)
-        guarantor_form = GuarantorForm(request.POST)
-        
-        if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid() and guarantor_form.is_valid():
-            print("Los formularios son validos")
+        print("La solicitud contiene................", request.POST)        
+        if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid() and guarantor_form.is_valid() and formsetPhoneClient.is_valid() and formsetPhoneGuarantor.is_valid():
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
-            client = client_form.save()
-            
-            phone_numbers = phone_number_formC.save(commit=False)    
-            print(phone_number_formC.cleaned_data)
+            client.save()
+            phone_numbers = formsetPhoneClient.save(commit=False)
             for phone_number in phone_numbers:
-                if phone_number.phone_number != '':
+                if phone_number.phone_number_c:
                     phone_number.client = client
                     phone_number.save()
-            phone_number_formC.save_m2m()
-            
+                    
             credit = credit_form.save(commit=False)
             credit.client = client
             if not credit.is_old_credit:
@@ -57,29 +54,29 @@ def crear_credito(request):
             credit.save()
             
             guarantor = guarantor_form.save(commit=False)
-            if guarantor_form.cleaned_data['dni']:
+            if guarantor_form.cleaned_data["dni"]:
                 guarantor.credit = credit
                 guarantor.save()
-                phone_numbers = phone_number_formG.save(commit=False)
-                print(phone_number_formG.cleaned_data)
+                phone_numbers = formsetPhoneGuarantor.save(commit=False)
                 for phone_number in phone_numbers:
-                    if phone_number.phone_number != '':
+                    if phone_number.phone_number_g:
                         phone_number.guarantor = guarantor
                         phone_number.save()
-                phone_number_formG.save_m2m()
-
+            
             warranty = warranty_form.save(commit=False)
-            if warranty_form.cleaned_data['article']:
+            if warranty_form.cleaned_data["article"]:
                 warranty.credit = credit
                 warranty.save()
+        else:
+            print("--------------------------------Algun Formulario no es valido--------------------------------")
     
     context = {
         'cliente_form': client_form,
-        'phone_number_form': phone_number_formC,
-        'phone_number_formG': phone_number_formG,
+        'formsetPhoneClient': formsetPhoneClient,
+        'garante_form': guarantor_form,
+        'formsetPhoneGuarantor': formsetPhoneGuarantor,
         'credito_form': credit_form,
         'empeno_form': warranty_form,
-        'garante_form': guarantor_form
     }
     
     return render(request, 'credit/create_credit.html', context)

@@ -85,7 +85,11 @@
                     <td>{{warranty.brand}}</td>
                     <td>{{warranty.model}}</td>
                     <td>{{warranty.get_state_display}}</td>
-                    <td>{{warranty.client}}</td>
+                    {% if warranty.credit %}
+                    <td><a href="{% url 'clients:detail' warranty.credit.client.pk %}">{{warranty.credit}}</a></td>
+                    {% else %}
+                    <td>No hay credito asosiado</td>
+                    {% endif %}
                     <td>{{warranty.accessories}}</td>
                     {% if warranty.purchase_papers %}
                     <td>Si</td>

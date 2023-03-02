@@ -15,9 +15,9 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from django.urls import reverse_lazy
 #FORMS
-from .forms import ClientForm, PhoneNumberForm
+from .forms import ClientForm, PhoneNumberFormClient
 #MODEL
-from .models import Client, PhoneNumber
+from .models import Client, PhoneNumberClient
 from credit.models import Credit, Refinancing, Installment
 from credit.forms import RefinancingForm
 
@@ -56,7 +56,7 @@ class ClientListView(LoginRequiredMixin, ListView):
 def update_client(request, pk):
     client = get_object_or_404(Client, pk=pk)
     client_form = ClientForm(instance=client)
-    PhoneNumberFormSet = inlineformset_factory(Client, PhoneNumber, form=PhoneNumberForm, extra=0)
+    PhoneNumberFormSet = inlineformset_factory(Client, PhoneNumberClient, form=PhoneNumberFormClient, extra=0)
     phone_number_formset = PhoneNumberFormSet(instance=client)
 
     if request.method == 'POST':
@@ -84,8 +84,8 @@ def update_client(request, pk):
 #------------------------------------------------------------------
 def delete_phone_number(request, pk):
     try:
-        phone_number = PhoneNumber.objects.get(id=pk)
-    except PhoneNumber.DoesNotExist:
+        phone_number = PhoneNumberClient.objects.get(id=pk)
+    except PhoneNumberClient.DoesNotExist:
         return redirect('clients:update', pk=phone_number.client.id)
     phone_number.delete()
     return redirect('clients:update', pk=phone_number.client.id)
