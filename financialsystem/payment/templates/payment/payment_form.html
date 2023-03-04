@@ -1,41 +1,58 @@
-{% extends "core/base.html" %} {% load crispy_forms_tags %}{% load static %} {% block content %}
+{% load static %} 
+{% block content %}
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Registrar Pago</h3>
-    <section>
-        <form method="post">
-            {% csrf_token %}
-             {{ form|crispy }}
-
-            <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
-        </form>
-    </section>
+  <!-- MODAL FORMULARIO PAYMNET -->
+    <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active}}">
+      <strong class="btn btn-info rounded p-3" role="button">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Registrar un Pago</span>
+      </strong>
+    </div>
+      <!--Modal-->
+  <div class="modal fade" id="exampleModal{{credit_active}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active}}" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <form action="{% url 'payments:make_paid' credit_active.pk %}" method="POST">
+                  <div class="modal-header">
+                      <h4 class="modal-title" id="exampleModalLabel">Registrar Pago</h4>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                          {% csrf_token %}
+                          {{form_payment.as_p}}
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-success">Pagar</button>
+                      <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
 </main>
 
 <script>
-    // Obtener referencias a los elementos HTML
-    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    var amountElement = document.getElementById("id_amount");
+    var checkboxes_p = document.querySelectorAll('input[type="checkbox"][data-form-id="form_payment"]');
+    var amountElement = document.querySelector("#id_payment-amount");
 
-    // Crear la función para sumar los valores
     function sumar() {
       var total = 0;
 
-      // Recorrer todos los checkboxes para verificar cuáles están seleccionados
-      checkboxes.forEach(function(checkbox) {
+      checkboxes_p.forEach(function(checkbox) {
         if (checkbox.checked) {
           total += parseFloat(checkbox.value);
         }
       });
 
-      // Actualizar los valores en la página web
-      amountElement.innerHTML = total;
-      amountElement.value = total;
+      amountElement.innerHTML = total.toFixed(2);
+      amountElement.value = total.toFixed(2);
     }
 
-    // Agregar un detector de eventos para cuando se haga clic en un checkbox
-    checkboxes.forEach(function(checkbox) {
+    checkboxes_p.forEach(function(checkbox) {
       checkbox.addEventListener("click", sumar);
     });
   </script>
-{% endblock content %}}
+{% endblock content %}

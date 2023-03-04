@@ -1,29 +1,19 @@
-from decimal import Decimal
-from django.shortcuts import get_object_or_404, render
-
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
-from django.views.generic import UpdateView, DeleteView, CreateView
-
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-
+from django.views.generic import UpdateView, DeleteView, CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
-from .utils import all_properties_credit
+from .utils import *
+
+from .models import Credit
+from clients.models import Client
+from guarantor.models import Guarantor
 
 from .forms import CreditForm, RefinancingForm
-from .models import Credit, Installment, Refinancing
-from cashregister.models import CashRegister, Movement
-from adviser.models import Comission
-
-from clients.models import Client
-from clients.forms import ClientForm, PhoneNumberFormSet
-
-from warranty.forms import WarrantyForm
-
-from guarantor.models import Guarantor
 from guarantor.forms import GuarantorForm, PhoneNumberFormSetG
+from warranty.forms import WarrantyForm
+from clients.forms import ClientForm, PhoneNumberFormSet
 
 #CREAR UN CREDITO CON TODOS LOS FORMULARIOS ANIDADOS
 
@@ -67,8 +57,7 @@ def crear_credito(request):
             if warranty_form.cleaned_data["article"]:
                 warranty.credit = credit
                 warranty.save()
-        else:
-            print("--------------------------------Algun Formulario no es valido--------------------------------")
+        return redirect('clients:list')
     
     context = {
         'cliente_form': client_form,
@@ -161,27 +150,24 @@ class CreditDeleteView(DeleteView):
         return  reverse_lazy('credits:list')
     
 
+#------------------------------------------------------------------   
+def refinance_installment (request, pk):
+    credit = get_object_or_404(Credit, id = pk)
+    form = RefinancingForm(credit, request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            checkboxs_by_form = {key: True for key, value in request.POST.items() if key.startswith('Cuota')}
 
-def create_movement(instance, adviser):
-    mov = Movement.objects.create(
-        user = adviser,
-        amount = instance.amount,
-        cashregister = CashRegister.objects.last(),
-        operation_mode = 'EGRESO',
-        description = 'CREDITO PARA %s \nCUOTAS: %s' % (instance.client, instance.installment_num),
-        money_type = 'PESOS',
-        )
-    comission_create(instance, adviser)
-    return mov
+            # GET THE NUMBER OF THE LAST INSTALLMENT
+            last_installment = 0
+            for key in checkboxs_by_form.keys():
+                if key.startswith('Cuota'):
+                    last_installment = max(last_installment, int(key.split()[1]))
 
-
-def comission_create(instance, adviser):
-    amount = instance.amount*Decimal(0.075)
-    Comission.objects.create(
-        adviser = adviser,
-        amount = amount,
-        type = 'REGISTRO',
-        create_date = instance.start_date,
-        ) 
-    
-
+            refinancing = form.save(commit=False)
+            refinancing.installment = get_object_or_404(credit.installment, installment_number=last_installment)
+            refinancing.installment.condition = 'Refinanciada'
+            refinancing.installment.is_refinancing_installment = True
+            refinancing.installment.save()
+            refinancing.save()
+            return redirect('clients:detail', pk=credit.client.id)

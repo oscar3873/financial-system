@@ -102,15 +102,13 @@ class PhoneNumberFormGuarantor(forms.ModelForm):
         return phone_number_g    
     
     def __init__(self, *args, **kwargs):
-        super(PhoneNumberFormGuarantor,self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
         # Eliminar validación requerida
         for field in self.fields.values():
             field.required = False                
-        self.prefix = "guarantor"
-        self.helper = FormHelper
 
 #------------------------------------------------------------------
 PhoneNumberFormSetG = inlineformset_factory(

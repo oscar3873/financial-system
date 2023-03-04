@@ -77,27 +77,30 @@ class ClientForm(forms.ModelForm):
             raise forms.ValidationError("El DNI debe contener como minimo 7 y maximo 15 caracteres")
 
         # Verificar si ya existe un objeto con el mismo DNI en la base de datos
-        if Client.objects.filter(dni=dni).exists():
-            raise forms.ValidationError("Ya existe un Cliente con este DNI")
+        if not self.is_update:
+            if Client.objects.filter(dni=dni).exists():
+                raise forms.ValidationError("Ya existe un Cliente con este DNI")
 
         return dni
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
         # Validar formato de correo electrónico
-        try:
-            validate_email(email)
-        except forms.ValidationError:
-            raise forms.ValidationError("Ingrese un correo electrónico válido")
+        if not self.is_update:
+            try:
+                validate_email(email)
+            except forms.ValidationError:
+                raise forms.ValidationError("Ingrese un correo electrónico válido")
 
-        # Verificar si ya existe un objeto con el mismo correo electrónico en la base de datos
-        if Client.objects.filter(email=email).exists():
-            raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico")
+            # Verificar si ya existe un objeto con el mismo correo electrónico en la base de datos
+            if Client.objects.filter(email=email).exists():
+                raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico")
 
         return email
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        self.is_update = kwargs.pop('is_update', False)
+        super(ClientForm, self).__init__(*args, **kwargs)
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})

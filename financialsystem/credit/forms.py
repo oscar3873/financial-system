@@ -79,16 +79,21 @@ class RefinancingForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         excludes = ['Refinanciada', 'Pagada']
         installments = credit.installment.exclude(condition__in=excludes)
-
         for installment in installments:
             if installment == credit.installment.first():
                 self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
-                    label='Cuota %s (intereses acumulados $ %s)' % (installment.installment_number, installment.daily_interests),required=True,
-                    widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests})
-                )
+                    label='Cuota %s%s' % (
+                        installment.installment_number,
+                        ' (intereses acumulados $ %s)' % installment.daily_interests if installment.daily_interests > 0 else ''),
+                        required=True,
+                        widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref"})
+                    )
             else:
                 self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
-                    label='Cuota %s (intereses acumulados $ %s)' % (installment.installment_number, installment.daily_interests),required=False,
-                    widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests})
-                )
+                   label='Cuota %s%s' % (
+                        installment.installment_number,
+                        ' (intereses acumulados $ %s)' % installment.daily_interests if installment.daily_interests > 0 else ''),
+                        required=False,
+                        widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref"})
+                    )
         

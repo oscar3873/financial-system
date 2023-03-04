@@ -1,6 +1,7 @@
 from datetime import date, datetime, timedelta
-import decimal
-
+from decimal import Decimal
+from cashregister.models import CashRegister, Movement
+from adviser.models import Comission
 from .models import Credit, InstallmentRefinancing
 
 def refresh_condition_exp():
@@ -19,7 +20,7 @@ def refresh_condition_exp():
                     else:
                         dates = installment.end_date
                     resto = (date.today() - dates.date()).days
-                    installment.acc_int += resto*installment.amount*decimal.Decimal(0.02)
+                    installment.acc_int += resto*installment.amount*Decimal(0.02)
                     installment.lastup = datetime.today()
                     installment.save()
         
@@ -30,7 +31,7 @@ def refresh_condition_exp():
             else:
                 dates = installment_ven.end_date
             resto = (date.today() - dates.date()).days
-            installment_ven.acc_int += resto*installment_ven.amount*decimal.Decimal(0.02)
+            installment_ven.acc_int += resto*installment_ven.amount*Decimal(0.02)
             installment_ven.lastup = datetime.today()
             installment_ven.save()
 
@@ -60,7 +61,7 @@ def total_to_ref(amount, interest, pk, user, operation_mode):
         case 75: installments = 9
         case 100: installments = 12
     
-    interest = decimal.Decimal(float(interest/100) * float(amount))
+    interest = Decimal(float(interest/100) * float(amount))
     for i in range(installments):
         condition = 'A Tiempo'
         payment = None
@@ -69,7 +70,7 @@ def total_to_ref(amount, interest, pk, user, operation_mode):
             payment = operation_mode
 
         ref = InstallmentRefinancing.objects.create(
-            amount=decimal.Decimal(amount/installments)+interest,
+            amount=Decimal(amount/installments)+interest,
             installment_num = i+1,
             end_date = datetime.today() + (timedelta(days=30)*(i+1)),
             condition = condition,
@@ -82,3 +83,28 @@ def total_to_ref(amount, interest, pk, user, operation_mode):
 
 def all_properties_credit():
         return ["Monto solicitado", "Monto a devolver", "Numero de cuotas", "Monto de las cuotas", "Estado", "Cliente", "Asesor", "Fecha de registro", "Fecha de Finalizacion"]
+
+#--------------------- UTILS FUNCTIONS -------------------------------------------
+def create_movement(instance, adviser):
+    mov = Movement.objects.create(
+        user = adviser,
+        amount = instance.amount,
+        cashregister = CashRegister.objects.last(),
+        operation_mode = 'EGRESO',
+        description = 'CREDITO OTORGADO A %s - CUOTAS: %s' % (instance.client, instance.installment_num),
+        money_type = 'PESOS',
+        )
+    comission_create(instance, adviser, detail=mov.description)
+    return mov
+
+
+def comission_create(instance, adviser, detail):
+    amount = instance.amount*Decimal(0.075)
+    Comission.objects.create(
+        adviser = adviser,
+        amount = amount,
+        type = 'REGISTRO',
+        create_date = instance.start_date,
+        detail = detail,
+        ) 
+    

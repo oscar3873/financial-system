@@ -3,6 +3,8 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+
 from braces.views import GroupRequiredMixin
 from .models import Adviser, Comission
 from .utils import commission_properties
@@ -16,8 +18,8 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
-    def handle_no_permission(self, request):
-        return redirect("/")
+    def handle_no_permission(self):
+        return redirect("/accounts/login/")
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,7 +36,7 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
-    def handle_no_permission(self, request):
+    def handle_no_permission(self):
         return redirect("/")
     
     def get_context_data(self, **kwargs):
@@ -46,8 +48,9 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
     def get_object(self):
         return get_object_or_404(Adviser, id=self.kwargs['pk'])
 
-
-def pay_commission(request, pk):
+#----------------------------------------------------------------
+@login_required(login_url="/accounts/login/")
+def pay_commission(request,pk):
     try:
         commission = Comission.objects.get(id=pk)
         commission.is_paid = True
@@ -61,7 +64,8 @@ def pay_commission(request, pk):
 
 
 class AdviserUpdateView(UpdateView):
-    pass
+    model = Adviser
+    
 
 class AdviserDeleteView(DeleteView):
     pass

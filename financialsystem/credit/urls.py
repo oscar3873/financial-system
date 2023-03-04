@@ -8,4 +8,6 @@ credits_patterns = ([
     path('create/', CreditCreateView.as_view(), name='create'),
     path('update/<pk>/', CreditUpdateView.as_view(), name='update'),
     path('delete/<pk>/', CreditDeleteView.as_view(), name='delete'),
+    path('refinancing/<pk>/', refinance_installment, name='refinance'),
+
 ], "credits")

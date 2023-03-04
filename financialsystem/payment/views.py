@@ -4,6 +4,7 @@ from django.contrib import messages
 
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
 from django.urls import reverse, reverse_lazy
 
@@ -13,6 +14,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.models import Credit
+from .utils import payment_create
 from .models import Payment
 from .forms import PaymentForm
 
@@ -35,79 +37,31 @@ class PaymentListView(LoginRequiredMixin, ListView):
         
         return context
 
-#CREACION DE UNA NOTA
-class PaymentCreateView(CreateView):
-    model = Payment
-    form_class = PaymentForm
-    template_name = "payment/payment_form.html"
-    
-    # def get_form_kwargs(self):
-    #     kwargs = super().get_form_kwargs()
-    #     self.objet = get_object_or_404(Credit, pk = self.kwargs["pk"])
-    #     excludes = ['Refinanciada', 'Pagada']
-    #     self.installments = self.objet.installment.exclude(condition__in=excludes)
-    #     kwargs["installments"] = self.installments
-    #     return kwargs
-    
-    def get_success_url(self) -> str:
-        messages.success(self.request, 'Nota creada correctamente', "success")
-        print(self.objet, self.objet.client)
-        return  reverse_lazy('clients:detail', kwargs={'pk': self.objet.client.id})
-    
-    def form_valid(self, form):
-        installments_credit = list(self.installments.all())
-        checkboxs_by_form = {key: True for key, value in self.request.POST.items() if key.startswith('Cuota')}
-
-        pack = dict(zip(installments_credit, checkboxs_by_form.values()))
-        print(pack)
-        if form.is_valid():
-            payment = form.save(commit=False)
-            payment._user = self.request.user
-            for installment in pack.keys():
-                installment.condition = 'Pagada'
-                installment.is_paid_installment = True
-                payment.installment = installment
-                payment.save()
-                installment.save()
-            
-        return super(PaymentCreateView, self).form_valid(form)
-
-
-def make_payment_installment(request,pk):
-    credit = get_object_or_404(Credit, pk = pk)
-
-    excludes = ['Refinanciada', 'Pagada']
-    installments = credit.installment.exclude(condition__in=excludes)
-    
+#REALIZAR DE UN PAGO
+#------------------------------------------------------------------
+@login_required(login_url="/accounts/login/")
+def make_payment_installment(request, pk):
+    credit = get_object_or_404(Credit, pk=pk)
+    installments = credit.installment.exclude(condition__in=['Refinanciada', 'Pagada'])
     form = PaymentForm(installments, request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            installments_credit = list(installments.all())
-            checkboxs_by_form = {key: True for key, value in request.POST.items() if key.startswith('Cuota')}
-            pack = dict(zip(installments_credit, checkboxs_by_form.values()))
-            count_value = list(pack.values()).count(True)
-            print(count_value)
-            payment = form.save(commit=False)
-            amount = Decimal(payment.amount / count_value)
-            print('########################AMOUNT######################')
-            for installment in pack.keys():
-                installment.condition = 'Pagada'
-                installment.is_paid_installment = True
-                installment.save()
-                print('##############################################')
-                Payment.objects.create(
-                    amount=amount,
-                    paid_date=payment.paid_date,
-                    installment = installment,
-                    adviser=request.user.adviser,
-                    payment_method = payment.payment_method,
-                    detail = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number, installment.credit.client, request.user.adviser)
-                )
-                
-        return reverse_lazy('clients:detail', kwargs={'pk':credit.client.pk} )
     
-    return render(request, 'payment/payment_form.html', {'form':form})
-
+    if request.method == 'POST' and form.is_valid():
+        installments_credit = list(installments.all())
+        checkboxs_by_form = {key: True for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
+        pack = dict(zip(installments_credit, checkboxs_by_form.values()))
+        count_value = list(pack.values()).count(True)
+        payment = form.save(commit=False)
+        print(form.cleaned_data)
+        payment.amount = Decimal(payment.amount / count_value)
+        payment._adviser = request.user.adviser
+        for installment in pack.keys():
+            installment.condition = 'Pagada'
+            installment.is_paid_installment = True
+            installment.save()
+            payment_create(payment, installment)
+        return redirect('clients:detail', pk=credit.client.pk)
+    
+    return render(request, 'payment/payment_form.html', {'form': form})
 
 
 #BORRADO DE UNA NOTA

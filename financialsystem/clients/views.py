@@ -1,25 +1,30 @@
+from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Q
-from django.forms import inlineformset_factory
 
 from .utils import all_properties_client
 
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 
+
 #CRUD CLIENT
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import DeleteView
 
 from django.urls import reverse_lazy
 #FORMS
-from .forms import ClientForm, PhoneNumberFormClient
+from .forms import ClientForm, PhoneNumberFormSet
 #MODEL
 from .models import Client, PhoneNumberClient
-from credit.models import Credit, Refinancing, Installment
+from credit.models import Credit
 from credit.forms import RefinancingForm
+
+from payment.forms import PaymentForm
+
+
 
 # Create your views here.
 
@@ -53,33 +58,26 @@ class ClientListView(LoginRequiredMixin, ListView):
 
 #ACTUALIZACION DE UN CLIENTE
 #------------------------------------------------------------------
-def update_client(request, pk):
-    client = get_object_or_404(Client, pk=pk)
-    client_form = ClientForm(instance=client)
-    PhoneNumberFormSet = inlineformset_factory(Client, PhoneNumberClient, form=PhoneNumberFormClient, extra=0)
-    phone_number_formset = PhoneNumberFormSet(instance=client)
+def client_update(request, pk):
+    client = Client.objects.get(id=pk)
+    form = ClientForm(request.POST or None, instance=client, is_update=True)
 
+    formset = PhoneNumberFormSet(request.POST or None, instance=client)
+    
     if request.method == 'POST':
-        client_form = ClientForm(request.POST, instance=client)
-        phone_number_formset = PhoneNumberFormSet(request.POST, instance=client)
-
-        if client_form.is_valid():
-            print("VALID")
-            client = client_form.save(commit=False)
-            client.adviser = request.user.adviser
-            client.save()
-            phone_number_formset.save()
-            print()
-        else:
-            print(phone_number_formset.errors)
-    
-    context = {
-        'cliente_form': client_form,
-        'phone_number_form': phone_number_formset,
-    }
-    
-    return render(request, 'clients/client_update.html', context)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            return redirect('client_detail', client_id=pk)
+    else:
+        formset = PhoneNumberFormSet(instance=client, queryset=PhoneNumberClient.objects.filter(client=client))
         
+    context = {
+        'cliente_form': form,
+        'formsetPhoneClient': formset,
+    }
+
+    return render(request, 'clients/client_update.html', context=context)
 #BORRADO DE NUMEROS DE UN CLIENTE
 #------------------------------------------------------------------
 def delete_phone_number(request, pk):
@@ -122,25 +120,28 @@ class ClientDetailView(DetailView):
     model = Client
     template_name = 'clients/client_detail.html'
     
+
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        credit_active = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
+        
+        excludes = ['Refinanciada', 'Pagada']
+        installments = credit_active.installment.exclude(condition__in=excludes)
+
         context["credits"] = Credit.objects.filter(client = context["client"])
         if context["credits"]:
-            context["credit_active"] = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
+            context["credit_active"] = credit_active
             context["installments"] = context["credit_active"].installment.all()
-            context["form_ref"]= RefinancingForm(credit=context["credit_active"])
+            context["first_is_paid"] = context["credit_active"].installment.first().is_paid_installment
+            if installments :
+                context["form_ref"]= RefinancingForm(credit=context["credit_active"])
+                context["form_payment"]= PaymentForm(installments=installments)
+                context["amount_installment"] = context["credit_active"].installment.first().amount
+
         return context
 
     def get_object(self):
         return get_object_or_404(Client, id=self.kwargs['pk'])
     
-
-#------------------------------------------------------------------   
-def refinance_installment (request, pk):
-    credit = get_object_or_404(Credit, id = pk)
-    form = RefinancingForm(credit, request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            refinancing = form.save(commit=False)
-            refinancing.save()
-            return redirect('clients:detail', pk=credit.client.id)

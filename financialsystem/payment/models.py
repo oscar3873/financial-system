@@ -42,7 +42,6 @@ class Payment(models.Model):
 
 #--------------------------- SEÑALES PARA PAYMENT -------------------------------------
 def up_installmet(instance, *args, **kwargs):
-    print('##############################################SAVE')
     adviser = instance.adviser
     Movement.objects.create(
         amount = instance.amount,
@@ -52,12 +51,10 @@ def up_installmet(instance, *args, **kwargs):
         description= instance.detail,
         money_type = instance.payment_method
         )
-    print('##############################################SAVE')
     comission_create_inst(instance)
 
 def comission_create_inst(instance, *args, **kwargs):
     amount = instance.amount*Decimal(0.05)
-    print('##############################################dassdaads')
     Comission.objects.create(
         adviser = instance.adviser,
         amount = amount,
@@ -66,7 +63,6 @@ def comission_create_inst(instance, *args, **kwargs):
         money_type = instance.payment_method,
         detail= 'COBRO CUOTA %s - CLIENTE %s' % (instance.installment.installment_number, instance.installment.credit.client),
         )
-    print('#####################123123123ads')
 
 
 post_save.connect(up_installmet, sender = Payment)

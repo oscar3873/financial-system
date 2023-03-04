@@ -13,8 +13,11 @@ class PaymentForm(forms.ModelForm):
         ('DEBITO', 'DEBITO'),
     )
 
-    amount = forms.NumberInput(
-        attrs={'value': '0'}
+    amount = forms.CharField(
+        label= "Total a Pagar $",
+        widget=forms.TextInput(
+            attrs={'readonly': 'readonly', 'style': 'border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'}
+        )
     )
 
     paid_date = forms.DateField(
@@ -39,15 +42,17 @@ class PaymentForm(forms.ModelForm):
     def __init__(self,installments,*args, **kwargs):
 
         super(PaymentForm, self).__init__(*args, **kwargs)
+        self.prefix = "payment"
+        attrs = {"value": installments.first().amount, "data-form-id":"form_payment"}
         if installments.count() > 0:
             for installment in installments:
                 if installment == installments.first():
                     self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
                         label='Cuota %s' % (installment.installment_number),required=True,
-                        widget=forms.CheckboxInput(attrs={"value": installment.amount})
+                        widget=forms.CheckboxInput(attrs=attrs)
                     )
                 else:
                     self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
                         label='Cuota %s' % (installment.installment_number),required=False,
-                        widget=forms.CheckboxInput(attrs={"value": installment.amount})
+                        widget=forms.CheckboxInput(attrs=attrs)
                     )

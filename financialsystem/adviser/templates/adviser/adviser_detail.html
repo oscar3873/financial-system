@@ -17,10 +17,11 @@
                 <tr>
                     <td>{{commission.amount}}</td>
                     <td>{{commission.type}}</td>
-                    <td>{{commission.detail}}</td>
+                    <td>{{commission.created_at}}</td>
+                    <td>{{commission.detail|default_if_none:'-'}} </td>
                     {% if user.is_superuser %}
                     <td>
-                        <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{commission.pk}}"><i class="fa-solid fa-check"></i> &nbsp;</a>
+                        <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{commission.pk}}"><i class="fa-solid text-success fa-flag-checkered"></i> &nbsp;</a>
                         <!--Modal-->
                         <div class="modal fade" id="exampleModal{{commission.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{commission.pk}}" aria-hidden="true">
                             <div class="modal-dialog" role="document">

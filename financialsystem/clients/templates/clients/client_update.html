@@ -1,80 +1,113 @@
-<!-- crear_credito.html -->
 {% extends 'core/base.html' %} {% load crispy_forms_tags %} {% block content %}
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Registrar un Cliente</h3>
+    <h3 class="title font-weight-normal">Formulario de solicitud de servicios</h3>
     <section>
-        <div class="my-4">
-            <form method="post">
+        <div class="my-4 py-2">
+            <form class="form" method="post">
                 {% csrf_token %}
-                <h4 class="title p-2">Credito</h4>
-                <div class="form-row">
-                    <div class="form-group col-md-3">
-                        {{credito_form.start_date.label}} {{credito_form.start_date}}
+                <div class="row justify-content-center align-items-start">
+                    <div class="col-md-9">
+                        <div class="card box-shadow mb-3">
+                            <div class="card-body">
+                                <h4 class="title p-2">
+                                    <i class="fa-solid fa-user"></i> &nbsp; Titular
+                                </h4>
+                                <h5 class="title p-2">Informacion basica</h5>
+
+                                <div class="form-row">
+                                    {% if garante_form.errors or formsetPhoneGuarantor.errors %}
+                                    <ul class="error-list">
+                                        <li class="text-danger">Hay errores en el formulario de garantes, por favor corríjalos.</li>
+                                    </ul>
+                                    {% endif %} {% for field in cliente_form %} {% if field.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in field.errors %}
+                                        <li class="text-danger">{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %} {% endfor %}
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.first_name.label}} {{cliente_form.first_name}}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.email.label}} {{cliente_form.email}}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        {{cliente_form.dni.label}} {{cliente_form.dni}}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.address.label}} {{cliente_form.address}}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        {{cliente_form.profession.label}} {{cliente_form.profession}}
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        {{cliente_form.score.label}}{{cliente_form.score}}
+                                    </div>
+                                </div>
+                                <h5 class="title p-2 mt-3"><i class="fa-solid fa-phone"></i>&nbsp;Datos de Contacto</h5>
+                                <div class="form-row">
+                                    <ul class="error-list">
+                                        {% for form in formsetPhoneClient %} {% for field in form %} {% for error in field.errors %}
+                                        <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
+                                    </ul> {{ formsetPhoneClient.non_form_errors }}
+                                </div>
+                                
+                                    <div class="form-row">
+                                        {{formsetPhoneClient.management_form}} {% for phone_form in formsetPhoneClient %}
+                                        <div class="form-group col-md-3">
+                                            {{phone_form.phone_number_c.label}} {{phone_form.phone_number_c}}
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            {{phone_form.phone_type_c.label}} {{phone_form.phone_type_c}}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                            </div>
+                            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                        </div>
                     </div>
-                    <!-- <div class="form-group col-md-3">
-                        {{credito_form.end_date.label}} {{credito_form.end_date}}
-                    </div> -->
-                    <div class="form-group col-md-2">
-                        {{credito_form.amount.label}} {{credito_form.amount}}
-                    </div>
-                    <div class="form-group col-md-2">
-                        {{credito_form.installment_num.label}} {{credito_form.installment_num}}
-                    </div>
-                    <div class="form-group col-md-1">
-                        {{credito_form.credit_interest.label}} {{credito_form.credit_interest}}
+                    
+                <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Guardar Cámbios</button>
+                <!-- Agregar el modal -->
+                <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmacionModalLabel">Confirmar registro de servicio</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Está seguro de que desea enviar el formulario del servicio?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
+                            </div>
+                            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                        </div>
                     </div>
                 </div>
-                <h4 class="title p-2">Titular</h4>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{cliente_form.first_name.label}} {{cliente_form.first_name}}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{cliente_form.email.label}} {{cliente_form.email}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{cliente_form.dni.label}} {{cliente_form.dni}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{cliente_form.address.label}} {{cliente_form.address}}
-                    </div>
-                    <div class="form-group col-md-6">
-                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        {{cliente_form.profession.label}} {{cliente_form.profession}}
-                    </div>
-                    <div class="form-group col-md-3">
-                        {{cliente_form.score.label}}{{cliente_form.score}}
-                    </div>
-                </div>
-                <div class="form-row">
-                    {{phone_number_form.management_form}} {% for phone_form in phone_number_form %}
-                    <div class="form-group col-md-3">
-                        {{phone_form.phone_number.label}} {{phone_form.phone_number}}  {{phone_form.phone_number.id}}
-                    </div>
-                    <div class="form-group col-md-2">
-                        {{phone_form.phone_type.label}} {{phone_form.phone_type}}
-                    </div>
-                    {% endfor %}
-                <div>
-                    <button type="submit" class="btn btn-info d-block mx-auto my-4 rounded p-2">Registrar Credito</button>
-                </div>
-                
             </form>
         </div>
     </section>
 </main>
+
 {% endblock %}
