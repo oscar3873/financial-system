@@ -29,6 +29,7 @@ class Credit(models.Model):
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
     start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=datetime.now, null=True)
     end_date = models.DateTimeField(verbose_name='Fecha de Finalizacion del Credito', null=True)
+    payment_date = models.DateTimeField(help_text="Fecha de Pago")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -57,6 +58,7 @@ class Installment(models.Model):
     daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")
     start_date = models.DateTimeField(default=datetime.now, null=True)
     end_date = models.DateTimeField(null=True)
+    payment_date = models.DateTimeField(help_text="Fecha de Pago")
     condition = models.CharField(max_length=15,choices=CONDITION, default='A Tiempo')
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="installment", help_text="Credito de la cuota")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota")
@@ -80,6 +82,8 @@ class Refinancing(models.Model):
     refinancing_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolver de la Refinanciacion")
     installment = models.OneToOneField(Installment, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cuota de la Refinanciacion", related_name="refinancing")
     installment_num_refinancing = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
+    payment_date = models.DateTimeField(help_text="Fecha de Pago", null=True, default=None)
+    lastup = models.DateTimeField(default=datetime.now, null=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -89,7 +93,7 @@ class Refinancing(models.Model):
 #CUOTA DE REFINANCIACION
 class InstallmentRefinancing(models.Model):
     CHOICE = [
-        ('Pagado', 'Pagado'),
+        ('Pagada', 'Pagada'),
         ('A Tiempo','A Tiempo'),
         ('Legales','Legales'),
         ]
@@ -101,7 +105,7 @@ class InstallmentRefinancing(models.Model):
     installment_number = models.PositiveSmallIntegerField(help_text="Numero de cuota de la refinanciacion")
     refinancing = models.ForeignKey(Refinancing, on_delete=models.CASCADE, related_name="installment_refinancing", help_text="Refinanciacion de la cuota")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota de refinanciacion")
-    payment_date = models.DateField(help_text="Fecha de pago de la cuota de refinanciacion")
+    payment_date = models.DateTimeField(help_text="Fecha de pago de la cuota de refinanciacion")
     start_date = models.DateTimeField(default=datetime.now, verbose_name='Fecha de Inicio')
     end_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -149,10 +153,10 @@ def refinancing_repayment_amount_auto(instance, *args, **kwargs):
         case 6: refinancing.refinancing_interest = 50
         case 9: refinancing.refinancing_interest = 75
         case _: refinancing.refinancing_interest = 100
-    
-    print((refinancing.amount))
+
     interests_amount = Decimal(float(refinancing.amount) * (float(refinancing.refinancing_interest+100) / 100))
     repayment_amount = refinancing.amount + interests_amount
+    refinancing.end_date = datetime.now() + timedelta(days=30)*refinancing.installment_num_refinancing
     refinancing.refinancing_repayment_amount = Decimal(repayment_amount)
 
 def create_installmentsR_auto(instance, created, *args, **kwargs):

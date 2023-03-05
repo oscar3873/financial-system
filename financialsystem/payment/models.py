@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.db.models.signals import post_save
 from django.db import models
 
-from credit.models import Installment
+from credit.models import Installment, InstallmentRefinancing
 from cashregister.models import CashRegister, Movement
 from adviser.models import Comission, Adviser
 
@@ -23,7 +23,8 @@ class Payment(models.Model):
     is_refinancing_pay = models.BooleanField(default=False)
     
     amount = models.DecimalField(help_text="Monto de Pago", default=0,max_digits=15,decimal_places=2)
-    paid_date = models.DateTimeField(default=datetime.now, help_text="Fecha de Pago")
+    payment_date = models.DateTimeField(default=datetime.now, help_text="Fecha de Pago")
+    installment_ref = models.OneToOneField(InstallmentRefinancing, on_delete=models.SET_NULL, null=True, blank=True)
     installment = models.OneToOneField(Installment, on_delete=models.SET_NULL, null=True, blank=True)
     adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, null=True, blank=True)
     payment_method = models.CharField(max_length=20,choices=MONEY_TYPE, help_text="Metodo de Pago")
@@ -59,7 +60,7 @@ def comission_create_inst(instance, *args, **kwargs):
         adviser = instance.adviser,
         amount = amount,
         type = 'COBRO',
-        create_date = instance.paid_date,
+        create_date = instance.payment_date,
         money_type = instance.payment_method,
         detail= 'COBRO CUOTA %s - CLIENTE %s' % (instance.installment.installment_number, instance.installment.credit.client),
         )

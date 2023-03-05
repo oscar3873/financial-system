@@ -68,7 +68,7 @@
                             <h5 class="card-title p-4"><i class="fa-solid fa-calendar text-warning"></i> Proximos Vencimientos</h5>
                             {% if next_maturities.count > 0 %} {% for next_maturitie in next_maturities %}
                             <div class="card-text p-2">
-                                <small class="font-weight-bold text-primary"><i class="fa-solid fa-hourglass-end"></i> {{next_maturitie.end_date|date}} </small>
+                                <small class="font-weight-bold text-primary"><i class="fa-solid fa-hourglass-end"></i> {{next_maturitie.exp_date|date}} </small>
                                 <small class="font-weight-normal"> Cuota {{next_maturitie.installment_num}}</small>
                                 <small class="font-weight-bold">De <a href="{% url 'clients:detail' next_maturitie.credit.client.id %}" class="text-warning">{{next_maturitie.credit.client}}</a></small>
                                 <small class="font-weight-bold">Por <a href="{% url 'advisers:detail' next_maturitie.credit.client.adviser.pk %}" class="text-warning">{{next_maturitie.credit.client.adviser}}</a></small>

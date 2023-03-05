@@ -1,6 +1,5 @@
 from datetime import datetime
 from django import forms
-from crispy_forms.helper import FormHelper
 from .models import Credit, Refinancing
 
 #FORMULARIO PARA LA CREACION DEL CLIENTE
@@ -44,7 +43,6 @@ class CreditForm(forms.ModelForm):
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
-        self.helper = FormHelper
 
 #-----------------------------------------------------------------
 class RefinancingForm(forms.ModelForm):
@@ -62,7 +60,6 @@ class RefinancingForm(forms.ModelForm):
         )
     )
 
-
     installment_num_refinancing = forms.ChoiceField(
         label= "Numero de Cuotas",
         choices=CHOICES,
@@ -72,13 +69,12 @@ class RefinancingForm(forms.ModelForm):
 
     class Meta:
         model = Refinancing
-        fields = ["installment_num_refinancing","amount"]
+        fields = ["amount", "installment_num_refinancing"]
 
 
     def __init__(self,credit,*args, **kwargs):
         super().__init__(*args, **kwargs)
-        excludes = ['Refinanciada', 'Pagada']
-        installments = credit.installment.exclude(condition__in=excludes)
+        installments = credit.installment.exclude(condition__in=['Refinanciada', 'Pagada'])
         for installment in installments:
             if installment == credit.installment.first():
                 self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(

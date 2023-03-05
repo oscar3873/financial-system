@@ -2,7 +2,7 @@
 {% block content %}
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
 <main class="container my-4">
-  <!-- MODAL FORMULARIO PAYMNET -->
+  <!-- MODAL FORMULARIO PAYMENT -->
     <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active}}">
       <strong class="btn btn-info rounded p-3" role="button">
           <i class="fa-solid fa-receipt"></i>
@@ -21,8 +21,9 @@
                       </button>
                   </div>
                   <div class="modal-body">
-                          {% csrf_token %}
-                          {{form_payment.as_p}}
+                      <h5>Valor por Cuota $ {{amount_installment}}</h5>
+                      {% csrf_token %}
+                      {{form_payment.as_p}}
                   </div>
                   <div class="modal-footer">
                       <button class="btn btn-success">Pagar</button>
@@ -55,4 +56,5 @@
       checkbox.addEventListener("click", sumar);
     });
   </script>
+
 {% endblock content %}

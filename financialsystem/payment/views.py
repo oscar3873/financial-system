@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -14,6 +15,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.models import Credit
+from credit.models import Refinancing
 from .utils import payment_create
 from .models import Payment
 from .forms import PaymentForm
@@ -36,33 +38,6 @@ class PaymentListView(LoginRequiredMixin, ListView):
         #     context["properties"] = self.model.objects.all()[0].all_properties()
         
         return context
-
-#REALIZAR DE UN PAGO
-#------------------------------------------------------------------
-@login_required(login_url="/accounts/login/")
-def make_payment_installment(request, pk):
-    credit = get_object_or_404(Credit, pk=pk)
-    installments = credit.installment.exclude(condition__in=['Refinanciada', 'Pagada'])
-    form = PaymentForm(installments, request.POST or None)
-    
-    if request.method == 'POST' and form.is_valid():
-        installments_credit = list(installments.all())
-        checkboxs_by_form = {key: True for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
-        pack = dict(zip(installments_credit, checkboxs_by_form.values()))
-        count_value = list(pack.values()).count(True)
-        payment = form.save(commit=False)
-        print(form.cleaned_data)
-        payment.amount = Decimal(payment.amount / count_value)
-        payment._adviser = request.user.adviser
-        for installment in pack.keys():
-            installment.condition = 'Pagada'
-            installment.is_paid_installment = True
-            installment.save()
-            payment_create(payment, installment)
-        return redirect('clients:detail', pk=credit.client.pk)
-    
-    return render(request, 'payment/payment_form.html', {'form': form})
-
 
 #BORRADO DE UNA NOTA
 #------------------------------------------------------------------
@@ -89,3 +64,59 @@ class PaymentUpdateView(UpdateView):
     def get_success_url(self) -> str:
         messages.success(self.request, 'Nota actualizada satisfactoriamente', "info")
         return  reverse_lazy('payments:list')
+    
+#REALIZAR DE UN PAGO
+#------------------------------------------------------------------
+@login_required(login_url="/accounts/login/")
+def make_payment_installment_ref(request, pk):
+    refinancing = get_object_or_404(Refinancing, pk=pk)
+    installments = refinancing.installment_refinancing.exclude(condition='Pagada')
+    form = PaymentForm(installments, request.POST or None)
+    
+    if request.method == 'POST' and form.is_valid():
+        installment_ref = list(installments.all())
+        checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota') and value}
+        pack = dict(zip(installment_ref, checkboxs_by_form.values()))
+        count_value = list(pack.values()).count(True)
+        payment = form.save(commit=False)
+
+        payment.amount = Decimal(payment.amount / count_value)
+        payment._adviser = request.user.adviser
+
+        for installment in pack.keys():
+            installment.condition = 'Pagada'
+            installment.is_paid_installment = True
+            installment.payment_date = payment.payment_date
+            installment.save()
+            payment_create(payment, installment)
+        return redirect('clients:list')
+    
+    return render(request, 'payment/payment_form.html', {'form': form})
+
+#REALIZAR DE UN PAGO
+#------------------------------------------------------------------
+def make_payment_installment(request, pk):
+    credit = get_object_or_404(Credit, pk=pk)
+    installments = credit.installment.exclude(condition__in=['Refinanciada', 'Pagada'])
+    form = PaymentForm(installments, request.POST or None)
+    
+    if request.method == 'POST' and form.is_valid():
+        installments_credit = list(installments.all())
+        checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota') and value}
+        pack = dict(zip(installments_credit, checkboxs_by_form.values()))
+        count_value = list(pack.values()).count(True)
+        
+        print(pack)
+        payment = form.save(commit=False)
+        payment.amount = Decimal(payment.amount / count_value)
+        payment._adviser = request.user.adviser
+
+        for installment in pack.keys():
+            installment.condition = 'Pagada'
+            installment.is_paid_installment = True
+            installment.payment_date = payment.payment_date
+            installment.save()
+            payment_create(payment, installment)
+        return redirect('clients:detail', pk=credit.client.pk)
+    
+    return render(request, 'payment/payment_form.html', {'form': form})

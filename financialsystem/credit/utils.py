@@ -4,6 +4,12 @@ from cashregister.models import CashRegister, Movement
 from adviser.models import Comission
 from .models import Credit, InstallmentRefinancing
 
+
+
+def all_properties_credit():
+        return ["Monto solicitado", "Monto a devolver", "Numero de cuotas", "Monto de las cuotas", "Estado", "Cliente", "Asesor", "Fecha de registro", "Fecha de Finalizacion"]
+
+
 def refresh_condition_exp():
     if Credit.objects.exists():
         creditos_a_tiempo = Credit.objects.filter(condition = 'A Tiempo')       # TODOS LOS CREDITOS QUE 'ESTEN A TIEMPO'
@@ -51,38 +57,6 @@ def refresh_condition_paid():
     for credit in credit_ok:
         if credit.installment.count() == credit.installment.filter(is_paid_installment=True).count():
             credit.is_paid_credit=True
-
-
-def total_to_ref(amount, interest, pk, user, operation_mode):
-    interest = int(interest)
-    match(interest):
-        case 25: installments = 3
-        case 50: installments = 6
-        case 75: installments = 9
-        case 100: installments = 12
-    
-    interest = Decimal(float(interest/100) * float(amount))
-    for i in range(installments):
-        condition = 'A Tiempo'
-        payment = None
-        if i == 0:
-            condition = 'Pagada'
-            payment = operation_mode
-
-        ref = InstallmentRefinancing.objects.create(
-            amount=Decimal(amount/installments)+interest,
-            installment_num = i+1,
-            end_date = datetime.today() + (timedelta(days=30)*(i+1)),
-            condition = condition,
-            installment = pk,
-            )
-        if i == 0 :
-            ref.payment = payment
-            ref._adviser = user
-            ref.save()
-
-def all_properties_credit():
-        return ["Monto solicitado", "Monto a devolver", "Numero de cuotas", "Monto de las cuotas", "Estado", "Cliente", "Asesor", "Fecha de registro", "Fecha de Finalizacion"]
 
 #--------------------- UTILS FUNCTIONS -------------------------------------------
 def create_movement(instance, adviser):

@@ -20,7 +20,7 @@ class PaymentForm(forms.ModelForm):
         )
     )
 
-    paid_date = forms.DateField(
+    payment_date = forms.DateField(
         label="Fecha de Pago",
         required=True,
         widget=  forms.NumberInput(attrs={
@@ -37,7 +37,7 @@ class PaymentForm(forms.ModelForm):
     
     class Meta:
         model = Payment
-        fields = [ "paid_date", "payment_method","amount"]
+        fields = ["amount", "payment_date", "payment_method"]
     
     def __init__(self,installments,*args, **kwargs):
 

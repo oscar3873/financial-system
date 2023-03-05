@@ -93,27 +93,30 @@
                         <div class="px-4">
                             <p class="text-start">Monto solicitado:</p>
                             <p class="text-start">Monto a devolver:</p>
-                            <p class="text-start">Numero de Cuotas:</p>
+                            <p class="text-start">Cuotas:</p>
                         </div>
                         <div class="px-4">
                             <p class="text-start"><strong>$ {{credit_active.amount}}</strong></p>
                             <p class="text-start"><strong>$ {{credit_active.credit_repayment_amount}}</strong></p>
                             <p class="text-start"><strong>{{credit_active.installment_num}}</strong></p>
                         </div>
-                            <div class="form-group">
-                                <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
+                        <div class="form-group">
+                            <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
+                            {% if installments_available %}
                                 {% include "payment/payment_form.html" %}
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     <table class="table table-striped table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col">Numero de cuota</th>
+                                <th scope="col">Cuota</th>
                                 <th scope="col">Monto de la cuota</th>
                                 <th scope="col">Fecha de vencimiento</th>
                                 <th scope="col">Estado</th>
+                                {% if installments_available %}
                                 <th scope="col">Refinanciacion</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -121,24 +124,27 @@
                             <tr>
                                 <td>{{installment.installment_number}}</td>
                                 <td>{{installment.amount}}</td>
-                                <td>{{installment.payment_date}}</td>
-                                {% if installment.condition == 'Pagada' %}
+                                <td>{{installment.end_date|date}}</td>
+                                {% if installment.is_paid_installment %}
                                 <td>
                                     <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
                                         <strong>● Pagada</strong>
                                     </div>
                                 </td>
-                                {% elif installment.condition == 'Vencida' %}
+                                {% elif installment.is_caduced_installment %}
                                 <td>
                                     <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
                                         <strong>● Vencida</strong>
                                     </div>
                                 </td>
-                                {% elif installment.condition == 'Refinanciada' %}
+                                {% elif installment.is_refinancing_installment %}
                                 <td>
-                                    <div class="alert alert-secondary m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>● Refinanciada</strong>
-                                    </div>
+                                    <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
+                                    <a href="#">
+                                        <div class="alert alert-secondary m-0 p-1 text-center rounded-pill" role="alert">
+                                            <strong>● Refinanciada</strong>
+                                        </div>
+                                    </a>
                                 </td>
                                 {% else %}
                                 <td>
@@ -146,6 +152,10 @@
                                         <strong>● A Tiempo</strong>
                                     </div>
                                 </td>
+                                {% endif %}
+                                    
+                                {% if first_is_paid and installments_available %}
+
                                 <td>
                                     <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}">
                                         <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">Refinanciar</strong>
@@ -163,9 +173,9 @@
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <h5>Valor por Cuota $ {{amount_installment}}</h5>
-                                                            {% csrf_token %}
-                                                            {{form_ref.as_p}}
+                                                        <h5 id="selected-count">Valor por Cuota $ {{amount_installment}}</h5>
+                                                        {% csrf_token %}
+                                                        {{form_ref.as_p}}
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button class="btn btn-success">Refinanciar</button>
@@ -195,7 +205,6 @@
             <div class="col-xl-3 col-sm-6 col-12 p-3">
             </div>
         </div>
-
     </section>
 </main>
 
@@ -205,6 +214,7 @@
     const selector = document.querySelector('#id_installment_num_refinancing');
     const sumElement = document.querySelector('#id_amount');
     const interestElement = document.querySelector('#interest');
+    var porcentaje;
     
     function calcularSuma() {
         let sum = 0;
@@ -213,7 +223,7 @@
                 sum += parseFloat(checkbox.value);
             }
         });
-        let porcentaje;
+        
         console.log(selector.value);
         switch(parseInt(selector.value)){
             case 3: porcentaje=25;break;
@@ -224,12 +234,30 @@
         const selectorValue = parseFloat(selector.value);
         const total = (sum * (porcentaje+100)/100).toFixed(2);
         sumElement.value = `${total}`;
+        updateSelectedCount();
     }
     
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', calcularSuma);
     });
-    
-    selector.addEventListener('change', calcularSuma);
+    if (`{{amount_installment}}`){
+        selector.addEventListener('change', calcularSuma);
+    }
+    function updateSelectedCount() {
+        const selectedCountH5 = document.getElementById('selected-count');
+        const selected = Array.from(checkboxes).filter((c) => c.checked);
+        const selectedCount = selected.length;
+        
+        if (selectedCount === 0) {
+            selectedCountH5.textContent = `Valor por Cuota $ {{amount_installment}}` ;
+        } else if (selectedCount === 1) {
+            selectedCountH5.textContent = `Valor por Cuota $ {{amount_installment}} + ${porcentaje}%`;
+        } else {
+            selectedCountH5.textContent = `Valor por Cuota $ {{amount_installment}} + ${porcentaje}%`;
+        }
+    }
+
 </script>
+
+
 {% endblock content %}
