@@ -1,5 +1,5 @@
 def all_properties_client():
-        return ["Nombre Completo","Correo","Estado Civil","DNI","Numero de Telefono","Profesion","Domicilio", "Asesor", "Fecha de registro"]
+        return ["Nombre","DNI", "Asesor", "Fecha"]
 
 def all_properties_client_quot():
-        return ["Monto","Vencimiento","Cuota Nro", "Estado"]
+        return ["Monto","Vencimiento","Cuota", "Estado"]

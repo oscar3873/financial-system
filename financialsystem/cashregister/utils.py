@@ -1,2 +1,2 @@
 def all_properties_mov():
-    return ["Monto","Tipo de Operacion","Descripcion","Tipo de Divisa","Fecha de Realizacion","Por"]
+    return ["Monto","Operacion","Descripcion","Divisa","Fecha","Por"]

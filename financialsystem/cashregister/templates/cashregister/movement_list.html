@@ -2,7 +2,7 @@
 <!--Main-->
 <link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Movimientos de Caja</h3>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Movimientos de Caja</h4>
     <!--Seccion 1-->
     <section>
         <div class="row mt-4">
@@ -21,7 +21,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
             <div class="col-xl-6 col-sm-6 col-12 p-3">
@@ -40,28 +40,28 @@
                     <div class="form-group col-xl-12">
                         <span class="d-block px-2">Por {{ amount_filter.form.amount.label}}</span>
                         <span class="px-2">{{ amount_filter.form.amount}}</span>
-                        <button class="d-block btn btn-info m-2" type="submit">Buscar</button>
+                        <button class="d-block btn btn-primary m-2" type="submit">Buscar</button>
                     </div>
                 </form>
                 <form class="form-inline">
                     <div class="form-group col-xl-12">
                         <span class="px-2 d-block">Por {{ money_filter.form.money_type.label}}</span>
                         <span class="px-2">{{ money_filter.form.money_type}}</span>
-                        <button class="d-block btn btn-info m-2" type="submit">Buscar</button>
+                        <button class="d-block btn btn-primary m-2" type="submit">Buscar</button>
                     </div>
                 </form>
             </div>
-            <div class="card-footer p-0 mx-3 w-100 p-1 bg-info rounded-bottom"></div>
+            <div class="card-footer p-0 mx-3 w-100 p-1 bg-secondary rounded-bottom"></div>
             <div class="container p-0 mx-3 d-xl-flex bg-white border mt-4">
                 <form class="form-inline">
                     <div class="form-group col-xl-12">
                         <span class="d-block px-2">Por {{ description_filter.form.description.label}}</span>
                         <span class="px-2">{{ description_filter.form.description}}</span>
-                        <button class="d-block btn btn-info m-2" type="submit">Buscar</button>
+                        <button class="d-block btn btn-primary m-2" type="submit">Buscar</button>
                     </div>
                 </form>
             </div>
-            <div class="card-footer p-0 mx-3 w-100 p-1 bg-info rounded-bottom"></div>
+            <div class="card-footer p-0 mx-3 w-100 p-1 bg-secondary rounded-bottom"></div>
             <div class="container p-0 mx-3 d-xl-flex bg-white border mt-4">
                 <form class="form-inline">
                     <div class="form-group col-xl-12">
@@ -71,17 +71,17 @@
                         <span class="p-2">{{ listing_filter.form.operation_mode}}</span>
                         <span class="p-2 d-block">{{ listing_filter.form.created_at.label}}</span>
                         <span class="p-2">{{ listing_filter.form.created_at}}</span>
-                        <button class="d-block btn btn-info m-2" type="submit">Buscar</button>
+                        <button class="d-block btn btn-primary m-2" type="submit">Buscar</button>
                     </div>
                 </form>
             </div>
-            <div class="card-footer p-0 mx-3 w-100 p-1 bg-info rounded-bottom"></div>
+            <div class="card-footer p-0 mx-3 w-100 p-1 bg-secondary rounded-bottom"></div>
         </div>
     </section>
     <section>
         {% if movements %}
         <table class="table table-striped table-hover">
-            <h5 class=" p-4 pt-2 m-0 title">Cliente/s</h5>
+            <h5 class=" p-4 pt-2 m-0 title">Movimientos/s</h5>
             <thead class="table-light">
                 <tr>
                     {% for name_prop in properties %}
@@ -111,7 +111,7 @@
                                     <form action="{% url 'cashregister:delete' movement.pk %}" method="POST">
                                         {% csrf_token %}
                                         <div class="modal-header">
-                                            <h4 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h4>
+                                            <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
@@ -126,7 +126,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button class="btn btn-danger">Si, borrar</button>
-                                            <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                                            <button type="button" class="btn btn-primary m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
                                         </div>
                                     </form>
                                 </div>
@@ -140,7 +140,6 @@
                 {% endfor %}
             </tbody>
         </table>
-
         <div class="">
             <ul class="pagination justify-content-center">
                 {% if page_obj.has_previous %}
@@ -157,7 +156,7 @@
             </ul>
         </div>
         {% else %}
-        <h4 class="title font-weight-normal">No hay movimientos registrados</h4>
+        <h5 class="title font-weight-normal">No hay movimientos registrados</h5>
         {% endif %}
     </section>
     <!--Seccion 2-->

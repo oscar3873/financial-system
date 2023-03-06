@@ -10,9 +10,17 @@
     <link href="{% static 'core/vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
     <link href="{% static 'core/css/main.css' %}" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
     <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -67,7 +75,7 @@
                             <a class="nav-link font-weight-light m-2" href="{% url 'credits:list' %}"><i class="fa-solid fa-hand-holding-dollar"></i> Creditos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="{% url 'credits:list' %}"><i class="fa-sharp fa-solid fa-receipt"></i> Pagos</a>
+                            <a class="nav-link m-2" href="{% url 'credits:list' %}"><i class="fa-sharp fa-solid fa-receipt"></i> Pagos</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="{% url 'guarantors:list' %}"><i class="fa-solid fa-user-check"></i></i> Garantes</a>

@@ -36,3 +36,56 @@
         transform: rotateY(360deg)
     }
 }
+
+.nav-link {
+    position: relative;
+    box-shadow: none !important;
+}
+
+.nav-link:hover {
+    color: #ffffff;
+    text-shadow: -1px 0px 10px rgba(255, 255, 255, 0.7), 1px 0px 10px rgba(255, 255, 255, 0.7);
+    animation: bounceA 0.5s ease-in-out;
+}
+
+.nav-link:active {
+    box-shadow: 0 0 5px #000000;
+}
+
+@keyframes bounceA {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+ion-icon {
+    animation: draw 2s ease forwards;
+}
+
+ion-icon:hover {
+    animation: draw-hover 1s ease forwards;
+}
+
+@keyframes draw {
+    0% {
+        stroke-dasharray: 0 1000;
+    }
+    100% {
+        stroke-dasharray: 1000 0;
+    }
+}
+
+@keyframes draw-hover {
+    0% {
+        stroke-dasharray: 0 1000;
+    }
+    100% {
+        stroke-dasharray: 1000 0;
+    }
+}

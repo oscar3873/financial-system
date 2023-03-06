@@ -1,3 +1,4 @@
+from django import forms
 from django.forms import DateInput
 import django_filters
 from django_filters import filters
@@ -18,18 +19,30 @@ MONEY_TYPE = (
 )
 
 class ListingFilter(django_filters.FilterSet):
-    money_type = filters.ChoiceFilter(choices= MONEY_TYPE, label="Divisa", empty_label="Limpiar filtro")
-    operation_mode = filters.ChoiceFilter(choices=OPERATION_CHOISE, label="Tipo de Operación", empty_label="Limpiar filtro")
+    
+    amount = filters.RangeFilter(
+        label="Monto",
+        widget= django_filters.widgets.RangeWidget(attrs={'class': 'form-control m-1', 'style': 'width:100px'}))
+    
+    money_type = filters.ChoiceFilter(
+        choices= MONEY_TYPE, 
+        label="Divisa", 
+        empty_label="Limpiar",
+        widget=forms.Select(attrs={'class': 'form-control m-1'}))
+    operation_mode = filters.ChoiceFilter(
+        choices=OPERATION_CHOISE, 
+        label="Operación", 
+        empty_label="Limpiar",
+        widget=forms.Select(attrs={'class': 'form-control m-1'}))
     created_at = filters.DateFromToRangeFilter(
         label= "Desde - Hasta",
-        widget= django_filters.widgets.RangeWidget(attrs={'type': 'date'}),
+        widget= django_filters.widgets.RangeWidget(attrs={'type': 'date','class': 'form-control m-1'}),
         lookup_expr='icontains',
     )
     
     class Meta:
         model = Movement
-        fields = ['money_type', 'operation_mode', 'created_at', 'created_at']
-
+        fields = ['amount', 'money_type', 'operation_mode', 'created_at', 'created_at']
 
 class MoneyTypeFilter(django_filters.FilterSet):
     money_type = filters.ChoiceFilter(choices= MONEY_TYPE, label="Divisa", empty_label="Limpiar filtro")

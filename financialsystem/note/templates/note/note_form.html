@@ -1,7 +1,7 @@
 {% extends "core/base.html" %} {% load crispy_forms_tags %}{% load static %} {% block content %}
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Crear Nota</h3>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Crear Nota</h4>
     <section>
         <form method="post">{% csrf_token %} {{ form|crispy }}
             <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">

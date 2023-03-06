@@ -589,7 +589,7 @@ pre code {
 }
 
 .container {
-    width: 100%;
+    min-width: 90%;
     padding-right: 15px;
     padding-left: 15px;
     margin-right: auto;
@@ -1822,16 +1822,16 @@ pre code {
 .table-primary,
 .table-primary>th,
 .table-primary>td {
-    background-color: #b8daff;
+    background-color: #00365F;
 }
 
 .table-hover .table-primary:hover {
-    background-color: #9fcdff;
+    background-color: #0069d9;
 }
 
 .table-hover .table-primary:hover>td,
 .table-hover .table-primary:hover>th {
-    background-color: #9fcdff;
+    background-color: #0069d9;
 }
 
 .table-secondary,
@@ -2684,13 +2684,13 @@ fieldset:disabled a.btn {
 
 .btn-secondary:hover {
     color: #fff;
-    background-color: #5a6268;
-    border-color: #545b62;
+    background-color: #0573c8;
+    border-color: #0564ad;
 }
 
 .btn-secondary:focus,
 .btn-secondary.focus {
-    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5);
+    box-shadow: 0 0 0 0.2rem rgba(78, 167, 245, 0.5);
 }
 
 .btn-secondary.disabled,
@@ -2704,8 +2704,8 @@ fieldset:disabled a.btn {
 .btn-secondary:not(:disabled):not(.disabled).active,
 .show>.btn-secondary.dropdown-toggle {
     color: #fff;
-    background-color: #545b62;
-    border-color: #4e555b;
+    background-color: #0573c8;
+    border-color: #0564ad;
 }
 
 .btn-secondary:not(:disabled):not(.disabled):active:focus,
@@ -4577,7 +4577,6 @@ tbody.collapse.show {
 
 .navbar-light .navbar-toggler {
     color: rgba(0, 0, 0, 0.5);
-    border-color: rgba(0, 0, 0, 0.1);
 }
 
 .navbar-light .navbar-toggler-icon {
@@ -4662,7 +4661,7 @@ tbody.collapse.show {
     background-color: #fff;
     background-clip: border-box;
     border: 1px solid rgba(0, 0, 0, 0.125);
-    border-radius: 0.25rem;
+    border-radius: 1rem;
 }
 
 .card>hr {
@@ -6529,27 +6528,27 @@ button.bg-dark:focus {
 }
 
 .rounded {
-    border-radius: 0.25rem !important;
+    border-radius: 1rem !important;
 }
 
 .rounded-top {
-    border-top-left-radius: 0.25rem !important;
-    border-top-right-radius: 0.25rem !important;
+    border-top-left-radius: 1rem !important;
+    border-top-right-radius: 1rem !important;
 }
 
 .rounded-right {
-    border-top-right-radius: 0.25rem !important;
-    border-bottom-right-radius: 0.25rem !important;
+    border-top-right-radius: 1rem !important;
+    border-bottom-right-radius: 1rem !important;
 }
 
 .rounded-bottom {
-    border-bottom-right-radius: 0.25rem !important;
-    border-bottom-left-radius: 0.25rem !important;
+    border-bottom-right-radius: 1rem !important;
+    border-bottom-left-radius: 1rem !important;
 }
 
 .rounded-left {
-    border-top-left-radius: 0.25rem !important;
-    border-bottom-left-radius: 0.25rem !important;
+    border-top-left-radius: 1rem !important;
+    border-bottom-left-radius: 1rem !important;
 }
 
 .rounded-circle {

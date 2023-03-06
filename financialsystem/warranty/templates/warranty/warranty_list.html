@@ -2,7 +2,7 @@
 <!--Main-->
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Empeños</h3>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Empeños</h4>
     <!--Seccion 1-->
     {% if messages %} {% for message in messages %}
     <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
@@ -27,13 +27,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
         </div>
         <div class="row mb-4">
             <div class="col-xl-3 col-sm-6 col-12 p-3">
-                <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'warrantys:create' %}" role="button">
+                <a name="" id="" class="btn btn-primary rounded p-3" href="{% url 'warrantys:create' %}" role="button">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     <span>Ingresar Nuevo Empeño</span>
                 </a>
@@ -56,17 +56,17 @@
                         <span class="p-2">{{ listing_filter.form.purchase_papers}}</span>
                         <span class="p-2 d-block">{{ listing_filter.form.created_at.label}}</span>
                         <span class="p-2">{{ listing_filter.form.created_at}}</span>
-                        <button class="d-block btn btn-info m-2" type="submit">Buscar</button>
+                        <button class="d-block btn btn-primary m-2" type="submit">Buscar</button>
                     </div>
                 </form>
             </div>
-            <div class="card-footer p-0 mx-3 w-100 p-1 bg-info rounded-bottom"></div>
+            <div class="card-footer p-0 mx-3 w-100 p-1 bg-secondary rounded-bottom"></div>
         </div>
 
     </section>
     <section>
         {% if warrantys %}
-        <h4>Empeños Generales</h4>
+        <h5>Empeños Generales</h5>
         <table class="table table-striped table-hover">
             <thead class="table-light">
                 <tr>
@@ -107,7 +107,7 @@
                                     <form action="{% url 'warrantys:delete' warranty.pk %}" method="POST">
                                         {% csrf_token %}
                                         <div class="modal-header">
-                                            <h4 class="modal-title" id="exampleModalLabel">Eliminar Empeño</h4>
+                                            <h5 class="modal-title" id="exampleModalLabel">Eliminar Empeño</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
@@ -119,7 +119,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button class="btn btn-danger">Si, borrar</button>
-                                            <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                                            <button type="button" class="btn btn-primary m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
                                         </div>
                                     </form>
                                 </div>

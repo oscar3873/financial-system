@@ -5,7 +5,7 @@
     {% load crispy_forms_tags %}
     <form method="post" id="client_form">
         {% csrf_token %}
-        <h4 class="card-title">Informacion del Garante</h4>
+        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">Informacion del Garante</h5>
         {{ form|crispy}}
         <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
     </form>
