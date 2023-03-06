@@ -1,6 +1,7 @@
 {% block content %}
-
-<table class="table table-striped table-hover">
+{% with refinance as credit_active %}
+{% include "payment/payment_form.html" %}
+<div class="container"><table class="table table-striped table-hover">
     <thead class="table-light">
         <tr>
             <th scope="col">Cuota</th>
@@ -37,6 +38,6 @@
         </tr>
         {% endfor %}
     </tbody>
-</table>
-
+</table></div>
+{% endwith %}
 {% endblock content %}

@@ -53,7 +53,8 @@ class Installment(models.Model):
     is_caduced_installment = models.BooleanField(default=False , help_text="La cuota esta vencida")
     is_paid_installment = models.BooleanField(default=False, help_text="La cuota esta pagada")
     is_refinancing_installment = models.BooleanField(default=False, help_text="La cuota fue refinanciada")
-    
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     installment_number = models.PositiveSmallIntegerField(help_text="Numero de cuota del credito")
     daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")
     start_date = models.DateTimeField(default=datetime.now, null=True)
@@ -76,7 +77,8 @@ class Installment(models.Model):
 class Refinancing(models.Model):
     
     is_paid_refinancing = models.BooleanField(default=False, help_text="La refinanciacion esta pagada")
-    
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     interest = models.PositiveIntegerField(default=48, help_text="Intereses de la refinanciacion")
     amount = models.DecimalField(decimal_places=2, max_digits=15)
     refinancing_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolver de la Refinanciacion")
@@ -101,6 +103,7 @@ class InstallmentRefinancing(models.Model):
     is_caduced_installment = models.BooleanField(default=False , help_text="La cuota esta vencida")
     is_paid_installment = models.BooleanField(default=False, help_text="La cuota esta pagada")
     
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
     installment_number = models.PositiveSmallIntegerField(help_text="Numero de cuota de la refinanciacion")
     daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")

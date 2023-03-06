@@ -14,6 +14,7 @@ from .forms import CreditForm, RefinancingForm
 from guarantor.forms import GuarantorForm, PhoneNumberFormSetG
 from warranty.forms import WarrantyForm
 from clients.forms import ClientForm, PhoneNumberFormSet
+from payment.forms import PaymentForm
 
 #CREAR UN CREDITO CON TODOS LOS FORMULARIOS ANIDADOS
 
@@ -26,7 +27,6 @@ def crear_credito(request):
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
     
     if request.method == 'POST':
-        print("La solicitud contiene................", request.POST)        
         if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid() and guarantor_form.is_valid() and formsetPhoneClient.is_valid() and formsetPhoneGuarantor.is_valid():
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
@@ -57,7 +57,7 @@ def crear_credito(request):
             if warranty_form.cleaned_data["article"]:
                 warranty.credit = credit
                 warranty.save()
-        return redirect('clients:list')
+        return redirect('clients:list') #NO MARCA LOS ERRORES
     
     context = {
         'cliente_form': client_form,
@@ -202,6 +202,7 @@ class RefinancingDetailView(DetailView):
         refinance = installment.refinancing
 
         kwargs = super().get_context_data(**kwargs)
-        kwargs['form_payment_ref'] = RefinancingForm(credit=refinance)
-        kwargs['refinance'] = get_object_or_404(Refinancing, pk = installment.refinancing.pk)
+        kwargs['form_payment'] = PaymentForm(installments=refinance.installments.all())
+        kwargs['refinance'] = refinance
+        kwargs["amount_installment"] = refinance.installments.last().amount
         return kwargs
