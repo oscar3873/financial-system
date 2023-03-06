@@ -18,7 +18,7 @@ def refresh_condition_exp():
         installments_ref_vencidas = InstallmentRefinancing.objects.exclude(condition = 'Pagada').filter(end_date__date__lt=date.today())
 
         for installment_ven in cred_with_vencidas:                                                 
-            for installment in installment_ven.installment.filter(end_date__date__lt=date.today()):
+            for installment in installment_ven.installments.filter(end_date__date__lt=date.today()):
                 if installment.condition != 'Refinanciada':  
                     installment.condition = 'Vencida'
                     if installment.lastup.date() != date.today(): 
@@ -46,7 +46,7 @@ def refresh_condition_exp():
                 credito.condition = 'Vencido'
                 credito.save()                                                ## ACTUALIZACION DE condition DE CREDITO
 
-            cred = credito.installment.filter(condition= 'Vencida')
+            cred = credito.installments.filter(condition= 'Vencida')
             if cred.count() >= 2 and cred.end_date.date()+timedelta(days=10) < date.today():
                 credito.condition = 'Legales'
                 credito.save()
@@ -55,7 +55,7 @@ def refresh_condition_paid():
     credit_ok = Credit.objects.filter(is_paid_credit=False).filter(installment__is_paid_installment=True)
 
     for credit in credit_ok:
-        if credit.installment.count() == credit.installment.filter(is_paid_installment=True).count():
+        if credit.installments.count() == credit.installments.filter(is_paid_installment=True).count():
             credit.is_paid_credit=True
 
 #--------------------- UTILS FUNCTIONS -------------------------------------------

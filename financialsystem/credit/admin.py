@@ -31,7 +31,7 @@ class RefinancingAdmin(admin.ModelAdmin):
     list_display = (
             'installment',
             'is_paid_refinancing',
-            'refinancing_interest', 
+            'interest', 
             'amount', 
             'refinancing_repayment_amount', 
             'installment_num_refinancing',
@@ -44,10 +44,12 @@ class InstallmentRefinancingAdmin(admin.ModelAdmin):
     list_display = (
             'refinancing',
             'installment_number',
+            'daily_interests',
             'amount', 
             'payment_date', 
             'is_caduced_installment', 
             'is_paid_installment', 
+            'lastup',
             'created_at', 
             'updated_at'
     )

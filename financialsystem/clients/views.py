@@ -124,23 +124,24 @@ class ClientDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        credit_active = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
-        installments = credit_active.installment.exclude(condition__in=['Refinanciada', 'Pagada'])
-        refinancing = Refinancing.objects.filter(installment__credit=credit_active)
         context["credits"] = Credit.objects.filter(client = context["client"])
-        if context["credits"]:
+        credit_active = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
+        
+        if credit_active:
+            installments = credit_active.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+            refinancing = Refinancing.objects.filter(installment__credit=credit_active)
             context["credit_active"] = credit_active
             context["refinances"] = refinancing
-            context["installments"] = context["credit_active"].installment.all()
-            context["first_is_paid"] = context["credit_active"].installment.first().is_paid_installment
+            context["installments"] = credit_active.installments.all()
+            context["first_is_paid"] = credit_active.installments.first().is_paid_installment
             if installments :
                 context["form_ref"]= RefinancingForm(credit=context["credit_active"])
                 context["form_payment"]= PaymentForm(installments=installments)
-                context["amount_installment"] = context["credit_active"].installment.first().amount
-                if installments.exclude(condition__in=['Refinanciada', 'Pagada']).count() > 0 :
+                context["amount_installment"] = credit_active.installments.first().amount
+                if installments.exclude(condition__in=['Refinanciada', 'Pagada']).count() > 0:
                     context["installments_available"] = True
                 else:
-                    context["installments_available"] = False
+                    context["installments_available"] = False 
         return context
 
     def get_object(self):

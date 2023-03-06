@@ -11,11 +11,9 @@ from django.urls import reverse, reverse_lazy
 
 #CRUD Payment
 from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import UpdateView, DeleteView
 
-from credit.models import Credit
-from credit.models import Refinancing
+from credit.models import Credit, Installment
 from .utils import payment_create
 from .models import Payment
 from .forms import PaymentForm
@@ -69,17 +67,17 @@ class PaymentUpdateView(UpdateView):
 #------------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
 def make_payment_installment_ref(request, pk):
-    refinancing = get_object_or_404(Refinancing, pk=pk)
-    installments = refinancing.installment_refinancing.exclude(condition='Pagada')
-    form = PaymentForm(installments, request.POST or None)
+    installment = get_object_or_404(Installment, pk=pk)
+    refinanced_installments = installment.refinancing.installments.exclude(condition='Pagada')
+    form = PaymentForm(refinanced_installments, request.POST or None)
     
     if request.method == 'POST' and form.is_valid():
-        installment_ref = list(installments.all())
+        installment_ref = list(refinanced_installments.all())
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota') and value}
         pack = dict(zip(installment_ref, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
-        payment = form.save(commit=False)
 
+        payment = form.save(commit=False)
         payment.amount = Decimal(payment.amount / count_value)
         payment._adviser = request.user.adviser
 
@@ -89,15 +87,16 @@ def make_payment_installment_ref(request, pk):
             installment.payment_date = payment.payment_date
             installment.save()
             payment_create(payment, installment)
-        return redirect('clients:list')
+
+        return redirect('clients:detail', pk=installment.credit.client.pk)
     
-    return render(request, 'payment/payment_form.html', {'form': form})
+    # return render(request, 'payment/payment_form.html', {'form': form})
 
 #REALIZAR DE UN PAGO
 #------------------------------------------------------------------
 def make_payment_installment(request, pk):
     credit = get_object_or_404(Credit, pk=pk)
-    installments = credit.installment.exclude(condition__in=['Refinanciada', 'Pagada'])
+    installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
     form = PaymentForm(installments, request.POST or None)
     
     if request.method == 'POST' and form.is_valid():
@@ -106,7 +105,6 @@ def make_payment_installment(request, pk):
         pack = dict(zip(installments_credit, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
         
-        print(pack)
         payment = form.save(commit=False)
         payment.amount = Decimal(payment.amount / count_value)
         payment._adviser = request.user.adviser
@@ -117,6 +115,7 @@ def make_payment_installment(request, pk):
             installment.payment_date = payment.payment_date
             installment.save()
             payment_create(payment, installment)
+            
         return redirect('clients:detail', pk=credit.client.pk)
     
-    return render(request, 'payment/payment_form.html', {'form': form})
+    # return render(request, 'payment/payment_form.html', {'form': form})

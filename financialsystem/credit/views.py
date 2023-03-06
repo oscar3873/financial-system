@@ -6,7 +6,7 @@ from django.contrib import messages
 
 from .utils import *
 
-from .models import Credit
+from .models import Credit, Refinancing, Installment
 from clients.models import Client
 from guarantor.models import Guarantor
 
@@ -107,12 +107,12 @@ class CreditDetailView(DetailView):
         return get_object_or_404(Credit, pk=self.kwargs['pk'])
 
 
-#CREACION DE UN CREDITO
-#------------------------------------------------------------------     
-class CreditCreateView(CreateView):
+#ASOCIACION MEDIANTE CREACION DE UN CREDITO
+#------------------------------------------------------------------   
+class AssociateCreateView(CreateView):
     model = Credit
     form_class = CreditForm
-    
+
     def form_valid(self, form):
         if form.is_valid():
             form.instance.mov = create_movement(form.instance, self.request.user.adviser)
@@ -123,6 +123,27 @@ class CreditCreateView(CreateView):
         print(self.kwargs)
         messages.success(self.request, 'Credito creado correctamente', "success")
         return  reverse_lazy('credits:list')
+    
+
+#CREACION DE UN CREDITO
+#------------------------------------------------------------------     
+class CreditCreateTo(CreateView):
+    model = Credit
+    form_class = CreditForm
+    
+    def form_valid(self, form):
+        self.client = get_object_or_404(Client, pk=self.kwargs['pk'])
+        if form.is_valid():
+            print(self.kwargs)
+            credit = form.save(commit=False)
+            credit.client = self.client
+            credit.mov = create_movement(credit, self.request.user.adviser)
+            credit.save()
+        return super().form_valid(form)
+    
+    def get_success_url(self) -> str:
+        messages.success(self.request, 'Credito creado correctamente', "success")
+        return  reverse_lazy('clients:list') #CORREGIR PARA QUE VUELVA A LA PESTAÑA DEL CLIENTE
     
 
 #------------------------------------------------------------------     
@@ -138,7 +159,6 @@ class CreditUpdateView(UpdateView):
     
     def get_success_url(self) -> str:
         messages.success(self.request, 'Credito actualizado correctamente', "success")
-
         return  reverse_lazy('credits:list')
     
 #------------------------------------------------------------------     
@@ -165,9 +185,23 @@ def refinance_installment (request, pk):
                     last_installment = max(last_installment, int(key.split()[1]))
 
             refinancing = form.save(commit=False)
-            refinancing.installment = get_object_or_404(credit.installment, installment_number=last_installment)
+            refinancing.installment = get_object_or_404(Installment, credit=credit, installment_number=last_installment)
             refinancing.installment.condition = 'Refinanciada'
             refinancing.installment.is_refinancing_installment = True
             refinancing.installment.save()
             refinancing.save()
             return redirect('clients:detail', pk=credit.client.id)
+        
+#----------------------------------------------------------------
+class RefinancingDetailView(DetailView):
+    model = Installment
+    template_name = 'refinance/refinance_detail.html'
+
+    def get_context_data(self, **kwargs):
+        installment = self.get_object()
+        refinance = installment.refinancing
+
+        kwargs = super().get_context_data(**kwargs)
+        kwargs['form_payment_ref'] = RefinancingForm(credit=refinance)
+        kwargs['refinance'] = get_object_or_404(Refinancing, pk = installment.refinancing.pk)
+        return kwargs

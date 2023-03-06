@@ -33,7 +33,7 @@
         </div>
         <div class="row mb-4">
             <div class="col-xl-3 col-sm-6 col-12 p-3">
-                <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'credits:create' %}" role="button">
+                <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'credits:associate_credit' %}" role="button">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     <span>Cargar Nuevo credito</span>
                 </a>
@@ -60,7 +60,7 @@
                     <td>{{credit.amount}}</td>
                     <td>{{credit.credit_repayment_amount}}</td>
                     <td>{{credit.installment_num}}</td>
-                    <td>{{credit.installment.last.amount}}</td>
+                    <td>{{credit.installments.last.amount}}</td>
                     {% if credit.is_active %}
                     <td>
                         <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">

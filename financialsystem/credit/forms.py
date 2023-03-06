@@ -74,9 +74,9 @@ class RefinancingForm(forms.ModelForm):
 
     def __init__(self,credit,*args, **kwargs):
         super().__init__(*args, **kwargs)
-        installments = credit.installment.exclude(condition__in=['Refinanciada', 'Pagada'])
+        installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
         for installment in installments:
-            if installment == credit.installment.first():
+            if installment == credit.installments.first():
                 self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
                     label='Cuota %s%s' % (
                         installment.installment_number,

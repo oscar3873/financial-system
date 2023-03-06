@@ -140,7 +140,7 @@
                                 {% elif installment.is_refinancing_installment %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
-                                    <a href="#">
+                                    <a href="{% url 'credits:refinance_detail' installment.pk %}">
                                         <div class="alert alert-secondary m-0 p-1 text-center rounded-pill" role="alert">
                                             <strong>● Refinanciada</strong>
                                         </div>
@@ -152,10 +152,7 @@
                                         <strong>● A Tiempo</strong>
                                     </div>
                                 </td>
-                                {% endif %}
-                                    
-                                {% if first_is_paid and installments_available %}
-
+                                {% if first_is_paid %}
                                 <td>
                                     <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}">
                                         <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">Refinanciar</strong>
@@ -173,7 +170,7 @@
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <h5 id="selected-count">Valor por Cuota $ {{amount_installment}}</h5>
+                                                        <h5 id="selected-count">Valor por Cuota $ {{installment.amount}}</h5>
                                                         {% csrf_token %}
                                                         {{form_ref.as_p}}
                                                     </div>
@@ -185,7 +182,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                {% endif %}
+                                {% endif %}{% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -197,7 +194,28 @@
             <div class="col-xl-9 col-sm-6 col-12 p-3 text-center">
                 <h5 class="title pt-3">
                     <strong class="text-danger">●</strong> Sin credito activo</h5>
+                <a href="{% url 'credits:associate_credit_for_customer' client.pk %}" >
+                    <div class="col-sm-6 col-12 p-3 text-center">
+                        <div class="card mt-4">
+                            <div class="card-content">
+                                <div class="card-body">
+                                    <div class="media d-flex">
+                                        <div class="align-self-center">
+                                            <i class="fa-sharp fa-solid fa-credit-card text-warning icon-lg"></i>
+                                        </div>
+                                        <div class="media-body text-right">
+                                            <h5>+ Agregar Credito</h5>
+                                            <h5></h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    </div>
+                </div>
+                </a>
             </div>
+            
             {% endif %}
 
         </div>
@@ -234,30 +252,15 @@
         const selectorValue = parseFloat(selector.value);
         const total = (sum * (porcentaje+100)/100).toFixed(2);
         sumElement.value = `${total}`;
-        updateSelectedCount();
     }
     
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', calcularSuma);
     });
-    if (`{{amount_installment}}`){
+
+    if (`{{ amount_installment|default_if_none:False }}`) {
         selector.addEventListener('change', calcularSuma);
-    }
-    function updateSelectedCount() {
-        const selectedCountH5 = document.getElementById('selected-count');
-        const selected = Array.from(checkboxes).filter((c) => c.checked);
-        const selectedCount = selected.length;
-        
-        if (selectedCount === 0) {
-            selectedCountH5.textContent = `Valor por Cuota $ {{amount_installment}}` ;
-        } else if (selectedCount === 1) {
-            selectedCountH5.textContent = `Valor por Cuota $ {{amount_installment}} + ${porcentaje}%`;
-        } else {
-            selectedCountH5.textContent = `Valor por Cuota $ {{amount_installment}} + ${porcentaje}%`;
         }
-    }
-
 </script>
-
 
 {% endblock content %}

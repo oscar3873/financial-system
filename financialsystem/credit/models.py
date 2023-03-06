@@ -29,7 +29,7 @@ class Credit(models.Model):
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
     start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=datetime.now, null=True)
     end_date = models.DateTimeField(verbose_name='Fecha de Finalizacion del Credito', null=True)
-    payment_date = models.DateTimeField(help_text="Fecha de Pago")
+    payment_date = models.DateTimeField(verbose_name="Fecha de Pago",blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -58,9 +58,9 @@ class Installment(models.Model):
     daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")
     start_date = models.DateTimeField(default=datetime.now, null=True)
     end_date = models.DateTimeField(null=True)
-    payment_date = models.DateTimeField(help_text="Fecha de Pago")
+    payment_date = models.DateTimeField(help_text="Fecha de Pago", null=True, default=None)
     condition = models.CharField(max_length=15,choices=CONDITION, default='A Tiempo')
-    credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="installment", help_text="Credito de la cuota")
+    credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="installments", help_text="Credito de la cuota")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota")
     lastup = models.DateTimeField(default=datetime.now, null=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)
@@ -77,7 +77,7 @@ class Refinancing(models.Model):
     
     is_paid_refinancing = models.BooleanField(default=False, help_text="La refinanciacion esta pagada")
     
-    refinancing_interest = models.PositiveIntegerField(default=48, help_text="Intereses de la refinanciacion")
+    interest = models.PositiveIntegerField(default=48, help_text="Intereses de la refinanciacion")
     amount = models.DecimalField(decimal_places=2, max_digits=15)
     refinancing_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolver de la Refinanciacion")
     installment = models.OneToOneField(Installment, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cuota de la Refinanciacion", related_name="refinancing")
@@ -103,11 +103,13 @@ class InstallmentRefinancing(models.Model):
     
     condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
     installment_number = models.PositiveSmallIntegerField(help_text="Numero de cuota de la refinanciacion")
-    refinancing = models.ForeignKey(Refinancing, on_delete=models.CASCADE, related_name="installment_refinancing", help_text="Refinanciacion de la cuota")
+    daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")
+    refinancing = models.ForeignKey(Refinancing, on_delete=models.CASCADE, related_name="installments", help_text="Refinanciacion de la cuota")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota de refinanciacion")
-    payment_date = models.DateTimeField(help_text="Fecha de pago de la cuota de refinanciacion")
+    payment_date = models.DateTimeField(verbose_name="Fecha de Pago",blank=True, null=True)
     start_date = models.DateTimeField(default=datetime.now, verbose_name='Fecha de Inicio')
     end_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True)
+    lastup = models.DateTimeField(default=datetime.now, null=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -124,14 +126,14 @@ def repayment_amount_auto(instance, *args, **kwargs):
 def create_installments_auto(instance, created, *args, **kwargs):
     if not instance.is_old_credit:
         if not created:
-            instance.installment.all().delete()
+            instance.installments.all().delete()
         credit = instance
         days = 30
         amount_installment = Decimal(credit.credit_repayment_amount/credit.installment_num)
         for numberInstallments in range(credit.installment_num):
             end_date = credit.start_date + timedelta(days=days)
             numberInstms = numberInstallments + 1
-            credit.installment.create(
+            credit.installments.create(
                 installment_number=numberInstms, 
                 start_date = credit.start_date,
                 credit= credit, 
@@ -148,16 +150,17 @@ post_save.connect(create_installments_auto, sender= Credit)
 def refinancing_repayment_amount_auto(instance, *args, **kwargs):
     refinancing = instance
 
-    match (int (refinancing.installment_num_refinancing)):
+    match (int(refinancing.installment_num_refinancing)):
         case 3: refinancing.refinancing_interest = 25
         case 6: refinancing.refinancing_interest = 50
         case 9: refinancing.refinancing_interest = 75
         case _: refinancing.refinancing_interest = 100
 
-    interests_amount = Decimal(float(refinancing.amount) * (float(refinancing.refinancing_interest+100) / 100))
+    interests_amount = Decimal(float(refinancing.amount) * (float(refinancing.refinancing_interest) / 100 + 1))
     repayment_amount = refinancing.amount + interests_amount
     refinancing.end_date = datetime.now() + timedelta(days=30)*refinancing.installment_num_refinancing
     refinancing.refinancing_repayment_amount = Decimal(repayment_amount)
+
 
 def create_installmentsR_auto(instance, created, *args, **kwargs):
     if created:
@@ -165,10 +168,11 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
         days = 30
         amount_installment = Decimal(refinancing.refinancing_repayment_amount/refinancing.installment_num_refinancing)
         for numberInstallments in range(refinancing.installment_num_refinancing):
-            payment_date = instance.created_at + timedelta(days=days)
+            end_date = instance.created_at + timedelta(days=days)
             numberInstms = numberInstallments + 1
-            refinancing.installment_refinancing.create(installment_number=numberInstms, refinancing= refinancing, amount=amount_installment, payment_date=payment_date)
+            refinancing.installments.create(installment_number=numberInstms, refinancing=refinancing, amount=amount_installment, end_date=end_date)
             days += 30
 
-pre_save.connect(refinancing_repayment_amount_auto, sender= Refinancing)
-post_save.connect(create_installmentsR_auto, sender= Refinancing)
+
+pre_save.connect(refinancing_repayment_amount_auto, sender=Refinancing)
+post_save.connect(create_installmentsR_auto, sender=Refinancing)
