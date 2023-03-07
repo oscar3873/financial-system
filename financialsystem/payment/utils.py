@@ -16,4 +16,3 @@ def payment_create(payment, installment):
         payment_dict['installment_ref'] = installment
         
     Payment.objects.create(**payment_dict)
-#FICHAR 
