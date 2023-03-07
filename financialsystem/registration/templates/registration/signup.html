@@ -12,7 +12,7 @@
                 {% endif %}
                 <form action="" method="post">
                     {% csrf_token %}
-                    <h3 class="mb-4 text-center">Registrar Asesor</h3>
+                    <h4 class="mb-4 text-center animate__fadeInLeft" style="animation-duration: 0.5s !important;">Registrar Asesor</h4>
                     {{ form|crispy}}
                     <p><input type="submit" class="btn btn-success btn-block" value="Confirmar"></p>
                 </form>

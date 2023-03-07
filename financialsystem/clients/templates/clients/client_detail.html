@@ -3,7 +3,7 @@
 <link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
 <main class="container my-4">
     <!--Seccion 1-->
-    <h3 class="title font-weight-normal">{{client.first_name}} {{client.last_name}}</h3>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">{{client.first_name}} {{client.last_name}}</h4>
     {% if messages %} {% for message in messages %}
     <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
         <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
@@ -27,7 +27,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
             <div class="col-xl-5 col-sm-6 col-12 p-3">
@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <p class="px-4">Correo: <strong>{{client.email}}</strong></p>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
             <div class="col-xl-4 col-sm-6 col-12 p-3">
@@ -63,7 +63,7 @@
                         </div>
                     </div>
                     <p class="px-2">Correo: <strong>{{client.email}}</strong></p>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
         </div>
@@ -125,7 +125,25 @@
                                 <td>{{installment.installment_number}}</td>
                                 <td>{{installment.amount}}</td>
                                 <td>{{installment.end_date|date}}</td>
-                                {% if installment.is_paid_installment %}
+                                {% if installment.is_paid_installment and installment.is_refinancing_installment %}
+                                <td>
+                                    <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
+                                    <a href="{% url 'credits:refinance_detail' installment.pk %}">
+                                        <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
+                                            <strong>● Ref. Pagada</strong>
+                                        </div>
+                                    </a>
+                                </td>
+                                {% elif installment.is_refinancing_installment %}
+                                <td>
+                                    <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
+                                    <a href="{% url 'credits:refinance_detail' installment.pk %}">
+                                        <div class="alert alert-secondary m-0 p-1 text-center rounded-pill" role="alert">
+                                            <strong>● Refinanciada</strong>
+                                        </div>
+                                    </a>
+                                </td>
+                                {% elif installment.is_paid_installment %}
                                 <td>
                                     <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
                                         <strong>● Pagada</strong>
@@ -136,15 +154,6 @@
                                     <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
                                         <strong>● Vencida</strong>
                                     </div>
-                                </td>
-                                {% elif installment.is_refinancing_installment %}
-                                <td>
-                                    <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
-                                    <a href="{% url 'credits:refinance_detail' installment.pk %}">
-                                        <div class="alert alert-secondary m-0 p-1 text-center rounded-pill" role="alert">
-                                            <strong>● Refinanciada</strong>
-                                        </div>
-                                    </a>
                                 </td>
                                 {% else %}
                                 <td>
@@ -243,17 +252,25 @@
         });
         
         console.log(selector.value);
-        switch(parseInt(selector.value)){
-            case 3: porcentaje=25;break;
-            case 6: porcentaje=50;break;
-            case 9: porcentaje=75;break;
-            default: porcentaje=100;break;
+        switch (parseInt(selector.value)) {
+            case 3:
+                porcentaje = 25;
+                break;
+            case 6:
+                porcentaje = 50;
+                break;
+            case 9:
+                porcentaje = 75;
+                break;
+            default:
+                porcentaje = 100;
+                break;
         }
         const selectorValue = parseFloat(selector.value);
-        const total = (sum * (porcentaje+100)/100).toFixed(2);
+        const total = (sum * (porcentaje + 100) / 100).toFixed(2);
         sumElement.value = `${total}`;
     }
-    
+
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', calcularSuma);
     });

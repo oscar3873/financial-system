@@ -1,13 +1,12 @@
-from datetime import datetime
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 
 #CRUD Payment
 from django.views.generic.list import ListView
@@ -67,13 +66,14 @@ class PaymentUpdateView(UpdateView):
 #------------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
 def make_payment_installment(request, pk):
-    print(pk)
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments = refinancing.installments.exclude(condition='Pagada')
+        object_model = refinancing.installment_ref.last().credit.client
     except:
         credit = get_object_or_404(Credit, pk=pk)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+        object_model = credit.client
 
     form = PaymentForm(installments, request.POST or None)
     if request.method == 'POST' and form.is_valid():
@@ -93,5 +93,5 @@ def make_payment_installment(request, pk):
             installment.save()
             payment_create(payment, installment)
 
-        return redirect('clients:detail', pk=installment.credit.client.pk)
+        return redirect('clients:detail', pk=object_model.pk)
     

@@ -40,13 +40,11 @@ class PaymentForm(forms.ModelForm):
         fields = ["amount", "payment_date", "payment_method"]
     
     def __init__(self,installments,*args, **kwargs):
-        print(installments)
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.prefix = "payment"
         if installments.count() > 0:
             for installment in installments:
                 attrs = {"value": installment.amount + installment.daily_interests, "data-form-id":"form_payment"}
-
                 if installment == installments.first():
                     self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
                         label='Cuota %s' % (installment.installment_number),required=True,

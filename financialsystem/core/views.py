@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
-from note.models import Note
-from credit.models import Installment
-from cashregister.models import CashRegister, Movement
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from note.models import Note
+from credit.utils import refresh_condition
+from cashregister.models import CashRegister, Movement
+
 
 # Create your views here.
 
@@ -17,6 +19,7 @@ class HomePageView(LoginRequiredMixin, TemplateView):
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
+        refresh_condition()
         context = super().get_context_data(**kwargs)
         Caja = CashRegister.objects.get_or_create()
         context["cashregister"] = Caja[0]

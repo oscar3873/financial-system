@@ -52,6 +52,7 @@ class GuarantorForm(forms.ModelForm):
     class Meta:
         model = Guarantor
         fields = "__all__"
+        exclude = ["credit"]
     
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):

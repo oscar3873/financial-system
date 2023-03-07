@@ -2,7 +2,7 @@
 <!--Main-->
 <link href="{% static 'adviser/css/adviser.css' %}" rel="stylesheet">
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Asesores</h3>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Asesores</h4>
     <!--Seccion 1-->
     {% if messages %} {% for message in messages %}
     <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
@@ -27,13 +27,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
         </div>
         <div class="row mb-4">
             <div class="col-xl-3 col-sm-6 col-12 p-3">
-                <a name="" id="" class="btn btn-info rounded p-3" href="{% url 'signup' %}" role="button">
+                <a name="" id="" class="btn btn-primary rounded p-3" href="{% url 'signup' %}" role="button">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     <span>Registrar Nuevo Asesor</span>
                 </a>
@@ -61,28 +61,28 @@
                                 <div class="col-xs-4">
                                     <div class="profile-overview m-2">
                                         <p><strong><i class="fas fa-users text-warning"></i> Clientes</strong></p>
-                                        <h4>1300</h4>
+                                        <h5>1300</h5>
                                     </div>
                                 </div>
                                 <div class="col-xs-4">
                                     <div class="profile-overview m-2">
                                         <p><strong><i class="fas fa-money-check-alt text-warning"></i> Cobros</strong></p>
-                                        <h4>250</h4>
+                                        <h5>250</h5>
                                     </div>
                                 </div>
                                 <div class="col-xs-4">
                                     <div class="profile-overview m-2">
                                         <p><strong><i class="fas fa-dollar-sign text-warning"></i> Comisiones</strong></p>
-                                        <h4>168</h4>
+                                        <h5>168</h5>
                                     </div>
                                 </div>
                             </div>
                         </a>
-                        <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                        <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                     </div>
                 </div>
                 {% endfor %} {% else %}
-                <h4 class="title font-weight-normal">No hay Asesores Registrados</h4>
+                <h5 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">No hay Asesores Registrados</h5>
                 {% endif %}
             </div>
         </div>

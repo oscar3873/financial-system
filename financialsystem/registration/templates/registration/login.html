@@ -14,9 +14,9 @@
     <main class="container py-5" role="main">
         <div class="container my-5">
             <div class="d-flex flex-column">
-                <h3 class="m-0 text-center">
+                <h4 class="m-0 text-center animate__fadeInLeft" style="animation-duration: 0.5s !important;">
                     <img src="{% static 'registration/img/isotipo.png' %}" width="400px" class="img-fluid" alt="logotipo" />
-                </h3>
+                </h4>
                 <div class="col-lg-4 col-md-6 mx-auto">
                     <form action="" method="post">
                         {% csrf_token %} {% if form.non_field_errors %}

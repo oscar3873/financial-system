@@ -15,3 +15,6 @@ class Note(models.Model):
     
     def all_properties(self):
         return ["Titulo","Fecha de Creacion","Por"]
+
+    class Meta:
+        ordering = ["created_at"]

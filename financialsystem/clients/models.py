@@ -35,6 +35,8 @@ class Client(models.Model):
     def __str__(self):
         return self.first_name + " " + self.last_name
     
+    class Meta:
+        ordering = ["created_at"]
  
 class PhoneNumberClient(models.Model):
     
@@ -50,3 +52,4 @@ class PhoneNumberClient(models.Model):
     
     def __str__(self) -> str:
         return self.phone_number_c
+    

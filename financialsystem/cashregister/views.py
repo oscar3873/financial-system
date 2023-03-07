@@ -1,7 +1,10 @@
+from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from .utils import all_properties_mov
 from .tables import MovementTable
+
+from babel.dates import format_date
 
 from django import forms
 
@@ -15,49 +18,108 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from .models import Movement, CashRegister
-from .forms import MovementForm
+from .forms import MovementForm, MovementUpdateForm
 from django.views.generic.edit import FormView
 
 from .filters import DescriptionFilter, ListingFilter, MoneyTypeFilter, AmountFilter, UserFilter
 
+from django.db.models import Sum
+from django.utils import timezone
+
 # Create your views here.
 class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
-    model = CashRegister
-    second_model = Movement
+    model = Movement
+    second_model = CashRegister 
     form_class = MovementForm
     template_name = 'cashregister/cashregister.html'
-
-    ogin_url = "/accounts/login/"
+    filter_class = ListingFilter
+    paginate_by = 5
+    ordering = ['-created_at']
+    
+    login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-
+    
     def get_context_data(self, **kwargs):
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
+        
         if not CashRegister.objects.exists():
             CashRegister.objects.create()
+    
+        # Etiqueta para el día actual
+        today = timezone.now().date()
+
+        # Etiqueta para el mes actual
+        month = datetime.today().month
+        label_month = format_date(timezone.now(), format='MMMM Y', locale='es').capitalize()
+        label_day = f'Hoy {timezone.now().date().day} de {label_month}'
+
+        # Etiqueta para el año actual
+        year = timezone.now().year
+        label_year = str(year)
+
+        balances = [
+            {'money_type':'ARS','label': label_day, 'value': Movement.objects.filter(money_type="PESOS").filter(created_at__date=today).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'ARS','label': label_month, 'value': Movement.objects.filter(money_type="PESOS").filter(created_at__year=year, created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'ARS','label': label_year, 'value': Movement.objects.filter(money_type="PESOS").filter(created_at__year=year).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'USD','label': label_day, 'value': Movement.objects.filter(money_type="USD").filter(created_at__date=today).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'USD','label': label_month, 'value': Movement.objects.filter(money_type="USD").filter(created_at__year=year, created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'USD','label': label_year, 'value': Movement.objects.filter(money_type="USD").filter(created_at__year=year).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'TRANSFER','label': label_day, 'value': Movement.objects.filter(money_type="TRANSFER").filter(created_at__date=today).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'TRANSFER','label': label_month, 'value': Movement.objects.filter(money_type="TRANSFER").filter(created_at__year=year, created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'TRANSFER','label': label_year, 'value': Movement.objects.filter(money_type="TRANSFER").filter(created_at__year=year).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'CREDITO','label': label_day, 'value': Movement.objects.filter(money_type="CREDITO").filter(created_at__date=today).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'CREDITO','label': label_month, 'value': Movement.objects.filter(money_type="CREDITO").filter(created_at__year=year, created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'CREDITO','label': label_year, 'value': Movement.objects.filter(money_type="CREDITO").filter(created_at__year=year).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'DEBITO','label': label_day, 'value': Movement.objects.filter(money_type="DEBITO").filter(created_at__date=today).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'DEBITO','label': label_month, 'value': Movement.objects.filter(money_type="DEBITO").filter(created_at__year=year, created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'DEBITO','label': label_year, 'value': Movement.objects.filter(money_type="DEBITO").filter(created_at__year=year).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'EUR','label': label_day, 'value': Movement.objects.filter(money_type="EUR").filter(created_at__date=today).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'EUR','label': label_month, 'value': Movement.objects.filter(money_type="EUR").filter(created_at__year=year, created_at__month=month).aggregate(Sum('amount'))['amount__sum'] or 0},
+            {'money_type':'EUR','label': label_year, 'value': Movement.objects.filter(money_type="EUR").filter(created_at__year=year).aggregate(Sum('amount'))['amount__sum'] or 0},
+        ]
+        context["balances"] = balances
+    
         context["cashregister"] = CashRegister.objects.last()
-        context["movements"] = self.second_model.objects.all()[:4]
+        context["lastmovements"] = self.model.objects.all()[:4]
+        context["count_movements"] = self.model.objects.all().count()
+        context["movements"] = self.model.objects.all()
+        context["properties"] = all_properties_mov()
+        
+        context["listing_filter"] = ListingFilter(self.request.GET, context['movements'])
+        context['listing_filter'] = self.filterset
+        context['listing_filter_params'] = self.request.GET.urlencode()
         return context
     
     def form_valid(self, form):
-        if self.request.method == 'POST':
-            form.save()
+        user = self.request.user
+        movement = form.save(commit=False)
+        movement.user = user.adviser  # Establecer el usuario actual
+        movement.cashregister = CashRegister.objects.last()
+        movement.save()
         return super().form_valid(form)
     
+    def form_invalid(self, form):
+        raise Exception("El formulario no es válido: {}".format(form.errors))
 
     def get_form_kwargs(self):
         kwargs = super(CashRegisterListView, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
     
+        #DEFINICION DEL TIPO DE FILTRO ULTILIZADO
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = self.filter_class(self.request.GET, queryset=queryset)
+        return self.filterset.qs.order_by(*self.ordering)
+    
     def get_success_url(self) -> str:
-        return reverse_lazy('cashregister:list')
+        return reverse_lazy('cashregister:home')
 
 #LISTA DE MOVIMIENTOS
 #----------------------------------------------------------------
 class MovementListView(LoginRequiredMixin, ListView, MovementTable):
     model = Movement
-
     template_name = "cashregister/movement_list.html"
     paginate_by = 20
     ordering = ['-created_at']
@@ -114,7 +176,7 @@ class MovementDeleteView(DeleteView):
 #------------------------------------------------------------------
 class MovementUpdateView(UpdateView):
     model = Movement
-    form_class = MovementForm
+    form_class = MovementUpdateForm
     template_name_suffix = '_update_form'
     
     def get_form_kwargs(self):
@@ -124,4 +186,4 @@ class MovementUpdateView(UpdateView):
     
     def get_success_url(self) -> str:
         messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
-        return  reverse_lazy('cashregister:list')
+        return  reverse_lazy('cashregister:home')

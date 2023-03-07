@@ -2,32 +2,32 @@
 <!--Main-->
 <link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Creditos</h3>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Creditos</h4>
     <!--Seccion 1-->
     {% if messages %} {% for message in messages %}
-    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
-        <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
-        <span class="font-weight-light">{{ message }}</span>
+    <div class=" alert alert-{{message.extra_tags}} alert-dismissible " role="alert ">
+        <span type="button " class="close " data-dismiss="alert " aria-label="Close "><span aria-hidden="true ">&times;</span></span>
+        <span class="font-weight-light ">{{ message }}</span>
     </div>
     {% endfor %} {% endif %}
     <section>
-        <div class="row mt-4">
-            <div class="col-xl-3 col-sm-6 col-12 p-3">
-                <div class="card">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="align-self-center">
-                                    <i class="fa-solid fa-hand-holding-dollar text-warning icon-lg"></i>
+        <div class="row mt-4 ">
+            <div class="col-xl-3 col-sm-6 col-12 p-3 ">
+                <div class="card ">
+                    <div class="card-content ">
+                        <div class="card-body ">
+                            <div class="media d-flex ">
+                                <div class="align-self-center ">
+                                    <i class="fa-solid fa-hand-holding-dollar text-warning icon-lg "></i>
                                 </div>
-                                <div class="media-body text-right">
+                                <div class="media-body text-right ">
                                     <h5>{{count_credits}}</h5>
                                     <span>Total de Creditos</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom "></div>
                 </div>
             </div>
         </div>
@@ -43,13 +43,13 @@
     </section>
     <section>
         {% if credits %}
-        <table class="table table-striped table-hover">
-            <thead class="table-light">
+        <table class="table table-striped table-hover ">
+            <thead class="table-light ">
                 <tr>
                     {% for name_prop in properties %}
-                    <th scope="col">{{name_prop}}</th>
+                    <th scope="col ">{{name_prop}}</th>
                     {% endfor %} {% if user.is_superuser %}
-                    <th scope="col">Acciones</th>
+                    <th scope="col ">Acciones</th>
                     {% endif %}
 
                 </tr>
@@ -63,13 +63,13 @@
                     <td>{{credit.installments.last.amount}}</td>
                     {% if credit.is_active %}
                     <td>
-                        <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
+                        <div class="alert alert-success m-0 p-1 text-center rounded-pill " role="alert ">
                             <strong>Activo</strong>
                         </div>
                     </td>
                     {% endif %} {% if credit.is_old_credit %}
                     <td>
-                        <div class="alert alert-info m-0 p-1 text-center rounded-pill" role="alert">
+                        <div class="alert alert-info m-0 p-1 text-center rounded-pill " role="alert ">
                             <strong>No activo</strong>
                         </div>
                     </td>
@@ -81,33 +81,33 @@
                     <td>{{credit.end_date|date}}</td>
                     {% if user.is_superuser %}
                     <td>
-                        <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
+                        <a type="button " class="btn " data-toggle="modal " data-target="#exampleModal "><i class="fas fa-trash-alt text-danger "></i> &nbsp;</a>
                         <!--Modal-->
-                        <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <form action="{% url 'credits:delete' credit.pk %}" method="POST">
+                        <div class="modal fade " id="exampleModal{{formss.instance.pk}} " tabindex="-1 " role="dialog " aria-labelledby="exampleModalLabel{{formss.instance.pk}} " aria-hidden="true ">
+                            <div class="modal-dialog " role="document ">
+                                <div class="modal-content ">
+                                    <form action="{% url 'credits:delete' credit.pk %} " method="POST ">
                                         {% csrf_token %}
-                                        <div class="modal-header">
-                                            <h4 class="modal-title" id="exampleModalLabel">Eliminar credito</h4>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
+                                        <div class="modal-header ">
+                                            <h5 class="modal-title " id="exampleModalLabel ">Eliminar credito</h5>
+                                            <button type="button " class="close " data-dismiss="modal " aria-label="Close ">
+                                                <span aria-hidden="true ">&times;</span>
                                             </button>
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="modal-body ">
                                             <span>Esta seguro que desea borrar al credito</span>
                                             <strong>{{ client }} </strong>?
                                         </div>
-                                        <div class="modal-footer">
-                                            <button class="btn btn-danger">Si, borrar</button>
-                                            <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                                        <div class="modal-footer ">
+                                            <button class="btn btn-danger ">Si, borrar</button>
+                                            <button type="button " class="btn btn-primary m-2 rounded p-2 " data-dismiss="modal ">Cerrar</button>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
                         <!--End Modal-->
-                        <a href="{% url 'credits:update' credit.pk  %}"><i class="fas fa-edit text-info"></i></a>
+                        <a href="{% url 'credits:update' credit.pk %} "><i class="fas fa-edit text-info "></i></a>
                     </td>
                     {% endif %}
                 </tr>
@@ -115,23 +115,23 @@
             </tbody>
         </table>
 
-        <div class="">
-            <ul class="pagination justify-content-center">
+        <div class=" ">
+            <ul class="pagination justify-content-center ">
                 {% if page_obj.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page=1">&laquo; primero</a></li>
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">anterior</a></li> {% endif %}
+                <li class="page-item "><a class="page-link " href="?page=1 ">&laquo; primero</a></li>
+                <li class="page-item "><a class="page-link " href="?page={{ page_obj.previous_page_number }} ">anterior</a></li> {% endif %}
 
-                <li class="page-item">
-                    <a class="page-link">
+                <li class="page-item ">
+                    <a class="page-link ">
                         {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
                     </a> {% if page_obj.has_next %}
                 </li>
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">siguiente</a></li>
-                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">ultimo &raquo;</a> {% endif %}</li>
+                <li class="page-item "><a class="page-link " href="?page={{ page_obj.next_page_number }} ">siguiente</a></li>
+                <li class="page-item "><a class="page-link " href="?page={{ page_obj.paginator.num_pages }} ">ultimo &raquo;</a> {% endif %}</li>
             </ul>
         </div>
         {% else %}
-        <h4 class="title font-weight-normal">No hay Creditos Registrados</h4>
+        <h5 class="title font-weight-normal ">No hay Creditos Registrados</h5>
         {% endif %}
     </section>
     <!--Seccion 2-->

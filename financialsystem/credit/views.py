@@ -6,7 +6,7 @@ from django.contrib import messages
 
 from .utils import *
 
-from .models import Credit, Refinancing, Installment
+from .models import Credit, Installment
 from clients.models import Client
 from guarantor.models import Guarantor
 
@@ -28,6 +28,7 @@ def crear_credito(request):
     
     if request.method == 'POST':
         if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid() and guarantor_form.is_valid() and formsetPhoneClient.is_valid() and formsetPhoneGuarantor.is_valid():
+            print("-------------Fomularios validos------------------")
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
@@ -57,8 +58,8 @@ def crear_credito(request):
             if warranty_form.cleaned_data["article"]:
                 warranty.credit = credit
                 warranty.save()
-        return redirect('clients:list') #NO MARCA LOS ERRORES
-    
+    else:
+        print("------------Algun formulario es invalido------------")
     context = {
         'cliente_form': client_form,
         'formsetPhoneClient': formsetPhoneClient,
@@ -82,17 +83,10 @@ class CreditListView(LoginRequiredMixin, ListView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+
     
     def get_context_data(self, **kwargs):
-        # actualizar_fechas()
-        context = super().get_context_data(**kwargs)
-        context["count_credits"] = self.model.objects.all().count()
-        context["credits"] = self.model.objects.all()
-        if self.model.objects.all().count() > 0:
-            context["properties"] = all_properties_credit()
-        return context
-    
-    def get_context_data(self, **kwargs):
+        refresh_condition()
         context = super().get_context_data(**kwargs)
         context["count_credits"] = self.model.objects.all().count()
         context["credits"] = self.model.objects.all()
@@ -176,20 +170,17 @@ def refinance_installment (request, pk):
     form = RefinancingForm(credit, request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
-            checkboxs_by_form = {key: True for key, value in request.POST.items() if key.startswith('Cuota')}
-
-            # GET THE NUMBER OF THE LAST INSTALLMENT
-            last_installment = 0
-            for key in checkboxs_by_form.keys():
-                if key.startswith('Cuota'):
-                    last_installment = max(last_installment, int(key.split()[1]))
-
+            checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota') and value}
+            pack = dict(zip(Installment.objects.filter(credit=credit,condition__in=['Vencida','A Tiempo']), checkboxs_by_form.values()))
+            
             refinancing = form.save(commit=False)
-            refinancing.installment = get_object_or_404(Installment, credit=credit, installment_number=last_installment)
-            refinancing.installment.condition = 'Refinanciada'
-            refinancing.installment.is_refinancing_installment = True
-            refinancing.installment.save()
             refinancing.save()
+            for installment in pack.keys():
+                installment.condition = 'Refinanciada'
+                installment.is_refinancing_installment = True
+                installment.refinance = refinancing
+                installment.save()
+                
             return redirect('clients:detail', pk=credit.client.id)
         
 #----------------------------------------------------------------
@@ -198,11 +189,10 @@ class RefinancingDetailView(DetailView):
     template_name = 'refinance/refinance_detail.html'
 
     def get_context_data(self, **kwargs):
-        installment = self.get_object()
-        refinance = installment.refinancing
-
+        refinance = self.get_object().refinance
+        refinance_installments_available = refinance.installments.exclude(condition__in=['Pagada'])
         kwargs = super().get_context_data(**kwargs)
-        kwargs['form_payment'] = PaymentForm(installments=refinance.installments.all())
+        kwargs['form_payment'] = PaymentForm(installments=refinance_installments_available.all())
         kwargs['refinance'] = refinance
         kwargs["amount_installment"] = refinance.installments.last().amount
         return kwargs

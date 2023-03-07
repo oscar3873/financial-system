@@ -3,6 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db.models import Q
 
+from clients.filters import ListingFilter
+
 from .utils import all_properties_client
 
 from django.shortcuts import get_object_or_404, render
@@ -19,7 +21,7 @@ from django.urls import reverse_lazy
 from .forms import ClientForm, PhoneNumberFormSet
 #MODEL
 from .models import Client, PhoneNumberClient
-from credit.models import Credit, Refinancing
+from credit.models import Credit, Installment, Refinancing
 from credit.forms import RefinancingForm
 
 from payment.forms import PaymentForm
@@ -35,25 +37,28 @@ class ClientListView(LoginRequiredMixin, ListView):
     template_name = 'clients/client_list.html'
     ordering = ['-created_at']
     paginate_by = 4
+    filter_class = ListingFilter
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
-        # actualizar_fechas()
+        self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
+        
         context["count_clients"] = self.model.objects.all().count()
         context["clients"] = self.model.objects.all()
         context["properties"] = all_properties_client()
-        if self.request.GET.get("search") != None:
-            search = Client.objects.filter(
-                Q(first_name__icontains = self.request.GET.get("search")) |
-                Q(last_name__icontains = self.request.GET.get("search")) |
-                Q(civil_status__icontains = self.request.GET.get("search")) |
-                Q(dni__icontains = self.request.GET.get("search"))
-                )
-            context["clients"] = search
+        context["listing_filter"] = ListingFilter(self.request.GET, context['clients'])
         return context
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        self.filterset = self.filter_class(self.request.GET, queryset=queryset)
+        return self.filterset.qs.order_by(*self.ordering)
+    
+    def get_success_url(self) -> str:
+        return reverse_lazy('clients:list')
     
 
 #ACTUALIZACION DE UN CLIENTE
@@ -129,7 +134,8 @@ class ClientDetailView(DetailView):
         
         if credit_active:
             installments = credit_active.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-            refinancing = Refinancing.objects.filter(installment__credit=credit_active)
+            refinancing = Refinancing.objects.filter(installment_ref__credit=credit_active)
+
             context["credit_active"] = credit_active
             context["refinances"] = refinancing
             context["installments"] = credit_active.installments.all()

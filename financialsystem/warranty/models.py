@@ -28,3 +28,6 @@ class Warranty(models.Model):
     
     def __str__(self):
         return self.article + " " + self.brand + " " + self.model
+    
+    class Meta:
+        ordering = ["created_at"]

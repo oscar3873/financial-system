@@ -1,4 +1,5 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, DeleteView
@@ -41,7 +42,7 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["commissions"] = Comission.objects.filter(adviser=self.get_object())
+        context["commissions"] = Comission.objects.filter(adviser=self.get_object(), is_paid=False)
         context["properties"] = commission_properties()
         return context
 
@@ -50,16 +51,21 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
 
 #----------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
-def pay_commission(request,pk):
+def pay_commission(request, pk):
     try:
         commission = Comission.objects.get(id=pk)
-        commission.is_paid = True
-        commission.save()
     except Comission.DoesNotExist:
         return redirect('advisers:detail', pk=commission.adviser.id)
 
+    if commission.is_paid:
+        messages.error(request, "Esta comisión ya ha sido pagada.")
+        return redirect('advisers:detail', pk=commission.adviser.id)
+
+    commission.is_paid = True
+    commission.save()
     create_movement(commission)
 
+    messages.success(request, "La comisión se ha pagado exitosamente.")
     return redirect('advisers:detail', pk=commission.adviser.id)
 
 

@@ -1,22 +1,21 @@
-{% load static %} 
-{% block content %}
+{% load static %} {% block content %}
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
 <main class="container my-4">
   <!-- MODAL FORMULARIO PAYMENT -->
     <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active}}">
-      <strong class="btn btn-info rounded p-3" role="button">
+        <strong class="btn btn-info rounded p-3" role="button">
           <i class="fa-solid fa-receipt"></i>
           <span>Registrar un Pago</span>
       </strong>
     </div>
-      <!--Modal-->
-  <div class="modal fade" id="exampleModal{{credit_active}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active}}" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-          <div class="modal-content">
-              <form action="{% url 'payments:make_paid' credit_active.pk %}" method="POST">
-                  <div class="modal-header">
-                      <h4 class="modal-title" id="exampleModalLabel">Registrar Pago</h4>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <!--Modal-->
+    <div class="modal fade" id="exampleModal{{credit_active}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active}}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{% url 'payments:make_paid' credit_active.pk %}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Registrar Pago</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                       </button>
                   </div>
@@ -40,20 +39,20 @@
     var amountElement = document.querySelector("#id_payment-amount");
 
     function sumar() {
-      var total = 0;
+        var total = 0;
 
-      checkboxes_p.forEach(function(checkbox) {
-        if (checkbox.checked) {
-          total += parseFloat(checkbox.value);
-        }
-      });
+        checkboxes_p.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                total += parseFloat(checkbox.value);
+            }
+        });
 
-      amountElement.innerHTML = total.toFixed(2);
-      amountElement.value = total.toFixed(2);
+        amountElement.innerHTML = total.toFixed(2);
+        amountElement.value = total.toFixed(2);
     }
 
     checkboxes_p.forEach(function(checkbox) {
-      checkbox.addEventListener("click", sumar);
+        checkbox.addEventListener("click", sumar);
     });
   </script>
 

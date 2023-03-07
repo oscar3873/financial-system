@@ -46,7 +46,7 @@ class Comission(models.Model):
     type = models.CharField(max_length=20, null=True,choices=REG)
     money_type = models.CharField(max_length=20 , null=True, choices=MONEY_TYPE, default= MONEY_TYPE[0])
     create_date = models.DateTimeField(default=datetime.now)
-    detail = models.TextField(max_length=50, null=True, blank=True, help_text="Detalle de la operacion")
+    detail = models.TextField(max_length=100, null=True, blank=True, help_text="Detalle de la operacion")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

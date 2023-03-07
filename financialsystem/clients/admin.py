@@ -3,6 +3,7 @@ from .models import Client, PhoneNumberClient
 # Register your models here.
 class ClientAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'first_name',
         'last_name', 
         'address',

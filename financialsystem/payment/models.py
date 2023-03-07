@@ -34,15 +34,17 @@ class Payment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        
         if self.installment:
             return "Pago de {}".format(self.installment)
         else:
             return super().__str__()
 
+    class Meta:
+        ordering = ["created_at"]
+
 
 #--------------------------- SEÑALES PARA PAYMENT -------------------------------------
-def up_installmet(instance, *args, **kwargs):
+def up_installment(instance, *args, **kwargs):
     adviser = instance.adviser
     Movement.objects.create(
         amount = instance.amount,
@@ -56,14 +58,20 @@ def up_installmet(instance, *args, **kwargs):
 
 def comission_create_inst(instance, *args, **kwargs):
     amount = instance.amount*Decimal(0.05)
+
+    if instance.installment:
+        detail = f'COBRO CUOTA {instance.installment.installment_number} - CLIENTE {instance.installment.credit.client} '
+    else:
+        detail = f'COBRO CUOTA {instance.installment_ref.installment_number} - CLIENTE {instance.installment_ref.refinancing.installment_ref.last().credit.client} '
+
     Comission.objects.create(
         adviser = instance.adviser,
         amount = amount,
         type = 'COBRO',
         create_date = instance.payment_date,
         money_type = instance.payment_method,
-        detail= 'COBRO CUOTA %s - CLIENTE %s' % (instance.installment.installment_number, instance.installment.credit.client),
+        detail= detail,
         )
 
 
-post_save.connect(up_installmet, sender = Payment)
+post_save.connect(up_installment, sender = Payment)

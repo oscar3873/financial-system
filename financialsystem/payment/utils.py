@@ -12,7 +12,8 @@ def payment_create(payment, installment):
         payment_dict['detail'] = f'COBRO CUOTA {installment.installment_number} - CLIENTE {installment.credit.client} - ASESOR {payment._adviser}',
         payment_dict['installment'] = installment
     else:
-        payment_dict['detail'] = f'COBRO CUOTA {installment.installment_number} - CLIENTE {installment.refinancing.installment.credit.client} - ASESOR {payment._adviser}',
+        payment_dict['detail'] = f'COBRO CUOTA {installment.installment_number} - CLIENTE {installment.refinancing.installment_ref.last().credit.client} - ASESOR {payment._adviser}',
         payment_dict['installment_ref'] = installment
+        
     Payment.objects.create(**payment_dict)
 #FICHAR 

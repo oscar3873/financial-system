@@ -2,7 +2,7 @@
 <!--Main-->
 <link href="{% static 'clients/css/client_form.css' %}" rel="stylesheet">
 <main class="container my-4">
-    <h3 class="title font-weight-normal">Clientes</h3>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Clientes</h4>
     {% if 'register' in request.GET %}
     <div class="alert alert-success alert-dismissible" role="alert">
         <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
@@ -19,7 +19,7 @@
                             {% include "clients/includes/form.html" %}
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
                 </div>
             </div>
         </div>
