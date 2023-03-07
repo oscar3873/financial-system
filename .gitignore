@@ -5,10 +5,13 @@
 __pycache__
 db.sqlite3
 media
+migrations
 
 #Folders
 /migrations/
-
+*migrations
+*/migrations
+**/migrattions/
 # Backup files # 
 *.bak 
 
