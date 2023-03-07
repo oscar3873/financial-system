@@ -1,12 +1,11 @@
-from decimal import Decimal
+from datetime import date, datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db.models import Q
-
+from babel.dates import format_date
 from clients.filters import ListingFilter
 
 from .utils import all_properties_client
-
+from django.utils import timezone
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 
@@ -14,11 +13,12 @@ from django.shortcuts import redirect
 #CRUD CLIENT
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView, UpdateView
 
 from django.urls import reverse_lazy
 #FORMS
 from .forms import ClientForm, PhoneNumberFormSet
+from guarantor.forms import GuarantorForm
 #MODEL
 from .models import Client, PhoneNumberClient
 from credit.models import Credit
@@ -46,7 +46,29 @@ class ClientListView(LoginRequiredMixin, ListView):
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         
-        context["count_clients"] = self.model.objects.all().count()
+        # Etiqueta para el día actual
+        today = timezone.now().date()
+
+        # Etiqueta para el mes actual
+        month = datetime.today().month
+        label_month = format_date(timezone.now(), format='MMMM Y', locale='es').capitalize()
+        label_day = f'Hoy {timezone.now().date().day} de {label_month}'
+        year = timezone.now().year
+        label_year = str(year)
+        label_historial = "Historico"
+        # Cantidad de clientes histórica
+        count_clients = self.model.objects.count()
+        count_clients_today = self.model.objects.filter(created_at__date=today).count()
+        count_clients_this_month = self.model.objects.filter(created_at__year=year, created_at__month=month).count()
+        count_clients_this_year = self.model.objects.filter(created_at__year=year).count()
+        count_clients_dict = [
+            {'label':label_historial, 'value':count_clients},
+            {'label':label_day, 'value':count_clients_today},
+            {'label':label_month, 'value':count_clients_this_month},
+            {'label':label_year, 'value':count_clients_this_year},
+        ]
+        # Contextos
+        context["count_clients_dict"] = count_clients_dict
         context["clients"] = self.model.objects.all()
         context["properties"] = all_properties_client()
         context["listing_filter"] = ListingFilter(self.request.GET, context['clients'])
@@ -62,27 +84,35 @@ class ClientListView(LoginRequiredMixin, ListView):
     
 
 #ACTUALIZACION DE UN CLIENTE
-#------------------------------------------------------------------
-def client_update(request, pk):
-    client = Client.objects.get(id=pk)
-    form = ClientForm(request.POST or None, instance=client, is_update=True)
+#-----------------------------------------------------------------
+class ClientUpdateView(UpdateView):
+    model = Client
+    form_class = ClientForm
+    template_name_suffix = '_update'
 
-    formset = PhoneNumberFormSet(request.POST or None, instance=client)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['phone_formset'] = PhoneNumberFormSet(self.request.POST, instance=self.object)
+        else:
+            context['phone_formset'] = PhoneNumberFormSet(instance=self.object)
+        return context
+
+    def form_invalid(self, form):
+        print("Esto re invalido amigoooo", form.errors)
+        return super().form_invalid(form)
     
-    if request.method == 'POST':
-        if form.is_valid() and formset.is_valid():
-            form.save()
-            formset.save()
-            return redirect('client_detail', client_id=pk)
-    else:
-        formset = PhoneNumberFormSet(instance=client, queryset=PhoneNumberClient.objects.filter(client=client))
+    def form_valid(self, form):
+        print("Estoy aca amigo")
+        response = super().form_valid(form)
+        phone_formset = PhoneNumberFormSet(self.request.POST, instance=self.object)
+        phone_formset.save()
         
-    context = {
-        'cliente_form': form,
-        'formsetPhoneClient': formset,
-    }
+        return response
 
-    return render(request, 'clients/client_update.html', context=context)
+    def get_success_url(self) -> str:
+        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
+        return reverse_lazy('clients:list')
 #BORRADO DE NUMEROS DE UN CLIENTE
 #------------------------------------------------------------------
 def delete_phone_number(request, pk):
@@ -124,8 +154,6 @@ class QueryView(ListView):
 class ClientDetailView(DetailView):
     model = Client
     template_name = 'clients/client_detail.html'
-    
-
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

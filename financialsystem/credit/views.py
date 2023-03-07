@@ -58,6 +58,9 @@ def crear_credito(request):
             if warranty_form.cleaned_data["article"]:
                 warranty.credit = credit
                 warranty.save()
+            
+            messages.success(request, 'El cliente se ha guardado exitosamente.')
+            return reverse_lazy('clients:list')
     else:
         print("------------Algun formulario es invalido------------")
     context = {

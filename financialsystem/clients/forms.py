@@ -30,7 +30,7 @@ class ClientForm(forms.ModelForm):
         required=True,
     )
     email = forms.EmailField(
-        label= 'Correo Electrónico',
+        label= 'Correo',
         required=True,
     )
     civil_status = forms.ChoiceField(
@@ -77,7 +77,7 @@ class ClientForm(forms.ModelForm):
             raise forms.ValidationError("El DNI debe contener como minimo 7 y maximo 15 caracteres")
 
         # Verificar si ya existe un objeto con el mismo DNI en la base de datos
-        if not self.is_update:
+        if not self.instance.pk:
             if Client.objects.filter(dni=dni).exists():
                 raise forms.ValidationError("Ya existe un Cliente con este DNI")
 
@@ -86,7 +86,7 @@ class ClientForm(forms.ModelForm):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         # Validar formato de correo electrónico
-        if not self.is_update:
+        if not self.instance.pk:
             try:
                 validate_email(email)
             except forms.ValidationError:
@@ -117,6 +117,7 @@ class PhoneNumberFormClient(forms.ModelForm):
     
     phone_number_c = forms.CharField(
         label = 'Telefono',
+        required=False
     )
     
     phone_type_c = forms.ChoiceField(
@@ -146,7 +147,7 @@ class PhoneNumberFormClient(forms.ModelForm):
             field.widget.attrs.update({'class': 'form-control'})
         # Eliminar validación requerida
         for field in self.fields.values():
-            field.required = False   
+            field.required = False
 
 
 #------------------------------------------------------------------
