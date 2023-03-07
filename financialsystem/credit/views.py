@@ -108,13 +108,13 @@ class AssociateCreateView(CreateView):
     form_class = CreditForm
 
     def form_valid(self, form):
+        refresh_condition()
         if form.is_valid():
             form.instance.mov = create_movement(form.instance, self.request.user.adviser)
             form.save()
         return super().form_valid(form)
     
     def get_success_url(self) -> str:
-        print(self.kwargs)
         messages.success(self.request, 'Credito creado correctamente', "success")
         return  reverse_lazy('credits:list')
     
@@ -166,6 +166,7 @@ class CreditDeleteView(DeleteView):
 
 #------------------------------------------------------------------   
 def refinance_installment (request, pk):
+    refresh_condition()
     credit = get_object_or_404(Credit, id = pk)
     form = RefinancingForm(credit, request.POST or None)
     if request.method == 'POST':
@@ -189,6 +190,7 @@ class RefinancingDetailView(DetailView):
     template_name = 'refinance/refinance_detail.html'
 
     def get_context_data(self, **kwargs):
+        refresh_condition()
         refinance = self.get_object().refinance
         refinance_installments_available = refinance.installments.exclude(condition__in=['Pagada'])
         kwargs = super().get_context_data(**kwargs)

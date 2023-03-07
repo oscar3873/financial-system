@@ -13,6 +13,7 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView, DeleteView
 
 from credit.models import Credit, Refinancing
+from credit.utils import refresh_condition
 from .utils import payment_create
 from .models import Payment
 from .forms import PaymentForm
@@ -25,7 +26,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
     ordering = ['-created_at']
     
     def get_context_data(self, **kwargs):
-        
+        refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         context["count_payments"] = self.model.objects.all().count()
@@ -66,6 +67,7 @@ class PaymentUpdateView(UpdateView):
 #------------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
 def make_payment_installment(request, pk):
+    refresh_condition()
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments = refinancing.installments.exclude(condition='Pagada')

@@ -7,6 +7,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 from braces.views import GroupRequiredMixin
+
+from credit.utils import refresh_condition
 from .models import Adviser, Comission
 from .utils import commission_properties
 from cashregister.models import CashRegister, Movement
@@ -23,6 +25,7 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
         return redirect("/accounts/login/")
     
     def get_context_data(self, **kwargs):
+        refresh_condition()
         context = super().get_context_data(**kwargs)
         context["count_advisers"] = Adviser.objects.count()
         context["advisers"] = Adviser.objects.all()
@@ -41,6 +44,7 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
         return redirect("/")
     
     def get_context_data(self, **kwargs):
+        refresh_condition()
         context = super().get_context_data(**kwargs)
         context["commissions"] = Comission.objects.filter(adviser=self.get_object(), is_paid=False)
         context["properties"] = commission_properties()
@@ -52,6 +56,7 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
 #----------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
 def pay_commission(request, pk):
+    refresh_condition()
     try:
         commission = Comission.objects.get(id=pk)
     except Comission.DoesNotExist:
@@ -78,6 +83,7 @@ class AdviserDeleteView(DeleteView):
 
 
 def create_movement(commission):
+    refresh_condition()
     Movement.objects.create(
             user = commission.adviser,
             amount = commission.amount,

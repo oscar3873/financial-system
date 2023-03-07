@@ -10,6 +10,8 @@ from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
+
+from credit.utils import refresh_condition
 from .models import Guarantor
 from .forms import GuarantorForm
 from .filters import ListingFilter
@@ -23,7 +25,7 @@ class GuarantorListView(LoginRequiredMixin, ListView):
     ordering = ['-created_at']
     
     def get_context_data(self, **kwargs):
-        
+        refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         context["count_guarantors"] = self.model.objects.all().count()
@@ -48,6 +50,7 @@ class GuarantorDetailView(LoginRequiredMixin, DetailView):
     redirect_field_name = 'redirect_to'
     
     def get_object(self):
+        refresh_condition()
         return get_object_or_404(Guarantor, id=self.kwargs['pk'])
 
 #CREACION DE UNA NOTA

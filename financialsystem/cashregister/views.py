@@ -1,6 +1,8 @@
 from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+
+from credit.utils import refresh_condition
 from .utils import all_properties_mov
 from .tables import MovementTable
 
@@ -40,6 +42,7 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
+        refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         
@@ -125,6 +128,7 @@ class MovementListView(LoginRequiredMixin, ListView, MovementTable):
     ordering = ['-created_at']
     
     def get_context_data(self, **kwargs):
+        refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         context["count_movements"] = self.model.objects.all().count()
@@ -161,6 +165,7 @@ class MovementDetailView(LoginRequiredMixin, DetailView):
     redirect_field_name = 'redirect_to'
     
     def get_object(self):
+        refresh_condition()
         return get_object_or_404(Movement, id=self.kwargs['pk'])
 
 #BORRADO DE UN MOVIMIENTO
@@ -180,6 +185,7 @@ class MovementUpdateView(UpdateView):
     template_name_suffix = '_update_form'
     
     def get_form_kwargs(self):
+        refresh_condition()
         kwargs = super(MovementUpdateView, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs

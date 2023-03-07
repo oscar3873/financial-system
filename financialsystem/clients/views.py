@@ -1,9 +1,9 @@
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db.models import Q
 
 from clients.filters import ListingFilter
+from credit.utils import refresh_condition
 
 from .utils import all_properties_client
 
@@ -43,6 +43,7 @@ class ClientListView(LoginRequiredMixin, ListView):
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
+        refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         
@@ -127,6 +128,7 @@ class ClientDetailView(DetailView):
     
 
     def get_context_data(self, **kwargs):
+        refresh_condition()
         context = super().get_context_data(**kwargs)
 
         context["credits"] = Credit.objects.filter(client = context["client"])
