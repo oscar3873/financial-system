@@ -17,7 +17,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 
 from django.urls import reverse_lazy
 #FORMS
-from .forms import ClientForm, PhoneNumberFormSet
+from .forms import ClientForm, PhoneNumberFormSet, PhoneNumberFormSetUpdate
 from guarantor.forms import GuarantorForm
 #MODEL
 from .models import Client, PhoneNumberClient
@@ -85,17 +85,21 @@ class ClientListView(LoginRequiredMixin, ListView):
 
 #ACTUALIZACION DE UN CLIENTE
 #-----------------------------------------------------------------
-class ClientUpdateView(UpdateView):
+class ClientUpdateView(LoginRequiredMixin, UpdateView):
     model = Client
     form_class = ClientForm
     template_name_suffix = '_update'
 
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context['phone_formset'] = PhoneNumberFormSet(self.request.POST, instance=self.object)
+            context['phone_formset'] = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
         else:
-            context['phone_formset'] = PhoneNumberFormSet(instance=self.object)
+            context['phone_formset'] = PhoneNumberFormSetUpdate(instance=self.object)
         return context
 
     def form_invalid(self, form):
@@ -105,7 +109,7 @@ class ClientUpdateView(UpdateView):
     def form_valid(self, form):
         print("Estoy aca amigo")
         response = super().form_valid(form)
-        phone_formset = PhoneNumberFormSet(self.request.POST, instance=self.object)
+        phone_formset = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
         phone_formset.save()
         
         return response
@@ -125,8 +129,12 @@ def delete_phone_number(request, pk):
 
 #BORRADO DE UN CLIENTE
 #------------------------------------------------------------------
-class ClientDelete(DeleteView):
+class ClientDelete(LoginRequiredMixin, DeleteView):
     model = Client
+    
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_success_url(self) -> str:
         messages.success(self.request, 'Cliente eliminado correctamente', "danger")
@@ -135,7 +143,7 @@ class ClientDelete(DeleteView):
 #CONSULTA
 #------------------------------------------------------------------
 class QueryView(ListView):
-    template_name = 'clients/query/query.html'
+    template_name = 'core/consultas.html'
     model = Client
     
     def get(self, request, *args, **kwargs):
@@ -151,9 +159,13 @@ class QueryView(ListView):
 
 #DETALLE DE CLIENTE
 #------------------------------------------------------------------
-class ClientDetailView(DetailView):
+class ClientDetailView(LoginRequiredMixin, DetailView):
     model = Client
     template_name = 'clients/client_detail.html'
+    
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

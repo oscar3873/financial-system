@@ -22,21 +22,21 @@ class ListingFilter(django_filters.FilterSet):
     
     amount = filters.RangeFilter(
         label="Monto",
-        widget= django_filters.widgets.RangeWidget(attrs={'class': 'form-control m-1', 'style': 'width:100px'}))
+        widget= django_filters.widgets.RangeWidget(attrs={'class': 'form-control w-40 m-auto'}))
     
     money_type = filters.ChoiceFilter(
         choices= MONEY_TYPE, 
         label="Divisa", 
         empty_label="Limpiar",
-        widget=forms.Select(attrs={'class': 'form-control m-1'}))
+        widget=forms.Select(attrs={'class': 'form-control m-auto'}))
     operation_mode = filters.ChoiceFilter(
         choices=OPERATION_CHOISE, 
         label="Operación", 
         empty_label="Limpiar",
-        widget=forms.Select(attrs={'class': 'form-control m-1'}))
+        widget=forms.Select(attrs={'class': 'form-control m-auto'}))
     created_at = filters.DateFromToRangeFilter(
         label= "Desde - Hasta",
-        widget= django_filters.widgets.RangeWidget(attrs={'type': 'date','class': 'form-control m-1'}),
+        widget= django_filters.widgets.RangeWidget(attrs={'type': 'date','class': 'form-control w-40 m-auto'}),
         lookup_expr='icontains',
     )
     

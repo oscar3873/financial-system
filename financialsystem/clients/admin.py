@@ -21,6 +21,7 @@ class PhoneNumberAdmin(admin.ModelAdmin):
         'phone_number_c', 
         'phone_type_c',
         'client',
+        'created_at'
     )   
 
 admin.site.register(Client, ClientAdmin)

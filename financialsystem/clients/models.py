@@ -66,6 +66,8 @@ class PhoneNumberClient(models.Model):
     phone_number_c = models.CharField(null=True, blank=True, max_length=50, help_text="Phone number", verbose_name="Numero de Telefono")
     phone_type_c = models.CharField(max_length=20, help_text="Type of phone", choices=PHONETYPE, verbose_name="Tipo de Telefono")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default="Some String",)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self) -> str:
-        return self.phone_number_c
+        return self.phone_number_c or ""

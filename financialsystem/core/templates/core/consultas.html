@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> {% load static %}
+    <!-- Estilos -->
+    <link href="{% static 'core/vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'registration/css/login.css' %}" rel="stylesheet" type='text/css'>
+    <title>Consultas</title>
+</head>
+
+<body class="body py-5">
+    <main class="container py-5" role="main">
+        <div class="container my-5">
+            <div class="d-flex flex-column">
+                <h4 class="m-0 text-center animate__fadeInLeft" style="animation-duration: 0.5s !important;">
+                    <img src="{% static 'registration/img/isotipo.png' %}" width="400px" class="img-fluid" alt="logotipo" />
+                </h4>
+                <div class="col-lg-4 col-md-6 mx-auto">
+                    <h4 class="title text-white">Ingrese DNI</h4>
+
+                    {% include "clients/query/search.html" %} {% if found == False %}
+                    <div class="alert alert-danger mt-2"><strong class="">Cliente no encontrado</strong></div> {% endif %}
+                    <p class="text-white">
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

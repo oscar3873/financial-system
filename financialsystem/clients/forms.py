@@ -158,6 +158,13 @@ PhoneNumberFormSet = inlineformset_factory(
     extra= 2,
     can_delete= False,
 )
+PhoneNumberFormSetUpdate = inlineformset_factory(
+    Client, 
+    PhoneNumberClient, 
+    form = PhoneNumberFormClient,
+    extra= 0,
+    can_delete= False,
+)
 
 #FORMULARIO PARA LA CREACION DE CREDITOS
 #------------------------------------------------------------------
