@@ -28,7 +28,6 @@ def crear_credito(request):
     
     if request.method == 'POST':
         if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid() and guarantor_form.is_valid() and formsetPhoneClient.is_valid() and formsetPhoneGuarantor.is_valid():
-            print("-------------Fomularios validos------------------")
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
@@ -58,6 +57,9 @@ def crear_credito(request):
             if warranty_form.cleaned_data["article"]:
                 warranty.credit = credit
                 warranty.save()
+            print("-------------Fomularios validos------------------")
+            messages.success(request, 'El cliente se ha guardado exitosamente.')
+            return redirect('clients:list')
     else:
         print("------------Algun formulario es invalido------------")
     context = {

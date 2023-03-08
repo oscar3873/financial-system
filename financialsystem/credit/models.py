@@ -166,12 +166,12 @@ def refinancing_repayment_amount_auto(instance, *args, **kwargs):
     refinancing = instance
 
     match (int(refinancing.installment_num_refinancing)):
-        case 3: refinancing.refinancing_interest = 25
-        case 6: refinancing.refinancing_interest = 50
-        case 9: refinancing.refinancing_interest = 75
-        case _: refinancing.refinancing_interest = 100
+        case 3: refinancing.interest = 25
+        case 6: refinancing.interest = 50
+        case 9: refinancing.interest = 75
+        case _: refinancing.interest = 100
 
-    interests_amount = Decimal(float(refinancing.amount) * (float(refinancing.refinancing_interest) / 100 + 1))
+    interests_amount = Decimal(float(refinancing.amount) * (float(refinancing.interest) / 100 + 1))
     repayment_amount = refinancing.amount + interests_amount
     refinancing.end_date = datetime.now() + timedelta(days=30)*refinancing.installment_num_refinancing
     refinancing.refinancing_repayment_amount = Decimal(repayment_amount)

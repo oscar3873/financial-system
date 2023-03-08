@@ -1,113 +1,106 @@
+<!-- crear_credito.html -->
 {% extends 'core/base.html' %} {% load crispy_forms_tags %} {% block content %}
 <main class="container my-4">
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Registrar un Cliente</h4>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de solicitud de servicios</h4>
     <section>
         <div class="my-4 py-2">
             <form class="form" method="post">
                 {% csrf_token %}
                 <div class="row justify-content-center align-items-start">
-                    <div class="col-md-9">
-                        <div class="card box-shadow mb-3">
+                    <div class="col-md-9 p-1">
+                        <div class="card bg-primary text-white box-shadow mb-3">
                             <div class="card-body">
                                 <h5 class="title p-2">
-                                    <i class="fa-solid fa-user"></i> &nbsp; Titular
+                                    <i class="fa-solid fa-user text-warning"></i> &nbsp; Titular
                                 </h5>
                                 <h5 class="title p-2">Informacion basica</h5>
-
-                                <div class="form-row">
-                                    {% if garante_form.errors or formsetPhoneGuarantor.errors %}
-                                    <ul class="error-list">
-                                        <li class="text-danger">Hay errores en el formulario de garantes, por favor corríjalos.</li>
-                                    </ul>
-                                    {% endif %} {% for field in cliente_form %} {% if field.errors %}
-                                    <ul class="errorlist">
-                                        {% for error in field.errors %}
-                                        <li class="text-danger">{{ error }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% endif %} {% endfor %}
-                                </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.first_name.label}} {{cliente_form.first_name}}
+                                        {{form.first_name.label}} {{form.first_name}}
                                     </div>
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}
+                                        {{form.last_name.label}} {{form.last_name}}
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.email.label}} {{cliente_form.email}}
+                                        {{form.email.label}} {{form.email}}
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.dni.label}} {{cliente_form.dni}}
+                                        {{form.dni.label}} {{form.dni}}
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}
+                                        {{form.civil_status.label}} {{form.civil_status}}
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.address.label}} {{cliente_form.address}}
+                                        {{form.address.label}} {{form.address}}
                                     </div>
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}
+                                        {{form.job_address.label}} {{form.job_address}}
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.profession.label}} {{cliente_form.profession}}
+                                        {{form.profession.label}} {{form.profession}}
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.score.label}}{{cliente_form.score}}
+                                        {{form.score.label}}{{form.score}}
                                     </div>
                                 </div>
-                                <h5 class="title p-2 mt-3"><i class="fa-solid fa-phone"></i>&nbsp;Datos de Contacto</h5>
+                                <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
                                 <div class="form-row">
                                     <ul class="error-list">
-                                        {% for form in formsetPhoneClient %} {% for field in form %} {% for error in field.errors %}
+                                        {% for form in phone_formset %} {% for field in form %} {% for error in field.errors %}
                                         <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
-                                    </ul> {{ formsetPhoneClient.non_form_errors }}
+                                    </ul> {{ phone_formset.non_form_errors }}
                                 </div>
+                                <p>
+                                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
+                                      Añadir numeros de contacto
+                                    </button>
+                                </p>
+                                <div class="collapse" id="collapsePNC">
+                                    <div class="form-row">
+                                        {{phone_formset.management_form}} {% for phone_form in phone_formset %}
+                                        <div class="form-group col-md-3">
+                                            {{phone_form.phone_number_c.label}} {{phone_form.phone_number_c}}
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            {{phone_form.phone_type_c.label}} {{phone_form.phone_type_c}}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
 
-                                <div class="form-row">
-                                    {{formsetPhoneClient.management_form}} {% for phone_form in formsetPhoneClient %}
-                                    <div class="form-group col-md-3">
-                                        {{phone_form.phone_number_c.label}} {{phone_form.phone_number_c}}
-                                    </div>
-                                    <div class="form-group col-md-2">
-                                        {{phone_form.phone_type_c.label}} {{phone_form.phone_type_c}}
-                                    </div>
-                                    {% endfor %}
                                 </div>
                             </div>
                             <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
                         </div>
                     </div>
-
-                    <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Guardar Cámbios</button>
-                    <!-- Agregar el modal -->
-                    <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="confirmacionModalLabel">Confirmar registro de servicio</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                </div>
-                                <div class="modal-body">
-                                    ¿Está seguro de que desea enviar el formulario del servicio?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
-                                </div>
-                                <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                </div>
+                <button type="button" class="btn btn btn-secondary d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Actualizar Cliente</button>
+                <!-- Agregar el modal -->
+                <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmacionModalLabel">Confirmar registro de servicio</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             </div>
+                            <div class="modal-body">
+                                ¿Está seguro de que desea enviar el formulario del servicio?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
+                            </div>
+                            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
                         </div>
                     </div>
+                </div>
             </form>
-            </div>
+        </div>
     </section>
 </main>
-
 {% endblock %}

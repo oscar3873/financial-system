@@ -13,9 +13,11 @@ class Client(models.Model):
     )
     
     SCORE = [
-        (600 , 'Bueno (600)'),
-        (400 , 'Regular (400)'),
-        (200 , 'Riesgoso (200)')
+        ('Exelente','Exelente'),
+        ('Muy Bueno', 'Muy bueno'),
+        ('Bueno' , 'Bueno'),
+        ('Regular' , 'Regular'),
+        ('Riesgoso' , 'Riesgoso')
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -27,7 +29,8 @@ class Client(models.Model):
     dni = models.PositiveIntegerField(null=False, help_text="dni number", blank=False, verbose_name="DNI")
     profession = models.CharField(max_length=50, help_text="Profession", verbose_name="Profesion")
     address = models.CharField(max_length=250, help_text="Address", verbose_name="Direccion")
-    score = models.PositiveIntegerField(choices=SCORE, default=200 , null=True)
+    score = models.PositiveIntegerField(default=0 , null=True)
+    score_label = models.CharField(blank=True, choices=SCORE, max_length=10, verbose_name="Estado del score", null=True)
     job_address = models.CharField(max_length=250, help_text="Job address", verbose_name="Direccion laboral")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -35,9 +38,25 @@ class Client(models.Model):
     def __str__(self):
         return self.first_name + " " + self.last_name
     
+
+    def set_score_label(self):
+        if self.score <= 200:
+            self.score_label = 'Riesgoso'
+        elif self.score <= 400:
+            self.score_label = 'Regular'
+        elif self.score <= 800:
+            self.score_label = 'Bueno'
+        elif self.score <= 1200:
+            self.score_label = 'Muy Bueno'
+        else:
+            self.score_label = 'Exelente'
+
+    def save(self, *args, **kwargs):
+        self.set_score_label()
+        super(Client, self).save(*args, **kwargs)
+    
     class Meta:
         ordering = ["created_at"]
- 
 class PhoneNumberClient(models.Model):
     
     PHONETYPE = (

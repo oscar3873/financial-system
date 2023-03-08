@@ -11,13 +11,13 @@
                 <div class="row">
                     <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
                         <div class="mb-3 row justify-content-center">
-                            <form class="form" method="post">
-                                {% csrf_token %}
-                                <div class="card bg-primary text-white box-shadow ">
-                                    <div class="card-body">
-                                        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">
-                                            <i class="fa-solid fa-right-left text-warning"></i>&nbsp;Realizar Operacion en caja
-                                        </h5>
+                            <div class="card mb-1 mx-3 bg-primary text-white box-shadow ">
+                                <div class="card-body">
+                                    <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">
+                                        <i class="fa-solid fa-right-left text-warning"></i>&nbsp;Realizar Operacion en caja
+                                    </h5>
+                                    <form class="form" method="post">
+                                        {% csrf_token %}
                                         <div class="form-group">
                                             <div class="input-group">
                                                 <label for="{{ form.amount.id_for_label }}" class="input-group-text bg-warning rounded-0 border-0 text-white">{{ form.amount.label }}</label> {{ form.amount }}
@@ -52,22 +52,21 @@
                                                 <button id="ingreso" class="btn rounded btn-success box-shadow w-100 mb-3" type="submit">Ingreso</button>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="card-footer p-1 bg-primary rounded-bottom"></div>
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                     <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 px-1">
                         <div class="row mx-2 align-items-start justify-content-start">
-                            <div class="card bg-primary text-white box-shadow">
+                            <div class="card bg-primary col-md-7 cold-sm-7 col-lg-7 col-xl-7 mb-2 text-white box-shadow">
                                 <div class="card-body border-bottom-0">
                                     <div class="row align-items-center">
-                                        <div class="col-md-6">
+                                        <div class="col-md-5">
                                             <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-cash-register text-warning"></i>&nbsp;Caja</h5>
                                             <p class="card-text font-weight-light">Balances en Caja</p>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-7 px-1">
                                             <div class="" id="balance">
                                                 {% if cashregister.total_balanceARS.amount > 0 %}
                                                 <span class="box-amount text-success" style="font-size: 2rem; font-weight: 300;"> {{cashregister.total_balanceARS.amount}} </span>
@@ -79,16 +78,15 @@
                                         </div>
                                     </div>
                                     <!-- Crear los botones para cada balance -->
-                                    <div class="btn-group mb-3" role="group" aria-label="Balances">
+                                    <div class="btn-group mt-3" role="group" aria-label="Balances">
                                         <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceARS }}')">ARS</button>
                                         <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceUSD }}')">USD</button>
                                         <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceEUR }}')">EUR</button>
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceTRANSFER }}')">TRANSFER</button>
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceCREDITO }}')">CREDITO</button>
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceDEBITO }}')">DEBITO</button>
+                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceTRANSFER }}')">TRAN</button>
+                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceCREDITO }}')">CRED</button>
+                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceDEBITO }}')">DEB</button>
                                     </div>
                                 </div>
-                                <div class="card-footer p-1 bg-primary rounded-bottom"></div>
                             </div>
                             <div class="col-xs-5 col-sm-5 pl-2 col-md-5 col-lg-5">
                                 <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-primary text-white box-shadow card">
@@ -114,8 +112,8 @@
                                                 <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path></svg>
                                                         </ion-icon>
                                                         {% endif %} {% if balance.value >= 0 %}
-                                                        <span class="text-white" style="font-size: 2rem;">+{{ balance.value }}</span> {% else %}
-                                                        <span class="text-white" style="font-size: 2rem;">{{ balance.value }}</span> {% endif %}
+                                                        <span class="text-white" style="font-size: 2rem;">+{{ balance.value|floatformat:2 }}</span> {% else %}
+                                                        <span class="text-white" style="font-size: 2rem;">{{ balance.value|floatformat:2 }}</span> {% endif %}
                                                         <span class="text-white font-weight-bold last-balance-title mb-0">{{ balance.money_type }}</span>
                                                     </div>
 
@@ -177,7 +175,15 @@
                                         </thead>
                                         <tbody>
                                             {% for movement in object_list %}
-                                            <tr class="open-offcanvas" data-info='{"amount": "{{movement.amount}}", "description": "{{movement.description}}", "money_type": "{{movement.money_type}}", "created_at": "{{movement.created_at}}", "user": "{{movement.user}}", "operation_mode": "{{movement.get_operation_mode_display}}", "pk":"{{movement.pk}}"}'>
+                                            <tr class="open-offcanvas" data-info='{
+                                                "amount": "{{movement.amount}}", 
+                                                "description": "{{movement.description}}", 
+                                                "money_type": "{{movement.money_type}}", 
+                                                "created_at": "{{movement.created_at}}", 
+                                                "user": "{{movement.user}}", 
+                                                "operation_mode": "{{movement.get_operation_mode_display}}", 
+                                                "pk":"{{movement.pk}}"
+                                            }'>
                                                 {% if movement.amount > 0 %}
                                                 <td class="text-success">+<a class="animate__fadeInDown" style="animation-duration: 0.5s !important;" href="{% url 'cashregister:update' movement.pk %}">{{movement.amount}}</a></td>
                                                 {% else %}

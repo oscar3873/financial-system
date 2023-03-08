@@ -7,13 +7,13 @@ class ListingFilter(django_filters.FilterSet):
     dni = django_filters.NumberFilter(
         label="DNI",
         lookup_expr="iexact",
-        widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresar DNI'})
+        widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'DNI'})
     )
     first_name_or_last_name = django_filters.CharFilter(
         label="Nombre o apellido",
         lookup_expr="icontains",
         method="filter_name_or_lastname",
-        widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresar nombre completo'})
+        widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre o Apellido'})
     )
 
     def filter_name_or_lastname(self, queryset, name, value):
