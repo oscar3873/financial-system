@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from datetime import date, datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
@@ -8,7 +9,7 @@ from credit.utils import refresh_condition
 
 from .utils import all_properties_client
 from django.utils import timezone
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 
 
@@ -16,10 +17,11 @@ from django.shortcuts import redirect
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView, UpdateView
+from django.views.generic.edit import DeleteView, UpdateView
 
 from django.urls import reverse_lazy
 #FORMS
-from .forms import ClientForm, PhoneNumberFormSet
+from .forms import ClientForm, PhoneNumberFormSetUpdate
 from guarantor.forms import GuarantorForm
 #MODEL
 from .models import Client, PhoneNumberClient
@@ -114,9 +116,9 @@ class ClientUpdateView(UpdateView):
         """
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context['phone_formset'] = PhoneNumberFormSet(self.request.POST, instance=self.object)
+            context['phone_formset'] = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
         else:
-            context['phone_formset'] = PhoneNumberFormSet(instance=self.object)
+            context['phone_formset'] = PhoneNumberFormSetUpdate(instance=self.object)
         return context
 
     def form_invalid(self, form):
@@ -132,7 +134,7 @@ class ClientUpdateView(UpdateView):
         """
         print("Estoy aca amigo")
         response = super().form_valid(form)
-        phone_formset = PhoneNumberFormSet(self.request.POST, instance=self.object)
+        phone_formset = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
         phone_formset.save()
         
         return response
@@ -165,6 +167,10 @@ class ClientDelete(DeleteView):
     Borra un cliente.
     """
     model = Client
+    
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_success_url(self) -> str:
         """
@@ -204,6 +210,10 @@ class ClientDetailView(DetailView):
     """
     model = Client
     template_name = 'clients/client_detail.html'
+    
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
 
     def get_context_data(self, **kwargs):

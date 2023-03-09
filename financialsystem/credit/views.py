@@ -60,7 +60,7 @@ def crear_credito(request):
             if warranty_form.cleaned_data["article"]:
                 warranty.credit = credit
                 warranty.save()
-            print("-------------Fomularios validos------------------")
+            
             messages.success(request, 'El cliente se ha guardado exitosamente.')
             return redirect('clients:list')
     else:

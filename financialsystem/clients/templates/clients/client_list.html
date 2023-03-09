@@ -15,7 +15,7 @@
             <div class="col-xl-3 col-sm-3 col-lg-3">
                 <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-primary text-white box-shadow card">
                     <div class="card-body pb-0" id="movements-carousel">
-                        <h5 class="text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-down-left-and-up-right-to-center"></i> &nbsp;Estadisticas</h5>
+                        <h5 class="text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-down-left-and-up-right-to-center text-warning"></i> &nbsp;Cantidad de Clientes</h5>
                         <!-- Slider main container -->
                         <div class="swiper bg-primary">
                             <!-- Additional required wrapper -->
@@ -106,6 +106,7 @@
                                         "adviser": "{{client.adviser}}",
                                         "address": "{{client.address}}",
                                         "id": "{{client.id}}",
+                                        "adviser_id": "{{client.adviser.id}}",
                                         "job_address": "{{client.job_address}}",
                                         "profession": "{{client.profession}}",
                                         "score": "{{client.score}}",
@@ -188,12 +189,17 @@
 
                 phoneNumbers.push(match[0]);
             }
+
+            if (phoneNumbers.length == 0) {
+                phoneNumbers.push("Sin datos de contacto")
+            }
+
             const phoneNumbersHtml = phoneNumbers.map(number => `<a class="pr-2 font-weight-bold text-warning" href="tel:${number}">${number}</a>`).join("");
             offcanvas.innerHTML = `
             <div class="card-body">
-                <p class="m-0" style="font-size: 2rem"> ${info.first_name} ${info.last_name}    </p> 
+                <a href="/clients/${info.id}"><p class="m-0 text-white text-link" style="font-size: 2rem;text-decoration:none!important;">${info.first_name} ${info.last_name}</p></a>
                 <p class="m-0">Registrado por asesor financiero</p>
-                <p><a href="/asesors/${info.adviser.id}" class="text-warning"><strong>${info.adviser}</strong></a></p>
+                <a href="/asesors/${info.adviser_id}"><p class="text-warning"><strong>${info.adviser}</strong></p></a>
                 <h5 class="m-0">Contacto</h5>
                 <ul class="list p-0">
                 ${phoneNumbersHtml}

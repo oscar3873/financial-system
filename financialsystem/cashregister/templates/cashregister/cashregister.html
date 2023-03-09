@@ -3,97 +3,94 @@
 <link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
 <main class="container my-4">
 
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Movimientos de Caja</h4>
-    <section class="row">
+    <h4 class="title text-center text-lg-left font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Movimientos de Caja</h4>
+    <section class="section">
         <div class="col-12 col-lg-12 col-md-12">
             <!--Caja-->
             <article class="container p-0 my-4">
-                <div class="row">
-                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-                        <div class="mb-3 row justify-content-center">
-                            <div class="card mb-1 mx-3 bg-primary text-white box-shadow ">
-                                <div class="card-body">
-                                    <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">
-                                        <i class="fa-solid fa-right-left text-warning"></i>&nbsp;Realizar Operacion en caja
-                                    </h5>
-                                    <form class="form" method="post">
-                                        {% csrf_token %}
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <label for="{{ form.amount.id_for_label }}" class="input-group-text bg-warning rounded-0 border-0 text-white">{{ form.amount.label }}</label> {{ form.amount }}
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text bg-warning text-white">$</span>
-                                                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-3 pb-1">
+                        <div class="card mb-1 mx-3 bg-primary text-white box-shadow ">
+                            <div class="card-body">
+                                <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">
+                                    <i class="fa-solid fa-right-left text-warning"></i>&nbsp;Realizar movimiento
+                                </h5>
+                                <form class="form" method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <label for="{{ form.amount.id_for_label }}" class="input-group-text bg-warning rounded-0 border-0 text-white">{{ form.amount.label }}</label> {{ form.amount }}
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-warning text-white">$</span>
                                             </div>
                                         </div>
+                                    </div>
 
 
-                                        <div class="form-group">
-                                            <label for="{{ form.description.label }}" class="form-label">{{ form.description.label }}</label>
-                                            <textarea class="form-control" required id="{{ form.description.id_for_label }}" name="{{ form.description.name }}" rows="3"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="{{ form.money_type.id_for_label }}" class="form-label">{{ form.money_type.label }}</label>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend ">
-                                                    <span class="input-group-text bg-warning text-white">{{ form.money_type.symbol }}</span>
-                                                </div>
-                                                {{ form.money_type }}
+                                    <div class="form-group">
+                                        <label for="{{ form.description.label }}" class="form-label">{{ form.description.label }}</label>
+                                        <textarea class="form-control" required id="{{ form.description.id_for_label }}" name="{{ form.description.name }}" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="{{ form.money_type.id_for_label }}" class="form-label">{{ form.money_type.label }}</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend ">
+                                                <span class="input-group-text bg-warning text-white">{{ form.money_type.symbol }}</span>
                                             </div>
+                                            {{ form.money_type }}
                                         </div>
-                                        <div class="form-group">
-                                            <label for="{{ form.operation_mode.id_for_label }}" class="form-label">{{ form.operation_mode.label }}</label> {{ form.operation_mode }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="{{ form.operation_mode.id_for_label }}" class="form-label">{{ form.operation_mode.label }}</label> {{ form.operation_mode }}
+                                    </div>
+                                    <div class="card-row d-flex flex-md-row flex-column justify-content-center">
+                                        <div class="col-md-6 p-1">
+                                            <button id="egreso" class="btn rounded btn-danger box-shadow w-100 mb-3 text-white" type="submit">Egreso</button>
                                         </div>
-                                        <div class="card-row d-flex flex-md-row flex-column justify-content-center">
-                                            <div class="col-md-6 mb-3 mb-md-0">
-                                                <button id="egreso" class="btn rounded btn-danger box-shadow w-100 mb-3 text-white" type="submit">Egreso</button>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <button id="ingreso" class="btn rounded btn-success box-shadow w-100 mb-3" type="submit">Ingreso</button>
-                                            </div>
+                                        <div class="col-md-6 p-1">
+                                            <button id="ingreso" class="btn rounded btn-success box-shadow w-100 mb-3" type="submit">Ingreso</button>
                                         </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 px-1">
-                        <div class="row mx-2 align-items-start justify-content-start">
-                            <div class="card bg-primary col-md-7 cold-sm-7 col-lg-7 col-xl-7 mb-2 text-white box-shadow">
-                                <div class="card-body border-bottom-0">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-5">
-                                            <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-cash-register text-warning"></i>&nbsp;Caja</h5>
-                                            <p class="card-text font-weight-light">Balances en Caja</p>
-                                        </div>
-                                        <div class="col-md-7 px-1">
-                                            <div class="" id="balance">
+                    <div class="col-lg-9 px-1">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6 mb-2 align-items-stretch">
+                                <div class="card bg-primary text-white box-shadow">
+                                    <div class="card-body border-bottom-0">
+                                        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-cash-register text-warning"></i>&nbsp;Caja</h5>
+                                        <div class="row align-items-center justify-content-center">
+                                            <div id="balance">
                                                 {% if cashregister.total_balanceARS.amount > 0 %}
-                                                <span class="box-amount text-success" style="font-size: 2rem; font-weight: 300;"> {{cashregister.total_balanceARS.amount}} </span>
-                                                <span class="text-success"> {{cashregister.total_balanceARS.currency}} </span> {% else %}
-                                                <span class="box-amount text-danger" style="font-size: 2rem; font-weight: 300;">{{cashregister.total_balanceARS.amount}} </span>
-                                                <span class="text-danger"> {{cashregister.total_balanceARS.currency}} </span> {% endif %}
+                                                <span class="box-amount text-success font-weight-bold" style="font-size: 2rem; font-weight: 300;"> {{cashregister.total_balanceARS.amount}} </span>
+                                                <span class="text-warning font-weight-bold"> {{cashregister.total_balanceARS.currency}} </span> {% else %}
+                                                <span class="box-amount text-danger font-weight-bold" style="font-size: 2rem; font-weight: 300;">{{cashregister.total_balanceARS.amount}} </span>
+                                                <span class="text-warning font-weight-bold"> {{cashregister.total_balanceARS.currency}} </span> {% endif %}
 
                                             </div>
                                         </div>
-                                    </div>
-                                    <!-- Crear los botones para cada balance -->
-                                    <div class="btn-group mt-3" role="group" aria-label="Balances">
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceARS }}')">ARS</button>
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceUSD }}')">USD</button>
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceEUR }}')">EUR</button>
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceTRANSFER }}')">TRAN</button>
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceCREDITO }}')">CRED</button>
-                                        <button type="button" class="btn btn-primary" onclick="showBalance('{{ cashregister.total_balanceDEBITO }}')">DEB</button>
+                                        <div class="row align-items-center justify-content-center">
+                                            <!-- Crear los botones para cada balance -->
+                                            <div class="btn-group mt-3" role="group" aria-label="Balances">
+                                                <button type="button" class="btn btn-secondary" onclick="showBalance('{{ cashregister.total_balanceARS }}')">ARS</button>
+                                                <button type="button" class="btn btn-secondary" onclick="showBalance('{{ cashregister.total_balanceUSD }}')">USD</button>
+                                                <button type="button" class="btn btn-secondary" onclick="showBalance('{{ cashregister.total_balanceEUR }}')">EUR</button>
+                                                <button type="button" class="btn btn-secondary" onclick="showBalance('{{ cashregister.total_balanceTRANSFER }}')">TRAN</button>
+                                                <button type="button" class="btn btn-secondary" onclick="showBalance('{{ cashregister.total_balanceCREDITO }}')">CRED</button>
+                                                <button type="button" class="btn btn-secondary" onclick="showBalance('{{ cashregister.total_balanceDEBITO }}')">DEB</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xs-5 col-sm-5 pl-2 col-md-5 col-lg-5">
-                                <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-primary text-white box-shadow card">
+                            <div class="col-lg-6 mb-2 align-items-stretch">
+                                <div class="card bg-primary text-white box-shadow">
                                     <div class="card-body pb-0" id="movements-carousel">
-                                        <h5 class="text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-down-left-and-up-right-to-center"></i> &nbsp;Balances</h5>
+                                        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-down-left-and-up-right-to-center text-warning"></i> &nbsp;Balances</h5>
                                         <!-- Slider main container -->
-                                        <div class="swiper bg-primary">
+                                        <div class="swiper mb-2 bg-primary">
                                             <!-- Additional required wrapper -->
                                             <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
                                                 <!-- ... contenido del list-group ... -->
@@ -112,8 +109,8 @@
                                                 <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path></svg>
                                                         </ion-icon>
                                                         {% endif %} {% if balance.value >= 0 %}
-                                                        <span class="text-white" style="font-size: 2rem;">+{{ balance.value|floatformat:2 }}</span> {% else %}
-                                                        <span class="text-white" style="font-size: 2rem;">{{ balance.value|floatformat:2 }}</span> {% endif %}
+                                                        <span class="text-white font-weight-bold" style="font-size: 2rem;">+{{ balance.value|floatformat:2 }}</span> {% else %}
+                                                        <span class="text-white font-weight-bold" style="font-size: 2rem;">{{ balance.value|floatformat:2 }}</span> {% endif %}
                                                         <span class="text-white font-weight-bold last-balance-title mb-0">{{ balance.money_type }}</span>
                                                     </div>
 
@@ -128,138 +125,155 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row mx-2 mt-2 align-items-start">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-cash-register"></i>&nbsp;Busquedas</h5>
-                                    <form class="form-inline">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div class="d-block">
-                                                <label class="" for="{{ listing_filter.form.amount.name }}">{{ listing_filter.form.amount.label }}</label> {{ listing_filter.form.amount }}
-                                            </div>
-                                            <div class="d-block">
-                                                <label class="" for="{{ listing_filter.form.money_type.name }}">{{ listing_filter.form.money_type.label }}</label> {{ listing_filter.form.money_type }}
-                                            </div>
-                                            <div class="d-block">
-                                                <label class="" for="{{ listing_filter.form.operation_mode.name }}">{{ listing_filter.form.operation_mode.label }}</label> {{ listing_filter.form.operation_mode }}
-                                            </div>
-                                            <div class="d-block">
-                                                <label class="" for="{{ listing_filter.form.created_at.name }}">{{ listing_filter.form.created_at.label }}</label> {{ listing_filter.form.created_at }}
-                                            </div>
-
-                                        </div>
-                                        <div class="text-center mt-1">
-                                            <button class="btn btn-primary rounded ml-2" type="submit">Buscar</button>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="card-footer p-1 bg-primary rounded-bottom"></div>
-                            </div>
-                        </div>
-                        <div class="row mx-2 mt-2 align-items-start">
-                            {% if movements %}
-                            <div class="col-md-12 cold-sm-12 col-lg-12 px-2 card box-shadow">
-                                <div class="card-body table-responsive">
-                                    <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">
-                                        <i class="fas fa-list-alt"></i>&nbsp;Movimientos
-                                    </h5>
-                                    <table class="table table-striped table-hover">
-                                        <thead class="table-primary">
-                                            <tr>
-                                                {% for name_prop in properties %}
-                                                <th scope="col" class="text-white font-weight-normal">{{name_prop}}</th>
-                                                {% endfor %} {% if user.is_superuser %}
-                                                <!-- <th scope="col" class="text-white font-weight-normal">Acciones</th> -->
-                                                {% endif %}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for movement in object_list %}
-                                            <tr class="open-offcanvas" data-info='{
-                                                "amount": "{{movement.amount}}", 
-                                                "description": "{{movement.description}}", 
-                                                "money_type": "{{movement.money_type}}", 
-                                                "created_at": "{{movement.created_at}}", 
-                                                "user": "{{movement.user}}", 
-                                                "operation_mode": "{{movement.get_operation_mode_display}}", 
-                                                "pk":"{{movement.pk}}"
-                                            }'>
-                                                {% if movement.amount > 0 %}
-                                                <td class="text-success">+<a class="animate__fadeInDown" style="animation-duration: 0.5s !important;" href="{% url 'cashregister:update' movement.pk %}">{{movement.amount}}</a></td>
-                                                {% else %}
-                                                <td class="text-danger">{{movement.amount}}</td>
-                                                {% endif %} {% if movement.get_operation_mode_display == "INGRESO" %}
-                                                <td>
-                                                    <ion-icon name="trending-up-outline" class="text-success mr-2" style="font-size: 2rem;">
-                                                        <svg viewBox="0 0 512 512">
-                                                              <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path>
-                                                            </svg>
-                                                    </ion-icon>
-                                                </td>
-                                                {% else %}
-                                                <td>
-                                                    <ion-icon name="trending-down-outline" class="text-danger mr-2" style="font-size: 2rem;">
-                                                        <svg viewBox="0 0 512 512">
-                                                              <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path>
-                                                            </svg>
-                                                    </ion-icon>
-                                                </td>
-                                                {% endif %}
-                                                <td>{{movement.description|truncatewords:2}}</td>
-                                                <td>{{movement.money_type|slice:":4"}}</td>
-                                                <td>{{movement.created_at|date|truncatewords:3}}</td>
-                                                <td>{{movement.user}}</td>
-                                                {% if user.is_superuser %} {% endif %}
-                                            </tr>
-                                            <!--Delete Modal-->
-                                            <div class="modal fade" id="exampleModal{{movement.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{movement.pk}}" aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content bg-primary text-white">
-                                                        <form action="{% url 'cashregister:delete' movement.pk %}" method="POST">
-                                                            {% csrf_token %}
-                                                            <div class="modal-header bg-primary text-white">
-                                                                <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
-                                                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <span>Esta seguro que desea borrar </span>
-                                                                <strong>el movimiento, realizada el {{movement.created_at.date}} </strong>?
-                                                                <p>Tipo: <span class="strong">{{ movement.operation_mode }}</span></p>
-                                                                <p>Monto: <span class="strong">{{ movement.amount }}</span></p>
-                                                                <p>Realizada el <span class="strong">{{movement.created_at}}</span></p>
-                                                                <p>Por <strong class="text-warning">{{movement.user}}</strong></p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button class="btn btn-danger">Si, borrar</button>
-                                                                <button type="button" class="btn btn-primary m-2 p-2" data-dismiss="modal">Cerrar</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="card bg-primary text-white box-shadow">
+                                    <div class="card-body">
+                                        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-search text-warning"></i>&nbsp;Busqueda</h5>
+                                        <form class="form-inline d-block justify-content-center">
+                                            <div class="row justify-content-center justify-content-around align-items-end flex-column flex-lg-row ">
+                                                <div class="col-lg-3 p-0 text-center">
+                                                    <label class="" for="{{ listing_filter.form.amount.name }}">{{ listing_filter.form.amount.label }}</label> {{ listing_filter.form.amount }}
+                                                </div>
+                                                <div class="col-lg-2 col-4 col-md-12 m-auto  p-0 text-center">
+                                                    <label class="" for="{{ listing_filter.form.money_type.name }}">{{ listing_filter.form.money_type.label }}</label> {{ listing_filter.form.money_type }}
+                                                </div>
+                                                <div class="col-lg-2 col-4 col-md-12 m-auto  p-0 text-center">
+                                                    <label class="" for="{{ listing_filter.form.operation_mode.name }}">{{ listing_filter.form.operation_mode.label }}</label> {{ listing_filter.form.operation_mode }}
+                                                </div>
+                                                <div class="col-lg-3 p-0 text-center">
+                                                    <label class="" for="{{ listing_filter.form.created_at.name }}">{{ listing_filter.form.created_at.label }}</label> {{ listing_filter.form.created_at }}
+                                                </div>
+                                                <div class="col-lg-2 p-0 text-center mt-2 mt-lg-0">
+                                                    <button class="btn btn-warning text-white rounded ml-2" type="submit">Buscar</button>
                                                 </div>
                                             </div>
-                                            <!--End Delete Modal-->
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                        </form>
+                                    </div>
+                                    <div class="card-footer p-1 bg-primary rounded-bottom"></div>
                                 </div>
-                                <div class="">
-                                    <ul class="pagination justify-content-center">
-                                        {% if page_obj.has_previous %}
-                                        <li class="page-item"><a class="page-link bg-primary text-white" href="?{{ listing_filter_params }}&page=1">&laquo; primero</a></li>
-                                        <li class="page-item"><a class="page-link bg-primary text-white" href="?{{ listing_filter_params }}&page={{ page_obj.previous_page_number }}">anterior</a></li> {% endif %}
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            {% if movements %}
+                            <div class="col-md-12 cold-sm-12 col-lg-12">
+                                <div class="card box-shadow">
+                                    <div class="card-body table-responsive">
+                                        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">
+                                            <i class="fas fa-list-alt"></i>&nbsp;Movimientos
+                                        </h5>
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-primary text-white">
+                                                <tr>
+                                                    <th scope="col">
+                                                        <i class="fa fa-usd text-warning"></i> Monto
+                                                    </th>
+                                                    <th scope="col">
+                                                        <i class="fa fa-exchange-alt text-warning"></i> Operacion
+                                                    </th>
+                                                    <th scope="col">
+                                                        <i class="fa fa-file-alt  text-warning"></i> Descripcion
+                                                    </th>
+                                                    <th scope="col">
+                                                        <i class="fa fa-money-bill-wave text-warning"></i> Divisa
+                                                    </th>
+                                                    <th scope="col">
+                                                        <i class="fa fa-calendar text-warning"></i> Fecha
+                                                    </th>
+                                                    <th scope="col">
+                                                        <i class="fa fa-id-card text-warning"></i> Por
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for movement in object_list %}
+                                                <tr class="open-offcanvas" data-info='{
+                                                    "amount": "{{movement.amount}}", 
+                                                    "description": "{{movement.description}}", 
+                                                    "money_type": "{{movement.money_type}}", 
+                                                    "created_at": "{{movement.created_at}}", 
+                                                    "user": "{{movement.user}}", 
+                                                    "operation_mode": "{{movement.get_operation_mode_display}}", 
+                                                    "pk":"{{movement.pk}}"
+                                                }'>
+                                                    {% if movement.amount > 0 %}
+                                                    <td class="text-success">+<a class="animate__fadeInDown" style="animation-duration: 0.5s !important;" href="{% url 'cashregister:update' movement.pk %}">{{movement.amount}}</a></td>
+                                                    {% else %}
+                                                    <td class="text-danger">{{movement.amount}}</td>
+                                                    {% endif %} {% if movement.get_operation_mode_display == "INGRESO" %}
+                                                    <td>
+                                                        <ion-icon name="trending-up-outline" class="text-success mr-2" style="font-size: 2rem;">
+                                                            <svg viewBox="0 0 512 512">
+                                                                  <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path>
+                                                                </svg>
+                                                        </ion-icon>
+                                                    </td>
+                                                    {% else %}
+                                                    <td>
+                                                        <ion-icon name="trending-down-outline" class="text-danger mr-2" style="font-size: 2rem;">
+                                                            <svg viewBox="0 0 512 512">
+                                                                  <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path>
+                                                                </svg>
+                                                        </ion-icon>
+                                                    </td>
+                                                    {% endif %}
+                                                    <td>{{movement.description|truncatewords:2}}</td>
+                                                    <td>{{movement.money_type|slice:":4"}}</td>
+                                                    <td>{{movement.created_at|date|truncatewords:3}}</td>
+                                                    <td>{{movement.user}}</td>
+                                                    {% if user.is_superuser %} {% endif %}
+                                                </tr>
+                                                <!--Delete Modal-->
+                                                <div class="modal fade" id="exampleModal{{movement.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{movement.pk}}" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content bg-primary text-white">
+                                                            <form action="{% url 'cashregister:delete' movement.pk %}" method="POST">
+                                                                {% csrf_token %}
+                                                                <div class="modal-header bg-primary text-white">
+                                                                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
+                                                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <span>Esta seguro que desea borrar </span>
+                                                                    <strong>el movimiento, realizada el {{movement.created_at.date}} </strong>?
+                                                                    <p>Tipo: <span class="strong">{{ movement.operation_mode }}</span></p>
+                                                                    <p>Monto: <span class="strong">{{ movement.amount }}</span></p>
+                                                                    <p>Realizada el <span class="strong">{{movement.created_at}}</span></p>
+                                                                    <p>Por <strong class="text-warning">{{movement.user}}</strong></p>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button class="btn btn-danger">Si, borrar</button>
+                                                                    <button type="button" class="btn btn-primary m-2 p-2" data-dismiss="modal">Cerrar</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--End Delete Modal-->
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <nav aria-label="Page navigation">
+                                        <ul class="pagination justify-content-center">
+                                            {% if page_obj.has_previous %}
+                                            <li class="page-item"><a class="page-link bg-primary text-white" href="?{{ listing_filter_params }}&page=1">&laquo;</a></li>
+                                            <li class="page-item"><a class="page-link bg-primary text-white" href="?{{ listing_filter_params }}&page={{ page_obj.previous_page_number }}">anterior</a></li>
+                                            {% endif %}
 
-                                        <li class="page-item">
-                                            <a class="page-link bg-primary text-white">
-                                                {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                                            </a> {% if page_obj.has_next %}
-                                        </li>
-                                        <li class="page-item"><a class="page-link bg-primary text-white" href="?{{ listing_filter_params }}&page={{ page_obj.next_page_number }}">siguiente</a></li>
-                                        <li class="page-item"><a class="page-link bg-primary text-white" href="?{{ listing_filter_params }}&page={{ page_obj.paginator.num_pages }}">ultimo &raquo;</a> {% endif %}</li>
-                                    </ul>
+                                            <li class="page-item">
+                                                <a class="page-link bg-primary text-white">
+                                                    {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                                </a> {% if page_obj.has_next %}
+                                            </li>
+                                            <li class="page-item"><a class="page-link bg-primary text-white" href="?{{ listing_filter_params }}&page={{ page_obj.next_page_number }}">siguiente</a></li>
+                                            <li class="page-item"><a class="page-link bg-primary text-white" href="?{{ listing_filter_params }}&page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}</li>
+                                        </ul>
+                                    </nav>
+                                    <div class="card-footer p-1 bg-primary rounded-bottom"></div>
                                 </div>
-                                <div class="card-footer p-1 bg-primary rounded-bottom"></div>
                             </div>
                             {% endif %}
                         </div>
@@ -398,11 +412,11 @@
         // Formatear el monto y agregar la clase "box-amount"
         var amountFormatted = amount.replace('.', ',');
         if (negativeSign == '-') {
-            var amountHtml = '<span class="box-amount text-danger" style="font-size: 2rem; font-weight: 300;">' + negativeSign + amountFormatted + '</span>';
-            var currencyHtml = '<span class="box-currency text-danger">' + currency + '</span>';
+            var amountHtml = '<span class="animate__fadeInDown box-amount text-danger font-weight-bold" style="font-size: 2rem; font-weight: 300;animation-duration: 1s !important;">' + negativeSign + amountFormatted + '</span>';
+            var currencyHtml = '<span class="box-currency text-danger font-weight-bold">' + currency + '</span>';
         } else {
-            var amountHtml = '<span class="box-amount text-success" style="font-size: 2rem; font-weight: 300;">' + negativeSign + amountFormatted + '</span>';
-            var currencyHtml = '<span class="box-currency text-success">' + currency + '</span>';
+            var amountHtml = '<span class="animate__fadeInDown box-amount text-success font-weight-bold" style="font-size: 2rem; font-weight: 300;animation-duration: 1s !important;">' + negativeSign + amountFormatted + '</span>';
+            var currencyHtml = '<span class="box-currency text-success font-weight-bold">' + currency + '</span>';
         }
 
 

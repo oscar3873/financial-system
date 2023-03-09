@@ -1,0 +1,89 @@
+.led-success {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background-color: #357a38;
+    transform-style: preserve-3d;
+    animation: glow 2s infinite linear;
+    backface-visibility: hidden;
+}
+
+.led-sucess.blink {
+    animation: blink-animation 1s infinite alternate linear;
+}
+
+@keyframes blink-animation {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.5;
+    }
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px 2px rgba(0, 255, 0, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 20px 6px rgba(6, 221, 6, 0.4);
+    }
+}
+
+.led-danger {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background-color: #c82333;
+    transform-style: preserve-3d;
+    animation: glow-danger 2s infinite linear;
+    backface-visibility: hidden;
+}
+
+.led-danger.blink {
+    animation: blink-animation 1s infinite alternate linear;
+}
+
+.led-warning {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background-color: #C9961A;
+    transform-style: preserve-3d;
+    animation: glow-warning 2s infinite linear;
+    backface-visibility: hidden;
+}
+
+.led-warning.blink {
+    animation: blink-animation 1s infinite alternate linear;
+}
+
+@keyframes blink-animation {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.5;
+    }
+}
+
+@keyframes glow-danger {
+    0% {
+        box-shadow: 0 0 5px 2px rgba(255, 0, 0, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 20px 6px rgba(221, 6, 6, 0.4);
+    }
+}
+
+@keyframes glow-warning {
+    0% {
+        box-shadow: 0 0 5px 2px rgba(255, 187, 0, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 20px 6px rgba(221, 187, 6, 0.4);
+    }
+}

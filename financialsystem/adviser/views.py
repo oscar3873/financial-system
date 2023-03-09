@@ -1,11 +1,13 @@
 from decimal import Decimal
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+
 
 from braces.views import GroupRequiredMixin
 
@@ -20,7 +22,8 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     Vista de lista de objetos del modelo Adviser, que requiere autenticación y pertenecer al grupo 'admin_group' para acceder a ella.
     '''
     model = Adviser
-    group_required = "admin_group"
+    group_required = 'admin_group'
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
@@ -46,12 +49,18 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
     """
     Vista para ver los detalles de un asesor.
     """
+    model = Adviser
+    group_required = 'admin_group'
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
-    def handle_no_permission(self):
+    def handle_no_permission(self, request):
         """
         Redirige al usuario a la página de inicio si no tiene permisos para ver la vista.
         """
         return redirect("/")
+
     
     def get_context_data(self, **kwargs):
         """
@@ -67,11 +76,19 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
         """
         Devuelve el objeto asesor correspondiente al id pasado como parámetro en la url.
         """
-        return get_object_or_404(Adviser, id=self.kwargs['pk'])
+        try:
+            adviser = Adviser.objects.get(id=self.kwargs["pk"])
+            return adviser
+        except Adviser.DoesNotExist:
+            raise Http404
 
 
 #----------------------------------------------------------------
+def is_admin(user):
+    return user.is_superuser
+
 @login_required(login_url="/accounts/login/")
+@user_passes_test(is_admin)
 def pay_commission(request, pk):
     '''Función que maneja la vista para pagar una comisión'''
 

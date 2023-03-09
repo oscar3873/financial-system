@@ -3,7 +3,6 @@ from decimal import Decimal
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
-from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 
 
@@ -20,11 +19,12 @@ class Adviser(models.Model):
         ordering = ['-created_at']
     
 # signals
-@receiver(post_save, sender=User)
 def ensure_profile_exists(sender, instance, **kwargs):
     if kwargs.get('created', False):
         Adviser.objects.get_or_create(user = instance)
         print("Se acaba de crear un usuario y un asesor")
+
+post_save.connect(ensure_profile_exists, sender=User)
 
 ###############################################################################
 
