@@ -13,7 +13,7 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
 from .models import Warranty
-from .forms import WarrantyForm
+from .forms import WarrantyForm, SellForm
 from .filters import ListingFilter
 from .utils import all_properties_warranty
 
@@ -28,6 +28,7 @@ class WarrantyListView(LoginRequiredMixin, ListView):
         refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
+        context["form_sell"] = SellForm()
         context["count_warrantys"] = self.model.objects.all().count()
         context["warrantys"] = self.model.objects.all()
         context["listing_filter"] = ListingFilter(self.request.GET, queryset=context["warrantys"])
@@ -82,3 +83,24 @@ class WarrantyUpdateView(UpdateView):
     def get_success_url(self) -> str:
         messages.success(self.request, 'Garante actualizada satisfactoriamente', "info")
         return  reverse_lazy('warrantys:list')
+
+
+#REALIZAR UNA VENTA DE UN ARTICULO
+#------------------------------------------------------------------
+def sell_article(request, pk):
+    article = get_object_or_404(Warranty, pk = pk)
+    form = SellForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            selled = form.save(commit=False)
+            selled.adviser = request.user.adviser
+            selled.article = article
+            
+            article.is_selled = True
+            article.save()
+            selled.save()
+        else:
+            messages.error(request, 'No se pudo realizar la venta', "danger")
+    return redirect('warrantys:list')
+    

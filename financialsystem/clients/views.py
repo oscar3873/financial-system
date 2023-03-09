@@ -8,7 +8,7 @@ from credit.utils import refresh_condition
 
 from .utils import all_properties_client
 from django.utils import timezone
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 
 
@@ -116,6 +116,7 @@ class ClientUpdateView(UpdateView):
     def get_success_url(self) -> str:
         messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
         return reverse_lazy('clients:list')
+    
 #BORRADO DE NUMEROS DE UN CLIENTE
 #------------------------------------------------------------------
 def delete_phone_number(request, pk):
@@ -138,8 +139,8 @@ class ClientDelete(DeleteView):
 #CONSULTA
 #------------------------------------------------------------------
 class QueryView(ListView):
-    template_name = 'clients/query/query.html'
     model = Client
+    template_name = 'core/home.html'
     
     def get(self, request, *args, **kwargs):
         found = self.request.GET.get("search")
@@ -148,7 +149,7 @@ class QueryView(ListView):
                 search = self.model.objects.get(dni=found)
                 return redirect('clients:detail', pk=search.pk)
             except :
-               self.extra_context = {"found": False}
+                messages.error(request, "Cliente no encontrado")
                 
         return super().get(request, *args, **kwargs)
 

@@ -94,9 +94,10 @@ def comission_create(instance, adviser, detail):
     amount = instance.amount*Decimal(0.075)
     Comission.objects.create(
         adviser = adviser,
+        interest = Decimal(7.5),
         amount = amount,
         type = 'REGISTRO',
-        create_date = instance.start_date,
+        last_up = instance.start_date,
         detail = detail,
         ) 
     

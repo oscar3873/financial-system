@@ -67,8 +67,9 @@ def comission_create_inst(instance, *args, **kwargs):
     Comission.objects.create(
         adviser = instance.adviser,
         amount = amount,
+        interest = Decimal(5),
         type = 'COBRO',
-        create_date = instance.payment_date,
+        last_up = instance.payment_date,
         money_type = instance.payment_method,
         detail= detail,
         )

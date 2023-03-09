@@ -126,11 +126,16 @@ class AssociateCreateView(CreateView):
 class CreditCreateTo(CreateView):
     model = Credit
     form_class = CreditForm
-    
+    template_name = 'credit/credit_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['client'] = Client.objects.all()
+        return context
+
     def form_valid(self, form):
         self.client = get_object_or_404(Client, pk=self.kwargs['pk'])
         if form.is_valid():
-            print(self.kwargs)
             credit = form.save(commit=False)
             credit.client = self.client
             credit.mov = create_movement(credit, self.request.user.adviser)
@@ -139,7 +144,7 @@ class CreditCreateTo(CreateView):
     
     def get_success_url(self) -> str:
         messages.success(self.request, 'Credito creado correctamente', "success")
-        return  reverse_lazy('clients:list') #CORREGIR PARA QUE VUELVA A LA PESTAÑA DEL CLIENTE
+        return  reverse_lazy('clients:detail', kwargs=self.kwargs)
     
 
 #------------------------------------------------------------------     

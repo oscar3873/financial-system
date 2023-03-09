@@ -1,2 +1,3 @@
 def all_properties_warranty():
-    return ["Articulo", "Marca", "Modelo", "Estado", "Cliente", "Descripcion", "Papeles", "Fecha de alta"]
+    return ["ID","Articulo", "Marca", "Modelo", "Estado", "Cliente", "Observaciones", "Papeles", "Fecha de alta"]
+#  LO QUE SI VA ES ARTICULO, ESTADO, CLIENTE, SI ESTA VENDIDO O NO

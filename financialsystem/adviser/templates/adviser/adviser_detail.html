@@ -15,7 +15,9 @@
         <tr>
             <td>{{commission.amount}}</td>
             <td>{{commission.type}}</td>
+            <td>{{commission.created_at}}</td>
             <td>{{commission.detail}}</td>
+            <td>{{commission.interest}}</td>
             {% if user.is_superuser %}
             <td>
                 <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{commission.pk}}"><i class="fa-solid fa-check"></i> &nbsp;</a>
@@ -35,11 +37,15 @@
                                     <span>Pago comision a</span>
                                     <strong>{{ commission.adviser }} </strong>?
 
-                                    <strong>{{ commission.amount }} </strong>
+                                    <div>
+                                        <p><strong>Monto : ${{ commission.amount }} </strong></p>
 
-                                    <strong>{{ commission.type }} </strong>
+                                        <p><strong>Tipo: {{ commission.type }} </strong></p>
 
-                                    <strong>{{ commission.detail }} </strong>
+                                        <p><strong>Detalle: {{ commission.detail }} </strong></p>
+
+                                        <p><strong>Interes: <input name="porcentage" placeholder="{{commission.interest}}">% </strong></p>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button class="btn btn-success">Confirmar</button>

@@ -191,9 +191,9 @@
             const phoneNumbersHtml = phoneNumbers.map(number => `<a class="pr-2 font-weight-bold text-warning" href="tel:${number}">${number}</a>`).join("");
             offcanvas.innerHTML = `
             <div class="card-body">
-                <p><a href="/clients/${info.id}" class="m-0" style="font-size: 2rem"> ${info.first_name} ${info.last_name} </a></p> 
+                <p class="m-0" style="font-size: 2rem"> ${info.first_name} ${info.last_name}    </p> 
                 <p class="m-0">Registrado por asesor financiero</p>
-                <p><a href="/asesors/${info.adviser.user}" class="text-warning"><strong>${info.adviser}</strong></a></p>
+                <p><a href="/asesors/${info.adviser.id}" class="text-warning"><strong>${info.adviser}</strong></a></p>
                 <h5 class="m-0">Contacto</h5>
                 <ul class="list p-0">
                 ${phoneNumbersHtml}

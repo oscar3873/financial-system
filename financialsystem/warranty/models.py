@@ -1,9 +1,14 @@
+from datetime import datetime
+from decimal import Decimal
 from django.db import models
+from django.db.models.signals import pre_save, pre_delete
 
 # Create your models here.
 from django.db import models
 from credit.models import Credit
+from adviser.models import Adviser, Comission
 # Create your models here.
+
 class Warranty(models.Model):
     
     ARTICLE_STATE = (
@@ -16,6 +21,8 @@ class Warranty(models.Model):
         ('USADO:MUCHO USO', 'USADO:MUCHO USO'),
     )
     
+    is_selled = models.BooleanField(default=False)
+
     article = models.CharField(max_length=50, help_text="Articulo", verbose_name="Articulo")
     purchase_papers = models.BooleanField(blank=True, verbose_name="Papeles de compra", default=False, help_text="Papeles de compra")
     brand = models.CharField(max_length=50, help_text="Marca", verbose_name="Marca")
@@ -23,6 +30,7 @@ class Warranty(models.Model):
     accessories = models.CharField(max_length=50, help_text="Accesorios", verbose_name="Accesorios")
     state = models.CharField(blank=True, choices=ARTICLE_STATE, max_length=30, verbose_name="Estado")
     credit = models.ForeignKey(Credit, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Empeño del usuario", related_name="warranty_clients")
+    detail = models.TextField(max_length=150, blank=True, null=True, help_text="Observaciones del articulo")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -31,3 +39,49 @@ class Warranty(models.Model):
     
     class Meta:
         ordering = ["created_at"]
+
+
+class Sell(models.Model):
+    MONEY_TYPE = [
+        ('PESOS','PESOS'),
+        ('USD','USD'),
+        ('EUR', 'EUR'),
+        ('TRANSFER','TRANSFERENCIA'),
+        ('DEBITO','DEBITO'),
+        ('CREDITO','CREDITO'),
+        ]
+
+    amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+    payment_method = models.CharField(max_length=15, choices=MONEY_TYPE,null=True, blank=True, default=MONEY_TYPE[0])
+    adviser = models.ForeignKey(Adviser,on_delete=models.SET_NULL, null=True)
+    commission = models.ForeignKey(Comission, on_delete=models.SET_NULL, null=True)
+    article = models.OneToOneField(Warranty, on_delete=models.SET_NULL, blank=True, null=True, related_name='sell')
+    sell_date = models.DateTimeField(null=True, default=datetime.now)
+    detail = models.TextField(max_length=150, blank=True, null=True, help_text="Observaciones del articulo")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+#--------------------------------------- SEÑALES PARA SELL ------------------------------------------------
+
+def sell_commission(instance, *args, **kwargs):
+    if not instance.commission:
+        amount = instance.amount*Decimal(0.05)
+        instance.commission = Comission.objects.create(
+            adviser = instance.adviser,
+            interest = Decimal(5),
+            amount = amount,
+            type = 'VENTA',
+            last_up = instance.sell_date,
+            detail = "VENTA ARTICULO: %s" % instance.article,
+            ) 
+
+def sell_delete(instance, *args, **kwargs):
+    instance.commission.delete()
+    instance.article.is_selled = False
+    instance.article.save()
+
+pre_save.connect(sell_commission, sender=Sell)
+pre_delete.connect(sell_delete, sender=Sell)

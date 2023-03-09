@@ -1,4 +1,5 @@
 import uuid
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from adviser.models import Adviser
 
@@ -29,7 +30,7 @@ class Client(models.Model):
     dni = models.PositiveIntegerField(null=False, help_text="dni number", blank=False, verbose_name="DNI")
     profession = models.CharField(max_length=50, help_text="Profession", verbose_name="Profesion")
     address = models.CharField(max_length=250, help_text="Address", verbose_name="Direccion")
-    score = models.PositiveIntegerField(default=0 , null=True)
+    score = models.PositiveIntegerField(default=0, null=True, validators=[MinValueValidator(0), MaxValueValidator(1500)])
     score_label = models.CharField(blank=True, choices=SCORE, max_length=10, verbose_name="Estado del score", null=True)
     job_address = models.CharField(max_length=250, help_text="Job address", verbose_name="Direccion laboral")
     created_at = models.DateTimeField(auto_now_add=True)

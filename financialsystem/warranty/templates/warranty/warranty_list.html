@@ -71,7 +71,7 @@
             <thead class="table-light">
                 <tr>
                     {% for name_prop in properties %}
-                    <th scope="col">{{name_prop}}</th>
+                    <th scope="col">{{name_prop}}</th>  <!-- AGREGAR EL ESTADO DE VENDIDO BOOLEANO (is_selled)-->
                     {% endfor %} {% if user.is_superuser %}
                     <th scope="col">Acciones</th>
                     {% endif %}
@@ -81,6 +81,7 @@
             <tbody>
                 {% for warranty in page_obj %}
                 <tr>
+                    <td>#{{warranty.pk}}</td>
                     <td><a href="{% url 'warrantys:detail' warranty.pk %}">{{warranty.article}}</a></td>
                     <td>{{warranty.brand}}</td>
                     <td>{{warranty.model}}</td>
@@ -99,6 +100,33 @@
                     <td>{{warranty.created_at}}</td>
                     {% if user.is_superuser %}
                     <td>
+                        {% if not warranty.is_selled %}
+                        <a type="button" class="btn" data-toggle="modal" data-target="#sell{{warranty.pk}}"><i class="fa-regular fa-cart-shopping text-success"></i> &nbsp;</a>
+                        <!--Modal-->
+                        <div class="modal fade" id="sell{{warranty.pk}}" tabindex="-1" role="dialog" aria-labelledby="sell{{warranty.pk}}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <form action="{% url 'warrantys:sell' warranty.pk %}" method="POST">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel">Vender Articulo #{{warranty.pk}}</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {% csrf_token %}
+                                            {{form_sell.as_p}}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-success">Refinanciar</button>
+                                            <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{warranty.pk}}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
                         <!--Modal-->
                         <div class="modal fade" id="exampleModal{{warranty.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{warranty.pk}}" aria-hidden="true">
@@ -126,6 +154,7 @@
                             </div>
                         </div>
                         <!--End Modal-->
+
                         <a href="{% url 'warrantys:update' warranty.pk  %}"><i class="fas fa-edit text-info"></i></a>
                     </td>
                     {% endif %}

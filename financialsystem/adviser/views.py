@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.views.generic.list import ListView
@@ -11,6 +12,7 @@ from braces.views import GroupRequiredMixin
 from credit.utils import refresh_condition
 from .models import Adviser, Comission
 from .utils import commission_properties
+from .forms import PorcentageUpdate
 from cashregister.models import CashRegister, Movement
 
 # Create your views here.
@@ -67,6 +69,8 @@ def pay_commission(request, pk):
         return redirect('advisers:detail', pk=commission.adviser.id)
 
     commission.is_paid = True
+    porcentage = request.POST.get('porcentage')
+    commission._last_interest = Decimal(porcentage)
     commission.save()
     create_movement(commission)
 
@@ -83,7 +87,6 @@ class AdviserDeleteView(DeleteView):
 
 
 def create_movement(commission):
-    refresh_condition()
     Movement.objects.create(
             user = commission.adviser,
             amount = commission.amount,
