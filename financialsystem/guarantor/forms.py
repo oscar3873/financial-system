@@ -54,9 +54,7 @@ class GuarantorForm(forms.ModelForm):
         fields = "__all__"
         exclude = ["credit"]
     
-    #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        # print(kwargs)
         super().__init__(*args, **kwargs)
         for field_name in self.fields:
             field = self.fields.get(field_name)
@@ -66,8 +64,6 @@ class GuarantorForm(forms.ModelForm):
         for field in self.fields.values():
             field.required = False    
         
-        self.helper = FormHelper
-    #VALIDACION DEL DNI CAPTURA EL ERROR MOSTRANDO UN MENSAJE
 
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO
 #------------------------------------------------------------------
@@ -93,6 +89,9 @@ class PhoneNumberFormGuarantor(forms.ModelForm):
         fields = ('phone_number_g', 'phone_type_g')
     
     def clean_phone_number_g(self):
+        """
+        Validacion de numero de telefono.
+        """
         phone_number_g = self.cleaned_data.get('phone_number_g')
         if phone_number_g is None or phone_number_g == '':
             return None

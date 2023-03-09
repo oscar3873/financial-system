@@ -5,6 +5,9 @@ from .models import Guarantor
 
 
 class ListingFilter(django_filters.FilterSet):
+    """
+    Filtrador Garante.
+    """
     dni = filters.CharFilter(label="DNI", lookup_expr="exact")
     client = filters.CharFilter(label="Cliente")
     created_at = filters.DateFromToRangeFilter(

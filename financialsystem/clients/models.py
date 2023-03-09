@@ -41,6 +41,9 @@ class Client(models.Model):
     
 
     def set_score_label(self):
+        """
+        Coloca el 'label' del campo score correspondiente.
+        """
         if self.score <= 200:
             self.score_label = 'Riesgoso'
         elif self.score <= 400:

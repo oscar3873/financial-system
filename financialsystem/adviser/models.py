@@ -59,15 +59,19 @@ class Comission(models.Model):
 
 #-------------------------- SEÑALES PARA COMMISSION --------------------------------------
 def update_commission(instance, *args, **kwargs):
+    '''Actualiza la comisión de una instancia si ha sido pagada. 
+    Calcula el valor real de la comisión basado en la última tasa de interés almacenada. 
+    Actualiza el monto y la tasa de interés de la instancia, y el tiempo de última actualización.'''
+
     if instance.is_paid:
         match (float(instance._last_interest)):
             case 7.5: porcentage = instance._last_interest
             case 5: porcentage = instance._last_interest
             case _: porcentage = instance._last_interest
 
-        real_value = Decimal((instance.amount*100)/instance.interest)
-        print(real_value, instance._last_interest)
-        instance.amount = Decimal(real_value*(instance._last_interest/100))
+        real_value = Decimal((instance.amount*100)/instance.interest)   # Calculo para saber el monto original (el 100%)
+        instance.original_amount = real_value
+        instance.amount = Decimal(real_value*(instance._last_interest/100)) # Monto de la comision
         instance.interest = Decimal(porcentage)
         instance.last_up = datetime.now()
 

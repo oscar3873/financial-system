@@ -30,6 +30,9 @@ from django.utils import timezone
 
 # Create your views here.
 class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
+    '''
+    Vista general de CashRegister, con autenticación de usuario logeado, con filtrado para los campos de Movement.
+    '''
     model = Movement
     second_model = CashRegister 
     form_class = MovementForm
@@ -42,6 +45,9 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de la caja que se encuentran en la base de datos para usarlo en el contexto.
+        """
         refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -95,6 +101,9 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         return context
     
     def form_valid(self, form):
+        """
+        Función que se encarga de guardar el formulario.
+        """
         user = self.request.user
         movement = form.save(commit=False)
         movement.user = user.adviser  # Establecer el usuario actual
@@ -103,31 +112,49 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         return super().form_valid(form)
     
     def form_invalid(self, form):
+        """
+        Muestra la causa por el cual el formulario no es válido.
+        """	
         raise Exception("El formulario no es válido: {}".format(form.errors))
 
     def get_form_kwargs(self):
+        """
+        Función que se encarga de obtener los parámetros del formulario.
+        """
         kwargs = super(CashRegisterListView, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
     
         #DEFINICION DEL TIPO DE FILTRO ULTILIZADO
     def get_queryset(self):
+        """
+        Retorna un queryset de objetos que serán utilizados para renderizar la vista.
+        """
         queryset = super().get_queryset()
         self.filterset = self.filter_class(self.request.GET, queryset=queryset)
         return self.filterset.qs.order_by(*self.ordering)
     
     def get_success_url(self) -> str:
+        """
+        Método que redirige al usuario a la página de inicio después de crear un nuevo movimiento.
+        """
         return reverse_lazy('cashregister:home')
 
 #LISTA DE MOVIMIENTOS
 #----------------------------------------------------------------
 class MovementListView(LoginRequiredMixin, ListView, MovementTable):
+    """
+    Vista basada en clase para mostrar una lista de movimientos de caja.
+    """
     model = Movement
     template_name = "cashregister/movement_list.html"
     paginate_by = 20
     ordering = ['-created_at']
     
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los movimientos que se encuentran en la base de datos para usarlo en el contexto.
+        """
         refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -144,6 +171,9 @@ class MovementListView(LoginRequiredMixin, ListView, MovementTable):
     
     #DEFINICION DEL TIPO DE FILTRO ULTILIZADO
     def get_queryset(self):
+        """
+        Devuelve el conjunto de consultas para la lista de movimientos.
+        """
         queryset = super().get_queryset()
         if "user" in self.request.GET and len(self.request.GET) == 1:
             return UserFilter(self.request.GET, queryset=queryset).qs
@@ -158,38 +188,64 @@ class MovementListView(LoginRequiredMixin, ListView, MovementTable):
 
 
 class MovementDetailView(LoginRequiredMixin, DetailView):
+    """
+    Vista de detalle de un objeto de Movimiento.
+    """
     model = Movement
     template_name = 'cashregister/movement_detail.html'
     
+    # Se especifica la URL de inicio de sesión y el campo de redirección
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
     def get_object(self):
-        refresh_condition()
+        """
+        Obtiene el objeto Movimiento correspondiente al ID dado.
+        """
+        refresh_condition()  # Actualiza las condiciones de la aplicación
         return get_object_or_404(Movement, id=self.kwargs['pk'])
+
 
 #BORRADO DE UN MOVIMIENTO
 #------------------------------------------------------------------
 class MovementDeleteView(DeleteView):
+    """
+    Clase para eliminar un objeto Movement de la base de datos.
+    """
     model = Movement
     
     def get_success_url(self) -> str:
+        """
+        Obtiene la URL de redirección después de que se ha eliminado correctamente un objeto Movement.
+        Agrega un mensaje de éxito a la cola de mensajes.
+        """
         messages.success(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()), "danger")
-        return  reverse_lazy('cashregister:list')
+        return reverse_lazy('cashregister:list')
+
 
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
 class MovementUpdateView(UpdateView):
+    """
+    Clase para actualizar un objeto Movement de la base de datos.
+    """
     model = Movement
     form_class = MovementUpdateForm
     template_name_suffix = '_update_form'
     
     def get_form_kwargs(self):
+        """
+        Función que se encarga de obtener los parámetros del formulario.
+        """
         refresh_condition()
         kwargs = super(MovementUpdateView, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
     
     def get_success_url(self) -> str:
+        """
+        Obtiene la URL de redirección después de que se ha actualizado correctamente un objeto Movement.
+        Agrega un mensaje de éxito a la cola de mensajes.
+        """	
         messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
         return  reverse_lazy('cashregister:home')

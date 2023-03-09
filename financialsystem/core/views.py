@@ -19,6 +19,9 @@ class HomePageView(LoginRequiredMixin, TemplateView):
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los modelos necesarios que se encuentran en la base de datos para usarlo en el contexto.
+        """
         refresh_condition()
         context = super().get_context_data(**kwargs)
         Caja = CashRegister.objects.get_or_create()

@@ -45,6 +45,9 @@ class Payment(models.Model):
 
 #--------------------------- SEÑALES PARA PAYMENT -------------------------------------
 def up_installment(instance, *args, **kwargs):
+    """
+    Crea un movimiento luego de guardar el objeto Payment.
+    """
     adviser = instance.adviser
     Movement.objects.create(
         amount = instance.amount,
@@ -57,6 +60,9 @@ def up_installment(instance, *args, **kwargs):
     comission_create_inst(instance)
 
 def comission_create_inst(instance, *args, **kwargs):
+    """
+    Crea un comission luego de guardar el objeto Payment.
+    """
     amount = instance.amount*Decimal(0.05)
 
     if instance.installment:

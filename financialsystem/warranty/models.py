@@ -67,6 +67,9 @@ class Sell(models.Model):
 #--------------------------------------- SEÑALES PARA SELL ------------------------------------------------
 
 def sell_commission(instance, *args, **kwargs):
+    """
+    Crea una comision por venta.
+    """
     if not instance.commission:
         amount = instance.amount*Decimal(0.05)
         instance.commission = Comission.objects.create(

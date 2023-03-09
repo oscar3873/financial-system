@@ -4,6 +4,9 @@ from django.db.models import Q
 from django.forms import TextInput
 
 class ListingFilter(django_filters.FilterSet):
+    """
+    Filtrador de Cliente.
+    """
     dni = django_filters.NumberFilter(
         label="DNI",
         lookup_expr="iexact",

@@ -19,6 +19,9 @@ from payment.forms import PaymentForm
 #CREAR UN CREDITO CON TODOS LOS FORMULARIOS ANIDADOS
 
 def crear_credito(request):
+    """
+    Creacion de un cliente, credito, garante y empeño, con sus respectivos formularios.
+    """
     client_form = ClientForm(request.POST or None)
     guarantor_form = GuarantorForm(request.POST or None)
     warranty_form = WarrantyForm(request.POST or None)
@@ -77,6 +80,9 @@ def crear_credito(request):
 #LISTA DE CREDITOS
 #------------------------------------------------------------------
 class CreditListView(LoginRequiredMixin, ListView):
+    """
+    Lista de creditos.
+    """
     model = Credit
     template_name = 'credits/credit_list.html'
     ordering = ['-id']
@@ -88,6 +94,9 @@ class CreditListView(LoginRequiredMixin, ListView):
 
     
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los creditos de la base de datos para usarlos en el contexto.
+        """
         refresh_condition()
         context = super().get_context_data(**kwargs)
         context["count_credits"] = self.model.objects.all().count()
@@ -96,6 +105,9 @@ class CreditListView(LoginRequiredMixin, ListView):
         return context
     
 class CreditDetailView(DetailView):
+    """
+    Detalle	del credito.
+    """
     model = Credit
     template_name = 'credits/credit_detail.html'
 
@@ -106,10 +118,16 @@ class CreditDetailView(DetailView):
 #ASOCIACION MEDIANTE CREACION DE UN CREDITO
 #------------------------------------------------------------------   
 class AssociateCreateView(CreateView):
+    """
+    Asocia un credito por crear a un cliente ya existente.
+    """
     model = Credit
     form_class = CreditForm
 
     def form_valid(self, form):
+        """
+        Validacion del formulario de credito.
+        """
         refresh_condition()
         if form.is_valid():
             form.instance.mov = create_movement(form.instance, self.request.user.adviser)
@@ -117,6 +135,9 @@ class AssociateCreateView(CreateView):
         return super().form_valid(form)
     
     def get_success_url(self) -> str:
+        """ 
+        Redirecciona al listado de credito, con un mensaje de creacion exitosa.
+        """
         messages.success(self.request, 'Credito creado correctamente', "success")
         return  reverse_lazy('credits:list')
     
@@ -124,16 +145,25 @@ class AssociateCreateView(CreateView):
 #CREACION DE UN CREDITO
 #------------------------------------------------------------------     
 class CreditCreateTo(CreateView):
+    """
+    Creacion de un credito para un cliente a buscar.
+    """	
     model = Credit
     form_class = CreditForm
     template_name = 'credit/credit_form.html'
 
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
+        """
         context = super().get_context_data(**kwargs)
         context['client'] = Client.objects.all()
         return context
 
     def form_valid(self, form):
+        """
+        Validacion de formulario de credito.
+        """
         self.client = get_object_or_404(Client, pk=self.kwargs['pk'])
         if form.is_valid():
             credit = form.save(commit=False)
@@ -143,36 +173,57 @@ class CreditCreateTo(CreateView):
         return super().form_valid(form)
     
     def get_success_url(self) -> str:
+        """
+        Redirecciona al listado de credito, con un mensaje de creacion exitosa.
+        """
         messages.success(self.request, 'Credito creado correctamente', "success")
         return  reverse_lazy('clients:detail', kwargs=self.kwargs)
     
 
 #------------------------------------------------------------------     
 class CreditUpdateView(UpdateView):
+    """
+    Actualizacion de credito.
+    """
     model = Credit
     form_class = CreditForm
 
     def form_valid(self, form):
+        """
+        Validacion de formulario.
+        """
         if form.is_valid():
             form.instance.mov.amount = form.instance.amount
             form.instance.mov.save()
         return super().form_valid(form)
     
     def get_success_url(self) -> str:
+        """
+        Redirecciona al listado de credito, con un mensaje de creacion exitosa.
+        """
         messages.success(self.request, 'Credito actualizado correctamente', "success")
         return  reverse_lazy('credits:list')
     
 #------------------------------------------------------------------     
 class CreditDeleteView(DeleteView):
+    """
+    Borrado de credito.
+    """	
     model = Credit
     
     def get_success_url(self) -> str:
+        """
+        Redirecciona al listado de credito, con un mensaje de creacion exitosa.
+        """
         messages.success(self.request, 'Credito borrado correctamente', "danger")
         return  reverse_lazy('credits:list')
     
 
 #------------------------------------------------------------------   
 def refinance_installment (request, pk):
+    """
+    Refiancia cuotas y actualiza sus estados.
+    """
     refresh_condition()
     credit = get_object_or_404(Credit, id = pk)
     form = RefinancingForm(credit, request.POST or None)
@@ -193,10 +244,16 @@ def refinance_installment (request, pk):
         
 #----------------------------------------------------------------
 class RefinancingDetailView(DetailView):
+    """
+    Detalle del refinanciacion.
+    """
     model = Installment
     template_name = 'refinance/refinance_detail.html'
 
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los refinanciamientos de la base de datos para usarlos en el contexto y poder pagarlos con PaymentsForm.
+        """
         refresh_condition()
         refinance = self.get_object().refinance
         refinance_installments_available = refinance.installments.exclude(condition__in=['Pagada'])

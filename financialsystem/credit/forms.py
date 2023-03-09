@@ -73,6 +73,9 @@ class RefinancingForm(forms.ModelForm):
 
 
     def __init__(self,credit,*args, **kwargs):
+        """
+        Formulario de Refinanciacion. Mediante 'checkboxs', selecciona cuotas a refiannciar.
+        """
         super().__init__(*args, **kwargs)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
         for installment in installments:

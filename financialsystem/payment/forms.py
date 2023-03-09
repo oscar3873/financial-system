@@ -40,6 +40,9 @@ class PaymentForm(forms.ModelForm):
         fields = ["amount", "payment_date", "payment_method"]
     
     def __init__(self,installments,*args, **kwargs):
+        """
+        Formulario de Pagos. Mediante 'checkboxs', selecciona cuotas a pagar.
+        """
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.prefix = "payment"
         if installments.count() > 0:

@@ -131,6 +131,9 @@ class InstallmentRefinancing(models.Model):
 
 #-------------------- SEÑALES PARA CREDITOS Y CUOTAS --------------------
 def repayment_amount_auto(instance, *args, **kwargs):
+        """
+        Calcula el monto de devolver del Credito.
+        """
         credit = instance
         if credit.condition not in ['Pagado', 'Vencido']:
             credit.end_date = (timedelta(days=30)*credit.installment_num) + credit.start_date
@@ -139,9 +142,12 @@ def repayment_amount_auto(instance, *args, **kwargs):
 
 
 def create_installments_auto(instance, created, *args, **kwargs):
-    if not instance.is_old_credit:
+    """
+    Crea las cuotas del credito
+    """
+    if not instance.is_old_credit: 
         if not created and instance.condition != 'Pagada':
-            instance.installments.all().delete()
+            instance.installments.all().delete() # Actualizacion de credito (crea nuevas cuotas en base los nuevos datos del credito, borrando las cuotas anteriores)
         credit = instance
         days = 30
         amount_installment = Decimal(credit.credit_repayment_amount/credit.installment_num)
@@ -165,6 +171,9 @@ post_save.connect(create_installments_auto, sender= Credit)
 
 #-------------------- SEÑALES PARA REFINANCIACION Y CUOTAS --------------------
 def refinancing_repayment_amount_auto(instance, *args, **kwargs):
+    """
+    Calcula el monto de devolver de la Refinanciacion.
+    """
     refinancing = instance
 
     match (int(refinancing.installment_num_refinancing)):
@@ -181,6 +190,9 @@ def refinancing_repayment_amount_auto(instance, *args, **kwargs):
 
 
 def create_installmentsR_auto(instance, created, *args, **kwargs):
+    """
+    Crea cuotas de Refinanciacion.
+    """
     if created:
         refinancing = instance
         days = 30

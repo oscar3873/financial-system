@@ -20,12 +20,18 @@ from .forms import PaymentForm
 
 # Create your views here.
 class PaymentListView(LoginRequiredMixin, ListView):
+    """
+    Lista de pagos.
+    """
     model = Payment
     template_name = "payment/payment_list.html"
     paginate_by = 6
     ordering = ['-created_at']
     
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los pagos que se encuentran en la base de datos para usarlo en el contexto.
+        """
         refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -40,26 +46,42 @@ class PaymentListView(LoginRequiredMixin, ListView):
 #BORRADO DE UNA NOTA
 #------------------------------------------------------------------
 class PaymentDeleteView(DeleteView):
+    """
+    Borrado de un pago.
+    """
     model = Payment
     
     def get_success_url(self) -> str:
-        messages.success(self.request, 'Nota eliminada correctamente', "danger")
+        """
+        Obtiene la URL de redirección después de que se ha eliminado correctamente.
+        Agrega un mensaje de éxito a la cola de mensajes.
+        """
+        messages.success(self.request, 'Nota borrada correctamente', "danger")
         return  reverse_lazy('payments:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
 class PaymentUpdateView(UpdateView):
+    """
+    Actualización de un pago.
+    """	
     model = Payment
     form_class = PaymentForm
     template_name_suffix = '_update_form'
     
     def get_form_kwargs(self):
-        
+        """
+        Función que se encarga de obtener los parámetros del formulario.
+        """
         kwargs = super(PaymentUpdateView, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
     
     def get_success_url(self) -> str:
+        """
+        Obtiene la URL de redirección después de que se ha eliminado correctamente.
+        Agrega un mensaje de éxito a la cola de mensajes.
+        """
         messages.success(self.request, 'Nota actualizada satisfactoriamente', "info")
         return  reverse_lazy('payments:list')
     
@@ -67,6 +89,9 @@ class PaymentUpdateView(UpdateView):
 #------------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
 def make_payment_installment(request, pk):
+    """
+    Metodo para realizar pagos de cuotas normales y refinanciadas.
+    """
     refresh_condition()
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)

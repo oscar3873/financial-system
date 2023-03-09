@@ -61,6 +61,9 @@ class ClientForm(forms.ModelForm):
         exclude = ["adviser"]
 
     def clean(self):
+        """
+        Validar que todos los campos estén requeridos
+        """	
         cleaned_data = super().clean()
         fields_to_validate = ['first_name', 'last_name', 'address', 'job_address']
         
@@ -72,6 +75,9 @@ class ClientForm(forms.ModelForm):
         return cleaned_data
     
     def clean_dni(self):
+        """
+        Validar que el DNI sea válido
+        """
         dni = self.cleaned_data.get('dni')
         if len(str(dni)) < 7 or  len(str(dni)) >= 15:
             raise forms.ValidationError("El DNI debe contener como minimo 7 y maximo 15 caracteres")
@@ -84,6 +90,9 @@ class ClientForm(forms.ModelForm):
         return dni
     
     def clean_email(self):
+        """
+        Validar que el correo electrónico sea válido
+        """
         email = self.cleaned_data.get('email')
         # Validar formato de correo electrónico
         if not self.instance.pk:
@@ -99,7 +108,6 @@ class ClientForm(forms.ModelForm):
         return email
 
     def __init__(self, *args, **kwargs):
-        self.is_update = kwargs.pop('is_update', False)
         super(ClientForm, self).__init__(*args, **kwargs)
         for field_name in self.fields:
             field = self.fields.get(field_name)
@@ -131,6 +139,9 @@ class PhoneNumberFormClient(forms.ModelForm):
         fields = ('phone_number_c', 'phone_type_c')
     
     def clean_phone_number_c(self):
+        """
+        Validar que el número de teléfono sea válido
+        """	
         phone_number_c = self.cleaned_data.get('phone_number_c')
         if phone_number_c is None or phone_number_c == '':
             return None

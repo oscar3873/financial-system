@@ -35,6 +35,9 @@ from payment.forms import PaymentForm
 #LISTA DE CLIENTES
 #------------------------------------------------------------------
 class ClientListView(LoginRequiredMixin, ListView):
+    """
+    Lista de clientes con autenticacion de logeo.
+    """
     model = Client
     template_name = 'clients/client_list.html'
     ordering = ['-created_at']
@@ -45,6 +48,9 @@ class ClientListView(LoginRequiredMixin, ListView):
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
+        """
         refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -78,22 +84,34 @@ class ClientListView(LoginRequiredMixin, ListView):
         return context
     
     def get_queryset(self):
+        """
+        Función que se encarga de obtener los parámetros del formulario.
+        """
         queryset = super().get_queryset()
         self.filterset = self.filter_class(self.request.GET, queryset=queryset)
         return self.filterset.qs.order_by(*self.ordering)
     
     def get_success_url(self) -> str:
+        """
+        Función que se encarga de devolver la URL de la vista actual.
+        """
         return reverse_lazy('clients:list')
     
 
 #ACTUALIZACION DE UN CLIENTE
 #-----------------------------------------------------------------
 class ClientUpdateView(UpdateView):
+    """
+    Actualiza el client y sus telefonos.
+    """
     model = Client
     form_class = ClientForm
     template_name_suffix = '_update'
 
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los clientes (telefonos) que se encuentran en la base de datos para usarlo en el contexto.
+        """
         context = super().get_context_data(**kwargs)
         if self.request.POST:
             context['phone_formset'] = PhoneNumberFormSet(self.request.POST, instance=self.object)
@@ -102,10 +120,16 @@ class ClientUpdateView(UpdateView):
         return context
 
     def form_invalid(self, form):
+        """
+        Muestra un error en caso de formulario invalido.
+        """
         print("Esto re invalido amigoooo", form.errors)
         return super().form_invalid(form)
     
     def form_valid(self, form):
+        """
+        Actualiza el cliente y sus telefonos.
+        """
         print("Estoy aca amigo")
         response = super().form_valid(form)
         phone_formset = PhoneNumberFormSet(self.request.POST, instance=self.object)
@@ -114,12 +138,19 @@ class ClientUpdateView(UpdateView):
         return response
 
     def get_success_url(self) -> str:
+        """
+        Obtiene la URL de redirección después de que se ha actualizado correctamente.
+        Agrega un mensaje de éxito a la cola de mensajes.
+        """	
         messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
         return reverse_lazy('clients:list')
     
 #BORRADO DE NUMEROS DE UN CLIENTE
 #------------------------------------------------------------------
 def delete_phone_number(request, pk):
+    """
+    Borra un número de telefono de un cliente.
+    """	
     try:
         phone_number = PhoneNumberClient.objects.get(id=pk)
     except PhoneNumberClient.DoesNotExist:
@@ -130,37 +161,56 @@ def delete_phone_number(request, pk):
 #BORRADO DE UN CLIENTE
 #------------------------------------------------------------------
 class ClientDelete(DeleteView):
+    """
+    Borra un cliente.
+    """
     model = Client
     
     def get_success_url(self) -> str:
+        """
+        Obtiene la URL de redirección después de que se ha borrado correctamente.
+        Agrega un mensaje de éxito a la cola de mensajes.
+        """	
         messages.success(self.request, 'Cliente eliminado correctamente', "danger")
         return  reverse_lazy('clients:list')
 
 #CONSULTA
 #------------------------------------------------------------------
 class QueryView(ListView):
+    """
+    Consulta de clientes.
+    """
     model = Client
     template_name = 'core/home.html'
     
     def get(self, request, *args, **kwargs):
-        found = self.request.GET.get("search")
-        if found != None and found != '':
-            try: 
-                search = self.model.objects.get(dni=found)
-                return redirect('clients:detail', pk=search.pk)
-            except :
-                messages.error(request, "Cliente no encontrado")
+        """
+        Obtiene el numero DNI ingresado en el search e intenta matchear.
+        """
+        dni = self.request.GET.get("search")
+        try: 
+            search = self.model.objects.get(dni=dni)
+            return redirect('clients:detail', pk=search.pk) # redirecciona al detalle del cliente en caso de encontrarlo
+        except :
+            messages.error(request, "Cliente no encontrado")
                 
         return super().get(request, *args, **kwargs)
 
 #DETALLE DE CLIENTE
 #------------------------------------------------------------------
 class ClientDetailView(DetailView):
+    """
+    Detalle de un cliente.
+    """
     model = Client
     template_name = 'clients/client_detail.html'
     
 
     def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
+        Con Formularios de Pago y Refianciacion para realizar las respectivas actividades dentro del msimo template.
+        """
         refresh_condition()
         context = super().get_context_data(**kwargs)
 
@@ -186,5 +236,8 @@ class ClientDetailView(DetailView):
         return context
 
     def get_object(self):
+        """
+        Función que se encarga de obtener el cliente.
+        """	
         return get_object_or_404(Client, id=self.kwargs['pk'])
     
