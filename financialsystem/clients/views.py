@@ -17,7 +17,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 
 from django.urls import reverse_lazy
 #FORMS
-from .forms import ClientForm, PhoneNumberFormSet, PhoneNumberFormSetUpdate
+from .forms import ClientForm, PhoneNumberFormSetUpdate
 from guarantor.forms import GuarantorForm
 #MODEL
 from .models import Client, PhoneNumberClient
@@ -168,6 +168,7 @@ class ClientDetailView(LoginRequiredMixin, DetailView):
     redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
+        # Obtener el contexto de la vista superior (DetailView)
         context = super().get_context_data(**kwargs)
 
         credit_active = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()

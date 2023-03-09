@@ -1,6 +1,6 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
 <!--Main-->
-<link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
+<link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet">
 <main class="container my-4">
     <!--Seccion 1-->
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">{{client.first_name}} {{client.last_name}}</h4>
@@ -11,60 +11,104 @@
     </div>
     {% endfor %} {% endif %}
     <section>
-        <div class="row mt-4">
-            <div class="col-xl-3 col-sm-6 col-12 p-3">
-                <div class="card">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="align-self-center">
-                                    <i class="fa-sharp fa-solid fa-credit-card text-warning icon-lg"></i>
+        <div class="row justify-content-center">
+            <div class="col-xl-3 col-sm-3 col-12 p-3">
+                <!-- Swiper -->
+                <div class="swiper SwiperCards">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <div class="card bg-primary box-shadow text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-trophy text-warning"></i>&nbsp;Score</h5>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="text-warning font-weight-bold">{{client.score_label}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row justify-content-around align-items-center">
+                                        {% if client.score_label == "Exelente" or client.score_label == "Muy Bueno" %}
+                                        <div class="led-success"></div>
+                                        {% elif client.score_label == "Bueno" %}
+                                        <div class="led-warning"></div>
+                                        {% else %}
+                                        <div class="led-danger"></div>
+                                        {% endif %}
+
+                                        <span class="text-white" style="font-size: 2rem">{{client.score}}</span>
+                                    </div>
                                 </div>
-                                <div class="media-body text-right">
-                                    <h5>{{client.score}}</h5>
-                                    <h5>Score</h5>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="card bg-primary box-shadow text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-trophy text-warning"></i>&nbsp;Score</h5>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <p class="text-warning font-weight-bold">{{client.score_label}}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row justify-content-around align-items-center">
+                                        {% if client.score_label == "Exelente" or client.score_label == "Muy Bueno" %}
+                                        <div class="led-success"></div>
+                                        {% elif client.score_label == "Bueno" %}
+                                        <div class="led-warning"></div>
+                                        {% else %}
+                                        <div class="led-danger"></div>
+                                        {% endif %}
+
+                                        <span class="text-white" style="font-size: 2rem">{{client.score}}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
+                    <div class="swiper-pagination"></div>
                 </div>
             </div>
             <div class="col-xl-5 col-sm-6 col-12 p-3">
-                <div class="card">
-                    <h5 class="title pt-3 text-center">Datos Personales</h5>
-                    <div class="d-flex justify-content-around">
-                        <div class="px-2">
-                            <p>Domicilio: <strong>{{client.address}}</strong></p>
-                            <p>Estado civil: <strong>{{client.get_civil_status_display}}</strong></p>
-                            <p>Profesion: <strong>{{client.profession}}</strong></p>
+                <!-- Swiper -->
+                <div class="swiper SwiperData">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" style="height: auto;">
+                            <div class="card bg-primary text-white">
+                                <h5 class="title pt-3 text-center"><i class="fas fa-id-card text-warning"></i> Datos Personales</h5>
+                                <div class="d-flex justify-content-around">
+                                    <div class="px-2">
+                                        <p><span>Domicilio: </span><strong class="text-warning">{{client.address}}</strong></p>
+                                        <p><span>Estado civil: </span><strong class="text-warning">{{client.get_civil_status_display}}</strong></p>
+                                        <p><span>Profesion: </span><strong class="text-warning">{{client.profession}}</strong></p>
+                                    </div>
+                                    <div>
+                                        <p><span>DNI: </span><strong class="text-warning">{{client.dni}}</strong></p>
+                                        <p><span>Domicilio Laboral: </span><strong class="text-warning">{{client.job_address}}</strong></p>
+                                        <p><span>Correo: </span><strong class="text-warning">{{client.email}}</strong></p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p>DNI: <strong>{{client.dni}}</strong></p>
-                            <p>Domicilio Laboral: <strong>{{client.job_address}}</strong></p>
+                        <div class="swiper-slide" style="height: auto;">
+                            <div class="card bg-primary text-white">
+                                <h5 class="title pt-3 text-center"><i class="fas fa-id-card text-warning"></i> Datos Personales</h5>
+                                <div class="d-flex justify-content-around">
+                                    <div class="px-2">
+                                        <p><span>Domicilio: </span><strong class="text-warning">{{client.address}}</strong></p>
+                                        <p><span>Estado civil: </span><strong class="text-warning">{{client.get_civil_status_display}}</strong></p>
+                                        <p><span>Profesion: </span><strong class="text-warning">{{client.profession}}</strong></p>
+                                    </div>
+                                    <div>
+                                        <p><span>DNI: </span><strong class="text-warning">{{client.dni}}</strong></p>
+                                        <p><span>Domicilio Laboral: </span><strong class="text-warning">{{client.job_address}}</strong></p>
+                                        <p><span>Correo: </span><strong class="text-warning">{{client.email}}</strong></p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <p class="px-4">Correo: <strong>{{client.email}}</strong></p>
-                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
+                    <div class="swiper-pagination"></div>
                 </div>
             </div>
             <div class="col-xl-4 col-sm-6 col-12 p-3">
-                <div class="card">
-                    <h5 class="title pt-3 text-center">Datos Garante</h5>
-                    <div class="d-flex justify-content-around">
-                        <div class="px-2">
-                            <p>Domicilio: <strong>{{client.address}}</strong></p>
-                            <p>Estado civil: <strong>{{client.get_civil_status_display}}</strong></p>
-                            <p>Profesion: <strong>{{client.profession}}</strong></p>
-                        </div>
-                        <div class="px-1">
-                            <p>DNI: <strong>{{client.dni}}</strong></p>
-                            <p>Domicilio Laboral: <strong>{{client.job_address}}</strong></p>
-                        </div>
-                    </div>
-                    <p class="px-2">Correo: <strong>{{client.email}}</strong></p>
-                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
-                </div>
             </div>
         </div>
         <div class="row mb-4">
@@ -197,7 +241,58 @@
 
     </section>
 </main>
+<script type="module">
+    import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.esm.browser.min.js';
+</script>
 
+<!--Swipper DataClient-->
+<script>
+    var swiper = new Swiper(".SwiperData", {
+        effect: 'flip',
+        flipEffect: {
+            slideShadows: false,
+        },
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: "auto",
+        coverflowEffect: {
+            rotate: 50,
+            stretch: 0,
+            depth: 100,
+            modifier: 1,
+            slideShadows: true,
+        },
+        autoplay: {
+            delay: 2100,
+            disableOnInteraction: false,
+        },
+    });
+</script>
+</script>
+<!--Swipper StateClient-->
+<script>
+    var swiper = new Swiper(".SwiperCards", {
+        effect: "coverflow",
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: "auto",
+        coverflowEffect: {
+            rotate: 50,
+            stretch: 0,
+            depth: 100,
+            modifier: 1,
+            slideShadows: true,
+        },
+        autoplay: {
+            delay: 2500,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            type: 'bullets',
+        },
+    });
+</script>
 
 <script>
     const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref"]');
@@ -238,5 +333,27 @@
     });
 
     selector.addEventListener('change', calcularSuma);
+</script>
+<script>
+    const ledSuccess = document.querySelector('.led-success');
+    const ledDanger = document.querySelector('.led-danger');
+    const ledWarning = document.querySelector('.led-warning');
+    let led;
+
+    if (ledSuccess != null) {
+        led = ledSuccess
+    } else if (ledDanger != null) {
+        led = ledDanger
+    } else {
+        led = ledWarning
+    }
+
+    function blink(led) {
+        led.classList.toggle('blink');
+    }
+
+    setInterval(() => {
+        blink(led);
+    }, 1500);
 </script>
 {% endblock content %}
