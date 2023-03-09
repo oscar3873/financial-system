@@ -96,6 +96,7 @@ def comission_create(instance, adviser, detail):
         adviser = adviser,
         interest = Decimal(7.5),
         amount = amount,
+        original_amount = instance.amount,
         type = 'REGISTRO',
         last_up = instance.start_date,
         detail = detail,

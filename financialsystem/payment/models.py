@@ -69,6 +69,7 @@ def comission_create_inst(instance, *args, **kwargs):
         amount = amount,
         interest = Decimal(5),
         type = 'COBRO',
+        original_amount = instance.amount,
         last_up = instance.payment_date,
         money_type = instance.payment_method,
         detail= detail,

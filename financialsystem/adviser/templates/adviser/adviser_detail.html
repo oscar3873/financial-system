@@ -38,13 +38,16 @@
                                     <strong>{{ commission.adviser }} </strong>?
 
                                     <div>
-                                        <p><strong>Monto : ${{ commission.amount }} </strong></p>
+                                        <p><strong>Monto : ${{ commission.amount }} ({{commission.interest}}% de {{commission.original_amount}})</strong></p>
 
                                         <p><strong>Tipo: {{ commission.type }} </strong></p>
 
                                         <p><strong>Detalle: {{ commission.detail }} </strong></p>
 
-                                        <p><strong>Interes: <input name="porcentage" placeholder="{{commission.interest}}">% </strong></p>
+                                        <p><strong>Interes: <input type="number" id="porcentage{{commission.id}}" placeholder="{{commission.interest}}" oninput="calculateResult('{{ commission.amount }}','{{ commission.interest }}','{{ commission.id }}')" >
+                                            <p id="result{{commission.id}}"></p>
+                                            </strong>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -62,4 +65,24 @@
         {% endfor %}
     </tbody>
 </table>
-{% endif %} {% endblock content %}
+{% endif %}
+<script>
+   function calculateResult(amount, interest, id) {
+        var porcentage = document.querySelector(`#porcentage${id}`).value;
+        porcentage = porcentage.replace(",", ".");
+
+        if (isNaN(parseFloat(porcentage))) {
+            var resultadoElem = document.getElementById(`result${id}`);
+            resultadoElem.innerHTML = "Calculando...";
+            return;
+        }
+
+        porcentage = parseFloat(porcentage);
+
+        let total_amount = parseFloat(amount)*(porcentage/100);
+
+        var resultadoElem = document.getElementById(`result${id}`);
+        resultadoElem.innerHTML = ("Total: $" + total_amount.toFixed(2));
+    }
+    </script>
+ {% endblock content %}

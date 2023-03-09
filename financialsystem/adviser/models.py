@@ -46,6 +46,7 @@ class Comission(models.Model):
     adviser = models.ForeignKey(Adviser,on_delete=models.SET_NULL,null=True)
     interest = models.DecimalField(null=True, decimal_places=2, max_digits=6)
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=20)
+    original_amount = models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True) 
     type = models.CharField(max_length=20, null=True,choices=REG)
     money_type = models.CharField(max_length=20 , null=True, choices=MONEY_TYPE, default= MONEY_TYPE[0])
     last_up = models.DateTimeField(default=datetime.now)

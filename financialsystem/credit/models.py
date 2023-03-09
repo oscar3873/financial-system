@@ -137,6 +137,7 @@ def repayment_amount_auto(instance, *args, **kwargs):
             repayment_amount = credit.installment_num*(Decimal(credit.credit_interest/100)*credit.amount)/(1-pow((1+Decimal(credit.credit_interest/100)),(- credit.installment_num)))
             credit.credit_repayment_amount = Decimal(repayment_amount)
 
+
 def create_installments_auto(instance, created, *args, **kwargs):
     if not instance.is_old_credit:
         if not created and instance.condition != 'Pagada':
@@ -157,6 +158,7 @@ def create_installments_auto(instance, created, *args, **kwargs):
                 )
             days += 30
 
+
 pre_save.connect(repayment_amount_auto, sender= Credit)
 post_save.connect(create_installments_auto, sender= Credit)
 
@@ -171,10 +173,11 @@ def refinancing_repayment_amount_auto(instance, *args, **kwargs):
         case 9: refinancing.interest = 75
         case _: refinancing.interest = 100
 
-    interests_amount = Decimal(float(refinancing.amount) * (float(refinancing.interest) / 100 + 1))
-    repayment_amount = refinancing.amount + interests_amount
-    refinancing.end_date = datetime.now() + timedelta(days=30)*refinancing.installment_num_refinancing
+    
+    repayment_amount = refinancing.amount
     refinancing.refinancing_repayment_amount = Decimal(repayment_amount)
+    refinancing.amount = Decimal(refinancing.amount / Decimal(1 + float(refinancing.interest) / 100))
+    refinancing.end_date = datetime.now() + timedelta(days=30)*refinancing.installment_num_refinancing
 
 
 def create_installmentsR_auto(instance, created, *args, **kwargs):

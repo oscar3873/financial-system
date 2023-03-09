@@ -274,7 +274,7 @@
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', calcularSuma);
     });
-
+    
     if (`{{ amount_installment|default_if_none:False }}`) {
         selector.addEventListener('change', calcularSuma);
         }
