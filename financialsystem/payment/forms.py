@@ -47,14 +47,17 @@ class PaymentForm(forms.ModelForm):
         self.prefix = "payment"
         if installments.count() > 0:
             for installment in installments:
+                daily_interests = ' (con interés {})'.format(installment.daily_interests) if installment.daily_interests > 0 else ''
+
                 attrs = {"value": installment.amount + installment.daily_interests, "data-form-id":"form_payment"}
+                
                 if installment == installments.first():
-                    self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
-                        label='Cuota %s' % (installment.installment_number),required=True,
+                    self.fields['Cuota %s %s' % (str(installment.installment_number), daily_interests)] = forms.BooleanField(
+                        label='Cuota %s %s' % (str(installment.installment_number), daily_interests),required=True,
                         widget=forms.CheckboxInput(attrs=attrs)
                     )
                 else:
-                    self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
-                        label='Cuota %s' % (installment.installment_number),required=False,
+                    self.fields['Cuota %s %s' % (str(installment.installment_number), daily_interests)] = forms.BooleanField(
+                        label='Cuota %s %s' % (str(installment.installment_number), daily_interests),required=False,
                         widget=forms.CheckboxInput(attrs=attrs)
                     )

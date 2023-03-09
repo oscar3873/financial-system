@@ -105,7 +105,7 @@ def make_payment_installment(request, pk):
     form = PaymentForm(installments, request.POST or None)
     if request.method == 'POST' and form.is_valid():
         installment_ = list(installments.all())
-        checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota') and value}
+        checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
         pack = dict(zip(installment_, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
 

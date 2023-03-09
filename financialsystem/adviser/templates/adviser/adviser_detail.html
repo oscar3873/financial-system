@@ -44,7 +44,7 @@
 
                                         <p><strong>Detalle: {{ commission.detail }} </strong></p>
 
-                                        <p><strong>Interes: <input type="number" id="porcentage{{commission.id}}" placeholder="{{commission.interest}}" oninput="calculateResult('{{ commission.amount }}','{{ commission.interest }}','{{ commission.id }}')" >
+                                        <p><strong>Interes: <input name="porcentage" type="number" id="porcentage{{commission.id}}" placeholder="{{commission.interest}}" oninput="calculateResult('{{ commission.amount }}','{{ commission.interest }}','{{ commission.id }}')" >1
                                             <p id="result{{commission.id}}"></p>
                                             </strong>
                                         </p>

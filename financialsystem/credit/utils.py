@@ -40,14 +40,14 @@ def for_refresh(obj_with_vencidas):
 
         installment_ven.is_caduced_installment = True
 
-        if installment_ven.lastup.date() != date.today():
+        if installment_ven.lastup != date.today():
             dates = installment_ven.lastup
         else:
-            dates = installment_ven.end_date
+            dates = installment_ven.end_date.date()
 
-        resto = (date.today() - dates.date()).days
+        resto = abs((date.today() - dates).days)
         client.score -= 5*resto
-        installment_ven.acc_int += resto * installment_ven.amount * Decimal(0.02)
+        installment_ven.daily_interests += resto * installment_ven.amount * Decimal(0.02)
         installment_ven.lastup = datetime.today()
         installment_ven.save()
         client.save()

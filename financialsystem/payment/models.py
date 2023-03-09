@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save, pre_delete
 from django.db import models
 
 from credit.models import Installment, InstallmentRefinancing
@@ -27,6 +27,8 @@ class Payment(models.Model):
     installment_ref = models.OneToOneField(InstallmentRefinancing, on_delete=models.SET_NULL, null=True, blank=True)
     installment = models.OneToOneField(Installment, on_delete=models.SET_NULL, null=True, blank=True)
     adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, null=True, blank=True)
+    commission_to = models.ForeignKey(Comission, on_delete=models.SET_NULL, null=True, blank=True)
+    payment_mov = models.ForeignKey(Movement, on_delete=models.CASCADE, null=True, blank=True)
     payment_method = models.CharField(max_length=20,choices=MONEY_TYPE, help_text="Metodo de Pago")
     detail = models.CharField(max_length=50, null=True, blank=True)
 
@@ -48,15 +50,14 @@ def up_installment(instance, *args, **kwargs):
     """
     Crea un movimiento luego de guardar el objeto Payment.
     """
-    adviser = instance.adviser
-    Movement.objects.create(
-        amount = instance.amount,
-        user = adviser,
-        cashregister = CashRegister.objects.last(),
-        operation_mode = 'INGRESO',
-        description= instance.detail,
-        money_type = instance.payment_method
-        )
+    instance.payment_mov = Movement.objects.create(
+            amount = instance.amount,
+            user = instance.adviser,
+            cashregister = CashRegister.objects.last(),
+            operation_mode = 'INGRESO',
+            description= instance.detail,
+            money_type = instance.payment_method
+            )
     comission_create_inst(instance)
 
 def comission_create_inst(instance, *args, **kwargs):
@@ -70,16 +71,23 @@ def comission_create_inst(instance, *args, **kwargs):
     else:
         detail = f'COBRO CUOTA {instance.installment_ref.installment_number} - CLIENTE {instance.installment_ref.refinancing.installment_ref.last().credit.client} '
 
-    Comission.objects.create(
-        adviser = instance.adviser,
-        amount = amount,
-        interest = Decimal(5),
-        type = 'COBRO',
-        original_amount = instance.amount,
-        last_up = instance.payment_date,
-        money_type = instance.payment_method,
-        detail= detail,
+    instance.commission_to = Comission.objects.create(
+            adviser = instance.adviser,
+            amount = amount,
+            interest = Decimal(5),
+            type = 'COBRO',
+            original_amount = instance.amount,
+            last_up = instance.payment_date,
+            money_type = instance.payment_method,
+            detail= detail,
         )
 
+def delete_mov_commission(instance, *args, **kwargs):
+    """
+    Elimina el movimiento y comision luego antes de borrar el pago.
+    """
+    instance.commission_to.delete()
+    instance.payment_mov.delete()
 
-post_save.connect(up_installment, sender = Payment)
+pre_save.connect(up_installment, sender = Payment)
+pre_delete.connect(delete_mov_commission, sender = Payment)

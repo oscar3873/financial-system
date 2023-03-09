@@ -104,10 +104,11 @@ def pay_commission(request, pk):
         return redirect('advisers:detail', pk=commission.adviser.id)
 
     commission.is_paid = True
-    porcentage = request.POST.get('porcentage')
-    commission._last_interest = Decimal(porcentage) # Agrego un atributo privado para utilizarlo unica vez en la señal de Commission
-    commission.save()
-    create_movement(commission)
+    porcentage_value = request.POST.get('porcentage')
+    print(porcentage_value)
+    commission._last_interest = Decimal(porcentage_value) # Agrego un atributo privado para utilizarlo unica vez en la señal de Commission
+    # commission.save()
+    # create_movement(commission)
 
     messages.success(request, "La comisión se ha pagado exitosamente.")
     return redirect('advisers:detail', pk=commission.adviser.id)
@@ -123,7 +124,7 @@ class AdviserDeleteView(DeleteView):
 
 def create_movement(commission):
     '''Crea un nuevo objeto Movement y lo guarda en la base de datos.'''
-    Movement.objects.create(
+    mov = Movement.objects.create(
             user = commission.adviser,
             amount = commission.amount,
             cashregister = CashRegister.objects.last(),
@@ -131,3 +132,5 @@ def create_movement(commission):
             description = 'COMISION %s - %s' % (commission.adviser, commission.type),
             money_type= commission.money_type
         )
+    commission.id_mov = mov.id
+    commission.save()

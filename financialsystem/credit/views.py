@@ -229,8 +229,9 @@ def refinance_installment (request, pk):
     form = RefinancingForm(credit, request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
-            checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota') and value}
-            pack = dict(zip(Installment.objects.filter(credit=credit,condition__in=['Vencida','A Tiempo']), checkboxs_by_form.values()))
+            installments = Installment.objects.filter(credit=credit, condition__in=['Vencida','A Tiempo'])
+            checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')} # VER
+            pack = dict(zip(installments, checkboxs_by_form.values()))
             
             refinancing = form.save(commit=False)
             refinancing.save()
@@ -245,7 +246,7 @@ def refinance_installment (request, pk):
 #----------------------------------------------------------------
 class RefinancingDetailView(DetailView):
     """
-    Detalle del refinanciacion.
+    Detalle de refinanciacion.
     """
     model = Installment
     template_name = 'refinance/refinance_detail.html'
@@ -257,8 +258,8 @@ class RefinancingDetailView(DetailView):
         refresh_condition()
         refinance = self.get_object().refinance
         refinance_installments_available = refinance.installments.exclude(condition__in=['Pagada'])
-        kwargs = super().get_context_data(**kwargs)
-        kwargs['form_payment'] = PaymentForm(installments=refinance_installments_available.all())
-        kwargs['refinance'] = refinance
-        kwargs["amount_installment"] = refinance.installments.last().amount
-        return kwargs
+        context = super().get_context_data(**kwargs)
+        context['form_payment'] = PaymentForm(installments=refinance_installments_available.all())
+        context['refinance'] = refinance
+        context["amount_installment"] = refinance.installments.last().amount
+        return context

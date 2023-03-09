@@ -43,6 +43,7 @@ class Comission(models.Model):
         ]
 
     is_paid = models.BooleanField(default=False)
+    id_mov = models.UUIDField(null=True, blank=True)
     adviser = models.ForeignKey(Adviser,on_delete=models.SET_NULL,null=True)
     interest = models.DecimalField(null=True, decimal_places=2, max_digits=6)
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=20)
