@@ -236,6 +236,9 @@
                                         </div>
                                     </div>
                                 {% endif %}{% endif %}
+                                <td>
+                                    <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

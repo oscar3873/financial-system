@@ -1,5 +1,48 @@
 {% extends 'core/base.html' %} {% block content %} {% load static %}
 
-{% include 'refinance/refinance_tables.html' %}
+{% with refinance as credit_active %}
+{% include "payment/payment_form.html" %}
+<div class="container"><table class="table table-striped table-hover">
+    <thead class="table-light">
+        <tr>
+            <th scope="col">Cuota</th>
+            <th scope="col">Monto de la cuota</th>
+            <th scope="col">Fecha de vencimiento</th>
+            <th scope="col">Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for installment_ref in refinance.installments.all %}
+        <tr>
+            <td>{{installment_ref.installment_number}}</td>
+            <td>{{installment_ref.amount}}</td>
+            <td>{{installment_ref.end_date|date}}</td>
+            {% if installment_ref.is_paid_installment %}
+            <td>
+                <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
+                    <strong>● Pagada</strong>
+                </div>
+            </td>
+            {% elif installment_ref.is_caduced_installment %}
+                <td>
+                    <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
+                        <strong>● Vencida</strong>
+                    </div>
+                </td>
+            {% else %}
+            <td>
+                <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
+                    <strong>● A Tiempo</strong>
+                </div>
+            </td>
+            {% endif %}
+            <td>
+                <a href="{% url 'credits:installmentRef_update' installment_ref.pk %}"><i class="fas fa-edit"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table></div>
+{% endwith %}
 
 {% endblock content %}

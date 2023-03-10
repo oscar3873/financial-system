@@ -1,16 +1,16 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView, DeleteView, CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
 from .utils import *
 
-from .models import Credit, Installment
+from .models import Credit, Installment, InstallmentRefinancing
 from clients.models import Client
 from guarantor.models import Guarantor
 
-from .forms import CreditForm, RefinancingForm
+from .forms import *
 from guarantor.forms import GuarantorForm, PhoneNumberFormSetG
 from warranty.forms import WarrantyForm
 from clients.forms import ClientForm, PhoneNumberFormSet
@@ -180,29 +180,51 @@ class CreditCreateTo(CreateView):
         return  reverse_lazy('clients:detail', kwargs=self.kwargs)
     
 
-#------------------------------------------------------------------     
-class CreditUpdateView(UpdateView):
-    """
-    Actualizacion de credito.
-    """
-    model = Credit
-    form_class = CreditForm
+#------------------------------------------------------------------   NUEVOOOO
+from django.forms import formset_factory, modelformset_factory
+   
 
-    def form_valid(self, form):
-        """
-        Validacion de formulario.
-        """
-        if form.is_valid():
-            form.instance.mov.amount = form.instance.amount
-            form.instance.mov.save()
-        return super().form_valid(form)
+def edit_credit(request, pk):
+    credit = Credit.objects.get(id=pk)
+    InstallmentFormSet = formset_factory(InstallmentoForm, extra=0)
+    if request.method == 'POST':
+        form = CreditWithInstallmentsForm(request.POST, instance=credit)
+        formset = InstallmentFormSet(request.POST, prefix='installments')
+        if form.is_valid() and formset.is_valid():
+            print('####################################')
+            credit = form.save()
+            for form in formset:
+                installment = form.save(commit=False)
+                installment.credit = credit
+            return redirect('credits:list')
+    else:
+        form = CreditWithInstallmentsForm(instance=credit)
+        formset = InstallmentFormSet(prefix='installments', initial=credit.installments.values())
+    return render(request, 'credit/edit_credit.html', {'form': form, 'formset': formset})
+# 
+#------------------------------------------------------------------   NUEVOOOO
+# class CreditUpdateView(UpdateView):
+#     """
+#     Actualizacion de credito.
+#     """
+#     model = Credit
+#     form_class = CreditForm
+
+#     def form_valid(self, form):
+#         """
+#         Validacion de formulario.
+#         """
+#         if form.is_valid():
+#             form.instance.mov.amount = form.instance.amount
+#             form.instance.mov.save()
+#         return super().form_valid(form)
     
-    def get_success_url(self) -> str:
-        """
-        Redirecciona al listado de credito, con un mensaje de creacion exitosa.
-        """
-        messages.success(self.request, 'Credito actualizado correctamente', "success")
-        return  reverse_lazy('credits:list')
+#     def get_success_url(self) -> str:
+#         """
+#         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
+#         """
+#         messages.success(self.request, 'Credito actualizado correctamente', "success")
+#         return  reverse_lazy('credits:list')
     
 #------------------------------------------------------------------     
 class CreditDeleteView(DeleteView):
@@ -230,16 +252,17 @@ def refinance_installment (request, pk):
     if request.method == 'POST':
         if form.is_valid():
             installments = Installment.objects.filter(credit=credit, condition__in=['Vencida','A Tiempo'])
-            checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')} # VER
+            checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
             pack = dict(zip(installments, checkboxs_by_form.values()))
             
             refinancing = form.save(commit=False)
             refinancing.save()
             for installment in pack.keys():
-                installment.condition = 'Refinanciada'
-                installment.is_refinancing_installment = True
-                installment.refinance = refinancing
-                installment.save()
+                if pack[installment]:
+                    installment.condition = 'Refinanciada'
+                    installment.is_refinancing_installment = True
+                    installment.refinance = refinancing
+                    installment.save()
                 
             return redirect('clients:detail', pk=credit.client.id)
         
@@ -263,3 +286,33 @@ class RefinancingDetailView(DetailView):
         context['refinance'] = refinance
         context["amount_installment"] = refinance.installments.last().amount
         return context
+
+#----------------------------------------------------------------
+class InstallmentRefUpdateView(UpdateView):
+    model = InstallmentRefinancing
+    form_class = InstallmentRefinancingForm
+    template_name = 'installment/installment_ref_update.html'
+    success_url = reverse_lazy('clients:list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['installment_ref'] = self.object
+        print(self.object.id)
+        return context
+    
+    def get_success_url(self):
+        return reverse('credits:refinance_detail', args=[self.object.refinancing.installment_ref.last().pk])
+    
+#----------------------------------------------------------------
+class InstallmentUpdateView(UpdateView):
+    model = Installment
+    form_class = InstallmentUpdateForm
+    template_name = 'installment/installment_update.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['installment'] = self.object
+        return context
+    
+    def get_success_url(self):
+        return reverse('clients:detail', args=[self.object.credit.client.pk])

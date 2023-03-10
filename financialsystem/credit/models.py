@@ -146,7 +146,7 @@ def create_installments_auto(instance, created, *args, **kwargs):
     Crea las cuotas del credito
     """
     if not instance.is_old_credit: 
-        if not created and instance.condition != 'Pagada':
+        if not created and instance.condition != 'Pagado':
             instance.installments.all().delete() # Actualizacion de credito (crea nuevas cuotas en base los nuevos datos del credito, borrando las cuotas anteriores)
         credit = instance
         days = 30

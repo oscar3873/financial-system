@@ -225,7 +225,7 @@ class ClientDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context["credits"] = Credit.objects.filter(client = context["client"])
-        credit_active = Credit.objects.filter(client = context["client"]).filter(condition = 'A Tiempo').last()
+        credit_active = Credit.objects.filter(client = context["client"]).filter(is_active=True).last()
         
         if credit_active:
             installments = credit_active.installments.exclude(condition__in=['Refinanciada', 'Pagada'])

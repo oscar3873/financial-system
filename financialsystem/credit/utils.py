@@ -14,9 +14,9 @@ def refresh_condition():
         credits_ok = Credit.objects.filter(condition='A Tiempo')
         cred_with_vencidas = credits_ok.filter(installments__end_date__date__lt=date.today())
         refinances = Refinancing.objects.filter(installments__end_date__lt=date.today())
-        
-        mi_lista = [cred_with_vencidas, refinances] if cred_with_vencidas and refinances else [cred_with_vencidas] if cred_with_vencidas else [refinances] if refinances else []
 
+        mi_lista = [cred_with_vencidas, refinances] if cred_with_vencidas and refinances else [cred_with_vencidas] if cred_with_vencidas else [refinances] if refinances else []
+    
         for model in mi_lista:
             for obj_with_vencidas in model:
                 for_refresh(obj_with_vencidas.installments.all())
@@ -45,7 +45,8 @@ def for_refresh(obj_with_vencidas):
         else:
             dates = installment_ven.end_date.date()
 
-        resto = abs((date.today() - dates).days)
+        resto = (date.today() - dates).days
+        print(resto)
         client.score -= 5*resto
         installment_ven.daily_interests += resto * installment_ven.amount * Decimal(0.02)
         installment_ven.lastup = datetime.today()

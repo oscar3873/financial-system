@@ -17,6 +17,7 @@ class CreditAdmin(admin.ModelAdmin):
 
 class InstallmentAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'credit',
         'installment_number', 
         'amount', 
@@ -30,6 +31,7 @@ class InstallmentAdmin(admin.ModelAdmin):
 
 class RefinancingAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'is_paid',
         'interest', 
         'amount', 
@@ -42,16 +44,17 @@ class RefinancingAdmin(admin.ModelAdmin):
     
 class InstallmentRefinancingAdmin(admin.ModelAdmin):
     list_display = (
-            'refinancing',
-            'installment_number',
-            'daily_interests',
-            'amount', 
-            'payment_date', 
-            'is_caduced_installment', 
-            'is_paid_installment', 
-            'lastup',
-            'created_at', 
-            'updated_at'
+        'id',
+        'refinancing',
+        'installment_number',
+        'daily_interests',
+        'amount', 
+        'payment_date', 
+        'is_caduced_installment', 
+        'is_paid_installment', 
+        'lastup',
+        'created_at', 
+        'updated_at'
     )
 
 admin.site.register(Credit, CreditAdmin)

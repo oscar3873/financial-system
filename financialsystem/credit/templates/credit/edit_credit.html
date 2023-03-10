@@ -1,0 +1,29 @@
+<!-- credit/edit_credit.html -->
+{% extends "core/base.html" %} {% block content %} {% load static %}
+
+<form method="post">
+    <h1>Edit Credit</h1>
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {{ formset.management_form }}
+    <div class="container p-0">
+        <div class="row justify-content-start">
+    {% for form in formset %}
+            <div class="col-md-4">
+                <div class="row justify-content-start">
+                    <div class="card my-4">
+                        <div class="card-body">
+                            {{ form.as_p }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+      {% endfor %}
+    </div>
+</div>
+      <button type="submit">Save Changes</button>
+    </form>
+  
+  {% endblock content %}

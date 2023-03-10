@@ -114,11 +114,12 @@ def make_payment_installment(request, pk):
         payment._adviser = request.user.adviser
 
         for installment in pack.keys():
-            installment.condition = 'Pagada'
-            installment.is_paid_installment = True
-            installment.payment_date = payment.payment_date
-            installment.save()
-            payment_create(payment, installment)
+            if pack[installment]:
+                installment.condition = 'Pagada'
+                installment.is_paid_installment = True
+                installment.payment_date = payment.payment_date
+                installment.save()
+                payment_create(payment, installment)
 
         return redirect('clients:detail', pk=object_model.pk)
     
