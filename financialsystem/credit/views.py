@@ -41,6 +41,7 @@ def crear_credito(request):
                     phone_number.save()
                     
             credit = credit_form.save(commit=False)
+            credit.is_active = True
             credit.client = client
             if not credit.is_old_credit:
                 credit.mov = create_movement(credit, request.user.adviser)
@@ -119,7 +120,7 @@ class CreditDetailView(DetailView):
 #------------------------------------------------------------------   
 class AssociateCreateView(CreateView):
     """
-    Asocia un credito por crear a un cliente ya existente.
+    Asocia un credito por crear a un cliente a buscar.
     """
     model = Credit
     form_class = CreditForm
@@ -130,9 +131,19 @@ class AssociateCreateView(CreateView):
         """
         refresh_condition()
         if form.is_valid():
-            form.instance.mov = create_movement(form.instance, self.request.user.adviser)
-            form.save()
+            p = form.save(commit=False)
+            print(p.is_active)
+            # form.instance.mov = create_movement(form.instance, self.request.user.adviser)
+            # form.save()
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
+        """
+        context = super().get_context_data(**kwargs)
+        context['client'] = Client.objects.all()
+        return context
     
     def get_success_url(self) -> str:
         """ 
@@ -146,27 +157,22 @@ class AssociateCreateView(CreateView):
 #------------------------------------------------------------------     
 class CreditCreateTo(CreateView):
     """
-    Creacion de un credito para un cliente a buscar.
+    Creacion de un credito para un cliente desde detail.
     """	
     model = Credit
     form_class = CreditForm
     template_name = 'credit/credit_form.html'
 
-    def get_context_data(self, **kwargs):
-        """
-        Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
-        """
-        context = super().get_context_data(**kwargs)
-        context['client'] = Client.objects.all()
-        return context
 
     def form_valid(self, form):
         """
         Validacion de formulario de credito.
         """
         self.client = get_object_or_404(Client, pk=self.kwargs['pk'])
+
         if form.is_valid():
             credit = form.save(commit=False)
+            credit.is_active = True
             credit.client = self.client
             credit.mov = create_movement(credit, self.request.user.adviser)
             credit.save()
@@ -191,7 +197,6 @@ def edit_credit(request, pk):
         form = CreditWithInstallmentsForm(request.POST, instance=credit)
         formset = InstallmentFormSet(request.POST, prefix='installments')
         if form.is_valid() and formset.is_valid():
-            print('####################################')
             credit = form.save()
             for form in formset:
                 installment = form.save(commit=False)

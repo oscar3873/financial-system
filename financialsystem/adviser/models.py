@@ -3,7 +3,7 @@ from decimal import Decimal
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, pre_delete
 
 
 # Create your models here.
@@ -75,5 +75,6 @@ def update_commission(instance, *args, **kwargs):
         instance.amount = Decimal(real_value*(instance._last_interest/100)) # Monto de la comision
         instance.interest = Decimal(porcentage)
         instance.last_up = datetime.now()
+
 
 pre_save.connect(update_commission, sender=Comission)

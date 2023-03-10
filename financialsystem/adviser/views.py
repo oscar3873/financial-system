@@ -8,12 +8,11 @@ from django.views.generic.edit import UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-
 from braces.views import GroupRequiredMixin
 
 from credit.utils import refresh_condition
 from .models import Adviser, Comission
-from .utils import commission_properties
+from .utils import *
 from cashregister.models import CashRegister, Movement
 
 # Create your views here.
@@ -105,10 +104,10 @@ def pay_commission(request, pk):
 
     commission.is_paid = True
     porcentage_value = request.POST.get('porcentage')
-    print(porcentage_value)
+
     commission._last_interest = Decimal(porcentage_value) # Agrego un atributo privado para utilizarlo unica vez en la señal de Commission
-    # commission.save()
-    # create_movement(commission)
+    commission.save()
+    create_movement(commission)
 
     messages.success(request, "La comisión se ha pagado exitosamente.")
     return redirect('advisers:detail', pk=commission.adviser.id)
@@ -122,15 +121,3 @@ class AdviserDeleteView(DeleteView):
     pass
 
 
-def create_movement(commission):
-    '''Crea un nuevo objeto Movement y lo guarda en la base de datos.'''
-    mov = Movement.objects.create(
-            user = commission.adviser,
-            amount = commission.amount,
-            cashregister = CashRegister.objects.last(),
-            operation_mode = 'EGRESO',
-            description = 'COMISION %s - %s' % (commission.adviser, commission.type),
-            money_type= commission.money_type
-        )
-    commission.id_mov = mov.id
-    commission.save()

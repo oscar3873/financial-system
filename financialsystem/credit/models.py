@@ -52,7 +52,6 @@ class Refinancing(models.Model):
     interest = models.PositiveIntegerField(default=48, help_text="Intereses de la refinanciacion")
     amount = models.DecimalField(decimal_places=2, max_digits=15)
     refinancing_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolver de la Refinanciacion")
-    # installment = models.OneToOneField(Installment, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cuota de la Refinanciacion", related_name="refinancing")
     installment_num_refinancing = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
     payment_date = models.DateTimeField(help_text="Fecha de Pago", null=True, blank=True)
     lastup = models.DateField(null=True, blank=True) #PARA CALCULO DE INTERESES DIARIOS
@@ -81,7 +80,7 @@ class Installment(models.Model):
     is_refinancing_installment = models.BooleanField(default=False, help_text="La cuota fue refinanciada")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    refinance = models.ForeignKey(Refinancing,on_delete=models.SET_NULL, null=True, blank=True, related_name='installment_ref')
+    refinance = models.ForeignKey(Refinancing,on_delete=models.CASCADE, null=True, blank=True, related_name='installment_ref')
     installment_number = models.PositiveSmallIntegerField(help_text="Numero de cuota del credito")
     daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")
     start_date = models.DateTimeField(default=datetime.now, null=True)
@@ -146,7 +145,7 @@ def create_installments_auto(instance, created, *args, **kwargs):
     Crea las cuotas del credito
     """
     if not instance.is_old_credit: 
-        if not created and instance.condition != 'Pagado':
+        if not created and instance.condition != 'Pagado':  #SI EL CREDITO A EDITAR ESTUVO PAGADO NO EDITA LAS CUOTAS, 
             instance.installments.all().delete() # Actualizacion de credito (crea nuevas cuotas en base los nuevos datos del credito, borrando las cuotas anteriores)
         credit = instance
         days = 30
