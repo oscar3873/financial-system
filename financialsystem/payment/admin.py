@@ -5,11 +5,8 @@ from .models import Payment
 class PaymentAdmin(admin.ModelAdmin):
     fields = (
         'detail',
-         'installment',
-         'installment_ref',
-         'is_refinancing_pay',
-         'amount',
-         'payment_date',
+        'amount',
+        'payment_date',
          )
     
 

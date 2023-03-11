@@ -12,7 +12,7 @@ from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView, DeleteView
 
-from credit.models import Credit, Refinancing
+from credit.models import Credit, Refinancing, Installment
 from credit.utils import refresh_condition
 from .utils import payment_create
 from .models import Payment
@@ -96,11 +96,11 @@ def make_payment_installment(request, pk):
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments = refinancing.installments.exclude(condition='Pagada')
-        object_model = refinancing.installment_ref.last().credit.client
+        client = refinancing.installment_ref.last().credit.client
     except:
         credit = get_object_or_404(Credit, pk=pk)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-        object_model = credit.client
+        client = credit.client
 
     form = PaymentForm(installments, request.POST or None)
     if request.method == 'POST' and form.is_valid():
@@ -121,5 +121,12 @@ def make_payment_installment(request, pk):
                 installment.save()
                 payment_create(payment, installment)
 
-        return redirect('clients:detail', pk=object_model.pk)
+        score = round(200/len(installment_))*count_value
+        if isinstance(installments, Installment):
+            client.score += score
+        else:
+            client.score += round(round(200/len(installment_))/2)
+        client.save()
+
+        return redirect('clients:detail', pk=client.pk)
     

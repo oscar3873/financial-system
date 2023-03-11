@@ -1,6 +1,7 @@
 from datetime import datetime
 from django import forms
 from .models import Credit, Installment, Refinancing
+from django.forms import inlineformset_factory
 
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
@@ -101,97 +102,54 @@ class InstallmentUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Installment
-        fields = ['amount','is_caduced_installment','is_paid_installment','is_refinancing_installment','payment_date','end_date']
+        fields = ['amount', 'end_date', 'payment_date', 'condition']  
+        labels = {
+            'amount': 'Monto',
+            'end_date': 'Fecha de Vencimiento',
+            'payment_date': 'Fecha de pago',
+            'condition': 'Condición'
+        }
         widgets = {
-            'payment_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'payment_date','type': 'date'}),
-            'end_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'end_date','type': 'date'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'readonly':True}),
+            'payment_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'payment_date','type': 'date'}, format='%Y-%m-%d'),
+            'end_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'end_date','type': 'date'},format='%Y-%m-%d'),
         }
         auto_id = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.instance.payment_date:
-            # print('#############')
-            self.initial['payment_date'] = self.instance.payment_date.date().strftime('%Y-%m-%d')
-        else:
-            self.fields['payment_date'].initial = ''
-
-        self.initial['end_date'] = self.instance.end_date.strftime('%Y-%m-%d')
-        
-        self.fields['is_caduced_installment'].label = '¿La cuota está vencida?'
-        self.fields['is_paid_installment'].label = '¿La cuota está pagada?'
-        self.fields['is_refinancing_installment'].label = '¿La cuota fue refinanciada?'
-        self.fields['payment_date'].label = 'Fecha de pago'
-        self.fields['end_date'].label = 'Fecha de Vencimiento'
-        self.fields['amount'].label = 'Monto de la cuota'
-
-        self.fields['amount'].widget.attrs['readonly'] = True
-
 
 class InstallmentRefinancingForm(forms.ModelForm):
-
+    
     class Meta:
         model = Installment
-        fields = ['amount','is_caduced_installment','is_paid_installment','payment_date','end_date']
+        fields = ['amount', 'end_date', 'payment_date', 'condition']
+        labels = {
+            'amount': 'Monto',
+            'end_date': 'Fecha de Vencimiento',
+            'payment_date': 'Fecha de pago',
+            'condition': 'Condición'
+        }
         widgets = {
-            'payment_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'payment_date','type': 'date'}),
-            'end_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'end_date','type': 'date'}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control', 'readonly':True}),
+            'payment_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'payment_date','type': 'date'}, format= '%Y-%m-%d'),
+            'end_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'end_date','type': 'date'},format= '%Y-%m-%d'),
         }
         auto_id = True
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.instance.payment_date:
-            self.initial['payment_date'] = self.instance.payment_date.date().strftime('%Y-%m-%d')
-        else:
-            self.fields['payment_date'].initial = ''
-
-        self.initial['end_date'] = self.instance.end_date.strftime('%Y-%m-%d')
-        
-        self.fields['is_caduced_installment'].label = '¿La cuota está vencida?'
-        self.fields['is_paid_installment'].label = '¿La cuota está pagada?'
-        self.fields['payment_date'].label = 'Fecha de pago'
-        self.fields['end_date'].label = 'Fecha de Vencimiento'
-        self.fields['amount'].label = 'Monto de la cuota'
-
-        self.fields['amount'].widget.attrs['readonly'] = True
 
 
-
-#------------------------------------------------------------------   NUEVOOOO
-from django.forms import inlineformset_factory
-
-# Creamos una clase de formulario para la entidad Credit
-class CreditoForm(forms.ModelForm):
-    class Meta:
-        model = Credit
-        fields = ['is_active', 'is_paid', 'is_old_credit', 'condition', 'credit_interest', 'amount', 'client', 'installment_num', 'start_date', 'end_date']
-
-# Creamos una clase de formulario para la entidad Installment
-class InstallmentoForm(forms.ModelForm):
-    class Meta:
-        model = Installment
-        fields = ['installment_number', 'start_date', 'end_date', 'payment_date', 'condition', 'amount']
-
-
-
-InstallmentFormSet = inlineformset_factory(
-    Credit, 
-    Installment, 
-    form=InstallmentoForm, 
-    extra=0
-    )
-
-
+#--------------------------FORMSET FOR CREDIT AND CREDIT'S INSTALMMENTS UPDATE----------------------------------------
 
 class CreditWithInstallmentsForm(forms.ModelForm):
     class Meta:
         model = Credit
-        fields = ['is_active', 'is_paid', 'is_old_credit', 'condition', 'credit_interest', 'amount', 'client', 'installment_num', 'start_date', 'end_date']
+        fields = ['is_active', 'is_paid', 'is_old_credit', 'condition', 'credit_interest', 'amount', 'installment_num', 'start_date', 'end_date']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.installment_formset = InstallmentFormSet(instance=self.instance)
-#------------------------------------------------------------------   NUEVOOOO
+
+InstallmentFormSet = inlineformset_factory(
+    Credit, 
+    Installment, 
+    form=InstallmentUpdateForm, 
+    )
+#-------------------------------------------------------------------------------------------------   

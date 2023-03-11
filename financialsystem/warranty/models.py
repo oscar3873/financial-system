@@ -76,7 +76,7 @@ def sell_commission(instance, *args, **kwargs):
             adviser = instance.adviser,
             interest = Decimal(5),
             amount = amount,
-            original_amount = instance.amount,
+            operation_amount = instance.amount,
             type = 'VENTA',
             last_up = instance.sell_date,
             detail = "VENTA ARTICULO: %s" % instance.article,

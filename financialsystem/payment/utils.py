@@ -9,11 +9,8 @@ def payment_create(payment, installment):
         'payment_method': payment.payment_method
     }
     if isinstance(installment, Installment):
-        payment_dict['detail'] = f'COBRO CUOTA {installment.installment_number} - CLIENTE {installment.credit.client} - ASESOR {payment._adviser}',
-        payment_dict['installment'] = installment
+        payment_dict['detail'] = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.credit.client, payment._adviser)
     else:
-        payment_dict['detail'] = f'COBRO CUOTA {installment.installment_number} - CLIENTE {installment.refinancing.installment_ref.last().credit.client} - ASESOR {payment._adviser}',
-        payment_dict['installment_ref'] = installment
-        payment_dict['is_refinancing_pay'] = True
+        payment_dict['detail'] = 'COBRO CUOTA REFINANCIADA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.refinancing.installment_ref.last().credit.client, payment._adviser)
         
     Payment.objects.create(**payment_dict)

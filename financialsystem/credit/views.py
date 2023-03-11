@@ -3,6 +3,8 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView, DeleteView, CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.forms import formset_factory
+import copy  
 
 from .utils import *
 
@@ -41,8 +43,8 @@ def crear_credito(request):
                     phone_number.save()
                     
             credit = credit_form.save(commit=False)
-            credit.is_active = True
             credit.client = client
+            credit.is_new = True
             if not credit.is_old_credit:
                 credit.mov = create_movement(credit, request.user.adviser)
             credit.save()
@@ -131,10 +133,11 @@ class AssociateCreateView(CreateView):
         """
         refresh_condition()
         if form.is_valid():
-            p = form.save(commit=False)
-            print(p.is_active)
-            # form.instance.mov = create_movement(form.instance, self.request.user.adviser)
-            # form.save()
+            cred = form.save(commit=False)
+            cred.is_new = True
+            cred.cliente = self.kwargs['client']
+            form.instance.mov = create_movement(form.instance, self.request.user.adviser)
+            form.save()
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -172,7 +175,7 @@ class CreditCreateTo(CreateView):
 
         if form.is_valid():
             credit = form.save(commit=False)
-            credit.is_active = True
+            credit.is_new = True
             credit.client = self.client
             credit.mov = create_movement(credit, self.request.user.adviser)
             credit.save()
@@ -186,51 +189,40 @@ class CreditCreateTo(CreateView):
         return  reverse_lazy('clients:detail', kwargs=self.kwargs)
     
 
-#------------------------------------------------------------------   NUEVOOOO
-from django.forms import formset_factory, modelformset_factory
-   
+#------------------------------------------------------------------   NUEVOOO
 
 def edit_credit(request, pk):
-    credit = Credit.objects.get(id=pk)
-    InstallmentFormSet = formset_factory(InstallmentoForm, extra=0)
+    
+    credit_original = Credit.objects.get(id=pk)
+    credit_copy = copy.copy(credit_original)
+    InstallmentFormSet = formset_factory(InstallmentUpdateForm, extra=0)
     if request.method == 'POST':
-        form = CreditWithInstallmentsForm(request.POST, instance=credit)
+        form = CreditWithInstallmentsForm(request.POST, instance=credit_original)
         formset = InstallmentFormSet(request.POST, prefix='installments')
         if form.is_valid() and formset.is_valid():
-            credit = form.save()
-            for form in formset:
-                installment = form.save(commit=False)
-                installment.credit = credit
-            return redirect('credits:list')
-    else:
-        form = CreditWithInstallmentsForm(instance=credit)
-        formset = InstallmentFormSet(prefix='installments', initial=credit.installments.values())
-    return render(request, 'credit/edit_credit.html', {'form': form, 'formset': formset})
-# 
-#------------------------------------------------------------------   NUEVOOOO
-# class CreditUpdateView(UpdateView):
-#     """
-#     Actualizacion de credito.
-#     """
-#     model = Credit
-#     form_class = CreditForm
+            credit = form.save(commit=False)
 
-#     def form_valid(self, form):
-#         """
-#         Validacion de formulario.
-#         """
-#         if form.is_valid():
-#             form.instance.mov.amount = form.instance.amount
-#             form.instance.mov.save()
-#         return super().form_valid(form)
-    
-#     def get_success_url(self) -> str:
-#         """
-#         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
-#         """
-#         messages.success(self.request, 'Credito actualizado correctamente', "success")
-#         return  reverse_lazy('credits:list')
-    
+            if (credit_copy.amount != credit.amount) or (credit_copy.credit_interest != credit.credit_interest) or (credit_copy.installment_num != credit.installment_num):
+                credit.is_new = True        
+                credit.save()
+
+            for form in formset:
+                installment = form.save(commit=False)   
+                installment.credit = credit
+                
+            messages.success(request,'Cambios realizados exitosamente')
+            return redirect('credits:edit_credit', pk=credit.pk)
+    else:
+        form = CreditWithInstallmentsForm(instance=credit_original)
+        formset = InstallmentFormSet(prefix='installments', initial=credit_original.installments.values())
+    context = {
+        'form': form,
+        'formset': formset,
+        'client': credit_original.client
+        }
+    return render(request, 'credit/edit_credit.html', context)
+
+
 #------------------------------------------------------------------     
 class CreditDeleteView(DeleteView):
     """

@@ -5,7 +5,7 @@ from django.db import models
 from djmoney.models.fields import MoneyField
 from django.db.models.signals import post_save, post_delete, pre_save
 
-from adviser.models import Adviser
+# from adviser.models import Adviser
 
 # Create your models here.
 class CashRegister(models.Model):
@@ -40,7 +40,7 @@ class Movement(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Amount of transaction")
     cashregister = models.ForeignKey(CashRegister, on_delete=models.CASCADE, help_text="Cash register", related_name="cash")
-    user = models.ForeignKey(Adviser, on_delete=models.SET_NULL, default=None, null=True, help_text="Usuario Operator", related_name="user_movements")
+    user = models.ForeignKey('adviser.Adviser', on_delete=models.SET_NULL, default=None, null=True, help_text="Usuario Operator", related_name="user_movements")
     operation_mode = models.CharField(max_length=10, choices=OPERATION_CHOISE, help_text="Operation mode")
     description = models.TextField(blank=True, max_length=500, help_text="description of the operation")
     money_type = models.CharField(max_length=20, choices=MONEY_TYPE, help_text="Tipo de divisa")

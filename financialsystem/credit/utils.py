@@ -24,6 +24,7 @@ def refresh_condition():
         for credit in credits_ok:
             if credit.installments.filter(condition="Vencida").count() == credit.installments.count():
                 credit.condition = "Vencido"
+                credit.is_paid = True
                 credit.save()
 
         refresh_installments_credits()
@@ -46,7 +47,6 @@ def for_refresh(obj_with_vencidas):
             dates = installment_ven.end_date.date()
 
         resto = (date.today() - dates).days
-        print(resto)
         client.score -= 5*resto
         installment_ven.daily_interests += resto * installment_ven.amount * Decimal(0.02)
         installment_ven.lastup = datetime.today()
@@ -97,7 +97,7 @@ def comission_create(instance, adviser, detail):
         adviser = adviser,
         interest = Decimal(7.5),
         amount = amount,
-        original_amount = instance.amount,
+        operation_amount = instance.amount,
         type = 'REGISTRO',
         last_up = instance.start_date,
         detail = detail,

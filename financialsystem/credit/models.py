@@ -12,11 +12,14 @@ class Credit(models.Model):
     CHOICE = [
         ('Pagado', 'Pagado'),
         ('A Tiempo','A Tiempo'),
+        ('Vencido', 'Vencido'),
         ]
 
     is_active = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False, help_text="El credito esta pagado")
     is_old_credit = models.BooleanField(default=False, help_text="Es un credito antiguo")
+    is_new = models.BooleanField(default=False, help_text="Se han modificados algunos campos") # PARA REALIZAR UN UPDATE BASADO EN CAMBIOS DE CAMPOS
+
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
@@ -130,23 +133,28 @@ class InstallmentRefinancing(models.Model):
 
 #-------------------- SEÑALES PARA CREDITOS Y CUOTAS --------------------
 def repayment_amount_auto(instance, *args, **kwargs):
-        """
-        Calcula el monto de devolver del Credito.
-        """
-        credit = instance
-        if credit.condition not in ['Pagado', 'Vencido']:
-            credit.end_date = (timedelta(days=30)*credit.installment_num) + credit.start_date
-            repayment_amount = credit.installment_num*(Decimal(credit.credit_interest/100)*credit.amount)/(1-pow((1+Decimal(credit.credit_interest/100)),(- credit.installment_num)))
-            credit.credit_repayment_amount = Decimal(repayment_amount)
+    """
+    Calcula el monto de devolver del Credito.
+    Ademas, sirve para cuando el credito recive una modificacion de algun campo, exceptuando
+    el campo 'is_new', el cual nos da la pauta si el credito fue modificado (se uso un Credit.save() por update)
+    Ej. update: 'credit.amount = <new_amount>' -> credit.save() -> repayment_amount_auto() -> news installments
+    """
+    credit = instance
+    if credit.is_new:
+        credit.end_date = (timedelta(days=30)*credit.installment_num) + credit.start_date
+        repayment_amount = credit.installment_num*(Decimal(credit.credit_interest/100)*credit.amount)/(1-pow((1+Decimal(credit.credit_interest/100)),(- credit.installment_num)))
+        credit.credit_repayment_amount = Decimal(repayment_amount)
+    credit.is_active = True
 
 
 def create_installments_auto(instance, created, *args, **kwargs):
     """
-    Crea las cuotas del credito
+    Crea las cuotas del credito.
+    Borra las cuotas aderidas en caso de actualizacion de campos sencibles:
+            ('amount', 'installment_num', 'credit_interest')
     """
-    if not instance.is_old_credit: 
-        if not created and instance.condition != 'Pagado':  #SI EL CREDITO A EDITAR ESTUVO PAGADO NO EDITA LAS CUOTAS, 
-            instance.installments.all().delete() # Actualizacion de credito (crea nuevas cuotas en base los nuevos datos del credito, borrando las cuotas anteriores)
+    if instance.is_new or created:
+        instance.installments.all().delete() # Actualizacion de credito (crea nuevas cuotas en base los nuevos datos del credito, borrando las cuotas anteriores)
         credit = instance
         days = 30
         amount_installment = Decimal(credit.credit_repayment_amount/credit.installment_num)
@@ -162,11 +170,29 @@ def create_installments_auto(instance, created, *args, **kwargs):
                 lastup=end_date
                 )
             days += 30
+    if instance.is_new:
+        instance.is_new = False
+        instance.save()
+
+
+def update_installment(instance, *args, **kwargs):
+    if instance.condition == 'Pagada':
+        instance.is_paid_installment = True
+    elif instance.condition == 'Vencida':
+        instance.is_caduced_installment = True
+    elif instance.condition == 'Refinanciada':
+        instance.is_refinancing_installment = True
+    else:
+        instance.is_refinancing_installment = False
+        instance.is_paid_installment = False
+        instance.is_caduced_installment = False
 
 
 pre_save.connect(repayment_amount_auto, sender= Credit)
 post_save.connect(create_installments_auto, sender= Credit)
 
+pre_save.connect(update_installment, sender=Installment)
+pre_save.connect(update_installment, sender=InstallmentRefinancing)
 
 #-------------------- SEÑALES PARA REFINANCIACION Y CUOTAS --------------------
 def refinancing_repayment_amount_auto(instance, *args, **kwargs):

@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -105,9 +106,13 @@ def pay_commission(request, pk):
     commission.is_paid = True
     porcentage_value = request.POST.get('porcentage')
 
-    commission._last_interest = Decimal(porcentage_value) # Agrego un atributo privado para utilizarlo unica vez en la señal de Commission
+    real_value = Decimal((commission.amount*100)/porcentage_value)   # Calculo para saber el monto original (el 100%)
+    commission.amount = Decimal(real_value*(porcentage_value/100)) # Monto de la comision   
+    commission.operation_amount = real_value 
+    commission.interest = Decimal(porcentage_value)
+    commission.last_up = datetime.now()
+    
     commission.save()
-    create_movement(commission)
 
     messages.success(request, "La comisión se ha pagado exitosamente.")
     return redirect('advisers:detail', pk=commission.adviser.id)

@@ -169,7 +169,22 @@
                                 <td>{{installment.installment_number}}</td>
                                 <td>{{installment.amount}}</td>
                                 <td>{{installment.end_date|date}}</td>
-                                {% if installment.is_paid_installment and installment.is_refinancing_installment %}
+
+                                {% if installment.condition == 'A Tiempo' %}
+                                <td>
+                                    <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
+                                        <strong>● A Tiempo</strong>
+                                    </div>
+                                </td>
+                                
+                                {% elif installment.is_caduced_installment %}
+                                <td>
+                                    <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
+                                        <strong>● Vencida</strong>
+                                    </div>
+                                </td>
+
+                                {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
                                     <a href="{% url 'credits:refinance_detail' installment.pk %}">
@@ -178,6 +193,7 @@
                                         </div>
                                     </a>
                                 </td>
+
                                 {% elif installment.is_refinancing_installment %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
@@ -187,25 +203,16 @@
                                         </div>
                                     </a>
                                 </td>
-                                {% elif installment.is_paid_installment %}
+                                                                
+                                {% else %}
                                 <td>
                                     <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
                                         <strong>● Pagada</strong>
                                     </div>
                                 </td>
-                                {% elif installment.is_caduced_installment %}
-                                <td>
-                                    <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>● Vencida</strong>
-                                    </div>
-                                </td>
-                                {% else %}
-                                <td>
-                                    <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>● A Tiempo</strong>
-                                    </div>
-                                </td>
-                                {% if first_is_paid %}
+                                {% endif %}
+
+                                {% if first_is_paid and not installment.is_refinancing_installment and not installment.is_paid_installment  %}
                                 <td>
                                     <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}">
                                         <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">Refinanciar</strong>
@@ -235,7 +242,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                {% endif %}{% endif %}
+                                {% endif %}
                                 <td>
                                     <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
                                 </td>
