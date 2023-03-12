@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import UpdateView, DeleteView, CreateView, ListView, DetailView
@@ -133,11 +134,15 @@ class AssociateCreateView(CreateView):
         """
         refresh_condition()
         if form.is_valid():
-            cred = form.save(commit=False)
-            cred.is_new = True
-            cred.cliente = self.kwargs['client']
-            form.instance.mov = create_movement(form.instance, self.request.user.adviser)
-            form.save()
+            # Recuperar el ID del cliente seleccionado
+            
+            selected_client_id = self.request.POST.get('selected_client_id')
+            # Asignar el crédito al cliente correspondiente
+            cliente = Client.objects.get(pk=selected_client_id)
+            credit = form.save(commit=False)
+            credit.is_new = True
+            credit.client = cliente
+            credit.save()
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -145,7 +150,7 @@ class AssociateCreateView(CreateView):
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         """
         context = super().get_context_data(**kwargs)
-        context['client'] = Client.objects.all()
+        context['clients'] = Client.objects.all()
         return context
     
     def get_success_url(self) -> str:
@@ -154,7 +159,37 @@ class AssociateCreateView(CreateView):
         """
         messages.success(self.request, 'Credito creado correctamente', "success")
         return  reverse_lazy('credits:list')
-    
+
+
+def buscar_clientes_view(request):
+    search_term = request.GET.get('search_term')
+
+    if search_term:
+        # Realizar la búsqueda de clientes que coincidan con el término de búsqueda
+        clientes = Client.objects.filter(
+            first_name__icontains=search_term
+        ) | Client.objects.filter(
+            last_name__icontains=search_term
+        ) | Client.objects.filter(
+            dni__startswith =search_term
+        )
+        
+        # Serializar los resultados como un diccionario de Python
+        data = {
+            'clientes': [
+                {
+                    'id': cliente.id,
+                    'full_name': f'{cliente.first_name} {cliente.last_name}',
+                    'dni': cliente.dni,
+                } for cliente in clientes
+            ]
+        }
+    else:
+        data = {'clientes': []}
+
+    return JsonResponse(data)
+
+
 
 #CREACION DE UN CREDITO
 #------------------------------------------------------------------     
@@ -166,7 +201,11 @@ class CreditCreateTo(CreateView):
     form_class = CreditForm
     template_name = 'credit/credit_form.html'
 
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_add'] = True
+        return context
+    
     def form_valid(self, form):
         """
         Validacion de formulario de credito.

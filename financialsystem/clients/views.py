@@ -180,27 +180,6 @@ class ClientDelete(DeleteView):
         messages.success(self.request, 'Cliente eliminado correctamente', "danger")
         return  reverse_lazy('clients:list')
 
-#CONSULTA
-#------------------------------------------------------------------
-class QueryView(ListView):
-    """
-    Consulta de clientes.
-    """
-    model = Client
-    template_name = 'core/home.html'
-    
-    def get(self, request, *args, **kwargs):
-        """
-        Obtiene el numero DNI ingresado en el search e intenta matchear.
-        """
-        dni = self.request.GET.get("search")
-        try: 
-            search = self.model.objects.get(dni=dni)
-            return redirect('clients:detail', pk=search.pk) # redirecciona al detalle del cliente en caso de encontrarlo
-        except :
-            messages.error(request, "Cliente no encontrado")
-                
-        return super().get(request, *args, **kwargs)
 
 #DETALLE DE CLIENTE
 #------------------------------------------------------------------
@@ -224,25 +203,24 @@ class ClientDetailView(DetailView):
         refresh_condition()
         context = super().get_context_data(**kwargs)
 
-        context["credits"] = Credit.objects.filter(client = context["client"])
-        credit_active = Credit.objects.filter(client = context["client"]).filter(is_active=True).last()
+        context["credits"] = context["client"].credits.all()
+        credits_active = context["credits"].filter(is_active=True)
         
-        if credit_active:
-            installments = credit_active.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-            refinancing = Refinancing.objects.filter(installment_ref__credit=credit_active)
+        if credits_active:
+            installments = credits_active.first().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+            refinancing = Refinancing.objects.filter(installment_ref__credit=credits_active.first())
 
-            context["credit_active"] = credit_active
+            context["credits_active"] = credits_active
             context["refinances"] = refinancing
-            context["installments"] = credit_active.installments.all()
-            context["first_is_paid"] = credit_active.installments.first().is_paid_installment
+            context["first_is_paid"] = credits_active.first().installments.first().is_paid_installment
+
             if installments :
-                context["form_ref"]= RefinancingForm(credit=context["credit_active"])
                 context["form_payment"]= PaymentForm(installments=installments)
-                context["amount_installment"] = credit_active.installments.first().amount
+                context["form_ref"]= RefinancingForm(credit=credits_active.first())
+                
                 if installments.exclude(condition__in=['Refinanciada', 'Pagada']).count() > 0:
                     context["installments_available"] = True
-                else:
-                    context["installments_available"] = False 
+                else: context["installments_available"] = False 
         return context
 
     def get_object(self):
@@ -251,3 +229,25 @@ class ClientDetailView(DetailView):
         """	
         return get_object_or_404(Client, id=self.kwargs['pk'])
     
+
+#CONSULTA
+#------------------------------------------------------------------
+class QueryView(ListView):
+    """
+    Consulta de clientes.
+    """
+    model = Client
+    template_name = 'core/home.html'
+    
+    def get(self, request, *args, **kwargs):
+        """
+        Obtiene el numero DNI ingresado en el search e intenta matchear.
+        """
+        dni = self.request.GET.get("search")
+        try: 
+            search = self.model.objects.get(dni=dni)
+            return redirect('clients:detail', pk=search.pk) # redirecciona al detalle del cliente en caso de encontrarlo
+        except :
+            messages.error(request, "Cliente no encontrado")
+                
+        return super().get(request, *args, **kwargs)

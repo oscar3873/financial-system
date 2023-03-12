@@ -18,10 +18,6 @@ class Client(models.Model):
         ('Muy Bueno', 'Muy bueno'),
         ('Bueno' , 'Bueno'),
         ('Regular' , 'Regular'),
-        ('Exelente','Exelente'),
-        ('Muy Bueno', 'Muy bueno'),
-        ('Bueno' , 'Bueno'),
-        ('Regular' , 'Regular'),
         ('Riesgoso' , 'Riesgoso')
     ]
 

@@ -27,7 +27,7 @@ class Credit(models.Model):
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto del Credito")
     mov = models.OneToOneField(Movement,on_delete=models.SET_NULL,null=True)
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="client_credits")
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="credits")
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
     start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=datetime.now, null=True)
     end_date = models.DateTimeField(verbose_name='Fecha de Finalizacion del Credito', null=True)
@@ -43,7 +43,7 @@ class Credit(models.Model):
             return super().__str__()
         
     class Meta:
-        ordering = ["created_at"]
+        ordering = ["-created_at"]
             
 
 #REFINANCIACION   
@@ -65,9 +65,8 @@ class Refinancing(models.Model):
         installment_numbers = [str(installment.installment_number) for installment in self.installment_ref.all()]
         return "Refinanciacion de las cuotas: {}".format(", ".join(installment_numbers))
 
-    
     class Meta:
-        ordering = ["created_at"]
+        ordering = ["-created_at"]
 
 #CUOTA DE CREDITO
 class Installment(models.Model):
@@ -140,6 +139,9 @@ def repayment_amount_auto(instance, *args, **kwargs):
     Ej. update: 'credit.amount = <new_amount>' -> credit.save() -> repayment_amount_auto() -> news installments
     """
     credit = instance
+    if instance.is_paid:
+        instance.is_active = False
+        instance.condition = 'Pagado'
     if credit.is_new:
         credit.end_date = (timedelta(days=30)*credit.installment_num) + credit.start_date
         repayment_amount = credit.installment_num*(Decimal(credit.credit_interest/100)*credit.amount)/(1-pow((1+Decimal(credit.credit_interest/100)),(- credit.installment_num)))

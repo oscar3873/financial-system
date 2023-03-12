@@ -128,7 +128,8 @@
                     {% endif %}
                 </div>
             </div>
-            {% if credit_active %}
+            {% if credits_active %}
+            {% for credit_active in credits_active %}
             <div class="col-xl-9 col-sm-6 col-12 p-3">
                 <div class="card">
                     <h5 class="title pt-3 text-start pl-4">
@@ -164,7 +165,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for installment in installments %}
+                            {% for installment in credit_active.installments.all %}
                             <tr>
                                 <td>{{installment.installment_number}}</td>
                                 <td>{{installment.amount}}</td>
@@ -184,7 +185,7 @@
                                     </div>
                                 </td>
 
-                                {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
+                                {% elif installment.is_paid_installment and installment.is_refinancing_installment and forloop.first %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
                                     <a href="{% url 'credits:refinance_detail' installment.pk %}">
@@ -194,7 +195,7 @@
                                     </a>
                                 </td>
 
-                                {% elif installment.is_refinancing_installment %}
+                                {% elif installment.is_refinancing_installment and forloop.first %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
                                     <a href="{% url 'credits:refinance_detail' installment.pk %}">
@@ -212,7 +213,7 @@
                                 </td>
                                 {% endif %}
 
-                                {% if first_is_paid and not installment.is_refinancing_installment and not installment.is_paid_installment  %}
+                                {% if first_is_paid and not installment.is_refinancing_installment and not installment.is_paid_installment and forloop.first %}
                                 <td>
                                     <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}">
                                         <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">Refinanciar</strong>
@@ -253,6 +254,7 @@
                     <div class="card-footer p-1 bg-info rounded-bottom"></div>
                 </div>
             </div>
+            {% endfor %}
             {% else %}
             <div class="col-xl-9 col-sm-6 col-12 p-3 text-center">
                 <h5 class="title pt-3">
@@ -380,7 +382,7 @@
         checkbox.addEventListener('change', calcularSuma);
     });
     
-    if (`{{ amount_installment|default_if_none:False }}`) {
+    if (`{{ credit_active.installments.first.amount|default_if_none:False }}`) {
         selector.addEventListener('change', calcularSuma);
         }
 </script>
