@@ -116,7 +116,7 @@ def pay_commission(request, pk):
     commission.interest = Decimal(porcentage_value)
     commission.last_up = datetime.now()
     
-    # commission.save()
+    commission.save()
 
     messages.success(request, "La comisión se ha pagado exitosamente.")
     return redirect('advisers:detail', pk=commission.adviser.id)

@@ -3,7 +3,7 @@ from decimal import Decimal
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_save, pre_delete
+from django.db.models.signals import post_save, pre_save, post_delete
 
 from cashregister.models import Movement, CashRegister
 
@@ -51,7 +51,7 @@ class Comission(models.Model):
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=20)
     operation_amount = models.DecimalField(blank=True, decimal_places=2, max_digits=20, null=True) 
     type = models.CharField(max_length=20, null=True,choices=REG)
-    money_type = models.CharField(max_length=20 , null=True, choices=MONEY_TYPE, default= MONEY_TYPE[0])
+    money_type = models.CharField(max_length=20 , null=True, choices=MONEY_TYPE, default= 'PESOS')
     last_up = models.DateTimeField(default=datetime.now)
     mov = models.OneToOneField(Movement, on_delete=models.CASCADE, null=True, blank=True)
     detail = models.TextField(max_length=100, null=True, blank=True, help_text="Detalle de la operacion")
@@ -77,6 +77,9 @@ def paid_commission(instance, *args, **kwargs):
             money_type= instance.money_type
         )
 
-    
+def delete_commission_mov(instance, *args, **kwargs):
+    if instance.mov:
+        instance.mov.delete()
+
 pre_save.connect(paid_commission, sender=Comission)
-# pre_delete.connect(delete_commission, sender=Comission)
+post_delete.connect(delete_commission_mov, sender=Comission)

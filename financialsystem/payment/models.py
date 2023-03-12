@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 import uuid
 
-from django.db.models.signals import post_save, pre_save, pre_delete
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.db import models
 
 from credit.models import Installment, InstallmentRefinancing
@@ -76,5 +76,8 @@ def comission_create_inst(instance):
             detail= instance.detail,
         )
 
+def delete_commission(instance, *args, **kwargs):
+    instance.commission_to.delete()
 
 pre_save.connect(up_installment, sender = Payment)
+post_delete.connect(delete_commission, sender = Payment)

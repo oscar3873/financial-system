@@ -114,7 +114,7 @@ class WarrantyUpdateView(UpdateView):
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.
         """
-        messages.success(self.request, 'Garante actualizada satisfactoriamente', "info")
+        messages.success(self.request, 'Articulo actualizado satisfactoriamente', "info")
         return  reverse_lazy('warrantys:list')
 
 
