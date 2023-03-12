@@ -3,7 +3,7 @@ import uuid
 from django.db import models
 from clients.models import Client
 from cashregister.models import Movement
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, pre_delete
 from datetime import datetime, timedelta
 # Create your models here.
 #CREDITO
@@ -82,7 +82,7 @@ class Installment(models.Model):
     is_refinancing_installment = models.BooleanField(default=False, help_text="La cuota fue refinanciada")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    refinance = models.ForeignKey(Refinancing,on_delete=models.CASCADE, null=True, blank=True, related_name='installment_ref')
+    refinance = models.ForeignKey(Refinancing,on_delete=models.SET_NULL, null=True, blank=True, related_name='installment_ref')
     installment_number = models.PositiveSmallIntegerField(help_text="Numero de cuota del credito")
     daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")
     start_date = models.DateTimeField(default=datetime.now, null=True)
@@ -189,12 +189,17 @@ def update_installment(instance, *args, **kwargs):
         instance.is_paid_installment = False
         instance.is_caduced_installment = False
 
+def delete_installment(instance, *args, **kwargs):
+    if instance.refinance: 
+        instance.refinance.delete()
+
 
 pre_save.connect(repayment_amount_auto, sender= Credit)
 post_save.connect(create_installments_auto, sender= Credit)
 
 pre_save.connect(update_installment, sender=Installment)
 pre_save.connect(update_installment, sender=InstallmentRefinancing)
+pre_delete.connect(delete_installment, sender=Installment)
 
 #-------------------- SEÑALES PARA REFINANCIACION Y CUOTAS --------------------
 def refinancing_repayment_amount_auto(instance, *args, **kwargs):

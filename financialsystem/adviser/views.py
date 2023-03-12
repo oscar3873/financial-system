@@ -85,7 +85,11 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
 
 #----------------------------------------------------------------
 def is_admin(user):
-    return user.is_superuser
+    if user.is_superuser:
+        return user.is_superuser
+    else:
+        messages.error('Lo sentimos, no tienes aceso a este apartado')
+        return False
 
 @login_required(login_url="/accounts/login/")
 @user_passes_test(is_admin)
@@ -104,7 +108,7 @@ def pay_commission(request, pk):
         return redirect('advisers:detail', pk=commission.adviser.id)
 
     commission.is_paid = True
-    porcentage_value = request.POST.get('porcentage')
+    porcentage_value = Decimal(request.POST.get('porcentage'))
 
     real_value = Decimal((commission.amount*100)/porcentage_value)   # Calculo para saber el monto original (el 100%)
     commission.amount = Decimal(real_value*(porcentage_value/100)) # Monto de la comision   
@@ -112,7 +116,7 @@ def pay_commission(request, pk):
     commission.interest = Decimal(porcentage_value)
     commission.last_up = datetime.now()
     
-    commission.save()
+    # commission.save()
 
     messages.success(request, "La comisión se ha pagado exitosamente.")
     return redirect('advisers:detail', pk=commission.adviser.id)

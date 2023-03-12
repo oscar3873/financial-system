@@ -20,9 +20,9 @@
             <td>{{commission.interest}}</td>
             {% if user.is_superuser %}
             <td>
-                <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{commission.pk}}"><i class="fa-solid fa-check"></i> &nbsp;</a>
+                <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{commission.pk}}"><i class="fa-solid fa-check" onclick="setDefaultInterest('{{ commission.amount }}','{{ commission.id }}')"></i> &nbsp;</a>
                 <!--Modal-->
-                <div class="modal fade" id="exampleModal{{commission.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{commission.pk}}" aria-hidden="true">
+                <div class="modal fade" id="exampleModal{{commission.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{commission.pk}}" aria-hidden="true" >
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <form action="{% url 'advisers:pay_commission' commission.pk %}" method="POST">
@@ -30,21 +30,21 @@
                                 <div class="modal-header">
                                     <h5 class="modal-title animate__fadeInLeft" style="animation-duration: 0.5s !important;" id="exampleModalLabel">Eliminar Cliente</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
                                 </div>
                                 <div class="modal-body">
                                     <span>Pago comision a</span>
                                     <strong>{{ commission.adviser }} </strong>?
 
                                     <div>
-                                        <p><strong>Monto : ${{ commission.amount }} ({{commission.interest}}% de {{commission.operation_amount}})</strong></p>
+                                        <p><strong>Monto : ${{ commission.amount }} ({{commission.interest}}% de  ${{commission.operation_amount}})</strong></p>
 
                                         <p><strong>Tipo: {{ commission.type }} </strong></p>
 
                                         <p><strong>Detalle: {{ commission.detail }} </strong></p>
 
-                                        <p><strong>Interes: <input name="porcentage" type="number" id="porcentage{{commission.id}}" placeholder="{{commission.interest}}" oninput="calculateResult('{{ commission.amount }}','{{ commission.interest }}','{{ commission.id }}')" >1
+                                        <p><strong>Interes: <input name="porcentage" type="number" step="0.01" id="porcentage{{commission.id}}" placeholder="{{commission.interest}}" oninput="calculateResult('{{ commission.amount }}','{{ commission.interest }}','{{ commission.id }}')" >
                                             <p id="result{{commission.id}}"></p>
                                             </strong>
                                         </p>
@@ -67,7 +67,10 @@
 </table>
 {% endif %}
 <script>
-   function calculateResult(amount, interest, id) {
+    let amount;
+    let real_value;
+
+    function calculateResult(amount, interest, id) {
         var porcentage = document.querySelector(`#porcentage${id}`).value;
         porcentage = porcentage.replace(",", ".");
 
@@ -79,10 +82,20 @@
 
         porcentage = parseFloat(porcentage);
 
-        let total_amount = parseFloat(amount)*(porcentage/100);
+        let total_amount = real_value*(porcentage/100);
+        console.log(porcentage+ "------" +  amount + "------" + real_value + "------" + total_amount);
 
         var resultadoElem = document.getElementById(`result${id}`);
         resultadoElem.innerHTML = ("Total: $" + total_amount.toFixed(2));
+    }
+    function setDefaultInterest(amount_org ,id) {
+        var input = document.querySelector(`#porcentage${id}`);
+        var placeholder = input.getAttribute('placeholder');
+        var value = placeholder.replace(',', '.');
+        input.value = value;
+
+        amount = parseFloat(amount_org);
+        real_value = parseFloat((amount*100)/value);
     }
     </script>
  {% endblock content %}
