@@ -1,5 +1,6 @@
 from datetime import datetime
 from django import forms
+from credit.models import Installment
 
 from payment.models import Payment
 
@@ -45,11 +46,21 @@ class PaymentForm(forms.ModelForm):
         """
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.prefix = "payment"
+
+        self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installments.first().credit.pk})
+
         if installments.count() > 0:
             for installment in installments:
                 daily_interests = ' (con interés {})'.format(installment.daily_interests) if installment.daily_interests > 0 else ''
 
-                attrs = {"value": installment.amount + installment.daily_interests, "data-form-id":"form_payment"}
+                if isinstance(installment,Installment):
+                    form = "form_payment%s" % installment.credit.pk
+                    self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installments.first().credit.pk})
+                else:
+                    form = "form_payment%s" % installment.refinancing.installment_ref.first().credit.pk
+                    self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installment.refinancing.installment_ref.first().credit.pk})
+
+                attrs = {"value": installment.amount + installment.daily_interests, "id":form}
                 
                 if installment == installments.first():
                     self.fields['Cuota %s %s' % (str(installment.installment_number), daily_interests)] = forms.BooleanField(

@@ -185,7 +185,7 @@
                                     </div>
                                 </td>
 
-                                {% elif installment.is_paid_installment and installment.is_refinancing_installment and forloop.first %}
+                                {% elif installment.is_paid_installment and installment.is_refinancing_installment and forloop.parentloop.first %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
                                     <a href="{% url 'credits:refinance_detail' installment.pk %}">
@@ -195,7 +195,7 @@
                                     </a>
                                 </td>
 
-                                {% elif installment.is_refinancing_installment and forloop.first %}
+                                {% elif installment.is_refinancing_installment and forloop.parentloop.first %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
                                     <a href="{% url 'credits:refinance_detail' installment.pk %}">
@@ -213,14 +213,15 @@
                                 </td>
                                 {% endif %}
 
-                                {% if first_is_paid and not installment.is_refinancing_installment and not installment.is_paid_installment and forloop.first %}
+                                {% if forloop.parentloop.first %}
+                                {% if first_is_paid and not installment.is_refinancing_installment and not installment.is_paid_installment %}
                                 <td>
-                                    <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}">
+                                    <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{installment.pk}}">
                                         <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">Refinanciar</strong>
                                     </div>
                                 </td>
                                 <!--Modal-->
-                                    <div class="modal fade" id="exampleModal{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active.pk}}" aria-hidden="true">
+                                    <div class="modal fade" id="exampleModal{{installment.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{installment.pk}}" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
                                                 <form action="{% url 'credits:refinance' credit_active.pk %}" method="POST">
@@ -243,6 +244,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                {% endif %}
                                 {% endif %}
                                 <td>
                                     <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
@@ -382,9 +384,8 @@
         checkbox.addEventListener('change', calcularSuma);
     });
     
-    if (`{{ credit_active.installments.first.amount|default_if_none:False }}`) {
-        selector.addEventListener('change', calcularSuma);
-        }
+    selector.addEventListener('change', calcularSuma);
+
 </script>
 <script>
     const ledSuccess = document.querySelector('.led-success');

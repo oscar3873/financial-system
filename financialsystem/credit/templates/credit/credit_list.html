@@ -81,9 +81,9 @@
                     <td>{{credit.end_date|date}}</td>
                     {% if user.is_superuser %}
                     <td>
-                        <a type="button " class="btn " data-toggle="modal " data-target="#exampleModal "><i class="fas fa-trash-alt text-danger "></i> &nbsp;</a>
+                        <a type="button " class="btn" data-toggle="modal" data-target="#exampleModal{{credit.instance.pk}} "><i class="fas fa-trash-alt text-danger "></i> &nbsp;</a>
                         <!--Modal-->
-                        <div class="modal fade " id="exampleModal{{formss.instance.pk}} " tabindex="-1 " role="dialog " aria-labelledby="exampleModalLabel{{formss.instance.pk}} " aria-hidden="true ">
+                        <div class="modal fade " id="exampleModal{{credit.instance.pk}} " tabindex="-1 " role="dialog " aria-labelledby="exampleModalLabel{{credit.instance.pk}} " aria-hidden="true">
                             <div class="modal-dialog " role="document ">
                                 <div class="modal-content ">
                                     <form action="{% url 'credits:delete' credit.pk %} " method="POST ">
@@ -100,7 +100,7 @@
                                         </div>
                                         <div class="modal-footer ">
                                             <button class="btn btn-danger ">Si, borrar</button>
-                                            <button type="button " class="btn btn-primary m-2 rounded p-2 " data-dismiss="modal ">Cerrar</button>
+                                            <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
                                         </div>
                                     </form>
                                 </div>

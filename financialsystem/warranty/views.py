@@ -12,6 +12,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
+from credit.models import Credit
 from .models import Warranty
 from .forms import WarrantyForm, SellForm
 from .filters import ListingFilter

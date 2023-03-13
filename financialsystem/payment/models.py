@@ -77,7 +77,11 @@ def comission_create_inst(instance):
         )
 
 def delete_commission(instance, *args, **kwargs):
-    instance.commission_to.delete()
+    '''
+    Eliminacion 'bidireccional': Elimina la instancia del pago y la comision realizada.
+    '''
+    if instance.commission_to:
+        instance.commission_to.delete()
 
 pre_save.connect(up_installment, sender = Payment)
 post_delete.connect(delete_commission, sender = Payment)

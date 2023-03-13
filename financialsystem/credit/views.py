@@ -132,18 +132,31 @@ class AssociateCreateView(CreateView):
         """
         Validacion del formulario de credito.
         """
-        refresh_condition()
         if form.is_valid():
             # Recuperar el ID del cliente seleccionado
             
             selected_client_id = self.request.POST.get('selected_client_id')
             # Asignar el crédito al cliente correspondiente
-            cliente = Client.objects.get(pk=selected_client_id)
+            client = get_object_or_404(Client, pk=selected_client_id)
             credit = form.save(commit=False)
             credit.is_new = True
-            credit.client = cliente
+            credit.client = client
             credit.save()
+
+            # Validar el formulario de garantía
+            warranty_form = WarrantyForm(self.request.POST)
+            warranty = warranty_form.save(commit=False)
+            if warranty_form.cleaned_data['article']:
+                # Asignar la garantía al crédito correspondiente
+                warranty.credit = credit
+                warranty.save()
+            else:
+                # Si el formulario de garantía no es válido, mostrar los errores en la página
+                context = self.get_context_data(form=form, warranty_form=warranty_form)
+                return self.render_to_response(context)
+            
         return super().form_valid(form)
+
 
     def get_context_data(self, **kwargs):
         """
@@ -151,6 +164,7 @@ class AssociateCreateView(CreateView):
         """
         context = super().get_context_data(**kwargs)
         context['clients'] = Client.objects.all()
+        context['warranty_form'] = WarrantyForm
         return context
     
     def get_success_url(self) -> str:
@@ -167,9 +181,9 @@ def buscar_clientes_view(request):
     if search_term:
         # Realizar la búsqueda de clientes que coincidan con el término de búsqueda
         clientes = Client.objects.filter(
-            first_name__icontains=search_term
+            first_name__startswith=search_term
         ) | Client.objects.filter(
-            last_name__icontains=search_term
+            last_name__startswith=search_term
         ) | Client.objects.filter(
             dni__startswith =search_term
         )
@@ -263,18 +277,15 @@ def edit_credit(request, pk):
 
 
 #------------------------------------------------------------------     
-class CreditDeleteView(DeleteView):
-    """
-    Borrado de credito.
-    """	
-    model = Credit
-    
-    def get_success_url(self) -> str:
-        """
-        Redirecciona al listado de credito, con un mensaje de creacion exitosa.
-        """
-        messages.success(self.request, 'Credito borrado correctamente', "danger")
-        return  reverse_lazy('credits:list')
+def client_delete(request, pk):
+    try:
+        cred = get_object_or_404(Credit, pk=pk)
+        cred.delete()
+        messages.success(request, 'Credito borrado correctamente', "success")
+        return  redirect('credits:list')
+    except:
+        messages.error(request, 'Hubo un error al intentar', "danger")
+        return  redirect('credits:list')
     
 
 #------------------------------------------------------------------   

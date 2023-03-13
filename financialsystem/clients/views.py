@@ -146,39 +146,6 @@ class ClientUpdateView(UpdateView):
         """	
         messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
         return reverse_lazy('clients:list')
-    
-#BORRADO DE NUMEROS DE UN CLIENTE
-#------------------------------------------------------------------
-def delete_phone_number(request, pk):
-    """
-    Borra un número de telefono de un cliente.
-    """	
-    try:
-        phone_number = PhoneNumberClient.objects.get(id=pk)
-    except PhoneNumberClient.DoesNotExist:
-        return redirect('clients:update', pk=phone_number.client.id)
-    phone_number.delete()
-    return redirect('clients:update', pk=phone_number.client.id)
-
-#BORRADO DE UN CLIENTE
-#------------------------------------------------------------------
-class ClientDelete(DeleteView):
-    """
-    Borra un cliente.
-    """
-    model = Client
-    
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
-    
-    def get_success_url(self) -> str:
-        """
-        Obtiene la URL de redirección después de que se ha borrado correctamente.
-        Agrega un mensaje de éxito a la cola de mensajes.
-        """	
-        messages.success(self.request, 'Cliente eliminado correctamente', "danger")
-        return  reverse_lazy('clients:list')
 
 
 #DETALLE DE CLIENTE
@@ -204,7 +171,7 @@ class ClientDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context["credits"] = context["client"].credits.all()
-        credits_active = context["credits"].filter(is_active=True)
+        credits_active = context["credits"].filter(is_active=True).order_by("created_at")
         
         if credits_active:
             installments = credits_active.first().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
@@ -215,12 +182,17 @@ class ClientDetailView(DetailView):
             context["first_is_paid"] = credits_active.first().installments.first().is_paid_installment
 
             if installments :
-                context["form_payment"]= PaymentForm(installments=installments)
+                context["form_payment1"]= PaymentForm(installments=installments)
                 context["form_ref"]= RefinancingForm(credit=credits_active.first())
+
+                installments_sec = credits_active.last().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+                if installments_sec:
+                    context["form_payment"]= PaymentForm(installments=installments_sec)
                 
-                if installments.exclude(condition__in=['Refinanciada', 'Pagada']).count() > 0:
-                    context["installments_available"] = True
-                else: context["installments_available"] = False 
+                context["installments_available"] = True
+                
+            else: context["installments_available"] = False 
+
         return context
 
     def get_object(self):
@@ -229,6 +201,40 @@ class ClientDetailView(DetailView):
         """	
         return get_object_or_404(Client, id=self.kwargs['pk'])
     
+
+#BORRADO DE UN CLIENTE
+#------------------------------------------------------------------
+class ClientDelete(DeleteView):
+    """
+    Borra un cliente.
+    """
+    model = Client
+    
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+    
+    def get_success_url(self) -> str:
+        """
+        Obtiene la URL de redirección después de que se ha borrado correctamente.
+        Agrega un mensaje de éxito a la cola de mensajes.
+        """	
+        messages.success(self.request, 'Cliente eliminado correctamente', "danger")
+        return  reverse_lazy('clients:list')
+
+    
+#BORRADO DE NUMEROS DE UN CLIENTE
+#------------------------------------------------------------------
+def delete_phone_number(request, pk):
+    """
+    Borra un número de telefono de un cliente.
+    """	
+    try:
+        phone_number = PhoneNumberClient.objects.get(id=pk)
+    except PhoneNumberClient.DoesNotExist:
+        return redirect('clients:update', pk=phone_number.client.id)
+    phone_number.delete()
+    return redirect('clients:update', pk=phone_number.client.id)
 
 #CONSULTA
 #------------------------------------------------------------------

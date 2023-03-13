@@ -83,9 +83,10 @@ def sell_commission(instance, *args, **kwargs):
             ) 
 
 def sell_delete(instance, *args, **kwargs):
-    instance.commission.delete()
-    instance.article.is_selled = False
-    instance.article.save()
+    if instance.commission:
+        instance.commission.delete()
+        instance.article.is_selled = False
+        instance.article.save()
 
 pre_save.connect(sell_commission, sender=Sell)
 pre_delete.connect(sell_delete, sender=Sell)

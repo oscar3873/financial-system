@@ -21,11 +21,6 @@ class WarrantyForm(forms.ModelForm):
         label = 'Articulo',
     )
     
-    purchase_papers = forms.BooleanField(
-        label= 'Papeles de compra',
-        initial= False,
-    )
-    
     state = forms.ChoiceField(
         choices= ARTICLE_STATE,
         label= "Estado"
@@ -43,6 +38,11 @@ class WarrantyForm(forms.ModelForm):
         label= "Accesorios",
     )
 
+    purchase_papers = forms.BooleanField(
+        label= 'Papeles de compra',
+        initial= False,
+    )
+
     detail = forms.CharField(
         label="Observaciones",
     )
@@ -50,6 +50,7 @@ class WarrantyForm(forms.ModelForm):
     class Meta:
         model = Warranty
         fields = "__all__"
+        exclude = ['credit','is_selled']
     
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):

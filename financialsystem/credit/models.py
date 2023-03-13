@@ -25,7 +25,7 @@ class Credit(models.Model):
     condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
     credit_interest = models.PositiveIntegerField(default=40, help_text="Intereses de credito")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto del Credito")
-    mov = models.OneToOneField(Movement,on_delete=models.SET_NULL,null=True)
+    mov = models.OneToOneField(Movement,on_delete=models.SET_NULL,null=True,blank=True)
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="credits")
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
@@ -139,14 +139,17 @@ def repayment_amount_auto(instance, *args, **kwargs):
     Ej. update: 'credit.amount = <new_amount>' -> credit.save() -> repayment_amount_auto() -> news installments
     """
     credit = instance
-    if instance.is_paid:
-        instance.is_active = False
-        instance.condition = 'Pagado'
+    
     if credit.is_new:
         credit.end_date = (timedelta(days=30)*credit.installment_num) + credit.start_date
         repayment_amount = credit.installment_num*(Decimal(credit.credit_interest/100)*credit.amount)/(1-pow((1+Decimal(credit.credit_interest/100)),(- credit.installment_num)))
         credit.credit_repayment_amount = Decimal(repayment_amount)
+        
     credit.is_active = True
+
+    if instance.is_paid:
+        instance.is_active = False
+        instance.condition = 'Pagado'
 
 
 def create_installments_auto(instance, created, *args, **kwargs):
@@ -195,10 +198,11 @@ def delete_installment(instance, *args, **kwargs):
 
 
 pre_save.connect(repayment_amount_auto, sender= Credit)
-post_save.connect(create_installments_auto, sender= Credit)
-
 pre_save.connect(update_installment, sender=Installment)
 pre_save.connect(update_installment, sender=InstallmentRefinancing)
+
+post_save.connect(create_installments_auto, sender= Credit)
+
 pre_delete.connect(delete_installment, sender=Installment)
 
 #-------------------- SEÑALES PARA REFINANCIACION Y CUOTAS --------------------

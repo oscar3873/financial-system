@@ -6,19 +6,36 @@
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Crear Crédito</h4>
     <section>
         <form method="post">
-            {% csrf_token %}
-            {{ form|crispy }}
-
-            {% if not is_add %}
-                <div class="form-group">
-                    <label for="search-input">Buscar Cliente</label>
-                    <input type="text" id="search-input" class="form-control" placeholder="Buscar por Nombre, Apellido o DNI">
+            <div class="row justify-content-center align-items-start">
+                {% csrf_token %}
+                
+                <div class="col-md-9 p-1">
+                    {{ form }}
+                    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Empeño</h4>
+                    <p>
+                        <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
+                        Añadir Articulo    
+                        </button>
+                    </p>
+                    <div class="collapse col-md-9 p-1" id="collapsePNC">
+                        <div class="form-row">
+                            {{ warranty_form }}
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
-            
-            <ul id="search-results" class="list-group mt-3"></ul>
 
-            <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
+                <div class="col-md-3 p-1">
+                    {% if not is_add %}
+                        <div class="form-group">
+                            <label for="search-input">Buscar Cliente</label>
+                            <input type="text" id="search-input" class="form-control" placeholder="Buscar por Nombre, Apellido o DNI">
+                        </div>
+                    {% endif %}
+                    <ul id="search-results" class="list-group mt-3"></ul>
+                </div>
+                
+                <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
+            </div>
         </form>
     </section>
 </main>

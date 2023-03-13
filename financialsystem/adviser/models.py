@@ -78,6 +78,9 @@ def paid_commission(instance, *args, **kwargs):
         )
 
 def delete_commission_mov(instance, *args, **kwargs):
+    '''
+    Eliminacion 'bidireccional': Elimina la instancia de la comision y el moviminto realizado.
+    '''
     if instance.mov:
         instance.mov.delete()
 
