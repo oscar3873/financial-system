@@ -1,12 +1,13 @@
 from datetime import datetime
 from decimal import Decimal
 from django.db import models
-from django.db.models.signals import pre_save, pre_delete
+from django.db.models.signals import pre_save, post_delete, pre_delete
 
 # Create your models here.
 from django.db import models
 from credit.models import Credit
 from adviser.models import Adviser, Comission
+from cashregister.models import Movement, CashRegister
 # Create your models here.
 
 class Warranty(models.Model):
@@ -54,8 +55,9 @@ class Sell(models.Model):
     amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     payment_method = models.CharField(max_length=15, choices=MONEY_TYPE,null=True, blank=True, default='PESOS')
     adviser = models.ForeignKey(Adviser,on_delete=models.SET_NULL, null=True)
-    commission = models.ForeignKey(Comission, on_delete=models.SET_NULL, null=True)
+    commission = models.ForeignKey(Comission, on_delete=models.SET_NULL, null=True, blank=True)
     article = models.OneToOneField(Warranty, on_delete=models.SET_NULL, blank=True, null=True, related_name='sell')
+    mov = models.OneToOneField(Movement, on_delete=models.SET_NULL, blank=True, null=True, related_name="sell")
     sell_date = models.DateTimeField(null=True, default=datetime.now)
     detail = models.TextField(max_length=150, blank=True, null=True, help_text="Observaciones del articulo")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -79,14 +81,29 @@ def sell_commission(instance, *args, **kwargs):
             operation_amount = instance.amount,
             type = 'VENTA',
             last_up = instance.sell_date,
-            detail = "VENTA ARTICULO: %s" % instance.article,
-            ) 
+            detail = 'VENTA DE %s - ASESOR: %s' % (instance.article, instance.adviser),
+            )
+    if not instance.mov:
+        instance.mov = Movement.objects.create(
+            user = instance.adviser,
+            amount = instance.amount,
+            cashregister = CashRegister.objects.first(),
+            operation_mode = 'INGRESO',
+            description = 'VENTA DE %s - ASESOR: %s' % (instance.article, instance.adviser),
+            money_type = instance.payment_method,
+            )
+
 
 def sell_delete(instance, *args, **kwargs):
     if instance.commission:
         instance.commission.delete()
         instance.article.is_selled = False
         instance.article.save()
+    if instance.mov:
+        instance.mov.delete()
+        instance.article.is_selled = False
+        instance.article.save()
+
 
 pre_save.connect(sell_commission, sender=Sell)
 pre_delete.connect(sell_delete, sender=Sell)

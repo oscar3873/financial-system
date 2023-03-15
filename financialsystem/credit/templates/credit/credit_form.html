@@ -23,7 +23,7 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="col-md-3 p-1">
                     {% if not is_add %}
                         <div class="form-group">
@@ -32,6 +32,12 @@
                         </div>
                     {% endif %}
                     <ul id="search-results" class="list-group mt-3"></ul>
+                    <div class="my-2 bg-primary border-0 text-white box-shadow card">
+                        <a name="" id="" class="btn btn-secondary rounded p-3" href="{% url 'credits:create_credit' %}" role="button">
+                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                            <span>Cargar Nuevo Cliente Completo</span>
+                        </a>
+                    </div>
                 </div>
                 
                 <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">

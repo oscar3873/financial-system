@@ -26,7 +26,7 @@ class Payment(models.Model):
     payment_date = models.DateTimeField(default=datetime.now, help_text="Fecha de Pago")
     adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, null=True, blank=True)
     commission_to = models.OneToOneField(Comission, on_delete=models.SET_NULL, null=True, blank=True)
-    payment_mov = models.OneToOneField(Movement, on_delete=models.CASCADE, null=True, blank=True)
+    mov = models.OneToOneField(Movement, on_delete=models.CASCADE, null=True, blank=True)
     payment_method = models.CharField(max_length=20,choices=MONEY_TYPE, help_text="Metodo de Pago")
     detail = models.CharField(max_length=150, null=True, blank=True)
 

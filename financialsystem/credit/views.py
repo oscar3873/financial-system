@@ -5,7 +5,9 @@ from django.views.generic import UpdateView, DeleteView, CreateView, ListView, D
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.forms import formset_factory
-import copy  
+import copy
+
+from cashregister.utils import create_movement  
 
 from .utils import *
 

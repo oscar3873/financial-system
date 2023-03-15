@@ -1,3 +1,4 @@
+from copy import copy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
@@ -14,7 +15,7 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from credit.utils import refresh_condition
 from credit.models import Credit
 from .models import Warranty
-from .forms import WarrantyForm, SellForm
+from .forms import WarrantyForm, SellForm, WarrantyUpdateForm
 from .filters import ListingFilter
 from .utils import all_properties_warranty
 
@@ -39,9 +40,7 @@ class WarrantyListView(LoginRequiredMixin, ListView):
         context["count_warrantys"] = self.model.objects.all().count()
         context["warrantys"] = self.model.objects.all()
         context["listing_filter"] = ListingFilter(self.request.GET, queryset=context["warrantys"])
-        #VALIDACION DE EXISTENCIA PARA AL MENOS UN CLIENTE
-        if self.model.objects.all().count() > 0:
-            context["properties"] = all_properties_warranty
+        context["properties"] = all_properties_warranty
         
         return context
     
@@ -53,6 +52,7 @@ class WarrantyListView(LoginRequiredMixin, ListView):
         return ListingFilter(self.request.GET, queryset=queryset).qs
 
 
+#DETALLE DE EMPEÑO (FUNCION UTIL PARA EL FUTURO, CON IMAGENES DEL ESTADO DEL MOMENTO QUE SE REGISTRO)
 class WarrantyDetailView(LoginRequiredMixin, DetailView):
     """
     Detalle de un empeño.
@@ -70,6 +70,7 @@ class WarrantyDetailView(LoginRequiredMixin, DetailView):
         refresh_condition()
         return get_object_or_404(Warranty, id=self.kwargs['pk'])
 
+
 #CREACION DE UNA NOTA
 class WarrantyCreateView(CreateView):
     """
@@ -83,7 +84,7 @@ class WarrantyCreateView(CreateView):
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.
         """
-        messages.success(self.request, 'Garante creada correctamente', "success")
+        messages.success(self.request, 'Articulo creado correctamente', "success")
         return  reverse_lazy('warrantys:list')
 
 #BORRADO DE UNA NOTA
@@ -98,7 +99,7 @@ class WarrantyDeleteView(DeleteView):
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.
         """
-        messages.success(self.request, 'Garante eliminada correctamente', "danger")
+        messages.success(self.request, 'Articulo eliminado correctamente', "danger")
         return  reverse_lazy('warrantys:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -108,9 +109,9 @@ class WarrantyUpdateView(UpdateView):
     Actualiza un empeño.
     """	
     model = Warranty
-    form_class = WarrantyForm
+    form_class = WarrantyUpdateForm
     template_name_suffix = '_update_form'
-    
+
     def get_success_url(self) -> str:
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.

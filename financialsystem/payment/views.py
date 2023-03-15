@@ -14,7 +14,7 @@ from django.views.generic.edit import UpdateView, DeleteView
 
 from credit.models import Credit, Refinancing, Installment
 from credit.utils import refresh_condition
-from .utils import payment_create
+from .utils import payment_create, all_properties_paymnet
 from .models import Payment
 from .forms import PaymentForm
 
@@ -26,7 +26,6 @@ class PaymentListView(LoginRequiredMixin, ListView):
     model = Payment
     template_name = "payment/payment_list.html"
     paginate_by = 6
-    ordering = ['-created_at']
     
     def get_context_data(self, **kwargs):
         """
@@ -37,9 +36,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["count_payments"] = self.model.objects.all().count()
         context["payments"] = self.model.objects.all()
-        #VALIDACION DE EXISTENCIA PARA AL MENOS UN CLIENTE
-        # if self.model.objects.all().count() > 0:
-        #     context["properties"] = self.model.objects.all()[0].all_properties()
+        context["properties"] = all_properties_paymnet()
         
         return context
 
@@ -56,7 +53,7 @@ class PaymentDeleteView(DeleteView):
         Obtiene la URL de redirección después de que se ha eliminado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.success(self.request, 'Nota borrada correctamente', "danger")
+        messages.success(self.request, 'Pago borrada correctamente', "danger")
         return  reverse_lazy('payments:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -82,7 +79,7 @@ class PaymentUpdateView(UpdateView):
         Obtiene la URL de redirección después de que se ha eliminado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.success(self.request, 'Nota actualizada satisfactoriamente', "info")
+        messages.success(self.request, 'Pago actualizada satisfactoriamente', "info")
         return  reverse_lazy('payments:list')
     
 #REALIZAR DE UN PAGO

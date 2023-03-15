@@ -1,6 +1,9 @@
 from payment.models import Payment
 from credit.models import Installment
 
+def all_properties_paymnet():
+    return ['Monto','Forma de Pago','Detalle','Fecha']
+
 def payment_create(payment, installment):
     payment_dict = {
         'amount': payment.amount,

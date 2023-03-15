@@ -83,6 +83,9 @@ def refresh_cashregister(instance, *args, **kwargs):
 
     instance.cashregister.save()
 
+
+
+
 def operation_type_validate(instance, *args, **kwargs):
     """
     Verifica la existencia de una Caja, caso contrario, es creada.
@@ -92,6 +95,7 @@ def operation_type_validate(instance, *args, **kwargs):
     instance.amount = abs(instance.amount)
     if instance.operation_mode == 'EGRESO':
         instance.amount = -instance.amount
+
 
 pre_save.connect(operation_type_validate, sender=Movement)
 post_save.connect(refresh_cashregister, sender= Movement)

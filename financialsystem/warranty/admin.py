@@ -5,6 +5,7 @@ from .models import Warranty, Sell
 # Register your models here.
 class WarrantyAdmin(admin.ModelAdmin):
     list_display = (
+        'is_selled',
         'article', 
         'brand', 
         'model', 

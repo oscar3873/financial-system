@@ -75,31 +75,4 @@ def refresh_installments_credits():
 
     
 
-
-
-#--------------------- UTILS FUNCTIONS -------------------------------------------
-def create_movement(instance, adviser):
-    mov = Movement.objects.create(
-        user = adviser,
-        amount = instance.amount,
-        cashregister = CashRegister.objects.last(),
-        operation_mode = 'EGRESO',
-        description = 'CREDITO OTORGADO A %s - CUOTAS: %s' % (instance.client, instance.installment_num),
-        money_type = 'PESOS',
-        )
-    comission_create(instance, adviser, detail=mov.description)
-    return mov
-
-
-def comission_create(instance, adviser, detail):
-    amount = instance.amount*Decimal(0.075)
-    Comission.objects.create(
-        adviser = adviser,
-        interest = Decimal(7.5),
-        amount = amount,
-        operation_amount = instance.amount,
-        type = 'REGISTRO',
-        last_up = instance.start_date,
-        detail = detail,
-        ) 
     

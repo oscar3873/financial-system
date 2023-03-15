@@ -105,12 +105,72 @@ class SellForm(forms.ModelForm):
     class Meta:
         model = Sell
         fields = "__all__"
-        exclude = ["adviser","article", "commission"]
+        exclude = ["adviser","article", "commission","mov"]
 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})
+
+class WarrantyUpdateForm(forms.ModelForm):
+    ARTICLE_STATE = (
+        ('NUEVO','NUEVO'),
+        ('USADO:COMO NUEVO', 'USADO:COMO NUEVO'),
+        ('USADO:MUY BUENO', 'USADO:MUY BUENO'),
+        ('USADO:BUENO', 'USADO:BUENO'),
+        ('USADO:ACEPTABLE', 'USADO:ACEPTABLE'),
+        ('USADO:REACONDICIONADO', 'USADO:REACONDICIONADO'),
+        ('USADO:MUCHO USO', 'USADO:MUCHO USO'),
+    )
+
+    is_selled = forms.BooleanField(
+        label="¿Esta vendido el articulo?",
+        required=False
+    )
+    
+    article = forms.CharField(
+        label = 'Articulo',
+    )
+    
+    state = forms.ChoiceField(
+        choices= ARTICLE_STATE,
+        label= "Estado"
+    )
+    
+    brand = forms.CharField(
+        label= "Marca",
+    )
+
+    model = forms.CharField(
+        label= "Modelo",
+    ) 
+    
+    accessories = forms.CharField(
+        label= "Accesorios",
+    )
+
+    purchase_papers = forms.BooleanField(
+        label= 'Papeles de compra',
+        initial= False,
+    )
+
+    detail = forms.CharField(
+        label="Observaciones",
+        required=False,
+    )
+
+    class Meta:
+        model = Warranty
+        fields = "__all__"
+        exclude = ['credit']
+    
+    #ASOCIACION DE CRYSPY FORM
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
