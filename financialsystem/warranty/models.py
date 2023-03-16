@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from django.db import models
-from django.db.models.signals import pre_save, post_delete, pre_delete
+from django.db.models.signals import pre_save, post_delete, post_save
 
 # Create your models here.
 from django.db import models
@@ -57,7 +57,7 @@ class Sell(models.Model):
     adviser = models.ForeignKey(Adviser,on_delete=models.SET_NULL, null=True)
     commission = models.ForeignKey(Comission, on_delete=models.SET_NULL, null=True, blank=True)
     article = models.OneToOneField(Warranty, on_delete=models.SET_NULL, blank=True, null=True, related_name='sell')
-    mov = models.OneToOneField(Movement, on_delete=models.SET_NULL, blank=True, null=True, related_name="sell")
+    mov = models.ForeignKey(Movement, on_delete=models.CASCADE, blank=True, null=True)
     sell_date = models.DateTimeField(null=True, default=datetime.now)
     detail = models.TextField(max_length=150, blank=True, null=True, help_text="Observaciones del articulo")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -94,16 +94,20 @@ def sell_commission(instance, *args, **kwargs):
             )
 
 
-def sell_delete(instance, *args, **kwargs):
+
+def sell_delete(instance, origin=False, *args, **kwargs):
+    print(instance.commission)
     if instance.commission:
         instance.commission.delete()
         instance.article.is_selled = False
         instance.article.save()
-    if instance.mov:
+
+    if not isinstance(origin,Movement):
         instance.mov.delete()
         instance.article.is_selled = False
         instance.article.save()
 
 
 pre_save.connect(sell_commission, sender=Sell)
-pre_delete.connect(sell_delete, sender=Sell)
+post_delete.connect(sell_delete, sender=Sell)
+

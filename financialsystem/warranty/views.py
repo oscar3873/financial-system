@@ -13,8 +13,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
-from credit.models import Credit
-from .models import Warranty
+from .models import Warranty, Sell
 from .forms import WarrantyForm, SellForm, WarrantyUpdateForm
 from .filters import ListingFilter
 from .utils import all_properties_warranty
@@ -111,6 +110,16 @@ class WarrantyUpdateView(UpdateView):
     model = Warranty
     form_class = WarrantyUpdateForm
     template_name_suffix = '_update_form'
+
+    def form_valid(self, form):
+        if not form.instance.is_selled:
+            try:
+                form.instance.sell.delete()
+            except:
+                pass
+
+        return super().form_valid(form)
+    
 
     def get_success_url(self) -> str:
         """
