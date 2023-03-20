@@ -28,6 +28,7 @@ from .filters import DescriptionFilter, ListingFilter, MoneyTypeFilter, AmountFi
 from django.db.models import Sum
 from django.utils import timezone
 
+
 # Create your views here.
 class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
     '''

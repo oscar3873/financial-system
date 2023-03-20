@@ -17,6 +17,7 @@ class CashRegister(models.Model):
     total_balanceTRANSFER = MoneyField(max_digits=20, decimal_places=2 , default_currency='ARS', null=True, default=0)
     total_balanceCREDITO = MoneyField(max_digits=20, decimal_places=2 , default_currency='ARS', null=True, default=0)
     total_balanceDEBITO = MoneyField(max_digits=20, decimal_places=2 , default_currency='ARS', null=True, default=0)
+    auth_expenses = models.CharField(max_length = 128, blank=True, null = True)
     
     #Name of the admin site
     def __str__(self) -> str:

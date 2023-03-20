@@ -1,7 +1,7 @@
 {% load static %} {% block content %}
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
 <main class="container my-4">
-  <!-- MODAL FORMULARIO PAYMENT -->
+    <!-- MODAL FORMULARIO PAYMENT -->
     <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}" onclick="verquepasa(`{{credit_active.pk}}`)">
         <strong class="btn btn-info rounded p-3" role="button">
           <i class="fa-solid fa-receipt"></i>
@@ -11,37 +11,32 @@
     <!--Modal-->
     <div class="modal fade" id="exampleModal{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active.pk}}" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content bg-primary text-white">
                 <form action="{% url 'payments:make_paid' credit_active.pk %}" method="POST">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Registrar Pago</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                       </button>
-                  </div>
-                  <div class="modal-body">
+                    </div>
+                    <div class="modal-body">
                         <h5>Valor por Cuota $ {{amount_installment}}</h5>
-                        {% csrf_token %}
-                        {% if forloop.first %}
-                            {{form_payment1.as_p}}
-                        {% else %}
-                            {{form_payment.as_p}}
-                        {% endif %}
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn btn-success">Pagar</button>
-                      <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
-                  </div>
-              </form>
-          </div>
-      </div>
-  </div>
+                        {% csrf_token %} {% if forloop.first %} {{form_payment1.as_p}} {% else %} {{form_payment.as_p}} {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success">Pagar</button>
+                        <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </main>
 
 <script>
-    function verquepasa(id){
-        let checkboxes_p = document.querySelectorAll('input[type="checkbox"][id="form_payment' + id +'"]');
-        var amountElement = document.querySelector("#id_payment-amount" +id);
+    function verquepasa(id) {
+        let checkboxes_p = document.querySelectorAll('input[type="checkbox"][id="form_payment' + id + '"]');
+        var amountElement = document.querySelector("#id_payment-amount" + id);
 
         function sumar() {
             console.log(checkboxes_p);
@@ -61,6 +56,6 @@
             checkbox.addEventListener("click", sumar);
         });
     }
-  </script>
+</script>
 
 {% endblock content %}
