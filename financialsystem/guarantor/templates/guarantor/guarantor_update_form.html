@@ -1,15 +1,94 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
 <!--Main-->
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
-<main class="container my-4">
-    {% load crispy_forms_tags %}
-    <form method="post" id="client_form">
-        {% csrf_token %}
-        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">Modificar Garante</h5>
-        {{ form|crispy}}
-        <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
-    </form>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-</main>
+<body>
+    <div class="container">
+        <h1 class="my-3">Actualizar Garante: {{object}}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.first_name.label_tag }} {{ form.first_name }}
+            {% if form.first_name.errors %}
+                <div class="text-danger">{{ form.first_name.errors.0 }}</div>
+            {% endif %}
+
+            {{ form.last_name.label_tag }} {{ form.last_name }}
+            {% if form.last_name.errors %}
+                <div class="text-danger">{{ form.last_name.errors.0 }}</div>
+            {% endif %}
+
+            {{ form.civil_status.label_tag }} {{ form.civil_status }}
+            {% if form.civil_status.errors %}
+                <div class="text-danger">{{ form.civil_status.errors.0 }}</div>
+            {% endif %}
+
+            {{ form.profession.label_tag }} {{ form.profession }}
+            {% if form.profession.errors %}
+                <div class="text-danger">{{ form.profession.errors.0 }}</div>
+            {% endif %}
+
+            {{ form.address.label_tag }} {{ form.address }}
+            {% if form.address.errors %}
+                <div class="text-danger">{{ form.address.errors.0 }}</div>
+            {% endif %}
+
+            {{ form.job_address.label_tag }} {{ form.job_address }}
+            {% if form.job_address.errors %}
+                <div class="text-danger">{{ form.job_address.errors.0 }}</div>
+            {% endif %}
+
+            {{ form.dni.label_tag }}
+            <div class="input-group">
+                {{ form.dni }}
+                <button type="button" class="btn btn-secondary" id="toggleEditDni">Editar</button>
+            </div>
+            {% if form.dni.errors %}
+                <div class="text-danger">{{ form.dni.errors.0 }}</div>
+            {% endif %}
+
+            {{ form.email.label_tag }}
+            <div class="input-group">
+                {{ form.email }}
+                <button type="button" class="btn btn-secondary" id="toggleEditEmail">Editar</button>
+            </div>
+            {% if form.email.errors %}
+                <div class="text-danger">{{ form.email.errors.0 }}</div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dniInput = document.getElementById('id_guarantor-dni');
+            var emailInput = document.getElementById('id_guarantor-email');
+            var toggleEditDni = document.getElementById('toggleEditDni');
+            var toggleEditEmail = document.getElementById('toggleEditEmail');
+
+            dniInput.setAttribute('readonly', 'readonly');
+            emailInput.setAttribute('readonly', 'readonly');
+
+            toggleEditDni.addEventListener('click', function() {
+                if (dniInput.hasAttribute('readonly')) {
+                    dniInput.removeAttribute('readonly');
+                    this.textContent = 'Bloquear';
+                } else {
+                    dniInput.setAttribute('readonly', 'readonly');
+                    this.textContent = 'Editar';
+                }
+            });
+
+            toggleEditEmail.addEventListener('click', function() {
+                if (emailInput.hasAttribute('readonly')) {
+                    emailInput.removeAttribute('readonly');
+                    this.textContent = 'Bloquear';
+                } else {
+                    emailInput.setAttribute('readonly', 'readonly');
+                    this.textContent = 'Editar';
+                }
+            });
+        });
+    </script>
+</body>
 
 {% endblock content %}

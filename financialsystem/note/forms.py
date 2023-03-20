@@ -25,10 +25,9 @@ class NoteForm(forms.ModelForm):
     
     class Meta:
         model = Note
-        fields = ["title", "content", "user"]
+        fields = ["title", "content"]
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request') # Para obtener el usuario
         super(NoteForm, self).__init__(*args, **kwargs)
-        self.fields["user"].initial = self.request.user.id
         self.helper = FormHelper

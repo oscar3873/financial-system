@@ -38,7 +38,7 @@ class Credit(models.Model):
     def __str__(self) -> str:
         
         if self.client:
-            return "Credito de {}, {}".format(self.client.first_name, self.client.last_name)
+            return "Credito de {}, {}".format(self.client.last_name, self.client.first_name)
         else:
             return super().__str__()
         

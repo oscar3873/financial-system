@@ -1,5 +1,4 @@
-from datetime import date, datetime
-from datetime import date, datetime
+from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
@@ -11,21 +10,17 @@ from .utils import all_properties_client
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 
 
 #CRUD CLIENT
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import DeleteView, UpdateView
-from django.views.generic.edit import DeleteView, UpdateView
+from django.views.generic import ListView, DetailView, DeleteView, UpdateView
 
-from django.urls import reverse_lazy
 #FORMS
 from .forms import ClientForm, PhoneNumberFormSetUpdate
-from guarantor.forms import GuarantorForm
 #MODEL
 from .models import Client, PhoneNumberClient
-from credit.models import Credit, Installment, Refinancing
+from credit.models import Refinancing
 from credit.forms import RefinancingForm
 
 from payment.forms import PaymentForm
@@ -109,6 +104,10 @@ class ClientUpdateView(UpdateView):
     model = Client
     form_class = ClientForm
     template_name_suffix = '_update'
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
         """
@@ -244,6 +243,10 @@ class QueryView(ListView):
     """
     model = Client
     template_name = 'core/home.html'
+
+    # Se especifica la URL de inicio de sesión y el campo de redirección
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get(self, request, *args, **kwargs):
         """
@@ -255,5 +258,4 @@ class QueryView(ListView):
             return redirect('clients:detail', pk=search.pk) # redirecciona al detalle del cliente en caso de encontrarlo
         except :
             messages.error(request, "Cliente no encontrado")
-                
-        return super().get(request, *args, **kwargs)
+        return (redirect('home' if self.request.user.is_authenticated else 'query'))

@@ -1,20 +1,27 @@
 from datetime import datetime
 from decimal import Decimal
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
+
+
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.models import User
+
 
 from braces.views import GroupRequiredMixin
 
 from credit.utils import refresh_condition
 from .models import Adviser, Comission
 from .utils import *
-from cashregister.models import CashRegister, Movement
+from .forms import *
 
 # Create your views here.
 class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
@@ -109,8 +116,8 @@ def pay_commission(request, pk):
 
     commission.is_paid = True
     porcentage_value = Decimal(request.POST.get('porcentage'))
-
-    real_value = Decimal((commission.amount*100)/porcentage_value)   # Calculo para saber el monto original (el 100%)
+    real_value = Decimal(round((commission.amount*100)/commission.interest))  # Calculo para saber el monto original (el 100%)
+    
     commission.amount = Decimal(real_value*(porcentage_value/100)) # Monto de la comision   
     commission.operation_amount = real_value 
     commission.interest = Decimal(porcentage_value)
@@ -119,11 +126,31 @@ def pay_commission(request, pk):
     commission.save()
 
     messages.success(request, "La comisión se ha pagado exitosamente.")
+    request.session['success_message'] = "La comisión se ha pagado exitosamente." # almacenar mensaje en la sesión
     return redirect('advisers:detail', pk=commission.adviser.id)
 
+@login_required(login_url="/accounts/login/")
+def update_user(request,pk):
+    user = get_object_or_404(Adviser, pk=pk).user
 
-class AdviserUpdateView(UpdateView):
-    model = Adviser
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=user)
+        password_form = PasswordChangeCustomForm(user, request.POST)
+        if user_form.is_valid() and password_form.is_valid():
+            user_form.save()
+            password_form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Usuario actualizado exitosamente.')
+    else:
+        user_form = UserUpdateForm(instance=user)
+        password_form = PasswordChangeCustomForm(user)
+
+    context = {
+        'user_form': user_form,
+        'password_form': password_form
+    }
+
+    return render(request, 'adviser/adviser_update_form.html', context)
     
 
 class AdviserDeleteView(DeleteView):

@@ -24,6 +24,10 @@ class NoteListView(LoginRequiredMixin, ListView):
     template_name = "note/note_list.html"
     paginate_by = 6
     ordering = ['-created_at']
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
         """
@@ -61,7 +65,20 @@ class NoteDetailView(LoginRequiredMixin, DetailView):
 class NoteCreateView(CreateView):
     model = Note
     form_class = NoteForm
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
+    def form_valid(self, form):
+        if form.is_valid():
+            note = form.save(commit=False)
+            print('si pasa')
+            note.user = self.request.user.adviser
+            form.save()
+
+        return super().form_valid(form)
+
     def get_form_kwargs(self):
         """
         Función que se encarga de obtener los parámetros del formulario.
@@ -98,6 +115,10 @@ class NoteUpdateView(UpdateView):
     model = Note
     form_class = NoteForm
     template_name_suffix = '_update_form'
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_form_kwargs(self):
         """

@@ -1,10 +1,12 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import UpdateView, DeleteView, CreateView, ListView, DetailView
+from django.views.generic import UpdateView, CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.forms import formset_factory
+from django.contrib.auth.decorators import login_required
+
 import copy
 
 from cashregister.utils import create_movement  
@@ -17,19 +19,20 @@ from guarantor.models import Guarantor
 
 from .forms import *
 from guarantor.forms import GuarantorForm, PhoneNumberFormSetG
-from warranty.forms import WarrantyForm
+from warranty.forms import WarrantyForm, WarrantyFormSet
 from clients.forms import ClientForm, PhoneNumberFormSet
 from payment.forms import PaymentForm
 
 #CREAR UN CREDITO CON TODOS LOS FORMULARIOS ANIDADOS
-
+@login_required(login_url="/accounts/login/")
 def crear_credito(request):
     """
     Creacion de un cliente, credito, garante y empeño, con sus respectivos formularios.
     """
     client_form = ClientForm(request.POST or None)
     guarantor_form = GuarantorForm(request.POST or None)
-    warranty_form = WarrantyForm(request.POST or None)
+    # warranty_form = WarrantyForm(request.POST or None)
+    warranty_form = WarrantyFormSet(request.POST or None,instance=Credit(),prefix= "warranty_credit")
     credit_form = CreditForm(request.POST or None)
     formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
@@ -62,10 +65,11 @@ def crear_credito(request):
                         phone_number.guarantor = guarantor
                         phone_number.save()
             
-            warranty = warranty_form.save(commit=False)
-            if warranty_form.cleaned_data["article"]:
-                warranty.credit = credit
-                warranty.save()
+            warrantys = warranty_form.save(commit=False)
+            for warranty in warrantys:
+                if warranty.article:
+                    warranty.credit = credit
+                    warranty.save()
             
             messages.success(request, 'El cliente se ha guardado exitosamente.')
             return redirect('clients:list')
@@ -77,7 +81,7 @@ def crear_credito(request):
         'garante_form': guarantor_form,
         'formsetPhoneGuarantor': formsetPhoneGuarantor,
         'credito_form': credit_form,
-        'empeno_form': warranty_form,
+        'empenos_form': warranty_form,
     }
     
     return render(request, 'credit/create_credit.html', context)
@@ -117,6 +121,10 @@ class CreditDetailView(DetailView):
     model = Credit
     template_name = 'credits/credit_detail.html'
 
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
     def get_object(self):
         return get_object_or_404(Credit, pk=self.kwargs['pk'])
 
@@ -125,10 +133,23 @@ class CreditDetailView(DetailView):
 #------------------------------------------------------------------   
 class AssociateCreateView(CreateView):
     """
-    Asocia un credito por crear a un cliente a buscar.
+    Asocia un credito por crear a un cliente .
     """
     model = Credit
     form_class = CreditForm
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
+    def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
+        """
+        context = super().get_context_data(**kwargs)
+        context['clients'] = Client.objects.all()
+        context['warranty_form'] = WarrantyForm
+        return context
 
     def form_valid(self, form):
         """
@@ -152,22 +173,9 @@ class AssociateCreateView(CreateView):
                 # Asignar la garantía al crédito correspondiente
                 warranty.credit = credit
                 warranty.save()
-            else:
-                # Si el formulario de garantía no es válido, mostrar los errores en la página
-                context = self.get_context_data(form=form, warranty_form=warranty_form)
-                return self.render_to_response(context)
             
         return super().form_valid(form)
 
-
-    def get_context_data(self, **kwargs):
-        """
-        Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
-        """
-        context = super().get_context_data(**kwargs)
-        context['clients'] = Client.objects.all()
-        context['warranty_form'] = WarrantyForm
-        return context
     
     def get_success_url(self) -> str:
         """ 
@@ -177,6 +185,7 @@ class AssociateCreateView(CreateView):
         return  reverse_lazy('credits:list')
 
 
+@login_required(login_url="/accounts/login/")
 def buscar_clientes_view(request):
     search_term = request.GET.get('search_term')
 
@@ -217,6 +226,10 @@ class CreditCreateTo(CreateView):
     form_class = CreditForm
     template_name = 'credit/credit_form.html'
 
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_add'] = True
@@ -245,7 +258,7 @@ class CreditCreateTo(CreateView):
     
 
 #------------------------------------------------------------------   NUEVOOO
-
+@login_required(login_url="/accounts/login/")
 def edit_credit(request, pk):
     
     credit_original = Credit.objects.get(id=pk)
@@ -291,6 +304,7 @@ def client_delete(request, pk):
     
 
 #------------------------------------------------------------------   
+@login_required(login_url="/accounts/login/")
 def refinance_installment (request, pk):
     """
     Refiancia cuotas y actualiza sus estados.
@@ -323,6 +337,10 @@ class RefinancingDetailView(DetailView):
     model = Installment
     template_name = 'refinance/refinance_detail.html'
 
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los refinanciamientos de la base de datos para usarlos en el contexto y poder pagarlos con PaymentsForm.
@@ -343,6 +361,10 @@ class InstallmentRefUpdateView(UpdateView):
     template_name = 'installment/installment_ref_update.html'
     success_url = reverse_lazy('clients:list')
 
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['installment_ref'] = self.object
@@ -357,6 +379,10 @@ class InstallmentUpdateView(UpdateView):
     model = Installment
     form_class = InstallmentUpdateForm
     template_name = 'installment/installment_update.html'
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

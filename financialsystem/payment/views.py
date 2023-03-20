@@ -65,6 +65,10 @@ class PaymentUpdateView(UpdateView):
     model = Payment
     form_class = PaymentForm
     template_name_suffix = '_update_form'
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_form_kwargs(self):
         """

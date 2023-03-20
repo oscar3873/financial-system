@@ -232,6 +232,10 @@ class MovementUpdateView(UpdateView):
     model = Movement
     form_class = MovementUpdateForm
     template_name_suffix = '_update_form'
+
+    # Se especifica la URL de inicio de sesión y el campo de redirección
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_form_kwargs(self):
         """

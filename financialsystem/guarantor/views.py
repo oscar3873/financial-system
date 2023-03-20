@@ -1,8 +1,9 @@
+from datetime import datetime
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-
-from django.shortcuts import get_object_or_404, render
-from django.shortcuts import redirect
+from babel.dates import format_date
+from django.shortcuts import get_object_or_404
 
 from django.urls import reverse_lazy
 
@@ -13,34 +14,56 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
 from .models import Guarantor
-from .forms import GuarantorForm
+from .forms import GuarantorForm, GuarantorUpdateForm
 from .filters import ListingFilter
-from .utils import all_properties_guarantor
 
 # Create your views here.
 class GuarantorListView(LoginRequiredMixin, ListView):
     """
-    Lista de Garantes.
+    Lista de clientes con autenticacion de logeo.
     """
     model = Guarantor
-    template_name = "guarantor/guarantor_list.html"
-    paginate_by = 6
+    template_name = 'guarantor/guarantor_list.html'
     ordering = ['-created_at']
+    paginate_by = 4
+    filter_class = ListingFilter
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
         """
-        Extrae los datos de los garantes que se encuentran en la base de datos para usarlo en el contexto.
+        Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
-        context["count_guarantors"] = self.model.objects.all().count()
-        context["guarantors"] = self.model.objects.all()
-        context["listing_filter"] = ListingFilter(self.request.GET, queryset=context["guarantors"])
-        #VALIDACION DE EXISTENCIA PARA AL MENOS UN CLIENTE
-        if self.model.objects.all().count() > 0:
-            context["properties"] = all_properties_guarantor
         
+        # Etiqueta para el día actual
+        today = timezone.now().date()
+
+        # Etiqueta para el mes actual
+        month = datetime.today().month
+        label_month = format_date(timezone.now(), format='MMMM Y', locale='es').capitalize()
+        label_day = f'Hoy {timezone.now().date().day} de {label_month}'
+        year = timezone.now().year
+        label_year = str(year)
+        label_historial = "Historico"
+        # Cantidad de clientes histórica
+        count_guarantors = self.model.objects.count()
+        count_guarantors_today = self.model.objects.filter(created_at__date=today).count()
+        count_guarantors_this_month = self.model.objects.filter(created_at__year=year, created_at__month=month).count()
+        count_guarantors_this_year = self.model.objects.filter(created_at__year=year).count()
+        count_guarantors_dict = [
+            {'label':label_historial, 'value':count_guarantors},
+            {'label':label_day, 'value':count_guarantors_today},
+            {'label':label_month, 'value':count_guarantors_this_month},
+            {'label':label_year, 'value':count_guarantors_this_year},
+        ]
+        # Contextos
+        context["count_guarantors_dict"] = count_guarantors_dict
+        context["guarantors"] = self.model.objects.all()
+        context["listing_filter"] = ListingFilter(self.request.GET, context['guarantors'])
         return context
     
     def get_queryset(self):
@@ -106,12 +129,30 @@ class GuarantorUpdateView(UpdateView):
     Actualiza un garante.
     """	
     model = Guarantor
-    form_class = GuarantorForm
+    form_class = GuarantorUpdateForm
     template_name_suffix = '_update_form'
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
+    def form_invalid(self, form):
+        """
+        Devuelve los datos preciamente ingresados, cuando el formulario es invalido.
+        """        
+        form.data = form.data.copy()
+        form.data['guarantor-dni'] = self.object.dni
+        form.data['guarantor-email'] = self.object.email
+
+        return self.render_to_response(self.get_context_data(form=form))
+
     def get_success_url(self) -> str:
         """
         Redirecciona al listado de garantes, con un mensaje de actualizacion exitosa.
         """	
         messages.success(self.request, 'Garante actualizada satisfactoriamente', "info")
         return  reverse_lazy('guarantors:list')
+    
+    """
+        Devuelve los datos preciamente ingresados, cuando el formulario es invalido.
+        """

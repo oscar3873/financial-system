@@ -3,8 +3,8 @@ from .views import NoteListView, NoteDetailView, NoteUpdateView, NoteDeleteView,
 
 note_patterns = ([
     path('', NoteListView.as_view(), name='list'),
-    path('<uuid:pk>/', NoteDetailView.as_view(), name='detail'),
+    path('<pk>/', NoteDetailView.as_view(), name='detail'),
     path('create/', NoteCreateView.as_view(), name='create'),
-    path('update/<uuid:pk>/', NoteUpdateView.as_view(), name='update'),
-    path('delete/<uuid:pk>/', NoteDeleteView.as_view(), name='delete'),
+    path('update/<pk>/', NoteUpdateView.as_view(), name='update'),
+    path('delete/<pk>/', NoteDeleteView.as_view(), name='delete'),
 ], "notes")

@@ -1,6 +1,7 @@
-<form class="form" method="get">
+<form class="form" method="get" action="{% url 'clients:query' %}">
     <div class="form-group">
         <input type="number" class="form-control rounded p-3 box-shadow" name="search" aria-describedby="helpId" placeholder="Buscar" value="{{ request.GET.search }}">
+
         <button type="submit" class="btn btn-lg d-block mx-auto my-2  btn-primary box-shadow">
                 <i class="fa fa-search" aria-hidden="true"></i>
                 Buscar

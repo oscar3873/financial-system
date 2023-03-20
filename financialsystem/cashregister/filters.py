@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import DateInput
+from django.forms import TextInput
 import django_filters
 from django_filters import filters
 from .models import Movement
@@ -28,12 +28,19 @@ class ListingFilter(django_filters.FilterSet):
         choices= MONEY_TYPE, 
         label="Divisa", 
         empty_label="Limpiar",
-        widget=forms.Select(attrs={'class': 'form-control m-auto'}))
+        widget=forms.Select(attrs={'class': 'form-control m-auto'})
+    )
+    description = filters.CharFilter(
+        label="Descripcion",
+        lookup_expr="icontains",
+        widget=TextInput(attrs={'class': 'form-control'})
+    )
     operation_mode = filters.ChoiceFilter(
         choices=OPERATION_CHOISE, 
         label="Operación", 
         empty_label="Limpiar",
-        widget=forms.Select(attrs={'class': 'form-control m-auto'}))
+        widget=forms.Select(attrs={'class': 'form-control m-auto'})
+    )
     created_at = filters.DateFromToRangeFilter(
         label= "Desde - Hasta",
         widget= django_filters.widgets.RangeWidget(attrs={'type': 'date','class': 'form-control w-40 m-auto'}),
@@ -42,7 +49,7 @@ class ListingFilter(django_filters.FilterSet):
     
     class Meta:
         model = Movement
-        fields = ['amount', 'money_type', 'operation_mode', 'created_at', 'created_at']
+        fields = ['amount', 'money_type', 'operation_mode', 'description', 'created_at', 'created_at']
 
 class MoneyTypeFilter(django_filters.FilterSet):
     money_type = filters.ChoiceFilter(choices= MONEY_TYPE, label="Divisa", empty_label="Limpiar filtro")

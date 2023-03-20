@@ -1,8 +1,8 @@
 from datetime import datetime
 from django import forms
-from crispy_forms.helper import FormHelper
+from django.forms import inlineformset_factory
 from warranty.models import Warranty, Sell
-from clients.models import Client
+from credit.models import Credit
 #FORMULARIO PARA LA CREACION DEL EMPEÑO
 #------------------------------------------------------------------
 class WarrantyForm(forms.ModelForm):
@@ -54,12 +54,12 @@ class WarrantyForm(forms.ModelForm):
     
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(WarrantyForm,self).__init__(*args, **kwargs)
         
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
-                
+        # Eliminar validación requerida
         for field in self.fields.values():
             field.required = False
             
@@ -174,3 +174,12 @@ class WarrantyUpdateForm(forms.ModelForm):
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
+
+#----------------------------------------------------------------
+WarrantyFormSet = inlineformset_factory(
+    Credit, 
+    Warranty, 
+    form = WarrantyForm,
+    extra= 1,
+    can_delete= False,
+)

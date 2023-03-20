@@ -73,7 +73,19 @@ class ClientForm(forms.ModelForm):
                 self.add_error(field_name, 'Este campo es requerido')
                 
         return cleaned_data
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if len(first_name) < 3:
+            raise forms.ValidationError("El nombre debe contener al menos 3 caracteres")
+        return first_name
     
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if len(last_name) < 3:
+            raise forms.ValidationError("El apellido debe contener al menos 3 caracteres")
+        return last_name
+
     def clean_dni(self):
         """
         Validar que el DNI sea válido
@@ -153,6 +165,7 @@ class PhoneNumberFormClient(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super(PhoneNumberFormClient,self).__init__(*args, **kwargs)
+
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
@@ -176,6 +189,3 @@ PhoneNumberFormSetUpdate = inlineformset_factory(
     extra= 0,
     can_delete= False,
 )
-
-#FORMULARIO PARA LA CREACION DE CREDITOS
-#------------------------------------------------------------------

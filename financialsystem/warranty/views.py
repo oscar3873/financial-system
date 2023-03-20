@@ -4,6 +4,8 @@ from django.contrib import messages
 
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
 
 from django.urls import reverse_lazy
 
@@ -13,7 +15,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
-from .models import Warranty, Sell
+from .models import Warranty
 from .forms import WarrantyForm, SellForm, WarrantyUpdateForm
 from .filters import ListingFilter
 from .utils import all_properties_warranty
@@ -27,6 +29,10 @@ class WarrantyListView(LoginRequiredMixin, ListView):
     template_name = "warranty/warranty_list.html"
     paginate_by = 6
     ordering = ['-created_at']
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_context_data(self, **kwargs):
         """
@@ -78,6 +84,10 @@ class WarrantyCreateView(CreateView):
     model = Warranty
     form_class = WarrantyForm
     template_name = "warranty/warranty_form.html"
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_success_url(self) -> str:
         """
@@ -111,6 +121,10 @@ class WarrantyUpdateView(UpdateView):
     form_class = WarrantyUpdateForm
     template_name_suffix = '_update_form'
 
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
     def form_valid(self, form):
         if not form.instance.is_selled:
             try:
@@ -131,6 +145,7 @@ class WarrantyUpdateView(UpdateView):
 
 #REALIZAR UNA VENTA DE UN ARTICULO
 #------------------------------------------------------------------
+@login_required(login_url="/accounts/login/")
 def sell_article(request, pk):
     """
     Realiza una venta de un articulo.
