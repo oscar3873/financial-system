@@ -21,7 +21,11 @@
                     </div>
                     <div class="modal-body">
                         <h5>Valor por Cuota $ {{amount_installment}}</h5>
-                        {% csrf_token %} {% if forloop.first %} {{form_payment1.as_p}} {% else %} {{form_payment.as_p}} {% endif %}
+                        {% csrf_token %}
+                        {% if forloop.first %} {{form_payment1.as_p}} {% else %} 
+                        <input type="button" value="Seleccionar todo" id="selectAll">
+                        <input type="button" value="Deseleccionar todo" id="deselectAll">
+                        {{form_payment.as_p}} {% endif %}
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-success">Pagar</button>
@@ -57,5 +61,21 @@
         });
     }
 </script>
+
+<script>
+    document.getElementById("selectAll").addEventListener("click", function() {
+      var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = true;
+      });
+    });
+  
+    document.getElementById("deselectAll").addEventListener("click", function() {
+      var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = false;
+      });
+    });
+  </script>
 
 {% endblock content %}

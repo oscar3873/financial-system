@@ -15,7 +15,7 @@
         {% for installment_ref in refinance.installments.all %}
         <tr>
             <td>{{installment_ref.installment_number}}</td>
-            <td>{{installment_ref.amount}}</td>
+            <td>{{installment_ref.amount}} {% if installment_ref.daily_interests > 0 %} + {{installment_ref.daily_interests}}{% endif %}</td>
             <td>{{installment_ref.end_date|date}}</td>
             {% if installment_ref.is_paid_installment %}
             <td>

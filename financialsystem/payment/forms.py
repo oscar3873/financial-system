@@ -47,8 +47,6 @@ class PaymentForm(forms.ModelForm):
         super(PaymentForm, self).__init__(*args, **kwargs)
         self.prefix = "payment"
 
-        self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installments.first().credit.pk})
-
         if installments.count() > 0:
             for installment in installments:
                 daily_interests = ' (con interés {})'.format(installment.daily_interests) if installment.daily_interests > 0 else ''
@@ -57,8 +55,8 @@ class PaymentForm(forms.ModelForm):
                     form = "form_payment%s" % installment.credit.pk
                     self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installments.first().credit.pk})
                 else:
-                    form = "form_payment%s" % installment.refinancing.installment_ref.first().credit.pk
-                    self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installment.refinancing.installment_ref.first().credit.pk})
+                    form = "form_payment%s" % installment.refinancing.pk
+                    self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installment.refinancing.pk})
 
                 attrs = {"value": installment.amount + installment.daily_interests, "id":form}
                 

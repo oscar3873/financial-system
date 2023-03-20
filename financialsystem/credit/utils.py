@@ -43,13 +43,17 @@ def for_refresh(obj_with_vencidas):
 
         if installment_ven.lastup != date.today():
             dates = installment_ven.lastup
-        else:
+
+        elif installment_ven.daily_interests == 0:
             dates = installment_ven.end_date.date()
+
+        else:
+            dates = date.today()
 
         resto = (date.today() - dates).days
         client.score -= 5*resto
         installment_ven.daily_interests += resto * installment_ven.amount * Decimal(0.02)
-        installment_ven.lastup = datetime.today()
+        installment_ven.lastup = date.today()
         installment_ven.save()
         client.save()
 
