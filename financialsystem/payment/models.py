@@ -7,7 +7,8 @@ from django.db import models
 
 from credit.models import Installment, InstallmentRefinancing
 from cashregister.models import CashRegister, Movement
-from adviser.models import Comission, Adviser
+from adviser.models import Adviser
+from commissions.models import Comission
 
 
 # Create your models here.

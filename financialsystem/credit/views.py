@@ -31,8 +31,7 @@ def crear_credito(request):
     """
     client_form = ClientForm(request.POST or None)
     guarantor_form = GuarantorForm(request.POST or None)
-    # warranty_form = WarrantyForm(request.POST or None)
-    warranty_form = WarrantyFormSet(request.POST or None,instance=Credit(),prefix= "warranty_credit")
+    warranty_form = WarrantyForm(request.POST or None)
     credit_form = CreditForm(request.POST or None)
     formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
@@ -65,11 +64,10 @@ def crear_credito(request):
                         phone_number.guarantor = guarantor
                         phone_number.save()
             
-            warrantys = warranty_form.save(commit=False)
-            for warranty in warrantys:
-                if warranty.article:
-                    warranty.credit = credit
-                    warranty.save()
+            warranty = warranty_form.save(commit=False)
+            if warranty_form.cleaned_data["article"]:
+                warranty.credit = credit
+                warranty.save()
             
             messages.success(request, 'El cliente se ha guardado exitosamente.')
             return redirect('clients:list')
@@ -81,7 +79,7 @@ def crear_credito(request):
         'garante_form': guarantor_form,
         'formsetPhoneGuarantor': formsetPhoneGuarantor,
         'credito_form': credit_form,
-        'empenos_form': warranty_form,
+        'empeno_form': warranty_form,
     }
     
     return render(request, 'credit/create_credit.html', context)
@@ -270,7 +268,7 @@ def edit_credit(request, pk):
         if form.is_valid() and formset.is_valid():
             credit = form.save(commit=False)
 
-            if (credit_copy.amount != credit.amount) or (credit_copy.credit_interest != credit.credit_interest) or (credit_copy.installment_num != credit.installment_num):
+            if (credit_copy.is_paid != credit.is_paid) and (credit_copy.amount != credit.amount) or (credit_copy.credit_interest != credit.credit_interest) or (credit_copy.installment_num != credit.installment_num):
                 credit.is_new = True        
                 credit.save()
 

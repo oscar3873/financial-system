@@ -171,10 +171,22 @@ class ClientDetailView(DetailView):
 
         context["credits"] = context["client"].credits.all()
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
+
         
         if credits_active:
             installments = credits_active.first().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
             refinancing = Refinancing.objects.filter(installment_ref__credit=credits_active.first())
+
+            first_credit = credits_active.first()
+            try:
+                context["guarantor_f"] = getattr(first_credit, 'guarantor_client', None)
+            except AttributeError:
+                context["guarantor_f"] = None
+
+            try:
+                context["article_first"] = getattr(first_credit, 'article_client', None)
+            except AttributeError:
+                context["article_first"] = None
 
             context["credits_active"] = credits_active
             context["refinances"] = refinancing
@@ -184,9 +196,22 @@ class ClientDetailView(DetailView):
                 context["form_payment1"]= PaymentForm(installments=installments)
                 context["form_ref"]= RefinancingForm(credit=credits_active.first())
 
-                installments_sec = credits_active.last().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-                if installments_sec:
-                    context["form_payment"]= PaymentForm(installments=installments_sec)
+                if credits_active.last() != credits_active.first():
+                    installments_sec = credits_active.last().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+
+                    last_credit = credits_active.last()
+                    try:
+                        context["guarantor_last"] = getattr(last_credit, 'guarantor_client', None)
+                    except AttributeError:
+                        context["guarantor_last"] = None
+
+                    try:
+                        context["article_f"] = getattr(last_credit, 'article_client', None)
+                    except AttributeError:
+                        context["article_f"] = None
+
+                    if installments_sec:
+                        context["form_payment"]= PaymentForm(installments=installments_sec)
                 
                 context["installments_available"] = True
                 

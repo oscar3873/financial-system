@@ -6,7 +6,8 @@ from django.db.models.signals import pre_save, post_delete, post_save
 # Create your models here.
 from django.db import models
 from credit.models import Credit
-from adviser.models import Adviser, Comission
+from adviser.models import Adviser
+from commissions.models import Comission
 from cashregister.models import Movement, CashRegister
 # Create your models here.
 
@@ -30,7 +31,7 @@ class Warranty(models.Model):
     model = models.CharField(max_length=50, help_text="Modelo", verbose_name="Modelo")
     accessories = models.CharField(max_length=50, help_text="Accesorios", verbose_name="Accesorios")
     state = models.CharField(blank=True, choices=ARTICLE_STATE, max_length=30, verbose_name="Estado")
-    credit = models.ForeignKey(Credit, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Empeño del usuario", related_name="warranty_clients")
+    credit = models.ForeignKey(Credit, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Empeño del usuario", related_name="warranty_client")
     detail = models.TextField(max_length=150, blank=True, null=True, help_text="Observaciones del articulo")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -54,10 +55,10 @@ class Sell(models.Model):
 
     amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     payment_method = models.CharField(max_length=15, choices=MONEY_TYPE,null=True, blank=True, default='PESOS')
-    adviser = models.ForeignKey(Adviser,on_delete=models.SET_NULL, null=True)
-    commission = models.ForeignKey(Comission, on_delete=models.SET_NULL, null=True, blank=True)
+    adviser = models.OneToOneField(Adviser,on_delete=models.SET_NULL, null=True)
+    commission = models.OneToOneField(Comission, on_delete=models.SET_NULL, null=True, blank=True)
     article = models.OneToOneField(Warranty, on_delete=models.SET_NULL, blank=True, null=True, related_name='sell')
-    mov = models.ForeignKey(Movement, on_delete=models.CASCADE, blank=True, null=True)
+    mov = models.OneToOneField(Movement, on_delete=models.CASCADE, blank=True, null=True)
     sell_date = models.DateTimeField(null=True, default=datetime.now)
     detail = models.TextField(max_length=150, blank=True, null=True, help_text="Observaciones del articulo")
     created_at = models.DateTimeField(auto_now_add=True)

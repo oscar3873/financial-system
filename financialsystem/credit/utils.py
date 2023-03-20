@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 from cashregister.models import CashRegister, Movement
-from adviser.models import Comission
+from commissions.models import Comission
 from .models import Credit, Refinancing, Installment
 
 

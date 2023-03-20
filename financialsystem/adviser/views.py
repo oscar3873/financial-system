@@ -19,7 +19,8 @@ from django.contrib.auth.models import User
 from braces.views import GroupRequiredMixin
 
 from credit.utils import refresh_condition
-from .models import Adviser, Comission
+from .models import Adviser
+from commissions.models import Comission
 from .utils import *
 from .forms import *
 
