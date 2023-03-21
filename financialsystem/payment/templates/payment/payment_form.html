@@ -22,10 +22,10 @@
                     <div class="modal-body">
                         <h5>Valor por Cuota $ {{amount_installment}}</h5>
                         {% csrf_token %}
-                        {% if forloop.first %} {{form_payment1.as_p}} {% else %} 
-                        <input type="button" value="Seleccionar todo" id="selectAll">
-                        <input type="button" value="Deseleccionar todo" id="deselectAll">
-                        {{form_payment.as_p}} {% endif %}
+
+                        {% if forloop.first %} {{form_payment1.as_p}} {% else %} {{form_payment.as_p}} {% endif %}
+                        <input type="button" id="select-all-button" value="Seleccionar/Deseleccionar todo" style="background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer;">
+
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-success">Pagar</button>
@@ -41,6 +41,7 @@
     function verquepasa(id) {
         let checkboxes_p = document.querySelectorAll('input[type="checkbox"][id="form_payment' + id + '"]');
         var amountElement = document.querySelector("#id_payment-amount" + id);
+        var selectAllButton = document.querySelector("#select-all-button");
 
         function sumar() {
             console.log(checkboxes_p);
@@ -48,7 +49,6 @@
             checkboxes_p.forEach(function(checkbox) {
                 if (checkbox.checked) {
                     total += parseFloat(checkbox.value);
-                    console.log(total);
                 }
             });
 
@@ -56,26 +56,33 @@
             amountElement.value = total.toFixed(2);
         }
 
+        function selectAll() {
+            var allSelected = true;
+            checkboxes_p.forEach(function(checkbox) {
+                if (!checkbox.checked) {
+                    allSelected = false;
+                }
+            });
+
+            if (allSelected) {
+                checkboxes_p.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+            } else {
+                checkboxes_p.forEach(function(checkbox) {
+                    checkbox.checked = true;
+                });
+            }
+
+            sumar();
+        }
+
         checkboxes_p.forEach(function(checkbox) {
             checkbox.addEventListener("click", sumar);
         });
+
+        selectAllButton.addEventListener("click", selectAll);
     }
 </script>
-
-<script>
-    document.getElementById("selectAll").addEventListener("click", function() {
-      var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(function(checkbox) {
-        checkbox.checked = true;
-      });
-    });
-  
-    document.getElementById("deselectAll").addEventListener("click", function() {
-      var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-      checkboxes.forEach(function(checkbox) {
-        checkbox.checked = false;
-      });
-    });
-  </script>
 
 {% endblock content %}

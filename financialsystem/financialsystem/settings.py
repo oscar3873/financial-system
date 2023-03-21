@@ -108,22 +108,22 @@ THOUSAND_SEPARATOR = '.'
 #     }
 # }
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 DATABASES = {
-    'default': {
-        'ENGINE':'django.db.backends.mysql',
-        'NAME':'finanxdb',
-        'USER':'ovsoft',
-        'PASSWORD':'5&IH5YCSt6tr8BDe8',
-        'HOST':'db4free.net',
-        'PORT':'3306',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE':'django.db.backends.mysql',
+#         'NAME':'finanxdb',
+#         'USER':'ovsoft',
+#         'PASSWORD':'5&IH5YCSt6tr8BDe8',
+#         'HOST':'db4free.net',
+#         'PORT':'3306',
+#     }
+# }
 
 
 # Password validation

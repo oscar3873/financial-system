@@ -101,6 +101,14 @@
         clientIdInput.value = clientId;
         searchInput.closest('form').appendChild(clientIdInput);
     });
+    const form = document.querySelector('form');
+    form.addEventListener('submit', (event) => {
+        const selectedClientIdInput = document.querySelector('input[name="selected_client_id"]');
+        if (!selectedClientIdInput) {
+            event.preventDefault();
+            alert('Por favor, seleccione un cliente antes de guardar.');
+        }
+    });
 </script>
 
 {% endblock content %}

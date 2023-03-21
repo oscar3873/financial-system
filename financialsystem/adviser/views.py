@@ -8,13 +8,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
-
-
-from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.models import User
-
 
 from braces.views import GroupRequiredMixin
 
@@ -132,26 +126,29 @@ def pay_commission(request, pk):
 
 @login_required(login_url="/accounts/login/")
 def update_user(request,pk):
-    user = get_object_or_404(Adviser, pk=pk).user
-
     if request.method == 'POST':
-        user_form = UserUpdateForm(request.POST, instance=user)
-        password_form = PasswordChangeCustomForm(user, request.POST)
-        if user_form.is_valid() and password_form.is_valid():
-            user_form.save()
-            password_form.save()
-            update_session_auth_hash(request, user)
-            messages.success(request, 'Usuario actualizado exitosamente.')
-    else:
-        user_form = UserUpdateForm(instance=user)
-        password_form = PasswordChangeCustomForm(user)
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+        password_form = PasswordChangeForm(request.user, request.POST)
 
-    context = {
+        if user_form.is_valid():
+            user_form.save()
+            messages.success(request, "Usuario actualizado correctamente",'success')
+            return redirect('advisers:detail', pk=pk)
+        
+        elif password_form.is_valid():
+            user = password_form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, "Contraseña actualizada correctamente",'success')
+            return redirect('advisers:detail', pk=pk)
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+        password_form = PasswordChangeForm(request.user)
+
+    return render(request, 'adviser/adviser_update_form.html', {
         'user_form': user_form,
         'password_form': password_form
-    }
+    })
 
-    return render(request, 'adviser/adviser_update_form.html', context)
     
 
 class AdviserDeleteView(DeleteView):

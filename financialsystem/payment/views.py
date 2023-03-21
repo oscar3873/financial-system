@@ -102,8 +102,9 @@ def make_payment_installment(request, pk):
         credit = get_object_or_404(Credit, pk=pk)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
         client = credit.client
-
+    
     form = PaymentForm(installments, request.POST or None)
+
     if request.method == 'POST' and form.is_valid():
         installment_ = list(installments.all())
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
@@ -129,5 +130,5 @@ def make_payment_installment(request, pk):
             client.score += round(round(200/len(installment_))/2)
         client.save()
 
-        return redirect('clients:detail', pk=client.pk)
+    return redirect('clients:detail', pk=client.pk)
     
