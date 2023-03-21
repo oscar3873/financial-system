@@ -66,6 +66,8 @@ class RefinancingForm(forms.ModelForm):
         choices=CHOICES,
         initial=CHOICES[0],
         required= True,
+        widget=forms.Select()
+
     )
 
     class Meta:
@@ -79,6 +81,10 @@ class RefinancingForm(forms.ModelForm):
         """
         super().__init__(*args, **kwargs)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+
+        self.fields['amount'].widget.attrs['id'] = 'id_amount{}'.format(credit.pk)
+        self.fields['installment_num_refinancing'].widget.attrs['id'] = 'id_installment_num_refinancing{}'.format(credit.pk)
+
         for installment in installments:
             if installment == credit.installments.first():
                 self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
@@ -86,7 +92,7 @@ class RefinancingForm(forms.ModelForm):
                         installment.installment_number,
                         ' (intereses acumulados $ %s)' % installment.daily_interests if installment.daily_interests > 0 else ''),
                         required=True,
-                        widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref"})
+                        widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref%s" % (credit.pk)})
                     )
             else:
                 self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
@@ -94,7 +100,7 @@ class RefinancingForm(forms.ModelForm):
                         installment.installment_number,
                         ' (intereses acumulados $ %s)' % installment.daily_interests if installment.daily_interests > 0 else ''),
                         required=False,
-                        widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref"})
+                        widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref%s" % (credit.pk)})
                     )
     
 

@@ -128,8 +128,11 @@
                     {% endif %}
                 </div>
             </div>
-            {% if credits_active %} 
-            {% for credit_active, form_payment in client_payment.items %}
+
+        {% if credits_active %} 
+
+        {% for credit_active, form_payment in client_payment.items %}
+        
             <div class="col-xl-9 col-sm-6 col-12 p-3">
                 <div class="card box-shadow">
                     <div class="card-body">
@@ -173,7 +176,7 @@
                                         
                                         {% if credit_active.installments.first.is_paid_installment %}
                                         <div type="button" class="btn" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
-                                            <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">Refinanciar</strong>
+                                            <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert" onclick="get_id(`{{credit_active.pk}}`)">Refinanciar</strong>
                                         </div>
                                         <!--Modal-->
                                         <div class="modal fade" id="Refinancing{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="Refinancing{{credit_active.pk}}" aria-hidden="true">
@@ -217,61 +220,55 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for installment in form_payment.2 %}
-                            <tr>
-                                <td>{{installment.0.0.installment_number}}</td>
-                                <td>{{installment.0.0.amount}}</td>
-                                <td>{{installment.0.0.end_date|date}}</td>
+                            {% for installments in form_payment.2 %}
+                                {% with installments.0 as installment %}
+                                    <tr>
+                                        <td>{{installment.installment_number}}</td>
+                                        <td>{{installment.amount}}</td>
+                                        <td>{{installment.end_date|date}}</td>
 
-                                {% if installment.0.0.condition == 'A Tiempo' %}
-                                <td>
-                                    <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>● A Tiempo</strong>
-                                    </div>
-                                </td>
+                                        {% if installment.condition == 'A Tiempo' %}
+                                            <td>
+                                                <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
+                                                    <strong>● A Tiempo</strong>
+                                                </div>
+                                            </td>
 
-                                {% elif installment.0.0.is_caduced_installment %}
-                                <td>
-                                    <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>● Vencida</strong>
-                                    </div>
-                                </td>
+                                        {% elif installment.is_caduced_installment %}
+                                            <td>
+                                                <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
+                                                    <strong>● Vencida</strong>
+                                                </div>
+                                            </td>
 
-                                {% elif installment.0.0.is_paid_installment and installment.0.0.is_refinancing_installment and forloop.parentloop.first %}
-                                <td>
-                                    <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
-                                        {% if installment.0.0.is_refinancing_installment %}
-                                        <!-- {{installment}} -->
-                                        <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
-                                            <strong>● Ref. Pagada</strong>
-                                        </div>
-                                        {% endif %}
-                                    <!-- </a> -->
-                                </td>
+                                        {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
+                                            <td>
+                                                <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
+                                                    <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
+                                                        <strong>● Ref. Pagada</strong>
+                                                    </div>
+                                            </td>
 
-                                {% elif installment.0.0.is_refinancing_installment and forloop.parentloop.first %}
-                                <td>
-                                    <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
-                                        {% if installment.0.0.is_refinancing_installment %}
-                                        <!-- {{installment}} -->
-                                        <div class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">
-                                            <strong>● Refinanciada</strong>
-                                        </div>
-                                        {% endif %}
-                                    <!-- </a> -->
-                                </td>
+                                        {% elif installment.is_refinancing_installment %}
+                                            <td>
+                                                <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
+                                                        <div class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">
+                                                            <strong>● Refinanciada</strong>
+                                                        </div>
+                                            </td>
 
-                                {% else %}
-                                <td>
-                                    <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
-                                        <strong>● Pagada</strong>
-                                    </div>
-                                </td>
-                                {% endif %} 
-                                <td>
-                                    <a href="{% url 'credits:installment_update' installment.0.0.pk %}"><i class="fas fa-edit"></i></a>
-                                </td>
-                            </tr>
+                                        {% else %}
+                                            <td>
+                                                <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
+                                                    <strong>● Pagada</strong>
+                                                </div>
+                                            </td>
+
+                                        {% endif %} 
+                                        <td>
+                                        </td>
+                                    </tr>
+                                {% endwith %}  
                             {% endfor %}
                         </tbody>
                     </table>
@@ -366,45 +363,49 @@
 </script>
 
 <script>
-    const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref"]');
-    const selector = document.querySelector('#id_installment_num_refinancing');
-    const sumElement = document.querySelector('#id_amount');
-    const interestElement = document.querySelector('#interest');
-    var porcentaje;
+    function get_id(id){
+        var id = id;
+    
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref'+id+'"]');
+        console.log('[data-form-id="form_ref'+id+'"]');
+        const selector = document.querySelector('#id_installment_num_refinancing'+id);
+        const sumElement = document.querySelector('#id_amount'+id);
+        var porcentaje;
 
-    function calcularSuma() {
-        let sum = 0;
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                sum += parseFloat(checkbox.value);
+        function calcularSuma() {
+            let sum = 0;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    sum += parseFloat(checkbox.value);
+                }
+            });
+
+            console.log(selector.value);
+            switch (parseInt(selector.value)) {
+                case 3:
+                    porcentaje = 25;
+                    break;
+                case 6:
+                    porcentaje = 50;
+                    break;
+                case 9:
+                    porcentaje = 75;
+                    break;
+                default:
+                    porcentaje = 100;
+                    break;
             }
+            const selectorValue = parseFloat(selector.value);
+            const total = (sum * (porcentaje + 100) / 100).toFixed(2);
+            sumElement.value = `${total}`;
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', calcularSuma);
         });
 
-        console.log(selector.value);
-        switch (parseInt(selector.value)) {
-            case 3:
-                porcentaje = 25;
-                break;
-            case 6:
-                porcentaje = 50;
-                break;
-            case 9:
-                porcentaje = 75;
-                break;
-            default:
-                porcentaje = 100;
-                break;
-        }
-        const selectorValue = parseFloat(selector.value);
-        const total = (sum * (porcentaje + 100) / 100).toFixed(2);
-        sumElement.value = `${total}`;
+        selector.addEventListener('change', calcularSuma);
     }
-
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', calcularSuma);
-    });
-
-    selector.addEventListener('change', calcularSuma);
 </script>
 <script>
     const ledSuccess = document.querySelector('.led-success');

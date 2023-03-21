@@ -268,7 +268,7 @@ def edit_credit(request, pk):
         if form.is_valid() and formset.is_valid():
             credit = form.save(commit=False)
 
-            if (credit_copy.is_paid != credit.is_paid) and (credit_copy.amount != credit.amount) or (credit_copy.credit_interest != credit.credit_interest) or (credit_copy.installment_num != credit.installment_num):
+            if (credit_copy.is_paid != credit.is_paid) or (credit_copy.amount != credit.amount) or (credit_copy.credit_interest != credit.credit_interest) or (credit_copy.installment_num != credit.installment_num):
                 credit.is_new = True        
                 credit.save()
 
@@ -325,7 +325,7 @@ def refinance_installment (request, pk):
                     installment.refinance = refinancing
                     installment.save()
                 
-            return redirect('clients:detail', pk=credit.client.id)
+    return redirect('clients:detail', pk=credit.client.pk)
         
 #----------------------------------------------------------------
 class RefinancingDetailView(DetailView):
