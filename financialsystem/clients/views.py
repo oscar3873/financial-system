@@ -171,52 +171,43 @@ class ClientDetailView(DetailView):
 
         context["credits"] = context["client"].credits.all()
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
+        context["credits_active"] = credits_active
 
+        forms_payments = []
+        form_refinancings = []
+
+        installments_by_credit = {}
+        for credit in credits_active:
+            installments_list = []
+            installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+            # refinancings = Refinancing.objects.filter(installment_ref__credit=credit)
+
+            if installments:
+                forms_payments.append(PaymentForm(installments=installments))
+                form_refinancings.append(RefinancingForm(credit=credit))
+
+            for installment in credit.installments.all():
+                refinance = installment.refinance
+                if refinance:
+                    refinance_installments_available = refinance.installments.exclude(condition__in=['Pagada'])
+                    payment_form = PaymentForm(installments=refinance_installments_available.all())
+                else:
+                    payment_form = None
+                installments_list.append((installment, payment_form))
+            installments_by_credit.setdefault(credit, []).extend(installments_list)
         
-        if credits_active:
-            installments = credits_active.first().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-            refinancing = Refinancing.objects.filter(installment_ref__credit=credits_active.first())
+        context["installments_available"] = True
+        
+        dicc = dict(zip(credits_active, forms_payments))
 
-            first_credit = credits_active.first()
-            try:
-                context["guarantor_f"] = getattr(first_credit, 'guarantor_client', None)
-            except AttributeError:
-                context["guarantor_f"] = None
+        for i, key in enumerate(dicc):
+            dicc[key] = [dicc[key]]
+            dicc[key].append(form_refinancings[i])
+            dicc[key].append(installments_by_credit.values())
 
-            try:
-                context["article_first"] = getattr(first_credit, 'article_client', None)
-            except AttributeError:
-                context["article_first"] = None
-
-            context["credits_active"] = credits_active
-            context["refinances"] = refinancing
-            context["first_is_paid"] = credits_active.first().installments.first().is_paid_installment
-
-            if installments :
-                context["form_payment1"]= PaymentForm(installments=installments)
-                context["form_ref"]= RefinancingForm(credit=credits_active.first())
-
-                if credits_active.last() != credits_active.first():
-                    installments_sec = credits_active.last().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-
-                    last_credit = credits_active.last()
-                    try:
-                        context["guarantor_last"] = getattr(last_credit, 'guarantor_client', None)
-                    except AttributeError:
-                        context["guarantor_last"] = None
-
-                    try:
-                        context["article_f"] = getattr(last_credit, 'article_client', None)
-                    except AttributeError:
-                        context["article_f"] = None
-
-                    if installments_sec:
-                        context["form_payment"]= PaymentForm(installments=installments_sec)
-                
-                context["installments_available"] = True
-                
-            else: context["installments_available"] = False 
-
+        context["client_payment"] = dicc
+        print(dicc)
+        
         return context
 
     def get_object(self):

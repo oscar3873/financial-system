@@ -20,10 +20,9 @@
                       </button>
                     </div>
                     <div class="modal-body">
-                        <h5>Valor por Cuota $ {{amount_installment}}</h5>
                         {% csrf_token %}
 
-                        {% if forloop.first %} {{form_payment1.as_p}} {% else %} {{form_payment.as_p}} {% endif %}
+                        {{form_payment.0.as_p}}   
                         <input type="button" id="select-all-button" value="Seleccionar/Deseleccionar todo" style="background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer;">
 
                     </div>

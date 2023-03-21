@@ -128,7 +128,8 @@
                     {% endif %}
                 </div>
             </div>
-            {% if credits_active %} {% for credit_active in credits_active %}
+            {% if credits_active %} 
+            {% for credit_active, form_payment in client_payment.items %}
             <div class="col-xl-9 col-sm-6 col-12 p-3">
                 <div class="card box-shadow">
                     <div class="card-body">
@@ -165,14 +166,42 @@
                                 <div class="col-12 p-0">
                                     <div class="form-group">
                                         <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
-                                        {% if installments_available %} {% include "payment/payment_form.html" %} {% endif %}
+                                        {% if installments_available %} 
+                                        {{ credit_active.pk}}
+                                            {% include "payment/payment_form.html" %} 
+                                        {% endif %}
+                                        
+                                        {% if credit_active.installments.first.is_paid_installment %}
+                                        <div type="button" class="btn" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
+                                            <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">Refinanciar</strong>
+                                        </div>
+                                        <!--Modal-->
+                                        <div class="modal fade" id="Refinancing{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="Refinancing{{credit_active.pk}}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <form action="{% url 'credits:refinance' credit_active.pk %}" method="POST">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title" id="exampleModalLabel">Refinanciacion de Cuotas</h4>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            {% csrf_token %} 
+                                                            {{form_payment.1.as_p}}
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-success">Refinanciar</button>
+                                                            <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %} 
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
-                            {% if installments_available %} {% include "payment/payment_form.html" %} {% endif %}
                         </div>
                     </div>
                     <table class="table table-striped table-hover">
@@ -188,44 +217,48 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for installment in credit_active.installments.all %}
+                            {% for installment in form_payment.2 %}
                             <tr>
-                                <td>{{installment.installment_number}}</td>
-                                <td>{{installment.amount}}</td>
-                                <td>{{installment.end_date|date}}</td>
+                                <td>{{installment.0.0.installment_number}}</td>
+                                <td>{{installment.0.0.amount}}</td>
+                                <td>{{installment.0.0.end_date|date}}</td>
 
-                                {% if installment.condition == 'A Tiempo' %}
+                                {% if installment.0.0.condition == 'A Tiempo' %}
                                 <td>
                                     <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
                                         <strong>● A Tiempo</strong>
                                     </div>
                                 </td>
 
-                                {% elif installment.is_caduced_installment %}
+                                {% elif installment.0.0.is_caduced_installment %}
                                 <td>
                                     <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
                                         <strong>● Vencida</strong>
                                     </div>
                                 </td>
 
-                                {% elif installment.is_paid_installment and installment.is_refinancing_installment and forloop.parentloop.first %}
+                                {% elif installment.0.0.is_paid_installment and installment.0.0.is_refinancing_installment and forloop.parentloop.first %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
-                                    <a href="{% url 'credits:refinance_detail' installment.pk %}">
+                                        {% if installment.0.0.is_refinancing_installment %}
+                                        <!-- {{installment}} -->
                                         <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
                                             <strong>● Ref. Pagada</strong>
                                         </div>
-                                    </a>
+                                        {% endif %}
+                                    <!-- </a> -->
                                 </td>
 
-                                {% elif installment.is_refinancing_installment and forloop.parentloop.first %}
+                                {% elif installment.0.0.is_refinancing_installment and forloop.parentloop.first %}
                                 <td>
                                     <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
-                                    <a href="{% url 'credits:refinance_detail' installment.pk %}">
-                                        <div class="alert alert-secondary m-0 p-1 text-center rounded-pill" role="alert">
+                                        {% if installment.0.0.is_refinancing_installment %}
+                                        <!-- {{installment}} -->
+                                        <div class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">
                                             <strong>● Refinanciada</strong>
                                         </div>
-                                    </a>
+                                        {% endif %}
+                                    <!-- </a> -->
                                 </td>
 
                                 {% else %}
@@ -234,38 +267,9 @@
                                         <strong>● Pagada</strong>
                                     </div>
                                 </td>
-                                {% endif %} {% if forloop.parentloop.first %} {% if first_is_paid and not installment.is_refinancing_installment and not installment.is_paid_installment %}
+                                {% endif %} 
                                 <td>
-                                    <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{installment.pk}}">
-                                        <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">Refinanciar</strong>
-                                    </div>
-                                </td>
-                                <!--Modal-->
-                                <div class="modal fade" id="exampleModal{{installment.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{installment.pk}}" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <form action="{% url 'credits:refinance' credit_active.pk %}" method="POST">
-                                                <div class="modal-header">
-                                                    <h4 class="modal-title" id="exampleModalLabel">Refinanciacion de Cuotas</h4>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <h5 id="selected-count">Valor por Cuota $ {{installment.amount}}</h5>
-                                                    {% csrf_token %} {{form_ref.as_p}}
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button class="btn btn-success">Refinanciar</button>
-                                                    <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %} {% endif %}
-                                <td>
-                                    <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
+                                    <a href="{% url 'credits:installment_update' installment.0.0.pk %}"><i class="fas fa-edit"></i></a>
                                 </td>
                             </tr>
                             {% endfor %}
