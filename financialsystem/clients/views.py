@@ -51,7 +51,7 @@ class ClientListView(LoginRequiredMixin, ListView):
         refresh_condition()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
-        
+        clients = self.model.objects.all()
         # Etiqueta para el día actual
         today = timezone.now().date()
 
@@ -62,6 +62,13 @@ class ClientListView(LoginRequiredMixin, ListView):
         year = timezone.now().year
         label_year = str(year)
         label_historial = "Historico"
+        score_counts_list = [
+            {'label': 'Riesgoso', 'value': clients.filter(score_label='Riesgoso').count()},
+            {'label': 'Regular', 'value': clients.filter(score_label='Regular').count()},
+            {'label': 'Bueno', 'value': clients.filter(score_label='Bueno').count()},
+            {'label': 'Muy Bueno', 'value': clients.filter(score_label='Muy Bueno').count()},
+            {'label': 'Excelente', 'value': clients.filter(score_label='Exelente').count()},
+        ]
         # Cantidad de clientes histórica
         count_clients = self.model.objects.count()
         count_clients_today = self.model.objects.filter(created_at__date=today).count()
@@ -75,7 +82,8 @@ class ClientListView(LoginRequiredMixin, ListView):
         ]
         # Contextos
         context["count_clients_dict"] = count_clients_dict
-        context["clients"] = self.model.objects.all()
+        context["clients"] = clients
+        context["score_counts_list"] = score_counts_list
         context["properties"] = all_properties_client()
         context["listing_filter"] = ListingFilter(self.request.GET, context['clients'])
         return context
@@ -172,6 +180,25 @@ class ClientDetailView(DetailView):
         context["credits"] = context["client"].credits.all()
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
         context["credits_active"] = credits_active
+
+        if credits_active:
+            installments = credits_active.first().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+            refinancing = Refinancing.objects.filter(installment_ref__credit=credits_active.first())
+
+            first_credit = credits_active.first()
+            try:
+                context["guarantor_f"] = getattr(first_credit, 'guarantor_client', None)
+            except AttributeError:
+                context["guarantor_f"] = None
+
+            try:
+                context["article_first"] = getattr(first_credit, 'article_client', None)
+            except AttributeError:
+                context["article_first"] = None
+
+            context["credits_active"] = credits_active
+            context["refinances"] = refinancing
+            context["first_is_paid"] = credits_active.first().installments.first().is_paid_installment
 
         forms_payments = []
         form_refinancings = []

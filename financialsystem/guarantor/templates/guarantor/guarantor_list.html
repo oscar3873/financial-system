@@ -120,7 +120,13 @@
                                     '>
                                         <td>{{guarantor.first_name}} {{guarantor.last_name}}</td>
                                         <td>{{guarantor.dni}}</td>
+
+                                        {% if guarantor.credit %}
                                         <td>{{guarantor.credit}}</td>
+                                        {% else %}
+                                        <td>No hay registros o fueron borrados</td>
+                                        {% endif %}
+
                                         <td>{{guarantor.created_at|date}}</td>
                                     </tr>
                                     {% endfor %}

@@ -1,12 +1,12 @@
 {% load static %} {% block content %}
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
-<main class="container my-4">
+<main class="main">
     <!-- MODAL FORMULARIO PAYMENT -->
-    <div type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}" onclick="verquepasa(`{{credit_active.pk}}`)">
-        <strong class="btn btn-info rounded p-3" role="button">
-          <i class="fa-solid fa-receipt"></i>
-          <span>Registrar un Pago</span>
-      </strong>
+    <div type="button" class="btn p-0 mt-2" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}" onclick="verquepasa(`{{credit_active.pk}}`)">
+        <div class="btn btn-primary p-3" role="button">
+            <i class="fa-solid fa-receipt text-warning"></i>
+            <span>Registrar un Pago</span>
+        </div>
     </div>
     <!--Modal-->
     <div class="modal fade" id="exampleModal{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active.pk}}" aria-hidden="true">
@@ -15,20 +15,18 @@
                 <form action="{% url 'payments:make_paid' credit_active.pk %}" method="POST">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Registrar Pago</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                       </button>
                     </div>
                     <div class="modal-body">
-                        {% csrf_token %}
-
-                        {{form_payment.0.as_p}}   
-                        <input type="button" id="select-all-button" value="Seleccionar/Deseleccionar todo" style="background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                        {% csrf_token %} {{form_payment.0.as_p}}
+                        <input class="btn btn-info" type="button" id="select-all-button" value="seleccionar todo">
 
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-success">Pagar</button>
-                        <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     </div>
                 </form>
             </div>

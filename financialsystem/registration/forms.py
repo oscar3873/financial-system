@@ -34,6 +34,9 @@ class UserCreationFormWithEmail(UserCreationForm):
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})
         self.helper = FormHelper
         
     def clean_email(self):

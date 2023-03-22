@@ -33,7 +33,7 @@ class ListingFilter(django_filters.FilterSet):
     description = filters.CharFilter(
         label="Descripcion",
         lookup_expr="icontains",
-        widget=TextInput(attrs={'class': 'form-control'})
+        widget=TextInput(attrs={'class': 'form-control m-auto'})
     )
     operation_mode = filters.ChoiceFilter(
         choices=OPERATION_CHOISE, 

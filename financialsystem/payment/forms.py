@@ -17,7 +17,7 @@ class PaymentForm(forms.ModelForm):
     amount = forms.CharField(
         label= "Total a Pagar $",
         widget=forms.TextInput(
-            attrs={'readonly': 'readonly', 'style': 'border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'}
+            attrs={'class':'form-control bg-primary text-warning font-weight-bold', 'readonly': 'readonly', 'style': 'font-size: 2rem; border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'}
         )
     )
 
@@ -25,12 +25,14 @@ class PaymentForm(forms.ModelForm):
         label="Fecha de Pago",
         required=True,
         widget=  forms.NumberInput(attrs={
+            'class': 'form-control',
             'type': 'date',
             'value': datetime.now().date()
             })
     )
 
     payment_method = forms.ChoiceField(
+        widget=forms.Select(attrs={'class': 'form-control m-auto'}),
         label="Forma de Pago",
         choices=MONEY_TYPE,
         required=True
