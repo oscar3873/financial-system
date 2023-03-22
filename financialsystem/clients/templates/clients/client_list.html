@@ -56,33 +56,7 @@
                     </a>
                 </div>
                 <div class="row justify-content-between mb-2">
-                    <div class="col-6 p-1">
-                        <div class="card bg-primary text-white box-shadow">
-                            <div class="card-body pb-0" id="movements-carousel">
-                                <h5 class="text-center text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fas fa-chart-line text-warning"></i> &nbsp;Scores</h5>
-                                <!-- Slider main container -->
-                                <div class="swiper bg-primary">
-                                    <!-- Additional required wrapper -->
-                                    <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
-                                        <!-- ... contenido del list-group ... -->
-                                        {% for count in score_counts_list %}
-                                        <li class="swiper-slide list-group-item bg-primary border-0">
-                                            <div class="text-warning font-weight-bold text-center">{{ count.label }}</div>
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <span class="text-white"><strong style="font-size: 2rem;">+{{ count.value}}</strong></span>
-                                            </div>
-
-                                        </li>
-                                        {% endfor %}
-                                    </ul>
-                                    <div class="swiper-pagination"></div>
-                                    <!-- If we need scrollbar -->
-                                    <div class="d-none swiper-scrollbar"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 p-1">
+                    <div class="col-12">
                         <div class="card bg-primary text-white box-shadow">
                             <div class="card-body pb-0" id="movements-carousel">
                                 <h5 class="text-center text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fas fa-chart-line text-warning"></i> &nbsp;Scores</h5>
@@ -218,6 +192,61 @@
                         {% endif %}
                     </div>
                 </div>
+            </div>
+            <div class="col-xl-3 col-md-3 col-sm-3 col-lg-3">
+                {% if clients_top %}
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fas fa-trophy text-warning"></i> &nbsp;Clientes Top</h5>
+                        <!-- Slider main container -->
+                        <h6 class="text-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fas fa-star text-warning"></i> &nbsp;Mas creditos</h6>
+                        <div class="swiper bg-primary">
+                            <!-- Additional required wrapper -->
+                            <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
+                                <!-- ... contenido del list-group ... -->
+                                {% for client in clients_top_credits %}
+                                <li class="swiper-slide list-group-item bg-primary border-0">
+                                    <div class="text-center">
+                                        <a class="text-warning font-weight-bold text-center" href="{% url 'clients:detail' client.pk %}" style="font-size: 1.5rem;">{{ client.first_name }} {{client.last_name}}</a>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <div class="swiper-pagination"></div>
+                            <!-- If we need scrollbar -->
+                            <div class="d-none swiper-scrollbar"></div>
+                        </div>
+                        <h6 class="mt-2 text-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fas fa-medal text-warning"></i> &nbsp;Mejor score</h6>
+                        <ul class="list-group list-group-flush">
+                            {% for client in clients_top %}
+                            <li class="list-group-item bg-primary">
+                                <div class="ms-2 me-auto">
+                                    <div class="font-weight-bold"><a class="text-white" href="{% url 'clients:detail' client.pk %}">{{client.first_name}} {{client.last_name}}</a></div>
+                                    <div>
+                                        <span>Registrado el </span>
+                                        <span class="font-weight-bold text-warning">{{client.created_at|date}}</span>
+                                    </div>
+                                    <div>
+                                        <span>Por </span>
+                                        <a href="{% url 'advisers:detail' client.adviser.pk %}" class="font-weight-bold text-warning">{{client.adviser}}</a>
+                                    </div>
+                                    <div>
+                                        <span>Score: </span>
+                                        <span class="badge bg-warning rounded-pill">{{client.score}}</span>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card box-shadow">
+                    <div class="card-body">
+                        <h4 class="card-title">No hay clientes top</h4>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
 
