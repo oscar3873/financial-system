@@ -36,8 +36,8 @@
                                 <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path></svg>
                                         </ion-icon>
                                         {% endif %} {% if count.value >= 0 %}
-                                        <span class="text-white" style="font-size: 2rem;">+{{ count.value}}</span> {% else %}
-                                        <span class="text-white" style="font-size: 2rem;">{{ count.value }}</span> {% endif %}
+                                        <span class="text-white"><strong style="font-size: 2rem;">+{{ count.value}}</strong></span> {% else %}
+                                        <span class="text-white"><strong style="font-size: 2rem;">{{ count.value }}</strong></span> {% endif %}
                                     </div>
 
                                 </li>
@@ -54,6 +54,60 @@
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                         <span>Cargar Nuevo Cliente</span>
                     </a>
+                </div>
+                <div class="row justify-content-between mb-2">
+                    <div class="col-6 p-1">
+                        <div class="card bg-primary text-white box-shadow">
+                            <div class="card-body pb-0" id="movements-carousel">
+                                <h5 class="text-center text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fas fa-chart-line text-warning"></i> &nbsp;Scores</h5>
+                                <!-- Slider main container -->
+                                <div class="swiper bg-primary">
+                                    <!-- Additional required wrapper -->
+                                    <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
+                                        <!-- ... contenido del list-group ... -->
+                                        {% for count in score_counts_list %}
+                                        <li class="swiper-slide list-group-item bg-primary border-0">
+                                            <div class="text-warning font-weight-bold text-center">{{ count.label }}</div>
+                                            <div class="d-flex justify-content-center align-items-center">
+                                                <span class="text-white"><strong style="font-size: 2rem;">+{{ count.value}}</strong></span>
+                                            </div>
+
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <div class="swiper-pagination"></div>
+                                    <!-- If we need scrollbar -->
+                                    <div class="d-none swiper-scrollbar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 p-1">
+                        <div class="card bg-primary text-white box-shadow">
+                            <div class="card-body pb-0" id="movements-carousel">
+                                <h5 class="text-center text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fas fa-chart-line text-warning"></i> &nbsp;Scores</h5>
+                                <!-- Slider main container -->
+                                <div class="swiper bg-primary">
+                                    <!-- Additional required wrapper -->
+                                    <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
+                                        <!-- ... contenido del list-group ... -->
+                                        {% for count in score_counts_list %}
+                                        <li class="swiper-slide list-group-item bg-primary border-0">
+                                            <div class="text-warning font-weight-bold text-center">{{ count.label }}</div>
+                                            <div class="d-flex justify-content-center align-items-center">
+                                                <span class="text-white"><strong style="font-size: 2rem;">+{{ count.value}}</strong></span>
+                                            </div>
+
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <div class="swiper-pagination"></div>
+                                    <!-- If we need scrollbar -->
+                                    <div class="d-none swiper-scrollbar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-xl-6 col-sm-6 col-lg-6">
@@ -100,17 +154,44 @@
                                     </thead>
                                     <tbody>
                                         {% for client in page_obj %}
-                                        <tr class="open-offcanvas" data-info='{"first_name":"{{client.first_name}}","last_name":"{{client.last_name}}","dni":"{{client.dni}}","email":"{{client.email}}","created_at":"{{client.created_at}}","adviser":"{{client.adviser}}","address":"{{client.address}}","id":"{{client.id}}","adviser_id":"{{client.adviser.id}}","job_address":"{{client.job_address}}","profession":"{{client.profession}}","score":"{{client.score}}","civil_status":"{{client.get_civil_status_display}}","phone_numbers":"{{client.phonenumberclient_set.all}}"}'>
+                                        <tr class="open-offcanvas" style="cursor: pointer;" data-info='{"first_name":"{{client.first_name}}","last_name":"{{client.last_name}}","dni":"{{client.dni}}","email":"{{client.email}}","created_at":"{{client.created_at}}","adviser":"{{client.adviser}}","address":"{{client.address}}","id":"{{client.id}}","adviser_id":"{{client.adviser.id}}","job_address":"{{client.job_address}}","profession":"{{client.profession}}","score":"{{client.score}}","civil_status":"{{client.get_civil_status_display}}","phone_numbers":"{{client.phonenumberclient_set.all}}"}'>
                                             <td>{{client.first_name}} {{client.last_name}}</td>
                                             <td>{{client.dni}}</td>
                                             <td>{{client.adviser}}</td>
                                             <td>{{client.created_at|date}}</td>
                                         </tr>
+                                        <!--Delete Modal-->
+                                        <div class="modal fade" id="exampleModal{{client.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{client.pk}}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content bg-primary text-white">
+                                                    <form method="POST" action="{% url 'clients:delete' client.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-header bg-primary text-white">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
+                                                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                                                <span aria-hidden="true">&times;</span>
+                                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <span>Esta seguro que desea borrar al cliente</span>
+                                                            <strong>{{client.first_name}}, {{client.last_name}} </strong>?
+                                                            <p>DNI: <strong>{{ client.dni }}</strong></p>
+                                                            <p>Registrado el <strong>{{client.created_at}}</strong></p>
+                                                            <p>Por el asesor <strong class="text-warning">{{client.adviser}}</strong></p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-danger">Si, borrar</button>
+                                                            <button type="button" class="btn btn-secondary m-2 p-2" data-dismiss="modal">Cerrar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--End Delete Modal-->
                                         {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
-
                             <div class="">
                                 <ul class="pagination justify-content-center">
                                     {% if page_obj.has_previous %}
@@ -141,9 +222,6 @@
         </div>
 
     </section>
-    <section>
-
-    </section>
     <div id="offcanvas" class="card bg-primary text-white offcanvas">
     </div>
     <div id="overlay"></div>
@@ -171,22 +249,18 @@
 
     openButtons.forEach(button => {
         button.addEventListener("click", function() {
-            console.log(this.getAttribute("data-info"))
             const info = JSON.parse(this.getAttribute("data-info").replace(/\n/g, ""));
-            console.log(info.dni);
             const regex = /\d+/g;
 
             const phoneNumbers = [];
             let match;
-            if (info.phoneNumbers) {
+            if (info.phone_numbers) {
                 while ((match = regex.exec(info.phone_numbers.toString())) !== null) {
-
                     phoneNumbers.push(match[0]);
                 }
             }
 
             if (phoneNumbers.length == 0) {
-                console.log("entre")
                 phoneNumbers.push("Sin datos de contacto")
             }
 

@@ -112,8 +112,10 @@
                                         {{credito_form.credit_interest.label}} {{credito_form.credit_interest}}
                                     </div>
                                     <div class="form-group col-md-12">
-                                        <label class="m-0" for="monto">Monto a Devolver:</label>
-                                        <h5 class="d-block mt-1 py-1 text-center" id="monto_valor" name="monto_valor"></h5>
+                                        <span class="m-0" for="monto">Monto a Devolver:</span>
+                                        <h5 class="d-block mt-1 py-1 text-center text-warning font-weight-bold" id="monto_valor" name="monto_valor" style="font-size: 2rem;"></h5>
+                                        <span id="cuota-label">Cuotas de:</span>
+                                        <h6 class="d-block mt-1 py-1 text-center text-warning font-weight-bold" id="cuota_valor" name="cuota_valor" style="font-size: 1.5rem;"></h6>
                                     </div>
                                 </div>
                             </div>
@@ -263,7 +265,6 @@
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                                 <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
                             </div>
-                            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
                         </div>
                     </div>
                 </div>
@@ -273,10 +274,11 @@
 </main>
 
 <script>
-    numero_cuota = document.getElementById("id_installment_num")
-    interes = document.getElementById("id_credit_interest")
-    monto = document.getElementById("id_amount")
-    monto_a_devolver = document.getElementById("monto_valor").textContent = "Calculando ...";
+    let numero_cuota = document.getElementById("id_installment_num")
+    let interes = document.getElementById("id_credit_interest")
+    let monto = document.getElementById("id_amount")
+    let monto_a_devolver = document.getElementById("monto_valor").textContent = "Calculando ...";
+    let cuota_a_devolver = document.getElementById("cuota_valor");
     numero_cuota.addEventListener("input", calcularMonto);
     interes.addEventListener("input", calcularMonto);
     monto.addEventListener("input", calcularMonto);
@@ -294,6 +296,11 @@
             document.getElementById("monto_valor").textContent = monto;
         } else {
             document.getElementById("monto_valor").textContent = monto.toLocaleString("es-AR", {
+                style: "currency",
+                currency: "ARS"
+            });
+            montoCuota = parseFloat((monto / installmentNum).toFixed(2));
+            cuota_a_devolver.textContent = montoCuota.toLocaleString("es-AR", {
                 style: "currency",
                 currency: "ARS"
             });

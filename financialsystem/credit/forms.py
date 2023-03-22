@@ -57,7 +57,7 @@ class RefinancingForm(forms.ModelForm):
     amount = forms.CharField(
         label= "Total a Pagar $",
         widget=forms.TextInput(
-            attrs={'readonly': 'readonly', 'style': 'border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'}
+            attrs={'class': 'form-control bg-primary text-warning font-weight-bold', 'readonly': 'readonly', 'style': 'font-size: 2rem; border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'}
         )
     )
 

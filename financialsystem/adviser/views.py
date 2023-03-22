@@ -25,6 +25,8 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     '''
     model = Adviser
     group_required = 'admin_group'
+    ordering = ['-created_at']
+    paginate_by = 4
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'

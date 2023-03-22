@@ -149,24 +149,26 @@
                                     <div class="card-body">
                                         <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-search text-warning"></i>&nbsp;Busqueda</h5>
                                         <form class="form-inline d-block justify-content-center">
-                                            <div class="row justify-content-center justify-content-around align-items-end flex-column flex-lg-row ">
-                                                <div class="col-lg-3 p-0 text-center">
-                                                    <label class="" for="{{ listing_filter.form.amount.name }}">{{ listing_filter.form.amount.label }}</label> {{ listing_filter.form.amount }}
+                                            <div class="row justify-content-center flex-column flex-lg-row ">
+                                                <div class="d-lg-flex justify-content-center">
+                                                    <div class="col-lg-3 p-0 text-center">
+                                                        <label class="" for="{{ listing_filter.form.amount.name }}">{{ listing_filter.form.amount.label }}</label> {{ listing_filter.form.amount }}
+                                                    </div>
+                                                    <div class="col-lg-2 col-4 col-5 m-auto p-0 text-center">
+                                                        <label class="" for="{{ listing_filter.form.description.name }}">{{ listing_filter.form.description.label }}</label> {{ listing_filter.form.description }}
+                                                    </div>
+                                                    <div class="col-lg-2 col-4 col-md-12 m-auto  p-0 text-center">
+                                                        <label class="" for="{{ listing_filter.form.money_type.name }}">{{ listing_filter.form.money_type.label }}</label> {{ listing_filter.form.money_type }}
+                                                    </div>
+                                                    <div class="col-lg-2 col-4 col-md-12 m-auto  p-0 text-center">
+                                                        <label class="" for="{{ listing_filter.form.operation_mode.name }}">{{ listing_filter.form.operation_mode.label }}</label> {{ listing_filter.form.operation_mode }}
+                                                    </div>
+                                                    <div class="col-lg-3 p-0 text-center">
+                                                        <label class="" for="{{ listing_filter.form.created_at.name }}">{{ listing_filter.form.created_at.label }}</label> {{ listing_filter.form.created_at }}
+                                                    </div>
                                                 </div>
-                                                <div class="col-lg-2 p-0 text-center">
-                                                    <label class="" for="{{ listing_filter.form.description.name }}">{{ listing_filter.form.description.label }}</label> {{ listing_filter.form.description }}
-                                                </div>
-                                                <div class="col-lg-2 col-4 col-md-12 m-auto  p-0 text-center">
-                                                    <label class="" for="{{ listing_filter.form.money_type.name }}">{{ listing_filter.form.money_type.label }}</label> {{ listing_filter.form.money_type }}
-                                                </div>
-                                                <div class="col-lg-2 col-4 col-md-12 m-auto  p-0 text-center">
-                                                    <label class="" for="{{ listing_filter.form.operation_mode.name }}">{{ listing_filter.form.operation_mode.label }}</label> {{ listing_filter.form.operation_mode }}
-                                                </div>
-                                                <div class="col-lg-3 p-0 text-center">
-                                                    <label class="" for="{{ listing_filter.form.created_at.name }}">{{ listing_filter.form.created_at.label }}</label> {{ listing_filter.form.created_at }}
-                                                </div>
-                                                <div class="col-lg-2 p-0 text-center mt-2 mt-lg-0">
-                                                    <button class="btn btn-warning text-white rounded ml-2" type="submit">Buscar</button>
+                                                <div class="col-lg-2 text-center">
+                                                    <button class="btn btn-warning text-white rounded mt-2" type="submit">Buscar</button>
                                                 </div>
                                             </div>
                                         </form>
@@ -217,9 +219,9 @@
                                                     "pk":"{{movement.pk}}"
                                                 }'>
                                                     {% if movement.amount > 0 %}
-                                                    <td class="text-success animate__fadeInDown" style="animation-duration: 0.5s !important;">+{{movement.amount}}</td>
+                                                    <td class="text-success animate__fadeInDown" style="animation-duration: 0.5s !important;"><strong>+{{movement.amount}}</strong></td>
                                                     {% else %}
-                                                    <td class="text-danger">{{movement.amount}}</td>
+                                                    <td class="text-danger"><strong>{{movement.amount}}</strong></td>
                                                     {% endif %} {% if movement.get_operation_mode_display == "INGRESO" %}
                                                     <td>
                                                         <ion-icon name="trending-up-outline" class="text-success mr-2" style="font-size: 2rem;">

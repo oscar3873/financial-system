@@ -11,83 +11,156 @@
     </div>
     {% endfor %} {% endif %}
     <section>
-        <div class="row mt-4">
-            <div class="col-xl-3 col-sm-6 col-12 p-3">
-                <div class="card">
-                    <div class="card-content">
-                        <div class="card-body">
-                            <div class="media d-flex">
-                                <div class="align-self-center">
-                                    <i class="fa-solid fa-users text-warning icon-lg"></i>
-                                </div>
-                                <div class="media-body text-right">
-                                    <h5>{{count_advisers}}</h5>
-                                    <span>Total de Asesores Registrados</span>
-                                </div>
-                            </div>
+        <div class="row mt-4 align-items-start">
+            <div class="col-xl-3 col-sm-3 col-lg-3">
+                <div class="card bg-primary text-white box-shadow">
+                    <div class="card-body pb-0" id="movements-carousel">
+                        <h5 class="text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-down-left-and-up-right-to-center text-warning"></i> &nbsp;Cantidad de Asesores</h5>
+                        <!-- Slider main container -->
+                        <div class="swiper bg-primary">
+                            <!-- Additional required wrapper -->
+                            <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
+                                <!-- ... contenido del list-group ... -->
+                                <li class="swiper-slide list-group-item bg-primary border-0">
+                                    <div class="text-warning font-weight-bold">{{ count.label }}</div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        {% if count_advisers >= 0 %}
+                                        <ion-icon name="trending-up-outline" class="text-success mr-2" style="font-size: 2rem;">
+                                            <svg viewBox="0 0 512 512">
+                                <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path></svg>
+                                        </ion-icon>
+                                        {% else %}
+                                        <ion-icon name="trending-down-outline" class="text-danger mr-2" style="font-size: 2rem;">
+                                            <svg viewBox="0 0 512 512">
+                                <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path></svg>
+                                        </ion-icon>
+                                        {% endif %} {% if count.value >= 0 %}
+                                        <span class="text-white"><strong style="font-size: 2rem;">+{{ count_advisers}}</strong></span> {% else %}
+                                        <span class="text-white"><strong style="font-size: 2rem;">{{ count_advisers }}</strong></span> {% endif %}
+                                    </div>
+
+                                </li>
+                            </ul>
+                            <div class="swiper-pagination"></div>
+                            <!-- If we need scrollbar -->
+                            <div class="d-none swiper-scrollbar"></div>
                         </div>
                     </div>
-                    <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
+                </div>
+                <div class="card bg-primary my-2 border-0 text-white box-shadow ">
+                    <a name="" id="" class="btn btn-secondary rounded p-3" href="{% url 'signup' %}" role="button">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        <span>Cargar Nuevo Asesor</span>
+                    </a>
                 </div>
             </div>
-        </div>
-        <div class="row mb-4">
-            <div class="col-xl-3 col-sm-6 col-12 p-3">
-                <a name="" id="" class="btn btn-primary rounded p-3" href="{% url 'signup' %}" role="button">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                    <span>Registrar Nuevo Asesor</span>
-                </a>
-            </div>
-        </div>
+            <div class="col-xl-6 col-sm-6 col-lg-6">
+                <div class="col-xl-12 col-sm-12 col-lg-12">
+                </div>
+                <div class="col-xl-12 col-sm-12 col-lg-12">
+                    {% if advisers %}
+                    <div class="card box-shadow">
+                        <div class="card-body">
+                            <h5 class="text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fas fa-user-tie"></i> &nbsp;Asesores</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-primary text-white">
+                                        <tr>
+                                            <th scope="col">
+                                                <i class="fa fa-user text-warning"></i> Nombre
+                                            </th>
+                                            <th scope="col">
+                                                <i class="fa fa-id-card text-warning"></i> DNI
+                                            </th>
+                                            <th scope="col">
+                                                <i class="fa fa-calendar text-warning"></i> Fecha
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for adviser in advisers %}
+                                        <tr class="open-offcanvas" style="cursor: pointer;" data-info='{"first_name":"{{client.first_name}}","last_name":"{{client.last_name}}","dni":"{{client.dni}}","email":"{{client.email}}","created_at":"{{client.created_at}}","adviser":"{{client.adviser}}","address":"{{client.address}}","id":"{{client.id}}","adviser_id":"{{client.adviser.id}}","job_address":"{{client.job_address}}","profession":"{{client.profession}}","score":"{{client.score}}","civil_status":"{{client.get_civil_status_display}}","phone_numbers":"{{client.phonenumberclient_set.all}}"}'>
+                                            <td>{{adviser.user.first_name}} {{adviser.user.last_name}}</td>
+                                            <td>{{adviser.user.dni}}</td>
+                                            <td>{{adviser.created_at|date}}</td>
+                                        </tr>
+                                        <!--Delete Modal-->
+                                        <div class="modal fade" id="exampleModal{{client.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{client.pk}}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content bg-primary text-white">
+                                                    <form method="POST" action="{% url 'advisers:delete' adviser.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-header bg-primary text-white">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
+                                                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                                                <span aria-hidden="true">&times;</span>
+                                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <span>Esta seguro que desea borrar al cliente</span>
+                                                            <strong>{{adviser.first_name}}, {{adviser.last_name}} </strong>?
+                                                            <p>DNI: <strong>{{ adviser.dni }}</strong></p>
+                                                            <p>Registrado el <strong>{{adviser.created_at}}</strong></p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-danger">Si, borrar</button>
+                                                            <button type="button" class="btn btn-secondary m-2 p-2" data-dismiss="modal">Cerrar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--End Delete Modal-->
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                    <li class="page-item"><a class="page-link bg-primary text-white" href="?page=1">&laquo; primero</a></li>
+                                    <li class="page-item"><a class="page-link bg-primary text-white" href="?page={{ page_obj.previous_page_number }}">anterior</a></li> {% endif %}
 
-    </section>
-    <section>
-        <div class="container p-0">
-            <div class="row justify-content-start">
-                {% if advisers %}
-                <!--Card Asesor 1-->
-                {% for adviser in advisers %}
-                <div class="col-md-4">
-                    <div class="profile-card-4 text-center border rounded box-shadow my-4 bg-white">
-                        <a href="{% url 'advisers:detail' adviser.pk %}" class="profile-content link-dark text-decoration-none">
-                            <div class="profile-name py-4">
-                                <p class="p-2 m-0"><i class="fas fa-user-circle text-warning"></i> Nombre Asesor</p>
-                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="img-fluid rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
-                                <p><i class="fa-solid fa-envelope text-warning"></i> @correo-asesor</p>
-                                <p><i class="fas fa-phone-alt text-warning"></i> +54-387-456678</p>
+                                    <li class="page-item">
+                                        <a class="page-link bg-primary text-white">
+                                    {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                                </a> {% if page_obj.has_next %}
+                                    </li>
+                                    <li class="page-item"><a class="page-link bg-primary text-white" href="?page={{ page_obj.next_page_number }}">siguiente</a></li>
+                                    <li class="page-item"><a class="page-link bg-primary text-white" href="?page={{ page_obj.paginator.num_pages }}">ultimo &raquo;</a> {% endif %}</li>
+                                </ul>
                             </div>
-                            <div class="profile-description py-2"><i class="fas fa-calendar-day text-warning"></i> Registrado el: 23/03/2023</div>
-                            <div class="row justify-content-center py-4">
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-users text-warning"></i> Clientes</strong></p>
-                                        <h5>1300</h5>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-money-check-alt text-warning"></i> Cobros</strong></p>
-                                        <h5>250</h5>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-dollar-sign text-warning"></i> Comisiones</strong></p>
-                                        <h5>168</h5>
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="card-footer p-1 bg-primary rounded-bottom"></div>
+                        {% else %}
+                        <div class="card box-shadow">
+                            <div class="card-body">
+                                <h4 class="card-title">No hay clientes registrados</h4>
                             </div>
-                        </a>
-                        <div class="card-footer p-1 bg-secondary rounded-bottom"></div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
-                {% endfor %} {% else %}
-                <h5 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">No hay Asesores Registrados</h5>
-                {% endif %}
             </div>
         </div>
-    </section>
-    <!--Seccion 2-->
-</main>
 
+    </section>
+    <div id="offcanvas" class="card bg-primary text-white offcanvas"></div>
+    <div id="overlay"></div>
+</main>
+<script type="module">
+    import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.esm.browser.min.js';
+</script>
+<script>
+    const swiper = new Swiper('.swiper', {
+        autoplay: {
+            delay: 2500,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: ".swiper-pagination",
+            dynamicBullets: true,
+        },
+    });
+</script>
 {% endblock content %}

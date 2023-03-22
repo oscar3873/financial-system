@@ -129,7 +129,7 @@
                 </div>
             </div>
 
-        {% if credits_active %} 
+            {% if credits_active %}
 
         {% for credit_active, form_payment in client_payment.items %} 
 <!-- DICCIONARIO PARA RECORRER COMPLETAMENTE LOS CREDITOS Y FORMULARIOS (PAGOS Y REF.) , CUOTAS Y FORMULARIOS DE PAGO DE REF.-->
@@ -202,13 +202,13 @@
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button class="btn btn-success">Refinanciar</button>
-                                                            <button type="button" class="btn btn-info m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                                                            <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
                                                         </div>
                                                     </form>
                                                 </div>
                                             </div>
                                         </div>
-                                        {% endif %} 
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -221,10 +221,10 @@
                                 <th scope="col"><i class="fas fa-dollar-sign text-warning"></i> Monto de la cuota</th>
                                 <th scope="col"><i class="fas fa-calendar-alt text-warning"></i> Fecha de vencimiento</th>
                                 <th scope="col"><i class="fas fa-check-circle text-warning"></i> Estado</th>
-                                {% if installments_available %}
-                                <th scope="col"><i class="fas fa-cog text-warning"></i> Acciones</th>
-                                {% endif %}
 
+                                {% if installments_available %}
+                                    <th scope="col"><i class="fas fa-cog text-warning"></i> Acciones</th>
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -233,18 +233,19 @@
 
 
 <!--  USAR installments.1 PARA MANIPULACION DE TUPLA DONDE : installments.1.0 = TABLA DE REFINANCIACION DE LA CUOTA /// installments.1.1 = FORMULARIO DE PAGO DE REFIANNCIACION DE LA CUOTA -->
-<!-- EJEMPLO: -->
-{% with installments.1.0 as refinancing_table %} <!-- usamos otro nombre para comodidad -->
-{% for installment_ref in refinancing_table.installments.all %} 
-<!-- refinancing_table.installments.all = son todas las cuotas de la refianciacion  -->
-<tr class="alert alert-warning">
-    <td>{{installment_ref.installment_number}}</td>
-    <td><strong>$ {{installment_ref.amount}}</strong></td>
-    <td>{{installment_ref.end_date|date}}</td>
-    <td><strong><i class="fas fa-clock text-warning"></i></strong></td>
-</tr>
-{% endfor %}
-{% endwith %}
+                            <!-- EJEMPLO: -->
+
+
+            <!-- {% with installments.1.0 as refinancing_table %}               usamos otro nombre para comodidad
+            {% for installment_ref in refinancing_table.installments.all %}     refinancing_table.installments.all = son todas las cuotas de la refianciacion  
+            <tr class="alert alert-warning">
+                <td>{{installment_ref.installment_number}}</td>
+                <td><strong>$ {{installment_ref.amount}}</strong></td>
+                <td>{{installment_ref.end_date|date}}</td>
+                <td><strong><i class="fas fa-clock text-warning"></i></strong></td>
+            </tr>
+            {% endfor %}
+            {% endwith %} -->
 
 
 
@@ -317,7 +318,8 @@
                     <div class="card-footer p-1 bg-primary rounded-bottom"></div>
                 </div>
             </div>
-            {% endfor %} {% else %}
+            {% endfor %} 
+            {% else %}
             <div class="col-xl-9 col-sm-6 col-12 p-3 text-center">
                 <h5 class="title pt-3">
                     <strong class="text-danger">●</strong> Sin credito activo</h5>
@@ -449,8 +451,9 @@
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', calcularSuma);
         });
-
-        selector.addEventListener('change', calcularSuma);
+        if (selector !== null) {
+            selector.addEventListener('change', calcularSuma);
+        }
     }
 </script>
 <script>

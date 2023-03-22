@@ -87,3 +87,10 @@
         box-shadow: 0 0 20px 6px rgba(221, 187, 6, 0.4);
     }
 }
+
+.circle-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 5px;
+}

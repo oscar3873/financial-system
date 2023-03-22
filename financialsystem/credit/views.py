@@ -347,6 +347,7 @@ class RefinancingDetailView(DetailView):
         refinance = self.get_object().refinance
         refinance_installments_available = refinance.installments.exclude(condition__in=['Pagada'])
         context = super().get_context_data(**kwargs)
+        print(refinance_installments_available.all())
         context['form_payment'] = PaymentForm(installments=refinance_installments_available.all())
         context['refinance'] = refinance
         context["amount_installment"] = refinance.installments.last().amount
