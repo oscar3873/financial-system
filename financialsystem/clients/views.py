@@ -192,23 +192,23 @@ class ClientDetailView(DetailView):
                     payment_form = PaymentForm(installments=refinance_installments_available.all())
                 else:
                     payment_form = None
-                installments_list.append((installment, payment_form))
+                installments_list.append((installment, (refinance, payment_form)))
             installments_by_credit.setdefault(credit, []).extend(installments_list)
 
             
         context["installments_available"] = True
-        print(forms_payments)
+
         dicc = dict(zip(credits_active, forms_payments))
-        # print(dicc)
+
         for i, key in enumerate(dicc):
             dicc[key] = [dicc[key]]
             dicc[key].append(form_refinancings[i])
-        # print(dicc)
+
         for key, value in dicc.items():
             if key in installments_by_credit:
                 value.append(installments_by_credit[key])
             dicc[key] = value
-        # print(dicc)
+        
         context["client_payment"] = dicc
         
         return context

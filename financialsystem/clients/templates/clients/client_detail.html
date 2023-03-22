@@ -172,7 +172,7 @@
                                     <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
                                         {% if installments_available %} 
                                             {{ credit_active.pk}}
-                                                {% with form_payment.0 as form_payment %}<!-- .1 para formulario de refinanciacion -->
+                                                {% with form_payment.0 as form_payment %}<!-- .0 para formulario de refinanciacion -->
                                                     {% include "payment/payment_form.html" %}  
                                                 {% endwith %}
                                         {% endif %}
@@ -229,7 +229,26 @@
                         </thead>
                         <tbody>
                             {% for installments in form_payment.2 %}
-                                {% with installments.0 as installment %}
+
+
+
+<!--  USAR installments.1 PARA MANIPULACION DE TUPLA DONDE : installments.1.0 = TABLA DE REFINANCIACION DE LA CUOTA /// installments.1.1 = FORMULARIO DE PAGO DE REFIANNCIACION DE LA CUOTA -->
+<!-- EJEMPLO: -->
+{% with installments.1.0 as refinancing_table %} <!-- usamos otro nombre para comodidad -->
+{% for installment_ref in refinancing_table.installments.all %} 
+<!-- refinancing_table.installments.all = son todas las cuotas de la refianciacion  -->
+<tr class="alert alert-warning">
+    <td>{{installment_ref.installment_number}}</td>
+    <td><strong>$ {{installment_ref.amount}}</strong></td>
+    <td>{{installment_ref.end_date|date}}</td>
+    <td><strong><i class="fas fa-clock text-warning"></i></strong></td>
+</tr>
+{% endfor %}
+{% endwith %}
+
+
+
+                                {% with installments.0 as installment %}  <!-- usamos otro nombre para comodidad -->
                                     {% if installment.condition == 'A Tiempo' %}
                                         <tr class="alert alert-warning">
                                             <td>{{installment.installment_number}}</td>
