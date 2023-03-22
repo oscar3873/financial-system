@@ -193,8 +193,10 @@ def update_installment(instance, *args, **kwargs):
         instance.is_caduced_installment = False
 
 def delete_installment(instance, *args, **kwargs):
-    if instance.refinance: 
+    try: 
         instance.refinance.delete()
+    except:
+        pass
 
 
 pre_save.connect(repayment_amount_auto, sender= Credit)
