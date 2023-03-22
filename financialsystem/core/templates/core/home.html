@@ -9,12 +9,11 @@
             <!--Buscador de Clientes-->
             <article class="container p-0 my-4">
                 {% if messages %} {% for message in messages %}
-                <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
+                <div class="alert alert-info alert-dismissible" role="alert">
                     <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
                     <span class="font-weight-light">{{ message }}</span>
                 </div>
-                {% endfor %} {% endif %}
-                {% include "clients/query/search.html" %}
+                {% endfor %} {% endif %} {% include "clients/query/search.html" %}
             </article>
             <!--Botones de  Carga-->
             <article class="container p-0 my-4">
