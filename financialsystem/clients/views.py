@@ -217,7 +217,6 @@ class ClientDetailView(DetailView):
                 value.append(installments_by_credit[key])
             dicc[key] = value
         
-        print(dicc)
         context["client_payment"] = dicc
         
         return context

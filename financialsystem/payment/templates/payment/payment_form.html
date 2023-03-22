@@ -2,7 +2,7 @@
 <link href="{% static 'note/css/note.css' %}" rel="stylesheet">
 <main class="main">
     <!-- MODAL FORMULARIO PAYMENT -->
-    <div type="button" class="btn p-0 mt-2" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}" onclick="verquepasa(`{{credit_active.pk}}`)">
+    <div type="button" class="btn p-0 mt-2" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}" onclick="get_pk(`{{credit_active.pk}}`)">
         <div class="btn btn-primary p-3" role="button">
             <i class="fa-solid fa-receipt text-warning"></i>
             <span>Registrar un Pago</span>
@@ -23,7 +23,7 @@
                         {% csrf_token %}
 
                         {{form_payment.as_p}}   
-                        <input type="button" id="select-all-button" value="Seleccionar/Deseleccionar todo" style="background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                        <input type="button" id="select-all-button{{credit_active.pk}}" value="Seleccionar/Deseleccionar todo" style="background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer;">
 
                     </div>
                     <div class="modal-footer">
@@ -37,11 +37,11 @@
 </main>
 
 <script>
-    function verquepasa(id) {
-        let checkboxes_p = document.querySelectorAll('input[type="checkbox"][id="form_payment' + id + '"]');
-        var amountElement = document.querySelector("#id_payment-amount" + id);
-        var selectAllButton = document.querySelector("#select-all-button");
-
+    function get_pk(pk) {
+        let checkboxes_p = document.querySelectorAll('input[type="checkbox"][id="form_payment' + pk + '"]');
+        var amountElement = document.querySelector("#id_payment-amount" + pk);
+        var selectAllButton = document.querySelector("#select-all-button" + pk);
+        console.log(selectAllButton);
         function sumar() {
             console.log(checkboxes_p);
             var total = 0;
@@ -62,7 +62,7 @@
                     allSelected = false;
                 }
             });
-
+            console.log(allSelected);
             if (allSelected) {
                 checkboxes_p.forEach(function(checkbox) {
                     checkbox.checked = false;
