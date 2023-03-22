@@ -160,6 +160,10 @@ def create_installments_auto(instance, created, *args, **kwargs):
     """
     if instance.is_new or created:
         instance.installments.all().delete() # Actualizacion de credito (crea nuevas cuotas en base los nuevos datos del credito, borrando las cuotas anteriores)
+        try:
+            for installment_with_ref in instance.installments.filter(refinance__isnull=False):
+                installment_with_ref.refiannce.delete()
+        except: pass
         credit = instance
         days = 30
         amount_installment = Decimal(credit.credit_repayment_amount/credit.installment_num)
