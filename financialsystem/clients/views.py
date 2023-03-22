@@ -218,7 +218,7 @@ class ClientDetailView(DetailView):
             dicc[key] = value
         
         context["client_payment"] = dicc
-        
+        print (dicc)
         return context
 
     def get_object(self):
