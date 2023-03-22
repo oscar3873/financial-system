@@ -196,7 +196,8 @@
                                                         <div class="modal-body">
                                                             {% csrf_token %} 
                                                                 {% with form_payment.1 as form_refinance %}<!-- .1 para formulario de refinanciacion -->
-                                                                {{form_refinance.as_p}} 
+
+                                                                    {{form_refinance.as_p}} 
                                                                 
                                                                 {% endwith %}
                                                         </div>
@@ -228,24 +229,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for installments in form_payment.2 %}
+                            {% with form_payment.2 as list_installments %}
+                                {% for installments in list_installments %}
+{{installments.1}}
 
-
-
-<!--  USAR installments.1 PARA MANIPULACION DE TUPLA DONDE : installments.1.0 = TABLA DE REFINANCIACION DE LA CUOTA /// installments.1.1 = FORMULARIO DE PAGO DE REFIANNCIACION DE LA CUOTA -->
+<!-- installments.0 es la cuota // installments.1 es la una lista que contiene la refinanciacion (_.1.0)(refinanciacion) y el formulario de pago de dicha refinanciacion (_.1.1)(formulario de pago) -->
                             <!-- EJEMPLO: -->
 
 
-            <!-- {% with installments.1.0 as refinancing_table %}               usamos otro nombre para comodidad
-            {% for installment_ref in refinancing_table.installments.all %}     refinancing_table.installments.all = son todas las cuotas de la refianciacion  
-            <tr class="alert alert-warning">
-                <td>{{installment_ref.installment_number}}</td>
-                <td><strong>$ {{installment_ref.amount}}</strong></td>
-                <td>{{installment_ref.end_date|date}}</td>
-                <td><strong><i class="fas fa-clock text-warning"></i></strong></td>
-            </tr>
-            {% endfor %}
-            {% endwith %} -->
+            {% with installments.1.0 as refinancing_table %}     {% with installments.1.1 as form_payment %}          
+                {% for installment_ref in refinancing_table.installments.all %}
+                    {% with installments.1.1 as form_payment %}
+                        {% with refinancing_table as credit_active %}
+                            {% include 'payment/payment_form.html' %}
+                        {% endwith %}
+                        <tr class="alert alert-warning">
+                            <td>{{installment_ref.installment_number}}</td>
+                            <td><strong>$ {{installment_ref.amount}}</strong></td>
+                            <td>{{installment_ref.end_date|date}}</td>
+                            <td><strong><i class="fas fa-clock text-warning"></i></strong></td>
+                        </tr>
+                    {% endwith %}
+                {% endfor %}
+            {% endwith %}   {% endwith %}
 
 
 
@@ -310,9 +316,11 @@
                                                 <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
                                             </td>
                                         </tr>
-                                    {% endif %}
-                                {% endwith %}  
-                            {% endfor %}
+                                        {% endif %}
+                                    {% endwith %} 
+                                
+                                {% endfor %}
+                            {% endwith %} 
                         </tbody>
                     </table>
                     <div class="card-footer p-1 bg-primary rounded-bottom"></div>

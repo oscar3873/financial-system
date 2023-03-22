@@ -181,28 +181,9 @@ class ClientDetailView(DetailView):
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
         context["credits_active"] = credits_active
 
-        if credits_active:
-            installments = credits_active.first().installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-            refinancing = Refinancing.objects.filter(installment_ref__credit=credits_active.first())
-
-            first_credit = credits_active.first()
-            try:
-                context["guarantor_f"] = getattr(first_credit, 'guarantor_client', None)
-            except AttributeError:
-                context["guarantor_f"] = None
-
-            try:
-                context["article_first"] = getattr(first_credit, 'article_client', None)
-            except AttributeError:
-                context["article_first"] = None
-
-            context["credits_active"] = credits_active
-            context["refinances"] = refinancing
-            context["first_is_paid"] = credits_active.first().installments.first().is_paid_installment
 
         forms_payments = []
         form_refinancings = []
-
         installments_by_credit = {}
         for credit in credits_active:
             installments_list = []
@@ -219,7 +200,7 @@ class ClientDetailView(DetailView):
                     payment_form = PaymentForm(installments=refinance_installments_available.all())
                 else:
                     payment_form = None
-                installments_list.append((installment, (refinance, payment_form)))
+                installments_list.append((installment, [refinance, payment_form]))
             installments_by_credit.setdefault(credit, []).extend(installments_list)
 
             
@@ -236,6 +217,7 @@ class ClientDetailView(DetailView):
                 value.append(installments_by_credit[key])
             dicc[key] = value
         
+        print(dicc)
         context["client_payment"] = dicc
         
         return context
