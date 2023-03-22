@@ -82,8 +82,8 @@ class RefinancingForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
 
-        self.fields['amount'].widget.attrs['id'] = 'id_amount{}'.format(credit.pk)
-        self.fields['installment_num_refinancing'].widget.attrs['id'] = 'id_installment_num_refinancing{}'.format(credit.pk)
+        self.fields['amount'].widget.attrs['id'] = 'id_amount{}'.format(credit.pk)  # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
+        self.fields['installment_num_refinancing'].widget.attrs['id'] = 'id_installment_num_refinancing{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
 
         for installment in installments:
             if installment == credit.installments.first():

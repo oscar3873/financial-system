@@ -131,57 +131,61 @@
 
         {% if credits_active %} 
 
-        {% for credit_active, form_payment in client_payment.items %}
-        
-            <div class="col-xl-9 col-sm-6 col-12 p-3">
-                <div class="card box-shadow">
-                    <div class="card-body">
-                        <div id="title-card" class="d-flex p-0 m-0 align-items-center">
-                            <div class="led-success"></div>
-                            <h5 class="title pl-3 m-0">Credito activo</h5>
+        {% for credit_active, form_payment in client_payment.items %} 
+<!-- DICCIONARIO PARA RECORRER COMPLETAMENTE LOS CREDITOS Y FORMULARIOS (PAGOS Y REF.) , CUOTAS Y FORMULARIOS DE PAGO DE REF.-->
+        <!-- credit_active = credito actual | form_payment ( _.0 = formulario de pago - _.1 = formulario de refinanciacion) -->
+        <div class="col-xl-9 col-sm-6 col-12 p-3">
+            <div class="card box-shadow">
+                <div class="card-body">
+                    <div id="title-card" class="d-flex p-0 m-0 align-items-center">
+                        <div class="led-success"></div>
+                        <h5 class="title pl-3 m-0">Credito activo</h5>
+                    </div>
+                    <div class="col-12 col-md-5 mt-4">
+                        <div class="row align-items-center">
+                            <div class="col p-0">
+                                <span>Monto solicitado:</span>
+                            </div>
+                            <div class="col p-0">
+                                <span class="font-weight-bold" style="font-size: 1.2rem;">${{credit_active.amount}}</span>
+                            </div>
                         </div>
-                        <div class="col-12 col-md-5 mt-4">
-                            <div class="row align-items-center">
-                                <div class="col p-0">
-                                    <span>Monto solicitado:</span>
-                                </div>
-                                <div class="col p-0">
-                                    <span class="font-weight-bold" style="font-size: 1.2rem;">${{credit_active.amount}}</span>
-                                </div>
+                        <div class="row align-items-center">
+                            <div class="col p-0">
+                                <span>Monto a devolver:</span>
                             </div>
-                            <div class="row align-items-center">
-                                <div class="col p-0">
-                                    <span>Monto a devolver:</span>
-                                </div>
-                                <div class="col p-0">
-                                    <span class="font-weight-bold" style="font-size: 1.2rem;">$ {{credit_active.credit_repayment_amount}}</span>
-                                </div>
+                            <div class="col p-0">
+                                <span class="font-weight-bold" style="font-size: 1.2rem;">$ {{credit_active.credit_repayment_amount}}</span>
                             </div>
-                            <div class="row align-items-center">
-                                <div class="col p-0">
-                                    <span>Cuotas:</span>
-                                </div>
-                                <div class="col p-0">
-                                    <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.installment_num}}</span>
-                                </div>
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col p-0">
+                                <span>Cuotas:</span>
                             </div>
-                            <div class="row align-items-center">
-                                <div class="col-12 p-0">
-                                    <div class="form-group">
-                                        <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
+                            <div class="col p-0">
+                                <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.installment_num}}</span>
+                            </div>
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="col-12 p-0">
+                                <div class="form-group">
+                                    <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
                                         {% if installments_available %} 
-                                        {{ credit_active.pk}}
-                                            {% include "payment/payment_form.html" %} 
+                                            {{ credit_active.pk}}
+                                                {% with form_payment.0 as form_payment %}<!-- .1 para formulario de refinanciacion -->
+                                                    {% include "payment/payment_form.html" %}  
+                                                {% endwith %}
                                         {% endif %}
                                         
                                         {% if credit_active.installments.first.is_paid_installment %}
-                                        <div type="button" class="btn" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
-                                            <strong class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert" onclick="get_id(`{{credit_active.pk}}`)">Refinanciar</strong>
+                                        <div type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
+                                            <i class="fas fa-sync-alt text-info"></i>
+                                            <span onclick="get_id(`{{credit_active.pk}}`)">Refinanciar</span>
                                         </div>
-                                        <!--Modal-->
+                                        <!--Modal de refinanciacion-->
                                         <div class="modal fade" id="Refinancing{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="Refinancing{{credit_active.pk}}" aria-hidden="true">
                                             <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
+                                                <div class="modal-content bg-primary text-white">
                                                     <form action="{% url 'credits:refinance' credit_active.pk %}" method="POST">
                                                         <div class="modal-header">
                                                             <h4 class="modal-title" id="exampleModalLabel">Refinanciacion de Cuotas</h4>
@@ -191,7 +195,10 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             {% csrf_token %} 
-                                                            {{form_payment.1.as_p}}
+                                                                {% with form_payment.1 as form_refinance %}<!-- .1 para formulario de refinanciacion -->
+                                                                {{form_refinance.as_p}} 
+                                                                
+                                                                {% endwith %}
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button class="btn btn-success">Refinanciar</button>
@@ -208,71 +215,87 @@
                         </div>
                     </div>
                     <table class="table table-striped table-hover">
-                        <thead class="table-light">
+                        <thead class="table-primary text-white">
                             <tr>
-                                <th scope="col">Cuota</th>
-                                <th scope="col">Monto de la cuota</th>
-                                <th scope="col">Fecha de vencimiento</th>
-                                <th scope="col">Estado</th>
+                                <th scope="col"><i class="fas fa-coins text-warning"></i> Cuota</th>
+                                <th scope="col"><i class="fas fa-dollar-sign text-warning"></i> Monto de la cuota</th>
+                                <th scope="col"><i class="fas fa-calendar-alt text-warning"></i> Fecha de vencimiento</th>
+                                <th scope="col"><i class="fas fa-check-circle text-warning"></i> Estado</th>
                                 {% if installments_available %}
-                                <th scope="col">Refinanciacion</th>
+                                <th scope="col"><i class="fas fa-cog text-warning"></i> Acciones</th>
                                 {% endif %}
+
                             </tr>
                         </thead>
                         <tbody>
                             {% for installments in form_payment.2 %}
                                 {% with installments.0 as installment %}
-                                    <tr>
-                                        <td>{{installment.installment_number}}</td>
-                                        <td>{{installment.amount}}</td>
-                                        <td>{{installment.end_date|date}}</td>
-
-                                        {% if installment.condition == 'A Tiempo' %}
+                                    {% if installment.condition == 'A Tiempo' %}
+                                        <tr class="alert alert-warning">
+                                            <td>{{installment.installment_number}}</td>
+                                            <td><strong>$ {{installment.amount}}</strong></td>
+                                            <td>{{installment.end_date|date}}</td>
+                                            <td><strong><i class="fas fa-clock text-warning"></i></strong></td>
                                             <td>
-                                                <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
-                                                    <strong>● A Tiempo</strong>
-                                                </div>
+                                                <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
                                             </td>
-
+                                        </tr>
                                         {% elif installment.is_caduced_installment %}
+                                        <tr class="alert alert-danger">
+                                            <td>{{installment.installment_number}}</td>
+                                            <td><strong>$ {{installment.amount}}</strong></td>
+                                            <td>{{installment.end_date|date}}</td>
+                                            <td><strong><i class="fas fa-exclamation-triangle text-danger"></i></strong></td>
                                             <td>
-                                                <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
-                                                    <strong>● Vencida</strong>
-                                                </div>
+                                                <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
                                             </td>
-
+                                        </tr>
                                         {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
+                                        <tr class="alert alert-info">
+                                            <td>{{installment.installment_number}}</td>
+                                            <td><strong>$ {{installment.amount}}</strong></td>
+                                            <td>{{installment.end_date|date}}</td>
                                             <td>
                                                 <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
-                                                    <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
-                                                        <strong>● Ref. Pagada</strong>
-                                                    </div>
+                                                <a href="{% url 'credits:refinance_detail' installment.pk %}">
+                                                    <strong><i class="fas fa-sync-alt text-info"></i></strong>
+                                                </a>
                                             </td>
-
+                                            <td>
+                                                <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
+                                            </td>
+                                        </tr>
                                         {% elif installment.is_refinancing_installment %}
+                                        <tr class="alert alert-info">
+                                            <td>{{installment.installment_number}}</td>
+                                            <td><strong>$ {{installment.amount}}</strong></td>
+                                            <td>{{installment.end_date|date}}</td>
                                             <td>
                                                 <!-- PONER BOTON PARA VER DETALLE DE LA REFINANCIACION  -->
-                                                        <div class="alert alert-primary m-0 p-1 text-center rounded-pill" role="alert">
-                                                            <strong>● Refinanciada</strong>
-                                                        </div>
+                                                <a href="{% url 'credits:refinance_detail' installment.pk %}">
+                                                    <strong><i class="fas fa-sync-alt text-info"></i></strong>
+                                                </a>
                                             </td>
-
-                                        {% else %}
                                             <td>
-                                                <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
-                                                    <strong>● Pagada</strong>
-                                                </div>
+                                                <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
                                             </td>
-
-                                        {% endif %} 
-                                        <td>
-                                        </td>
-                                    </tr>
+                                        </tr>
+                                        {% else %}
+                                        <tr class="alert alert-success">
+                                            <td>{{installment.installment_number}}</td>
+                                            <td><strong>$ {{installment.amount}}</strong></td>
+                                            <td>{{installment.end_date|date}}</td>
+                                            <td><strong><i class="fas fa-check text-success"></i></strong></td>
+                                            <td>
+                                                <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
                                 {% endwith %}  
                             {% endfor %}
                         </tbody>
                     </table>
-                    <div class="card-footer p-1 bg-info rounded-bottom"></div>
+                    <div class="card-footer p-1 bg-primary rounded-bottom"></div>
                 </div>
             </div>
             {% endfor %} {% else %}
@@ -363,14 +386,18 @@
 </script>
 
 <script>
-    function get_id(id){
+    function get_id(id){    // CAPTO ID DEL CREDITO PARA LA MANIPULACION DE PAGOS DE SUS CUOTAS
         var id = id;
     
-        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref'+id+'"]');
-        console.log('[data-form-id="form_ref'+id+'"]');
-        const selector = document.querySelector('#id_installment_num_refinancing'+id);
-        const sumElement = document.querySelector('#id_amount'+id);
-        var porcentaje;
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref'+id+'"]');  //AGREGO ID PARA SABER EXACTAMENTE QUE DE QUE CHECKBOXES SE TRATAN
+        const selector = document.querySelector('#id_installment_num_refinancing'+id);  // ID PARA EL SELECTOR EN CASO DE TENER MUCHOS CREDITOS A REFIANNCIAR
+        const sumElement = document.querySelector('#id_amount'+id); // ID PARA VER EL MONTO FINAL EN CASO DE QUERER REFIANNCIAR
+        const refInstallmentDetail = document.getElementById('ref-installment-detail');
+        const refInstallmentAmount = document.createElement('span');
+        let porcentaje;
+
+        refInstallmentAmount.classList.add('text-warning', 'font-weight-bold')
+        refInstallmentAmount.style.fontSize = '1.5rem';
 
         function calcularSuma() {
             let sum = 0;
