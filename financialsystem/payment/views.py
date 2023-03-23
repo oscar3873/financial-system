@@ -14,7 +14,7 @@ from django.views.generic.edit import UpdateView, DeleteView
 
 from credit.models import Credit, Refinancing, Installment
 from credit.utils import refresh_condition
-from .utils import payment_create, all_properties_paymnet
+from .utils import *
 from .models import Payment
 from .forms import PaymentForm
 
@@ -97,31 +97,39 @@ def make_payment_installment(request, pk):
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments = refinancing.installments.exclude(condition='Pagada')
+        amount_of_installments = refinancing.amount / refinancing.installment_num_refinancing
         client = refinancing.installment_ref.last().credit.client
     except:
         credit = get_object_or_404(Credit, pk=pk)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+        amount_of_installments = credit.amount / credit.installment_num
         client = credit.client
-    
+
     form = PaymentForm(installments, request.POST or None)
 
     if request.method == 'POST' and form.is_valid():
+        payment = form.save(commit=False)
+        
         installment_ = list(installments.all())
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
         pack = dict(zip(installment_, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
 
-        payment = form.save(commit=False)
-        payment.amount = Decimal(payment.amount / count_value)
         payment._adviser = request.user.adviser
+        payment.amount = Decimal(amount_of_installments)
+        
+        if count_value == 0 :
+            pay_installment(payment, installments, abs(Decimal(form.cleaned_data["amount_paid"])))
+        else:
+            print("EN CHECKBOXS")
 
-        for installment in pack.keys():
-            if pack[installment]:
-                installment.condition = 'Pagada'
-                installment.is_paid_installment = True
-                installment.payment_date = payment.payment_date
-                installment.save()
-                payment_create(payment, installment)
+            for installment in pack.keys():
+                if pack[installment]:
+                    installment.condition = 'Pagada'
+                    installment.is_paid_installment = True
+                    installment.payment_date = payment.payment_date
+                    installment.save()
+                    payment_create(payment, installment)
 
         score = round(200/len(installment_))*count_value
         if isinstance(installments, Installment):
@@ -129,6 +137,7 @@ def make_payment_installment(request, pk):
         else:
             client.score += round(round(200/len(installment_))/2)
         client.save()
-
+    else:
+        print(form.errors)
     return redirect('clients:detail', pk=client.pk)
     

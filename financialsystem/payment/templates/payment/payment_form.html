@@ -42,9 +42,8 @@
         let checkboxes_p = document.querySelectorAll('input[type="checkbox"][id="form_payment' + pk + '"]');
         var amountElement = document.querySelector("#id_payment-amount" + pk);
         var selectAllButton = document.querySelector("#select-all-button" + pk);
-        console.log(selectAllButton);
+
         function sumar() {
-            console.log(checkboxes_p);
             var total = 0;
             checkboxes_p.forEach(function(checkbox) {
                 if (checkbox.checked) {
@@ -63,7 +62,6 @@
                     allSelected = false;
                 }
             });
-            console.log(allSelected);
             if (allSelected) {
                 checkboxes_p.forEach(function(checkbox) {
                     checkbox.checked = false;

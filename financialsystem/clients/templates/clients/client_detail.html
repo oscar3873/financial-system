@@ -129,101 +129,94 @@
                 </div>
             </div>
 
-    {% if credits_active %}
-
-        {% for credit_active, form_payment in client_payment.items %} 
-<!-- DICCIONARIO PARA RECORRER COMPLETAMENTE LOS CREDITOS Y FORMULARIOS (PAGOS Y REF.) , CUOTAS Y FORMULARIOS DE PAGO DE REF.-->
-        <!-- credit_active = credito actual | form_payment ( _.0 = formulario de pago - _.1 = formulario de refinanciacion) -->
-        <div class="col-xl-9 col-sm-6 col-12 p-3">
-            <div class="card box-shadow">
-                <div class="card-body">
-                    <div id="title-card" class="d-flex p-0 m-0 align-items-center">
-                        <div class="led-success"></div>
-                        <h5 class="title pl-3 m-0">Credito activo</h5>
+            {% if credits_active %}
+            <div class="col-xl-9 col-sm-6 col-12 p-3">
+                <!-- DICCIONARIO PARA RECORRER COMPLETAMENTE LOS CREDITOS Y FORMULARIOS (PAGOS Y REF.) , CUOTAS Y FORMULARIOS DE PAGO DE REF.-->
+                <!-- credit_active = credito actual | form_payment ( _.0 = formulario de pago - _.1 = formulario de refinanciacion) -->
+                {% for credit_active, form_payment in client_payment.items %}
+                <div class="card box-shadow mt-2 plegable-card" data-card-id="{{ credit_active.id }}">
+                    <div class="title-card d-flex p-3 align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="led-success"></div>
+                            <h5 class="title pl-3 m-0">Credito activo</h5>
+                        </div>
+                        <button data-card-id="{{ credit_active.id }}" class="toggle-card btn btn-sm btn-white"><i class="fas fa-chevron-up"></i></button>
                     </div>
-                    <div class="col-12 col-md-5 mt-4">
-                        <div class="row align-items-center">
-                            <div class="col p-0">
-                                <span>Monto solicitado:</span>
+                    <div class="card-body">
+                        <div class="col-12 col-md-5 mt-4">
+                            <div class="row align-items-center">
+                                <div class="col p-0">
+                                    <span>Monto solicitado:</span>
+                                </div>
+                                <div class="col p-0">
+                                    <span class="font-weight-bold" style="font-size: 1.2rem;">${{credit_active.amount}}</span>
+                                </div>
                             </div>
-                            <div class="col p-0">
-                                <span class="font-weight-bold" style="font-size: 1.2rem;">${{credit_active.amount}}</span>
+                            <div class="row align-items-center">
+                                <div class="col p-0">
+                                    <span>Monto a devolver:</span>
+                                </div>
+                                <div class="col p-0">
+                                    <span class="font-weight-bold" style="font-size: 1.2rem;">$ {{credit_active.credit_repayment_amount}}</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row align-items-center">
-                            <div class="col p-0">
-                                <span>Monto a devolver:</span>
+                            <div class="row align-items-center">
+                                <div class="col p-0">
+                                    <span>Cuotas:</span>
+                                </div>
+                                <div class="col p-0">
+                                    <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.installment_num}}</span>
+                                </div>
                             </div>
-                            <div class="col p-0">
-                                <span class="font-weight-bold" style="font-size: 1.2rem;">$ {{credit_active.credit_repayment_amount}}</span>
-                            </div>
-                        </div>
-                        <div class="row align-items-center">
-                            <div class="col p-0">
-                                <span>Cuotas:</span>
-                            </div>
-                            <div class="col p-0">
-                                <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.installment_num}}</span>
-                            </div>
-                        </div>
-                        <div class="row align-items-center">
-                            <div class="col-12 p-0">
-                                <div class="form-group">
-                                    <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
-                                        {% if installments_available %} 
-                                            {{ credit_active.pk}}
-                                                {% with form_payment.0 as form_payment %}<!-- .0 para formulario de refinanciacion -->
-                                                    {% include "payment/payment_form.html" %}  
-                                                {% endwith %}
-                                        {% endif %}
-                                        
-                                        {% if credit_active.installments.first.is_paid_installment %}
-                                            <div type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
-                                                <i class="fas fa-sync-alt text-info"></i>
-                                                <span onclick="get_id(`{{credit_active.pk}}`)">Refinanciar</span>
-                                            </div>
-                                            <!--Modal de refinanciacion-->
-                                            <div class="modal fade" id="Refinancing{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="Refinancing{{credit_active.pk}}" aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content bg-primary text-white">
-                                                        <form action="{% url 'credits:refinance' credit_active.pk %}" method="POST">
-                                                            <div class="modal-header">
-                                                                <h4 class="modal-title" id="exampleModalLabel">Refinanciacion de Cuotas</h4>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                        <span aria-hidden="true">&times;</span>
-                                                                    </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                {% csrf_token %} 
-                                                                    {% with form_payment.1 as form_refinance %}<!-- .1 para formulario de refinanciacion -->
-
-                                                                        {{form_refinance.as_p}} 
-                                                                    
-                                                                    {% endwith %}
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button class="btn btn-success">Refinanciar</button>
-                                                                <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
+                            <div class="row align-items-center">
+                                <div class="col-12 p-0">
+                                    <div class="form-group">
+                                        <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
+                                        {% if installments_available %}{% with form_payment.0 as form_payment %}
+                                        <!-- .0 para formulario de refinanciacion -->
+                                        {% include "payment/payment_form.html" %} {% endwith %} {% endif %} {% if credit_active.installments.first.is_paid_installment %}
+                                        <div type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
+                                            <i class="fas fa-sync-alt text-info"></i>
+                                            <span onclick="get_id(`{{credit_active.pk}}`)">Refinanciar</span>
+                                        </div>
+                                        <!--Modal de refinanciacion-->
+                                        <div class="modal fade" id="Refinancing{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="Refinancing{{credit_active.pk}}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content bg-primary text-white">
+                                                    <form action="{% url 'credits:refinance' credit_active.pk %}" method="POST">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title" id="exampleModalLabel">Refinanciacion de Cuotas</h4>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            {% csrf_token %} {% with form_payment.1 as form_refinance %}
+                                                            <!-- .1 para formulario de refinanciacion -->
+                                                            {{form_refinance.as_p}} {% endwith %}
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-success">Refinanciar</button>
+                                                            <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
+                                        </div>
                                         {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <table class="table table-striped table-hover">
-                        <thead class="table-primary text-white">
-                            <tr>
-                                <th scope="col"><i class="fas fa-coins text-warning"></i> Cuota</th>
-                                <th scope="col"><i class="fas fa-dollar-sign text-warning"></i> Monto de la cuota</th>
-                                <th scope="col"><i class="fas fa-calendar-alt text-warning"></i> Fecha de vencimiento</th>
-                                <th scope="col"><i class="fas fa-check-circle text-warning"></i> Estado</th>
-
-                                {% if installments_available %}
+                        <table class="table table-lg-responsive table-striped table-hover">
+                            <thead class="table-primary text-white">
+                                <tr>
+                                    <th scope="col"><i class="fas fa-coins text-warning"></i> Cuota</th>
+                                    <th scope="col"><i class="fas fa-dollar-sign text-warning"></i> Monto</th>
+                                    <th scope="col"><i class="fas fa-calendar-alt text-warning"></i> Vencimiento</th>
+                                    <th scope="col"><i class="fas fa-check-circle text-warning"></i> Estado</th>
+    
+                                    {% if installments_available %}
                                     <th scope="col"><i class="fas fa-cog text-warning"></i> Acciones</th>
                                 {% endif %}
                             </tr>
@@ -315,6 +308,10 @@
                     <div class="led-danger"></div>
                     <h5 class="title pl-3 m-0">Sin creditos activos</h5>
                 </div>
+                <div id="title-card" class="d-flex p-0 m-0 align-items-center">
+                    <div class="led-danger"></div>
+                    <h5 class="title pl-3 m-0">Sin creditos activos</h5>
+                </div>
                 <a href="{% url 'credits:associate_credit_for_customer' client.pk %}">
                     <div class="col-sm-6 col-12 p-3 text-center">
                         <div class="card mt-4">
@@ -399,12 +396,12 @@
 </script>
 
 <script>
-    function get_id(id){    // CAPTO ID DEL CREDITO PARA LA MANIPULACION DE PAGOS DE SUS CUOTAS
+    function get_id(id) { // CAPTO ID DEL CREDITO PARA LA MANIPULACION DE PAGOS DE SUS CUOTAS
         var id = id;
-    
-        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref'+id+'"]');  //AGREGO ID PARA SABER EXACTAMENTE QUE DE QUE CHECKBOXES SE TRATAN
-        const selector = document.querySelector('#id_installment_num_refinancing'+id);  // ID PARA EL SELECTOR EN CASO DE TENER MUCHOS CREDITOS A REFIANNCIAR
-        const sumElement = document.querySelector('#id_amount'+id); // ID PARA VER EL MONTO FINAL EN CASO DE QUERER REFIANNCIAR
+
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref' + id + '"]'); //AGREGO ID PARA SABER EXACTAMENTE QUE DE QUE CHECKBOXES SE TRATAN
+        const selector = document.querySelector('#id_installment_num_refinancing' + id); // ID PARA EL SELECTOR EN CASO DE TENER MUCHOS CREDITOS A REFIANNCIAR
+        const sumElement = document.querySelector('#id_amount' + id); // ID PARA VER EL MONTO FINAL EN CASO DE QUERER REFIANNCIAR
         const refInstallmentDetail = document.getElementById('ref-installment-detail');
         const refInstallmentAmount = document.createElement('span');
         let porcentaje;

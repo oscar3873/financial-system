@@ -2,6 +2,8 @@ from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
+from django.db.models import Count
+
 from babel.dates import format_date
 from clients.filters import ListingFilter
 from credit.utils import refresh_condition
@@ -62,13 +64,6 @@ class ClientListView(LoginRequiredMixin, ListView):
         year = timezone.now().year
         label_year = str(year)
         label_historial = "Historico"
-        score_counts_list = [
-            {'label': 'Riesgoso', 'value': clients.filter(score_label='Riesgoso').count()},
-            {'label': 'Regular', 'value': clients.filter(score_label='Regular').count()},
-            {'label': 'Bueno', 'value': clients.filter(score_label='Bueno').count()},
-            {'label': 'Muy Bueno', 'value': clients.filter(score_label='Muy Bueno').count()},
-            {'label': 'Excelente', 'value': clients.filter(score_label='Exelente').count()},
-        ]
         # Cantidad de clientes histórica
         count_clients = self.model.objects.count()
         count_clients_today = self.model.objects.filter(created_at__date=today).count()
@@ -80,9 +75,24 @@ class ClientListView(LoginRequiredMixin, ListView):
             {'label':label_month, 'value':count_clients_this_month},
             {'label':label_year, 'value':count_clients_this_year},
         ]
+        
+        #Cantidad de datos por score
+        score_counts_list = [
+            {'label': 'Riesgoso', 'value': clients.filter(score_label='Riesgoso').count()},
+            {'label': 'Regular', 'value': clients.filter(score_label='Regular').count()},
+            {'label': 'Bueno', 'value': clients.filter(score_label='Bueno').count()},
+            {'label': 'Muy Bueno', 'value': clients.filter(score_label='Muy Bueno').count()},
+            {'label': 'Excelente', 'value': clients.filter(score_label='Exelente').count()},
+        ]
+        
+        #Top clientes
+        clients_top = Client.objects.filter(score__gt=1200)[:3]
+        clients_top_credits = Client.objects.annotate(num_credits=Count('credits')).order_by('-num_credits')[:3]
         # Contextos
         context["count_clients_dict"] = count_clients_dict
         context["clients"] = clients
+        context["clients_top"] = clients_top
+        context["clients_top_credits"] = clients_top_credits
         context["score_counts_list"] = score_counts_list
         context["properties"] = all_properties_client()
         context["listing_filter"] = ListingFilter(self.request.GET, context['clients'])
@@ -218,7 +228,6 @@ class ClientDetailView(DetailView):
             dicc[key] = value
         
         context["client_payment"] = dicc
-        print (dicc)
         return context
 
     def get_object(self):
