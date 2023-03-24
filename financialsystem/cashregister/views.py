@@ -101,22 +101,27 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         context['listing_filter_params'] = self.request.GET.urlencode()
         return context
     
+
     def form_valid(self, form):
         """
-        Función que se encarga de guardar el formulario.
+        Función que se encarga de guardar el formulario dependiendo el caso:
+        EGRESO: pidiendo password de confirmacion | INGRESO: confirmacion simple
         """
         cashregister = CashRegister.objects.first()
+        user = self.request.user
+        movement = form.save(commit=False)
+        movement.user = user.adviser
+        movement.cashregister = cashregister
 
-        if self.request.POST.get('password_confirm'):
-            if(self.request.POST.get('password_confirm') == cashregister.auth_expenses):
-                print('hdashuadsuada')
-                user = self.request.user
-                movement = form.save(commit=False)
-                movement.user = user.adviser  # Establecer el usuario actual
-                movement.cashregister = cashregister
-                movement.save()
+        if self.request.POST.get('EGRESO') and self.request.POST.get('password_confirm') != cashregister.auth_expenses:
+            messages.error(self.request, "Contraseña incorrecta")
+            return self.form_invalid(form)
+
+        movement.save()
+
         return super().form_valid(form)
     
+
     def form_invalid(self, form):
         """
         Muestra la causa por el cual el formulario no es válido.
@@ -144,6 +149,7 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         """
         Método que redirige al usuario a la página de inicio después de crear un nuevo movimiento.
         """
+        messages.success(self.request,"Movimiento realizado exitosamente!","success")
         return reverse_lazy('cashregister:home')
 
 #LISTA DE MOVIMIENTOS

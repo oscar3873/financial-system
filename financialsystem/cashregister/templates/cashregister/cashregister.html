@@ -2,8 +2,14 @@
 <!--Main-->
 <link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
 <main class="container my-4">
-
+    
     <h4 class="title text-center text-lg-left font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Movimientos de Caja</h4>
+    {% if messages %} {% for message in messages %}
+    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
+        <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+        <span class="font-weight-light">{{ message }}</span>
+    </div>
+    {% endfor %} {% endif %}
     <section class="section">
         <div class="row mt-4 align-items-start">
             <div class="col-12 col-lg-12 col-md-12">
@@ -42,10 +48,10 @@
                                     </div>
                                     <div class="card-row d-flex flex-md-row flex-column justify-content-center">
                                         <div class="col-md-6 p-1">
-                                            <a id="egreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-danger box-shadow w-100 mb-3 text-white" onclick="modal_funtion('egreso')">Egreso</a>
+                                            <a id="egreso" name="egreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-danger box-shadow w-100 mb-3 text-white" onclick="modal_funtion('egreso', `{{cashregister.auth_expenses}}`)">Egreso</a>
                                         </div>
                                         <div class="col-md-6 p-1">
-                                            <a id="ingreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-success box-shadow w-100 mb-3" onclick="modal_funtion('ingreso')">Ingreso</a>
+                                            <a id="ingreso" name="ingreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-success box-shadow w-100 mb-3" onclick="modal_funtion('ingreso')">Ingreso</a>
                                         </div>
                                     </div>
                                     <!--Auth Modal Egreso-->
@@ -62,7 +68,7 @@
 
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button class="btn btn-danger" type="submit">Confirmar</button>
+                                                    <button class="btn btn-danger" type="submit" id="confirm-button">Confirmar</button>
                                                     <button type="button" class="btn btn-secondary m-2 p-2" data-dismiss="modal">Cerrar</button>
                                                 </div>
                                             </div>
@@ -371,7 +377,10 @@
     });
 </script>
 <script>
-    function modal_funtion(button) {
+    function modal_funtion(button, password) {
+
+        var password_match = password;
+
         let description = document.getElementById("id_description_form");
         let amount = document.getElementById("id_amount_form");
         let money_type = document.getElementById("id_money_type");
@@ -384,14 +393,37 @@
         <span>Descripcion: ${description}</span>
         <span>Divisa: ${modal_body.innerHTML}</span>`;     
 
-        console.log(modal_body);
         if (button === 'egreso'){
             var input = '<input required name="password_confirm" id="password_confirm" type="password" class="form-control" placeholder="Ingrese contraseña de confirmacion">';
             insert = insert + '' + input;
-            console.log(insert);
             modal_body.innerHTML = insert;
         }
+        
+        const confirmButton = document.getElementById('confirm-button');
 
+        confirmButton.addEventListener('click', (event) => {
+
+            const passwordConfirmInput = document.getElementById('password_confirm');
+                // Obtener la contraseña ingresada por el usuario
+            const passwordConfirm = passwordConfirmInput.value;
+            const previousErrorMessage = passwordConfirmInput.nextElementSibling;
+                if (previousErrorMessage !== null && previousErrorMessage.classList.contains('error-message')) {
+                    previousErrorMessage.remove();
+                }
+            // Comparar las contraseñas
+            if (passwordConfirm !== password) {
+
+                // Mostrar un mensaje de error debajo del campo de contraseña
+                const errorMessage = document.createElement('span');
+                errorMessage.textContent = 'La contraseña ingresada no es correcta';
+                errorMessage.classList.add('error-message');
+                errorMessage.style.color = 'red';
+                passwordConfirmInput.insertAdjacentElement('afterend', errorMessage);
+                
+                // Evitar que se envíe el formulario
+                event.preventDefault();
+            }
+        });
     }
 
 </script>
