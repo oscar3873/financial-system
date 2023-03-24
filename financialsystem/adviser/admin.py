@@ -6,4 +6,4 @@ class NameAdmin(admin.ModelAdmin):
     list_display = ('user','created_at')
 
 admin.site.register(Adviser, NameAdmin)
-# admin.site.register(Comission, NameAdmin)
+# admin.site.register(Commission, NameAdmin)

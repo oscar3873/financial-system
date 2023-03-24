@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 import copy
 
-from cashregister.utils import create_movement  
+from cashregister.utils import create_movement, create_cashregister
 
 from .utils import *
 
@@ -101,11 +101,13 @@ class CreditListView(LoginRequiredMixin, ListView):
     redirect_field_name = 'redirect_to'
 
     
+    
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los creditos de la base de datos para usarlos en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         context = super().get_context_data(**kwargs)
         context["count_credits"] = self.model.objects.all().count()
         context["credits"] = self.model.objects.all()
@@ -289,7 +291,8 @@ def edit_credit(request, pk):
     return render(request, 'credit/edit_credit.html', context)
 
 
-#------------------------------------------------------------------     
+#------------------------------------------------------------------
+@login_required(login_url="/accounts/login/")     
 def client_delete(request, pk):
     try:
         cred = get_object_or_404(Credit, pk=pk)

@@ -13,6 +13,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
+from cashregister.utils import create_cashregister
 from .models import Guarantor
 from .forms import GuarantorForm, GuarantorUpdateForm
 from .filters import ListingFilter
@@ -30,12 +31,15 @@ class GuarantorListView(LoginRequiredMixin, ListView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+
+    
     
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         
@@ -99,6 +103,9 @@ class GuarantorCreateView(CreateView):
     model = Guarantor
     form_class = GuarantorForm
     template_name = "guarantor/guarantor_form.html"
+
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_success_url(self) -> str:
         """
@@ -114,6 +121,9 @@ class GuarantorDeleteView(DeleteView):
     Borra un garante.
     """
     model = Guarantor
+
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_success_url(self) -> str:
         """
@@ -152,7 +162,3 @@ class GuarantorUpdateView(UpdateView):
         """	
         messages.success(self.request, 'Garante actualizada satisfactoriamente', "info")
         return  reverse_lazy('guarantors:list')
-    
-    """
-        Devuelve los datos preciamente ingresados, cuando el formulario es invalido.
-        """

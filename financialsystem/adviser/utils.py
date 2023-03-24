@@ -1,5 +1,5 @@
 from decimal import Decimal
-from commissions.models import Comission
+from commissions.models import Commission, Interest
 
 def commission_properties():
     return ["Monto", "Tipo de Comision","Fecha de Operacion", "Detalle", "Interes %"]
@@ -7,9 +7,8 @@ def commission_properties():
 
 def comission_create(instance, adviser, detail):
     amount = instance.amount*Decimal(0.075)
-    Comission.objects.create(
+    Commission.objects.create(
         adviser = adviser,
-        interest = Decimal(7.5),
         amount = amount,
         operation_amount = instance.amount,
         type = 'REGISTRO',

@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 
-
 from django.urls import reverse_lazy
 
 #CRUD Warranty
@@ -15,6 +14,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
+from cashregister.utils import create_cashregister
 from .models import Warranty
 from .forms import WarrantyForm, SellForm, WarrantyUpdateForm
 from .filters import ListingFilter
@@ -34,11 +34,14 @@ class WarrantyListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
+    
+
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los empeños que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         context["form_sell"] = SellForm()
@@ -103,6 +106,9 @@ class WarrantyDeleteView(DeleteView):
     Borra un empeño.
     """
     model = Warranty
+
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_success_url(self) -> str:
         """

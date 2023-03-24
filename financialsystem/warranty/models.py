@@ -7,7 +7,7 @@ from django.db.models.signals import pre_save, post_delete, post_save
 from django.db import models
 from credit.models import Credit
 from adviser.models import Adviser
-from commissions.models import Comission
+from commissions.models import Commission
 from cashregister.models import Movement, CashRegister
 # Create your models here.
 
@@ -56,7 +56,7 @@ class Sell(models.Model):
     amount = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     payment_method = models.CharField(max_length=15, choices=MONEY_TYPE,null=True, blank=True, default='PESOS')
     adviser = models.OneToOneField(Adviser,on_delete=models.SET_NULL, null=True)
-    commission = models.OneToOneField(Comission, on_delete=models.SET_NULL, null=True, blank=True)
+    commission = models.OneToOneField(Commission, on_delete=models.SET_NULL, null=True, blank=True)
     article = models.OneToOneField(Warranty, on_delete=models.SET_NULL, blank=True, null=True, related_name='sell')
     mov = models.OneToOneField(Movement, on_delete=models.CASCADE, blank=True, null=True)
     sell_date = models.DateTimeField(null=True, default=datetime.now)
@@ -75,9 +75,8 @@ def sell_commission(instance, *args, **kwargs):
     """
     if not instance.commission:
         amount = instance.amount*Decimal(0.05)
-        instance.commission = Comission.objects.create(
+        instance.commission = Commission.objects.create(
             adviser = instance.adviser,
-            interest = Decimal(5),
             amount = amount,
             operation_amount = instance.amount,
             type = 'VENTA',

@@ -7,10 +7,11 @@ from django.db.models import Count
 from babel.dates import format_date
 from clients.filters import ListingFilter
 from credit.utils import refresh_condition
-
+from cashregister.utils import create_cashregister
 from .utils import all_properties_client
+
 from django.utils import timezone
-from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 
@@ -46,11 +47,13 @@ class ClientListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
+        
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         clients = self.model.objects.all()
@@ -203,14 +206,22 @@ class ClientDetailView(DetailView):
             forms_payments.append(PaymentForm(installments=installments) if installments else None)
             form_refinancings.append(RefinancingForm(credit=credit) if installments else None)
 
+            prev_refinance = None
             for installment in credit.installments.all():
                 refinance = installment.refinance
+
                 if refinance:
                     refinance_installments_available = refinance.installments.exclude(condition__in=['Pagada'])
                     payment_form = PaymentForm(installments=refinance_installments_available.all())
                 else:
                     payment_form = None
-                installments_list.append((installment, [refinance, payment_form]))
+
+                if refinance == prev_refinance:
+                    installments_list.append((installment, [None, None]))
+                else:
+                    installments_list.append((installment, [refinance, payment_form]))
+                prev_refinance = refinance
+
             installments_by_credit.setdefault(credit, []).extend(installments_list)
 
             
@@ -228,6 +239,7 @@ class ClientDetailView(DetailView):
             dicc[key] = value
         
         context["client_payment"] = dicc
+        print(dicc)
         return context
 
     
@@ -255,6 +267,7 @@ class ClientDelete(DeleteView):
     
 #BORRADO DE NUMEROS DE UN CLIENTE
 #------------------------------------------------------------------
+@login_required(login_url="/accounts/login/")
 def delete_phone_number(request, pk):
     """
     Borra un número de telefono de un cliente.

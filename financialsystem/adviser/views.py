@@ -13,8 +13,9 @@ from django.contrib.auth import update_session_auth_hash
 from braces.views import GroupRequiredMixin
 
 from credit.utils import refresh_condition
+from cashregister.utils import create_cashregister
 from .models import Adviser
-from commissions.models import Comission
+from commissions.models import Commission
 from .utils import *
 from .forms import *
 
@@ -31,6 +32,8 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
+    
+
     def handle_no_permission(self):
         '''
         Redirecciona al usuario a la página de inicio de sesión si no tiene permiso para acceder a la vista.
@@ -42,6 +45,7 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
         Extrae los datos de los asesores que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         context = super().get_context_data(**kwargs)
         context["count_advisers"] = Adviser.objects.count()
         context["advisers"] = Adviser.objects.all()
@@ -72,7 +76,7 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
         """
         refresh_condition()
         context = super().get_context_data(**kwargs)
-        context["commissions"] = Comission.objects.filter(adviser=self.get_object(), is_paid=False)
+        context["commissions"] = Commission.objects.filter(adviser=self.get_object(), is_paid=False)
         context["properties"] = commission_properties()
         return context
 
@@ -103,8 +107,8 @@ def pay_commission(request, pk):
     refresh_condition()
 
     try:
-        commission = Comission.objects.get(id=pk)
-    except Comission.DoesNotExist:
+        commission = Commission.objects.get(id=pk)
+    except Commission.DoesNotExist:
         return redirect('advisers:detail', pk=commission.adviser.id)
 
     if commission.is_paid:

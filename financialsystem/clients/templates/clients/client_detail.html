@@ -229,28 +229,28 @@
                                             <td><strong>$ {{installment.amount}}</strong></td>
                                             <td>{{installment.end_date|date}}</td>
                                             <td>
-                                                {% if installment.condition == 'A Tiempo' %}
+                                                {% if installment.is_paid_installment %}
+                                                    <strong><i class="fas fa-check text-success"></i></strong>
+                                                {% elif installment.condition == 'A Tiempo' %}
                                                     <strong><i class="fas fa-clock text-warning"></i></strong>
                                                 {% elif installment.is_caduced_installment %}
                                                     <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong>
                                                 {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
                                                     <a href="{% url 'credits:refinance_detail' installment.pk %}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>
-                                                {% elif installment.is_refinancing_installment %}
+                                                {% elif installments.1.0 %}
                                                     <a data-toggle="collapse" href="#collapseRefinancing-{{ installment.pk }}" role="button" aria-expanded="false" aria-controls="collapseRefinancing-{{ installment.pk }}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>
-                                                {% else %}
-                                                    <strong><i class="fas fa-check text-success"></i></strong>
                                                 {% endif %}
                                             </td>
                                             <td>
                                                 <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
                                             </td>
                                         </tr>
-                                        {% if installment.is_refinancing_installment %}
+                                        {% if installments.1.0 %}
                                             <tr class="collapse" id="collapseRefinancing-{{ installment.pk }}">
                                                 <td class="px-3" colspan="5">
                                                     <table class="table table-responsive-lg">
                                                         <thead class="table text-white">
-                                                            <h5 class="card-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-sync text-info"></i>&nbsp;Refinanciacion cuota {{installment.installment_number}}</h5>
+                                                            <h5 class="card-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-sync text-info"></i>&nbsp;{{installments.1.0}}</h5>
                                                         </thead>
 
                                                         <tbody>

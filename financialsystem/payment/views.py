@@ -14,6 +14,7 @@ from django.views.generic.edit import UpdateView, DeleteView
 
 from credit.models import Credit, Refinancing, Installment
 from credit.utils import refresh_condition
+from cashregister.utils import create_cashregister
 from .utils import *
 from .models import Payment
 from .forms import PaymentForm
@@ -26,12 +27,18 @@ class PaymentListView(LoginRequiredMixin, ListView):
     model = Payment
     template_name = "payment/payment_list.html"
     paginate_by = 6
+
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
+    
+
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los pagos que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         context["count_payments"] = self.model.objects.all().count()
@@ -47,6 +54,9 @@ class PaymentDeleteView(DeleteView):
     Borrado de un pago.
     """
     model = Payment
+
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_success_url(self) -> str:
         """
@@ -97,12 +107,10 @@ def make_payment_installment(request, pk):
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments = refinancing.installments.exclude(condition='Pagada')
-        amount_of_installments = refinancing.amount / refinancing.installment_num_refinancing
         client = refinancing.installment_ref.last().credit.client
     except:
         credit = get_object_or_404(Credit, pk=pk)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-        amount_of_installments = credit.amount / credit.installment_num
         client = credit.client
 
     form = PaymentForm(installments, request.POST or None)
@@ -116,13 +124,11 @@ def make_payment_installment(request, pk):
         count_value = list(pack.values()).count(True)
 
         payment._adviser = request.user.adviser
-        payment.amount = Decimal(amount_of_installments)
+        payment.amount = payment.amount/ count_value
         
         if count_value == 0 :
             pay_installment(payment, installments, abs(Decimal(form.cleaned_data["amount_paid"])))
         else:
-            print("EN CHECKBOXS")
-
             for installment in pack.keys():
                 if pack[installment]:
                     installment.condition = 'Pagada'
@@ -137,7 +143,6 @@ def make_payment_installment(request, pk):
         else:
             client.score += round(round(200/len(installment_))/2)
         client.save()
-    else:
-        print(form.errors)
+
     return redirect('clients:detail', pk=client.pk)
     

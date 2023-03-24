@@ -8,7 +8,7 @@ from django.db import models
 from credit.models import Installment, InstallmentRefinancing
 from cashregister.models import CashRegister, Movement
 from adviser.models import Adviser
-from commissions.models import Comission
+from commissions.models import Commission, Interest
 
 
 # Create your models here.
@@ -26,7 +26,7 @@ class Payment(models.Model):
     amount = models.DecimalField(help_text="Monto de Pago", default=0,max_digits=15,decimal_places=2)
     payment_date = models.DateTimeField(default=datetime.now, help_text="Fecha de Pago")
     adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, null=True, blank=True)
-    commission_to = models.OneToOneField(Comission, on_delete=models.SET_NULL, null=True, blank=True)
+    commission_to = models.OneToOneField(Commission, on_delete=models.SET_NULL, null=True, blank=True)
     mov = models.OneToOneField(Movement, on_delete=models.CASCADE, null=True, blank=True)
     payment_method = models.CharField(max_length=20,choices=MONEY_TYPE, help_text="Metodo de Pago")
     detail = models.CharField(max_length=150, null=True, blank=True)
@@ -64,12 +64,11 @@ def comission_create_inst(instance):
     """
     Crea un comission luego de guardar el objeto Payment.
     """
-    amount = instance.amount*Decimal(0.05)
+    amount = instance.amount*(Interest.objects.first().interest_payment/Decimal(100))
 
-    instance.commission_to = Comission.objects.create(
+    instance.commission_to = Commission.objects.create(
             adviser = instance.adviser,
-            amount = amount,
-            interest = Decimal(5),
+            amount = Decimal(amount),
             type = 'COBRO',
             operation_amount = instance.amount,
             last_up = instance.payment_date,
@@ -81,8 +80,10 @@ def delete_commission(instance, *args, **kwargs):
     '''
     Eliminacion 'bidireccional': Elimina la instancia del pago y la comision realizada.
     '''
-    if instance.commission_to:
-        instance.commission_to.delete()
+    try:
+        if instance.commission_to:
+            instance.commission_to.delete()
+    except: pass
 
 pre_save.connect(up_installment, sender = Payment)
 post_delete.connect(delete_commission, sender = Payment)

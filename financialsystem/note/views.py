@@ -1,8 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
-from django.shortcuts import get_object_or_404, render
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
 
 from django.urls import reverse_lazy
 
@@ -12,6 +11,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
+from cashregister.utils import create_cashregister
 from .models import Note
 from .forms import NoteForm
 
@@ -29,11 +29,14 @@ class NoteListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
+    
+
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de las notas que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         context["count_notes"] = self.model.objects.all().count()
@@ -101,6 +104,9 @@ class NoteDeleteView(DeleteView):
     Borrar una nota.
     """
     model = Note
+
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
     
     def get_success_url(self) -> str:
         """

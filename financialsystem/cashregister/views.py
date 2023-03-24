@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
 from credit.utils import refresh_condition
-from .utils import all_properties_mov
+from .utils import all_properties_mov, create_cashregister
 from .tables import MovementTable
 
 from babel.dates import format_date
@@ -44,18 +44,19 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
     
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+
+
+    
     
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de la caja que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         
-        if not CashRegister.objects.exists():
-            CashRegister.objects.create()
-    
         # Etiqueta para el día actual
         today = timezone.now().date()
 
@@ -162,12 +163,15 @@ class MovementListView(LoginRequiredMixin, ListView, MovementTable):
     template_name = "cashregister/movement_list.html"
     paginate_by = 20
     ordering = ['-created_at']
+
+    
     
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los movimientos que se encuentran en la base de datos para usarlo en el contexto.
         """
         refresh_condition()
+        create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
         context["count_movements"] = self.model.objects.all().count()

@@ -1,10 +1,10 @@
 from cashregister.models import Movement, CashRegister
 from adviser.utils import comission_create
+from commissions.models import Interest
 
 
 def all_properties_mov():
     return ["Monto","Operacion","Descripcion","Divisa","Fecha","Por"]
-
 
 def create_movement(instance, adviser):
     mov = Movement.objects.create(
@@ -17,3 +17,9 @@ def create_movement(instance, adviser):
         )
     comission_create(instance, adviser, detail=mov.description)
     return mov
+
+def create_cashregister():
+    if not CashRegister.objects.exists():
+        CashRegister.objects.create()
+        Interest.objects.create()
+    # pass
