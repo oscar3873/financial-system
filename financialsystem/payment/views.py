@@ -15,6 +15,7 @@ from django.views.generic.edit import UpdateView, DeleteView
 from credit.models import Credit, Refinancing, Installment
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
+from commissions.models import Interest
 from .utils import *
 from .models import Payment
 from .forms import PaymentForm
@@ -106,11 +107,13 @@ def make_payment_installment(request, pk):
     refresh_condition()
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
+        installments_score = refinancing.installments.all().count()
         installments = refinancing.installments.exclude(condition='Pagada')
         installment_amount = refinancing.installments.first().amount
         client = refinancing.installment_ref.last().credit.client
     except:
         credit = get_object_or_404(Credit, pk=pk)
+        installments_score = credit.installments.all().count()
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
         installment_amount = credit.installments.first().amount
         client = credit.client
@@ -140,12 +143,13 @@ def make_payment_installment(request, pk):
                     installment.save()
                     payment_create(payment, installment)
 
-        score = round(200/len(installment_))*count_value
-        if isinstance(installments, Installment):
-            client.score += score
-        else:
-            client.score += round(round(200/len(installment_))/2)
-        client.save()
+            points_per_installments = Interest.objects.first().points_score_installments/installments_score
+            score = round(points_per_installments*count_value)
+            if isinstance(installments, Installment):
+                client.score += score
+            else:
+                client.score += round(score*Interest.objects.first().porcentage_refinancing_score/100)
+            client.save()
 
     return redirect('clients:detail', pk=client.pk)
     

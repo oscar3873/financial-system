@@ -46,6 +46,9 @@ class Interest(models.Model):
     interest_payment = models.DecimalField(max_digits=5, decimal_places=2, default=5, help_text="Comision por cobro")
     interest_register = models.DecimalField(max_digits=5, decimal_places=2, default=7.5 , help_text="Comision por registro")
     interest_sell = models.DecimalField(max_digits=5, decimal_places=2, default=2 , help_text="Comision por venta")
+    porcentage_refinancing_score = models.DecimalField(max_digits=5, decimal_places=2, default=80 , help_text="Porcentaje de score")
+    points_score_credits = models.DecimalField(max_digits=5, decimal_places=2, default=100 , help_text="Puntos por credito pagado")
+    daily_interest = models.DecimalField(max_digits=5, decimal_places=2, default=2 , help_text="Disminucion de puntos por retraso diario")
 
 
 #-------------------------- SEÑALES PARA COMMISSION --------------------------------------
