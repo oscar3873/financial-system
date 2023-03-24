@@ -107,10 +107,12 @@ def make_payment_installment(request, pk):
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments = refinancing.installments.exclude(condition='Pagada')
+        installment_amount = refinancing.installments.first().amount
         client = refinancing.installment_ref.last().credit.client
     except:
         credit = get_object_or_404(Credit, pk=pk)
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+        installment_amount = credit.installments.first().amount
         client = credit.client
 
     form = PaymentForm(installments, request.POST or None)
@@ -124,13 +126,14 @@ def make_payment_installment(request, pk):
         count_value = list(pack.values()).count(True)
 
         payment._adviser = request.user.adviser
-        payment.amount = payment.amount/ count_value
-        
+
         if count_value == 0 :
+            payment.amount = installment_amount
             pay_installment(payment, installments, abs(Decimal(form.cleaned_data["amount_paid"])))
         else:
             for installment in pack.keys():
                 if pack[installment]:
+                    payment.amount = installment.amount
                     installment.condition = 'Pagada'
                     installment.is_paid_installment = True
                     installment.payment_date = payment.payment_date
