@@ -30,7 +30,6 @@ def pay_installment(payment, installments, amount_paid):
             installment.condition = 'Pagada'
             installment.is_paid_installment = True
             installment.payment_date = payment.payment_date
-            installment.amount_paid = 0
             installment.save()
 
             payment_create(payment, installment)
@@ -41,3 +40,4 @@ def pay_installment(payment, installments, amount_paid):
             installment.amount -= payment.amount
             installment.save()
             payment_create(payment, installment)
+            amount_paid=0

@@ -42,10 +42,10 @@
                                     </div>
                                     <div class="card-row d-flex flex-md-row flex-column justify-content-center">
                                         <div class="col-md-6 p-1">
-                                            <a id="egreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-danger box-shadow w-100 mb-3 text-white">Egreso</a>
+                                            <a id="egreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-danger box-shadow w-100 mb-3 text-white" onclick="modal_funtion('egreso')">Egreso</a>
                                         </div>
                                         <div class="col-md-6 p-1">
-                                            <a id="ingreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-success box-shadow w-100 mb-3">Ingreso</a>
+                                            <a id="ingreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-success box-shadow w-100 mb-3" onclick="modal_funtion('ingreso')">Ingreso</a>
                                         </div>
                                     </div>
                                     <!--Auth Modal Egreso-->
@@ -55,11 +55,11 @@
                                                 <div class="modal-header bg-primary text-white">
                                                     <h5 class="modal-title" id="exampleModalLabel">Confirmar Movimiento</h5>
                                                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                                                                                            <span aria-hidden="true">&times;</span>
-                                                                                                        </button>
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
                                                 </div>
-                                                <div class="modal-body">
-                                                    <input type="password" class="form-control" placeholder="Ingrese contraseña de confirmacion">
+                                                <div id='modal-body_confirmation' class="modal-body">
+
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button class="btn btn-danger" type="submit">Confirmar</button>
@@ -370,7 +370,31 @@
         overlay.style.display = "none";
     });
 </script>
+<script>
+    function modal_funtion(button) {
+        let description = document.getElementById("id_description_form");
+        let amount = document.getElementById("id_amount_form");
+        let money_type = document.getElementById("id_money_type");
+        let modal_body = document.getElementById("modal-body_confirmation");
 
+        console.log(amount.value);
+
+        modal_body.innerHTML= '';
+        var insert = `<span>Monto: ${amount.value}</span>
+        <span>Descripcion: ${description}</span>
+        <span>Divisa: ${modal_body.innerHTML}</span>`;     
+
+        console.log(modal_body);
+        if (button === 'egreso'){
+            var input = '<input required name="password_confirm" id="password_confirm" type="password" class="form-control" placeholder="Ingrese contraseña de confirmacion">';
+            insert = insert + '' + input;
+            console.log(insert);
+            modal_body.innerHTML = insert;
+        }
+
+    }
+
+</script>
 <script>
     const egresoBtn = document.getElementById('egreso');
     const ingresoBtn = document.getElementById('ingreso');
@@ -378,7 +402,7 @@
 
     egresoBtn.addEventListener('click', () => {
         operationModeField.value = 'EGRESO';
-    });
+    }); 
 
     ingresoBtn.addEventListener('click', () => {
         operationModeField.value = 'INGRESO';
@@ -452,7 +476,6 @@
         // Extraer el monto y la divisa utilizando una expresión regular
         var balanceParts = balance.match(/([0-9,.]+)\s*([^\s0-9]+)/);
         var amount = balanceParts[1];
-        console.log(amount);
         var currency = balanceParts[2];
         // Verificar si hay un signo "-" en el balance y agregarlo al final del monto si es necesario
         var negativeSign = balance.includes('-') ? '-' : '';

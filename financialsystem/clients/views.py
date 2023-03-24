@@ -230,11 +230,6 @@ class ClientDetailView(DetailView):
         context["client_payment"] = dicc
         return context
 
-    def get_object(self):
-        """
-        Función que se encarga de obtener el cliente.
-        """	
-        return get_object_or_404(Client, id=self.kwargs['pk'])
     
 
 #BORRADO DE UN CLIENTE

@@ -23,9 +23,15 @@ class MovementForm(forms.ModelForm):
     amount = forms.DecimalField(
         label = 'Monto',
         required=True,
+        initial=0,
+        widget=forms.NumberInput(
+            attrs={'id': 'id_amount_form'}
+            ),
     )
     description = forms.CharField(
-        widget=forms.Textarea(),
+        widget=forms.Textarea(
+            attrs={'id': 'id_description_form'}
+            ),
         label = 'Descripcion de la operacion',
         required=True,
     )

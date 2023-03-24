@@ -105,11 +105,16 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         """
         Función que se encarga de guardar el formulario.
         """
-        user = self.request.user
-        movement = form.save(commit=False)
-        movement.user = user.adviser  # Establecer el usuario actual
-        movement.cashregister = CashRegister.objects.last()
-        movement.save()
+        cashregister = CashRegister.objects.first()
+
+        if self.request.POST.get('password_confirm'):
+            if(self.request.POST.get('password_confirm') == cashregister.auth_expenses):
+                print('hdashuadsuada')
+                user = self.request.user
+                movement = form.save(commit=False)
+                movement.user = user.adviser  # Establecer el usuario actual
+                movement.cashregister = cashregister
+                movement.save()
         return super().form_valid(form)
     
     def form_invalid(self, form):
