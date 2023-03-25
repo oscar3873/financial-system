@@ -42,7 +42,9 @@ class Commission(models.Model):
         ordering = ['-created_at']
 
 class Interest(models.Model):
-
+    """
+    Clase para podes asignar de manera uniboca los intereses por comisiones y puntajes para clientes
+    """
     interest_register = models.DecimalField(max_digits=5, decimal_places=2, default=7.5 , help_text="Comision por registro")
     interest_payment = models.DecimalField(max_digits=5, decimal_places=2, default=5, help_text="Comision por cobro")
     interest_sell = models.DecimalField(max_digits=5, decimal_places=2, default=2 , help_text="Comision por venta")
