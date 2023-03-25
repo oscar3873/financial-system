@@ -142,13 +142,12 @@ def make_payment_installment(request, pk):
                     installment.payment_date = payment.payment_date
                     installment.save()
                     payment_create(payment, installment)
-
-            points_per_installments = Interest.objects.first().points_score_installments/installments_score
-            score = round(points_per_installments*count_value)
-            if isinstance(installments, Installment):
-                client.score += score
-            else:
-                client.score += round(score*Interest.objects.first().porcentage_refinancing_score/100)
+            
+            interest = Interest.objects.first()
+            points_per_installments = interest.points_score_credits if isinstance(installments, Installment) else interest.points_score_refinancing
+            print(points_per_installments)
+            score = round((points_per_installments/installments_score) * count_value)
+            client.score += score
             client.save()
 
     return redirect('clients:detail', pk=client.pk)

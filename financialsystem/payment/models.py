@@ -64,7 +64,7 @@ def comission_create_inst(instance):
     """
     Crea un comission luego de guardar el objeto Payment.
     """
-    amount = instance.amount*(Interest.objects.first().interest_payment/Decimal(100))
+    amount = instance.amount*(Interest.objects.first().interest_payment)/Decimal(100)
 
     instance.commission_to = Commission.objects.create(
             adviser = instance.adviser,

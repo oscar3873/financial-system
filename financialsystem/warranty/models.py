@@ -7,7 +7,7 @@ from django.db.models.signals import pre_save, post_delete, post_save
 from django.db import models
 from credit.models import Credit
 from adviser.models import Adviser
-from commissions.models import Commission
+from commissions.models import Commission, Interest
 from cashregister.models import Movement, CashRegister
 # Create your models here.
 
@@ -74,10 +74,10 @@ def sell_commission(instance, *args, **kwargs):
     Crea una comision por venta.
     """
     if not instance.commission:
-        amount = instance.amount*Decimal(0.05)
+        amount = instance.amount*Interest.objects.first().interest_sell/Decimal(100)
         instance.commission = Commission.objects.create(
             adviser = instance.adviser,
-            amount = amount,
+            amount = Decimal(amount),
             operation_amount = instance.amount,
             type = 'VENTA',
             last_up = instance.sell_date,

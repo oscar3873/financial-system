@@ -22,28 +22,29 @@ class ListingFilter(django_filters.FilterSet):
     
     amount = filters.RangeFilter(
         label="Monto",
-        widget= django_filters.widgets.RangeWidget(attrs={'class': 'form-control w-40 m-auto'}))
+        widget= django_filters.widgets.RangeWidget(attrs={'class': 'form-control w-40 m-auto','id': 'id_amount_filter'})
+        )
     
     money_type = filters.ChoiceFilter(
         choices= MONEY_TYPE, 
         label="Divisa", 
         empty_label="Limpiar",
-        widget=forms.Select(attrs={'class': 'form-control m-auto'})
+        widget=forms.Select(attrs={'class': 'form-control m-auto', 'id': 'id_money_type_filter'})
     )
     description = filters.CharFilter(
         label="Descripcion",
         lookup_expr="icontains",
-        widget=TextInput(attrs={'class': 'form-control m-auto'})
+        widget=TextInput(attrs={'class': 'form-control m-auto','id': 'id_description_filter'})
     )
     operation_mode = filters.ChoiceFilter(
         choices=OPERATION_CHOISE, 
         label="Operación", 
         empty_label="Limpiar",
-        widget=forms.Select(attrs={'class': 'form-control m-auto'})
+        widget=forms.Select(attrs={'class': 'form-control m-auto','id': 'id_operation_mode_filter'}),
     )
     created_at = filters.DateFromToRangeFilter(
         label= "Desde - Hasta",
-        widget= django_filters.widgets.RangeWidget(attrs={'type': 'date','class': 'form-control w-40 m-auto'}),
+        widget= django_filters.widgets.RangeWidget(attrs={'type': 'date','class': 'form-control w-40 m-auto','id': 'id_created_at_filter'}),
         lookup_expr='icontains',
     )
     

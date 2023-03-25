@@ -14,6 +14,7 @@ from braces.views import GroupRequiredMixin
 
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
+from commissions.forms import SettingsInterestForm
 from .models import Adviser
 from commissions.models import Commission
 from .utils import *
@@ -47,6 +48,9 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
         refresh_condition()
         create_cashregister()
         context = super().get_context_data(**kwargs)
+
+        context["settings_form"] = SettingsInterestForm(instance = Interest.objects.first()) # CONTEXT DEL FORMULARIO DE SETTINGS
+
         context["count_advisers"] = Adviser.objects.count()
         context["advisers"] = Adviser.objects.all()
         return context
@@ -76,6 +80,7 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
         """
         refresh_condition()
         context = super().get_context_data(**kwargs)
+        context["settings_form"] = SettingsInterestForm(instance = Interest.objects.first())
         context["commissions"] = Commission.objects.filter(adviser=self.get_object(), is_paid=False)
         context["properties"] = commission_properties()
         return context

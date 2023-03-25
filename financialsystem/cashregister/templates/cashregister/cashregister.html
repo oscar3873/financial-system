@@ -43,15 +43,16 @@
                                             {{ form.money_type }}
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group mt-2 mb-1">
                                         <label for="{{ form.operation_mode.id_for_label }}" class="form-label">{{ form.operation_mode.label }}</label> {{ form.operation_mode }}
-                                    </div>
-                                    <div class="card-row d-flex flex-md-row flex-column justify-content-center">
-                                        <div class="col-md-6 p-1">
-                                            <a id="egreso" name="egreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-danger box-shadow w-100 mb-3 text-white" onclick="modal_funtion('egreso', `{{cashregister.auth_expenses}}`,`{{user.is_superuser}}`)">Egreso</a>
-                                        </div>
-                                        <div class="col-md-6 p-1">
-                                            <a id="ingreso" name="ingreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-success box-shadow w-100 mb-3" onclick="modal_funtion('ingreso')">Ingreso</a>
+                                    
+                                        <div class="card-row d-flex flex-md-row flex-column justify-content-center">
+                                            <div class="col-md-6 p-1">
+                                                <a id="egreso" name="egreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-danger box-shadow w-100 text-white" onclick="modal_funtion('egreso', `{{cashregister.auth_expenses}}`,`{{user.is_superuser}}`)">Egreso</a>
+                                            </div>
+                                            <div class="col-md-6 p-1">
+                                                <a id="ingreso" name="ingreso" data-toggle="modal" data-target="#exampleModal" class="btn rounded btn-success box-shadow w-100" onclick="modal_funtion('ingreso')">Ingreso</a>
+                                            </div>
                                         </div>
                                     </div>
                                     <!--Auth Modal Egreso-->
@@ -384,15 +385,13 @@
 
         let description = document.getElementById("id_description_form");
         let amount = document.getElementById("id_amount_form");
-        let money_type = document.getElementById("id_money_type");
+        let money_type = document.getElementById("id_money_type_form");
         let modal_body = document.getElementById("modal-body_confirmation");
 
-        console.log(amount.value);
-
         modal_body.innerHTML= '';
-        var insert = `<span>Monto: ${amount.value}</span>
-        <span>Descripcion: ${description}</span>
-        <span>Divisa: ${modal_body.innerHTML}</span>`;     
+        var insert = `<p><span>Monto: ${amount.value}</span></p>
+        <p><span>Descripcion: ${description.value}</span></p>
+        <p><span>Divisa: ${id_money_type_form.value}</span></p>`;     
         
         if (is_superuser){
             superuser = `<label> Password: ${password} </label> `;

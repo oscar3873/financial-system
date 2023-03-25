@@ -1,0 +1,49 @@
+{% load static %} {% block content %}
+<div class="card bg-primary my-2 border-0 text-white box-shadow ">
+    <a name="settings" id="settings" class="btn btn-secondary rounded p-3" data-toggle="modal" data-target="#settings_modal" role="button">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        <span>Settings's</span>
+    </a>
+</div>
+<!--Modal-->
+<div class="modal fade" id="settings_modal" tabindex="-1" role="dialog" aria-labelledby="settings_modalLabel" aria-hidden="true" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="{% url 'commissions:settings' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title animate__fadeInLeft" style="animation-duration: 0.5s !important;" id="settings_modalLabel">Configuracion </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div >
+                        {{ settings_form.interest_register.label }}{{ settings_form.interest_register }}
+                    </div>
+                    <div >
+                        {{ settings_form.interest_payment.label }}{{ settings_form.interest_payment }}
+                    </div>
+                    <div >
+                        {{ settings_form.interest_sell.label }}{{ settings_form.interest_sell }}
+                    </div>
+                    <div >
+                        {{ settings_form.points_score_refinancing.label }}{{ settings_form.points_score_refinancing }}
+                    </div>
+                    <div >
+                        {{ settings_form.points_score_credits.label }}{{ settings_form.points_score_credits }}
+                    </div>
+                    <div >
+                        {{ settings_form.daily_interest.label }}{{ settings_form.daily_interest }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success">Confirmar</button>
+                    <button type="button" class="btn btn-primary m-2 rounded p-2" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--End Modal-->
+{% endblock %}

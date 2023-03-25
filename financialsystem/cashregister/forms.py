@@ -23,7 +23,6 @@ class MovementForm(forms.ModelForm):
     amount = forms.DecimalField(
         label = 'Monto',
         required=True,
-        initial=0,
         widget=forms.NumberInput(
             attrs={'id': 'id_amount_form'}
             ),
@@ -39,11 +38,17 @@ class MovementForm(forms.ModelForm):
         choices = MONEY_TYPE,
         label= 'Seleccione divisa',
         required=True,
+        widget=forms.Select(
+            attrs={'id': 'id_money_type_form'}
+            ),
     )
     operation_mode = forms.ChoiceField(
         choices= OPERATION_CHOISE,
-        label= 'Seleccione el tipo de operacion',
+        label= 'Seleccione operacion',
         required=True,
+        widget=forms.Select(
+            attrs={'id': 'id_operation_mode_form'}
+            ),
     )
     
     class Meta:
