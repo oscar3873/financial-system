@@ -23,7 +23,6 @@ class MovementForm(forms.ModelForm):
     amount = forms.DecimalField(
         label = 'Monto',
         required=True,
-        initial=0,
         widget=forms.NumberInput(
             attrs={'id': 'id_amount_form'}
             ),

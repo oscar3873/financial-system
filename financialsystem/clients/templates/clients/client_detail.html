@@ -65,6 +65,12 @@
                     </div>
                     <div class="swiper-pagination"></div>
                 </div>
+                <div class="card bg-primary my-2 border-0 text-white box-shadow ">
+                    <a name="" id="" class="btn btn-secondary rounded p-3" href="{% url 'credits:associate_credit_for_customer' client.pk %}" role="button">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        <span>Agregar nuevo credito</span>
+                    </a>
+                </div>
             </div>
             <div class="col-xl-5 col-sm-6 col-12 p-3">
                 <!-- Swiper -->
@@ -172,7 +178,7 @@
                                 <div class="col-12 p-0">
                                     <div class="form-group">
                                         <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
-                                        {% if installments_available %}{% with form_payment.0 as form_payment %}
+                                        {% if installments_available %} {% with form_payment.0 as form_payment %}
                                         <!-- .0 para formulario de refinanciacion -->
                                         {% include "payment/payment_form.html" %} {% endwith %} {% endif %} {% if credit_active.installments.first.is_paid_installment %}
                                         <div type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
@@ -215,131 +221,92 @@
                                     <th scope="col"><i class="fas fa-dollar-sign text-warning"></i> Monto</th>
                                     <th scope="col"><i class="fas fa-calendar-alt text-warning"></i> Vencimiento</th>
                                     <th scope="col"><i class="fas fa-check-circle text-warning"></i> Estado</th>
-    
+
                                     {% if installments_available %}
                                     <th scope="col"><i class="fas fa-cog text-warning"></i> Acciones</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                                {% for installments in form_payment.2 %}
-                                    {% with installments.0 as installment %}
-                                        <tr class="{% if installment.condition == 'A Tiempo' %}alert alert-warning{% elif installment.is_caduced_installment %}alert alert-danger{% elif installment.is_paid_installment and installment.is_refinancing_installment %}alert alert-info{% elif installment.is_refinancing_installment %}alert alert-info{% else %}alert alert-success{% endif %}">
-                                            <td>{{installment.installment_number}}</td>
-                                            <td><strong>$ {{installment.amount}}</strong></td>
-                                            <td>{{installment.end_date|date}}</td>
-                                            <td>
-                                                {% if installment.is_paid_installment %}
-                                                    <strong><i class="fas fa-check text-success"></i></strong>
-                                                {% elif installment.condition == 'A Tiempo' %}
-                                                    <strong><i class="fas fa-clock text-warning"></i></strong>
-                                                {% elif installment.is_caduced_installment %}
-                                                    <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong>
-                                                {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
-                                                    <a href="{% url 'credits:refinance_detail' installment.pk %}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>
-                                                {% elif installments.1.0 %}
-                                                    <a data-toggle="collapse" href="#collapseRefinancing-{{ installment.pk }}" role="button" aria-expanded="false" aria-controls="collapseRefinancing-{{ installment.pk }}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
-                                            </td>
-                                        </tr>
-                                        {% if installments.1.0 %}
-                                            <tr class="collapse" id="collapseRefinancing-{{ installment.pk }}">
-                                                <td class="px-3" colspan="5">
-                                                    <table class="table table-responsive-lg">
-                                                        <thead class="table text-white">
-                                                            <h5 class="card-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-sync text-info"></i>&nbsp;{{installments.1.0}}</h5>
-                                                        </thead>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for installments in form_payment.2 %} {% with installments.0 as installment %}
+                                <tr class="{% if installment.condition == 'A Tiempo' %}alert alert-warning{% elif installment.is_caduced_installment %}alert alert-danger{% elif installment.is_paid_installment and installment.is_refinancing_installment %}alert alert-info{% elif installment.is_refinancing_installment %}alert alert-info{% else %}alert alert-success{% endif %}">
+                                    <td>{{installment.installment_number}}</td>
+                                    <td><strong>$ {{installment.amount}}</strong></td>
+                                    <td>{{installment.end_date|date}}</td>
+                                    <td>
+                                        {% if installment.is_paid_installment %}
+                                        <strong><i class="fas fa-check text-success"></i></strong> {% elif installment.condition == 'A Tiempo' %}
+                                        <strong><i class="fas fa-clock text-warning"></i></strong> {% elif installment.is_caduced_installment %}
+                                        <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong> {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
+                                        <a href="{% url 'credits:refinance_detail' installment.pk %}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a> {% elif installments.1.0 %}
+                                        <a data-toggle="collapse" href="#collapseRefinancing-{{ installment.pk }}" role="button" aria-expanded="false" aria-controls="collapseRefinancing-{{ installment.pk }}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
+                                    </td>
+                                </tr>
+                                {% if installments.1.0 %}
+                                <tr class="collapse" id="collapseRefinancing-{{ installment.pk }}">
+                                    <td class="px-3" colspan="5">
+                                        <table class="table table-responsive-lg">
+                                            <thead class="table text-white">
+                                                <h5 class="card-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-sync text-info"></i>&nbsp;{{installments.1.0}}</h5>
+                                            </thead>
+                                            <tbody>
+                                                <!-- installments.0 es la cuota // installments.1 es la una lista que contiene la refinanciacion (_.1.0)(refinanciacion) y el formulario de pago de dicha refinanciacion (_.1.1)(formulario de pago) -->
 
-                                                        <tbody>
-<!-- installments.0 es la cuota // installments.1 es la una lista que contiene la refinanciacion (_.1.0)(refinanciacion) y el formulario de pago de dicha refinanciacion (_.1.1)(formulario de pago) -->
-
-                                                            {% with installments.1.0 as refinancing_table %}
-
-
-                                                                {% with installments.1.1 as form_payment %}     
-                                            <!-- BOTON PARA PAGAR REFINANCIACION // cambio nombre porque en el html de payment esta asi: form_payment -->
-                                                                    {% with refinancing_table as credit_active %}
-                                                        <!-- cambio nombre porque en el html de payment esta asi: credit_active -->
-                                                                        {% include "payment/payment_form.html" %}  
-                                                                    {% endwith %}
-                                                                {% endwith %}
-
-
-                                                                {% for installment_ref in refinancing_table.installments.all %}
-                                                                <tr class="{% if installment_ref.condition == 'A Tiempo' %}alert alert-warning{% elif installment_ref.is_caduced_installment %}alert alert-danger{% elif installment_ref.is_paid_installment and installment_ref.is_refinancing_installment %}alert alert-info{% elif installment_ref.is_refinancing_installment %}alert alert-info{% else %}alert alert-success{% endif %}">
-                                                                    <td>{{installment_ref.installment_number}}</td>
-                                                                    <td><strong>$ {{installment_ref.amount}}</strong></td>
-                                                                    <td>{{installment_ref.end_date|date}}</td>
-                                                                    <td>
-                                                                        {% if installment_ref.condition == 'A Tiempo' %}
-                                                                            <strong><i class="fas fa-clock text-warning"></i></strong>
-                                                                        {% elif installment_ref.is_caduced_installment %}
-                                                                            <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong>
-                                                                        {% else %}
-                                                                            <strong><i class="fas fa-check text-success"></i></strong>
-                                                                        {% endif %}
-                                                                    </td>
-                                                                    <td>
-                                                                        <a href="{% url 'credits:installmentRef_update' installment_ref.pk %}"><i class="fas fa-edit"></i></a>
-                                                                    </td>
-                                                                </tr>
-                                                                    </tr>
-                                                                {% endfor %}
-                                                            {% endwith %}
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        {% endif %}
-                                    {% endwith %}
-                                {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="card-footer p-1 bg-primary rounded-bottom"></div>
+                                                {% with installments.1.0 as refinancing_table %} {% with installments.1.1 as form_payment %}
+                                                <!-- BOTON PARA PAGAR REFINANCIACION // cambio nombre porque en el html de payment esta asi: form_payment -->
+                                                {% with refinancing_table as credit_active %}
+                                                <!-- cambio nombre porque en el html de payment esta asi: credit_active -->
+                                                <div class="p-3 d-flex justify-content-center">
+                                                    {% include "payment/payment_form.html" %}
+                                                </div>
+                                                {% endwith %} {% endwith %} {% for installment_ref in refinancing_table.installments.all %}
+                                                <tr class="{% if installment_ref.condition == 'A Tiempo' %}alert alert-warning{% elif installment_ref.is_caduced_installment %}alert alert-danger{% elif installment_ref.is_paid_installment and installment_ref.is_refinancing_installment %}alert alert-info{% elif installment_ref.is_refinancing_installment %}alert alert-info{% else %}alert alert-success{% endif %}">
+                                                    <td>{{installment_ref.installment_number}}</td>
+                                                    <td><strong>$ {{installment_ref.amount}}</strong></td>
+                                                    <td>{{installment_ref.end_date|date}}</td>
+                                                    <td>
+                                                        {% if installment_ref.condition == 'A Tiempo' %}
+                                                        <strong><i class="fas fa-clock text-warning"></i></strong> {% elif installment_ref.is_caduced_installment %}
+                                                        <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong> {% else %}
+                                                        <strong><i class="fas fa-check text-success"></i></strong> {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'credits:installmentRef_update' installment_ref.pk %}"><i class="fas fa-edit"></i></a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %} {% endwith %}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                                {% endif %} {% endwith %} {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="card-footer p-1 bg-primary rounded-bottom"></div>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="col-xl-9 col-sm-6 col-12 p-3 text-center">
-                <div id="title-card" class="d-flex p-0 m-0 align-items-center">
-                    <div class="led-danger"></div>
-                    <h5 class="title pl-3 m-0">Sin creditos activos</h5>
-                </div>
-                <div id="title-card" class="d-flex p-0 m-0 align-items-center">
-                    <div class="led-danger"></div>
-                    <h5 class="title pl-3 m-0">Sin creditos activos</h5>
-                </div>
-                <a href="{% url 'credits:associate_credit_for_customer' client.pk %}">
-                    <div class="col-sm-6 col-12 p-3 text-center">
-                        <div class="card mt-4">
-                            <div class="card-content">
-                                <div class="card-body">
-                                    <div class="media d-flex">
-                                        <div class="align-self-center">
-                                            <i class="fa-sharp fa-solid fa-credit-card text-warning icon-lg"></i>
-                                        </div>
-                                        <div class="media-body text-right">
-                                            <h5>+ Agregar Credito</h5>
-                                            <h5></h5>
-                                        </div>
-                                    </div>
-                                </div>
+                {% else %}
+                <div class="col-xl-9 col-sm-6 col-12 p-3 text-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="title-card" class="d-flex p-0 m-0 align-items-center">
+                                <div class="led-danger"></div>
+                                <h5 class="title pl-3 m-0">Sin creditos activos</h5>
                             </div>
-                            <div class="card-footer p-1 bg-info rounded-bottom"></div>
                         </div>
                     </div>
-                </a>
-            </div>
-            {% endif %}
+                </div>
+                {% endif %}
 
-        </div>
-        <div class="row mb-4">
-            <div class="col-xl-3 col-sm-6 col-12 p-3">
             </div>
-        </div>
+            <div class="row mb-4">
+                <div class="col-xl-3 col-sm-6 col-12 p-3">
+                </div>
+            </div>
     </section>
 </main>
 <script type="module">
@@ -467,14 +434,14 @@
     }, 1500);
 </script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         const toggleCardButtons = document.querySelectorAll(".toggle-card");
-        toggleCardButtons.forEach(function (toggleCardButton) {
-            if(toggleCardButtons != null) {
-                toggleCardButton.addEventListener("click", function () {
+        toggleCardButtons.forEach(function(toggleCardButton) {
+            if (toggleCardButtons != null) {
+                toggleCardButton.addEventListener("click", function() {
                     const cardId = toggleCardButton.getAttribute("data-card-id");
                     const cardContent = document.querySelector(`.plegable-card[data-card-id="${cardId}"] .card-body`);
-        
+
                     if (cardContent.style.display === "none") {
                         cardContent.style.display = "block";
                         toggleCardButton.innerHTML = '<i class="fas fa-chevron-up"></i>';

@@ -1,49 +1,69 @@
-{% extends "core/base.html" %} 
-{% load crispy_forms_tags %}{% load static %} 
-
-{% block content %}
+{% extends "core/base.html" %} {% load crispy_forms_tags %}{% load static %} {% block content %}
 <main class="container my-4">
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Crear Crédito</h4>
-    <section>
-        <form method="post">
-            <div class="row justify-content-center align-items-start">
-                {% csrf_token %}
-                
-                <div class="col-md-9 p-1">
-                    {{ form }}
-                    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Empeño</h4>
-                    <p>
-                        <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
-                        Añadir Articulo    
-                        </button>
-                    </p>
-                    <div class="collapse col-md-9 p-1" id="collapsePNC">
-                        <div class="form-row">
-                            {{ warranty_form }}
+    <a class="btn btn-secondary my-2 rounded p-3" href="{% url 'credits:create_credit' %}" role="button">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        <span>Nuevo Cliente</span>
+    </a>
+    <form class="d-block" method="post">
+        {% csrf_token %}
+        <section class="row">
+            <div class="col-md-8">
+                <div class="card box-shadow bg-primary text-white">
+                    <div class="card-header">
+                        <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Crear Crédito</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        {{form.start_date.label}} {{form.start_date}}
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        {{form.amount.label}} {{form.amount}}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        {{form.installment_num.label}} {{form.installment_num}}
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        {{form.credit_interest.label}} {{form.credit_interest}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group col-md-12">
+                                    <span class="m-0" for="monto">Monto a Devolver:</span>
+                                    <h5 class="d-block mt-1 py-1 text-start text-warning font-weight-bold" id="monto_valor" name="monto_valor" style="font-size: 2rem;"></h5>
+                                    <span id="cuota-label">Cuotas de:</span>
+                                    <h6 class="d-block mt-1 py-1 text-start text-warning font-weight-bold" id="cuota_valor" name="cuota_valor" style="font-size: 1.5rem;"></h6>
+                                </div>
+                            </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">Añadir Articulo</button>
+                                <div class="collapse p-4" id="collapsePNC">
+                                    <div class="form-row">
+                                        {{ warranty_form }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
                     </div>
                 </div>
-                
-                <div class="col-md-3 p-1">
-                    {% if not is_add %}
-                        <div class="form-group">
-                            <label for="search-input">Buscar Cliente</label>
-                            <input type="text" id="search-input" class="form-control" placeholder="Buscar por Nombre, Apellido o DNI">
-                        </div>
-                    {% endif %}
-                    <ul id="search-results" class="list-group mt-3"></ul>
-                    <div class="my-2 bg-primary border-0 text-white box-shadow card">
-                        <a name="" id="" class="btn btn-secondary rounded p-3" href="{% url 'credits:create_credit' %}" role="button">
-                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                            <span>Cargar Nuevo Cliente Completo</span>
-                        </a>
-                    </div>
-                </div>
-                
-                <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
             </div>
-        </form>
-    </section>
+            <div class="col-md-4">
+                {% if not is_add %}
+                <div class="form-group">
+                    <label for="search-input"><h4>Buscar Cliente</h4></label>
+                    <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
+                </div>
+                {% endif %}
+                <ul id="search-results" class="list-group text-dark mt-3"></ul>
+            </div>
+        </section>
+    </form>
 </main>
 
 <script>
@@ -69,12 +89,14 @@
                 searchResults.innerHTML = '';
                 clientes.forEach(cliente => {
                     const item = document.createElement('li');
+                    item.style.zIndex = "9999";
+                    item.style.cursor = 'pointer';
                     item.classList.add('list-group-item', 'client');
                     item.dataset.clientId = cliente.id;
                     item.innerHTML = `
                         <div class="d-flex justify-content-between">
                             <h6>${cliente.full_name}</h6>
-                            <span>${cliente.dni}</span>
+                            <h6 class="font-weight-bold">&nbsp${cliente.dni}</h6>
                         </div>
                     `;
                     searchResults.appendChild(item);
@@ -110,5 +132,38 @@
         }
     });
 </script>
+<script>
+    let numero_cuota = document.getElementById("id_installment_num")
+    let interes = document.getElementById("id_credit_interest")
+    let monto = document.getElementById("id_amount")
+    let monto_a_devolver = document.getElementById("monto_valor").textContent = "Calculando ...";
+    let cuota_a_devolver = document.getElementById("cuota_valor");
+    numero_cuota.addEventListener("input", calcularMonto);
+    interes.addEventListener("input", calcularMonto);
+    monto.addEventListener("input", calcularMonto);
 
+
+    function calcularMonto() {
+        var installmentNum = parseInt(document.getElementById("id_installment_num").value);
+        var creditInterest = parseFloat(document.getElementById("id_credit_interest").value);
+        var amount = parseFloat(document.getElementById("id_amount").value);
+
+        var monto = installmentNum * (creditInterest / 100 * amount) / (1 - Math.pow((1 + creditInterest / 100), (-installmentNum)));
+
+        if (isNaN(monto)) {
+            monto = "Caculando ..."
+            document.getElementById("monto_valor").textContent = monto;
+        } else {
+            document.getElementById("monto_valor").textContent = monto.toLocaleString("es-AR", {
+                style: "currency",
+                currency: "ARS"
+            });
+            montoCuota = parseFloat((monto / installmentNum).toFixed(2));
+            cuota_a_devolver.textContent = montoCuota.toLocaleString("es-AR", {
+                style: "currency",
+                currency: "ARS"
+            });
+        }
+    }
+</script>
 {% endblock content %}

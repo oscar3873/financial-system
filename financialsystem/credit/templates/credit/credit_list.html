@@ -5,7 +5,7 @@
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Creditos</h4>
     <!--Seccion 1-->
     {% if messages %} {% for message in messages %}
-    <div class=" alert alert-{{message.extra_tags}} alert-dismissible " role="alert ">
+    <div class=" alert alert-primary alert-dismissible " role="alert ">
         <span type="button " class="close " data-dismiss="alert " aria-label="Close "><span aria-hidden="true ">&times;</span></span>
         <span class="font-weight-light ">{{ message }}</span>
     </div>
@@ -61,19 +61,6 @@
                     <td>{{credit.credit_repayment_amount}}</td>
                     <td>{{credit.installment_num}}</td>
                     <td>{{credit.installments.last.amount}}</td>
-                    {% if credit.is_active %}
-                    <td>
-                        <div class="alert alert-success m-0 p-1 text-center rounded-pill " role="alert ">
-                            <strong>Activo</strong>
-                        </div>
-                    </td>
-                    {% endif %} {% if credit.is_old_credit %}
-                    <td>
-                        <div class="alert alert-info m-0 p-1 text-center rounded-pill " role="alert ">
-                            <strong>No activo</strong>
-                        </div>
-                    </td>
-                    {% endif %}
                     <td>{{credit.condition}}</td>
                     <td><a href="{% url 'clients:detail' credit.client.pk %}">{{credit.client}}</a></td>
                     <td><a href="{% url 'advisers:detail' credit.client.adviser.pk %}">{{credit.client.adviser}}</a></td>
