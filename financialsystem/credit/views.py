@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 import copy
 
@@ -111,6 +112,16 @@ class CreditListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["count_credits"] = self.model.objects.all().count()
         context["credits"] = self.model.objects.all()
+        
+        # Crear un objeto Paginator para dividir los resultados en páginas
+        paginator = Paginator(context["credits"], self.paginate_by)
+        page_number = self.request.GET.get('page')    # Obtener el número de página actual
+
+        # Obtener la página actual del objeto Paginator
+        page_obj = paginator.get_page(page_number)
+        # Agregar la página actual al contexto
+        context["credits"] = page_obj
+        
         context["properties"] = all_properties_credit()
         return context
     
@@ -233,6 +244,7 @@ class CreditCreateTo(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_add'] = True
+        context['warranty_form'] = WarrantyForm
         return context
     
     def form_valid(self, form):

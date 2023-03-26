@@ -19,7 +19,12 @@ class PaymentForm(forms.ModelForm):
         label= "Total a Pagar $",
         required=False,
         widget=forms.TextInput(
-            attrs={'class':'form-control bg-primary text-warning font-weight-bold', 'readonly': 'readonly', 'style': 'font-size: 2rem; border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'}
+            attrs={
+                'class':'form-control bg-primary text-warning font-weight-bold',
+                'readonly': 'readonly',
+                'value': '0.00',
+                'style': 'font-size: 2rem; border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'
+                }
         )
     )
 

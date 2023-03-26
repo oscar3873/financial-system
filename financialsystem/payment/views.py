@@ -127,7 +127,6 @@ def make_payment_installment(request, pk):
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
         pack = dict(zip(installment_, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
-
         payment._adviser = request.user.adviser
 
         if count_value == 0 :

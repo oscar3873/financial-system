@@ -2,10 +2,10 @@
 <!--Main-->
 <link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
 <main class="container my-4">
-    
+
     <h4 class="title text-center text-lg-left font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Movimientos de Caja</h4>
     {% if messages %} {% for message in messages %}
-    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
+    <div class="alert alert-primary alert-dismissible" role="alert">
         <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
         <span class="font-weight-light">{{ message }}</span>
     </div>
@@ -66,8 +66,6 @@
                                                     </button>
                                                 </div>
                                                 <div id='modal-body_confirmation' class="modal-body">
-                                                    
-
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button class="btn btn-success" type="submit" id="confirm-button">Confirmar</button>
@@ -90,7 +88,7 @@
                                         <div class="row align-items-center justify-content-center">
                                             <div id="balance">
                                                 {% if cashregister.total_balanceARS.amount > 0 %}
-                                                <span class="box-amount text-success font-weight-bold" style="font-size: 2rem; font-weight: 300;"> {{cashregister.total_balanceARS.amount|floatformat:2}} </span>
+                                                <span class="box-amount text-white font-weight-bold" style="font-size: 2rem; font-weight: 300;"> {{cashregister.total_balanceARS.amount|floatformat:2}} </span>
                                                 <span class="text-warning font-weight-bold"> {{cashregister.total_balanceARS.currency}} </span> {% else %}
                                                 <span class="box-amount text-danger font-weight-bold" style="font-size: 2rem; font-weight: 300;">{{cashregister.total_balanceARS.amount|floatformat:2}} </span>
                                                 <span class="text-warning font-weight-bold"> {{cashregister.total_balanceARS.currency}} </span> {% endif %}
@@ -135,8 +133,8 @@
                                                 <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path></svg>
                                                         </ion-icon>
                                                         {% endif %} {% if balance.value >= 0 %}
-                                                        <span class="text-white balAmount font-weight-bold" style="font-size: 2rem;">+{{ balance.value|floatformat:2}}</span> {% else %}
-                                                        <span class="text-white balAmount font-weight-bold" style="font-size: 2rem;">{{ balance.value|floatformat:2}}</span> {% endif %}
+                                                        <span class="balAmount font-weight-bold" style="font-size: 2rem;color: #a3d9a5;">+{{ balance.value|floatformat:2}}</span> {% else %}
+                                                        <span class="balAmount font-weight-bold" style="font-size: 2rem;color: #ff6961;">{{ balance.value|floatformat:2}}</span> {% endif %}
                                                         <span class="text-white font-weight-bold last-balance-title mb-0">{{ balance.money_type }}</span>
                                                     </div>
 
@@ -223,6 +221,7 @@
                                                     "money_type": "{{movement.money_type}}", 
                                                     "created_at": "{{movement.created_at}}", 
                                                     "user": "{{movement.user}}", 
+                                                    "userpk": "{{movement.user.pk}}", 
                                                     "operation_mode": "{{movement.get_operation_mode_display}}", 
                                                     "pk":"{{movement.pk}}"
                                                 }'>
@@ -262,8 +261,8 @@
                                                                 <div class="modal-header bg-primary text-white">
                                                                     <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
                                                                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
                                                                 </div>
                                                                 <div class="modal-body">
                                                                     <span>Esta seguro que desea borrar </span>
@@ -353,10 +352,10 @@
             </div>
             <div class="card-body">
                 <h4 class="m-0">Monto de la operacion</h4>
-                <p class="m-0" style="font-size: 2rem">${info.amount}</p>
+                <p class="m-0 font-weight-bold" style="font-size: 2rem">${info.amount}</p>
                 <p class="m-0">Por asesor financiero</p>
-                <p><a class="text-warning"><strong>${info.user}</strong></a></p>
-                <p class="m-0">Descrpcion</p>
+                <p><a href="/asesors/${info.userpk}" class="text-warning"><strong>${info.user}</strong></a></p>
+                <p class="m-0">Descripcion</p>
                 <p><strong>${info.description}</strong></p>
                 <h5 class="title pt-3">Acciones</h5>
                 <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal${info.pk}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
@@ -379,41 +378,36 @@
     });
 </script>
 <script>
-    function modal_funtion(button, password,is_superuser) {
+    function modal_funtion(button, password, is_superuser) {
 
-        var password_match = password;
+        let password_match = password;
 
         let description = document.getElementById("id_description_form");
         let amount = document.getElementById("id_amount_form");
         let money_type = document.getElementById("id_money_type_form");
         let modal_body = document.getElementById("modal-body_confirmation");
+        let insert = `<p>Monto: <span class="text-warning font-weight-bold">${amount.value}</span></p>
+        <p>Descripcion: <span class="text-warning font-weight-bold">${description.value}</span></p>
+        <p>Divisa: <span class="text-warning font-weight-bold">${money_type.value}</span></p>`;
+        modal_body.innerHTML = insert
 
-        modal_body.innerHTML= '';
-        var insert = `<p><span>Monto: ${amount.value}</span></p>
-        <p><span>Descripcion: ${description.value}</span></p>
-        <p><span>Divisa: ${id_money_type_form.value}</span></p>`;     
-        
-        if (is_superuser){
-            superuser = `<label> Password: ${password} </label> `;
-        } else{ superuser= ''}
-
-        if (button === 'egreso'){
-            var input = `<input required name="password_confirm" id="password_confirm" type="password" class="form-control" placeholder="Ingrese contraseña de confirmacion">`;
-            insert = insert + '' +superuser+ '' + input;
+        if (button === 'egreso') {
+            let input = `<input required name="password_confirm" id="password_confirm" type="password" class="form-control" placeholder="Ingrese contraseña de confirmacion">`;
+            insert = insert + '' + input;
             modal_body.innerHTML = insert;
         }
-        
+
         const confirmButton = document.getElementById('confirm-button');
 
         confirmButton.addEventListener('click', (event) => {
 
             const passwordConfirmInput = document.getElementById('password_confirm');
-                // Obtener la contraseña ingresada por el usuario
+            // Obtener la contraseña ingresada por el usuario
             const passwordConfirm = passwordConfirmInput.value;
             const previousErrorMessage = passwordConfirmInput.nextElementSibling;
-                if (previousErrorMessage !== null && previousErrorMessage.classList.contains('error-message')) {
-                    previousErrorMessage.remove();
-                }
+            if (previousErrorMessage !== null && previousErrorMessage.classList.contains('error-message')) {
+                previousErrorMessage.remove();
+            }
             // Comparar las contraseñas
             if (passwordConfirm !== password) {
 
@@ -421,15 +415,14 @@
                 const errorMessage = document.createElement('span');
                 errorMessage.textContent = 'La contraseña ingresada no es correcta';
                 errorMessage.classList.add('error-message');
-                errorMessage.style.color = 'red';
+                errorMessage.style.color = '#ff6961';
                 passwordConfirmInput.insertAdjacentElement('afterend', errorMessage);
-                
+
                 // Evitar que se envíe el formulario
                 event.preventDefault();
             }
         });
     }
-
 </script>
 <script>
     const egresoBtn = document.getElementById('egreso');
@@ -438,7 +431,7 @@
 
     egresoBtn.addEventListener('click', () => {
         operationModeField.value = 'EGRESO';
-    }); 
+    });
 
     ingresoBtn.addEventListener('click', () => {
         operationModeField.value = 'INGRESO';
@@ -520,10 +513,10 @@
 
         if (negativeSign == '-') {
             var amountHtml = '<span class="animate__fadeInDown box-amount text-danger font-weight-bold" style="font-size: 2rem; font-weight: 300;animation-duration: 1s !important;">' + negativeSign + amount + '</span>';
-            var currencyHtml = '<span class="box-currency text-danger font-weight-bold">' + currency + '</span>';
+            var currencyHtml = '<span class="box-currency text-warning font-weight-bold">' + currency + '</span>';
         } else {
-            var amountHtml = '<span class="animate__fadeInDown box-amount text-success font-weight-bold" style="font-size: 2rem; font-weight: 300;animation-duration: 1s !important;">' + negativeSign + amount + '</span>';
-            var currencyHtml = '<span class="box-currency text-success font-weight-bold">' + currency + '</span>';
+            var amountHtml = '<span class="animate__fadeInDown box-amount text-white font-weight-bold" style="font-size: 2rem; font-weight: 300;animation-duration: 1s !important;">' + negativeSign + amount + '</span>';
+            var currencyHtml = '<span class="box-currency text-warning font-weight-bold">' + currency + '</span>';
         }
 
 
