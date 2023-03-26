@@ -86,8 +86,6 @@ def refresh_cashregister(instance, *args, **kwargs):
     instance.cashregister.save()
 
 
-
-
 def operation_type_validate(instance, *args, **kwargs):
     """
     Verifica la existencia de una Caja, caso contrario, es creada.

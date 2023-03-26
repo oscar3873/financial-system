@@ -30,6 +30,8 @@ class Payment(models.Model):
     mov = models.OneToOneField(Movement, on_delete=models.CASCADE, null=True, blank=True)
     payment_method = models.CharField(max_length=20,choices=MONEY_TYPE, help_text="Metodo de Pago")
     detail = models.CharField(max_length=150, null=True, blank=True)
+    installment = models.ForeignKey(Installment, on_delete=models.CASCADE, null=True, blank=True, related_name='payments')
+    installment_ref = models.ForeignKey(InstallmentRefinancing, on_delete=models.CASCADE, null=True, blank=True, related_name='payments')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

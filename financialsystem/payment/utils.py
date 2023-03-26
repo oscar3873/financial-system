@@ -9,7 +9,8 @@ def payment_create(payment, installment):
         'amount': payment.amount,
         'payment_date': payment.payment_date,
         'adviser': payment._adviser,
-        'payment_method': payment.payment_method
+        'payment_method': payment.payment_method,
+        'installment': installment
     }
     if isinstance(installment, Installment):
         payment_dict['detail'] = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.credit.client, payment._adviser)

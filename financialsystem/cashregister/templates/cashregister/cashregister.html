@@ -65,8 +65,6 @@
                                                     </button>
                                                 </div>
                                                 <div id='modal-body_confirmation' class="modal-body">
-
-
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button class="btn btn-success" type="submit" id="confirm-button">Confirmar</button>
@@ -134,8 +132,8 @@
                                                 <path fill="none" stroke="currentColor" stroke-width="44" stroke-linecap="round" stroke-miterlimit="10" d="M416 128v192M288 256H96"></path></svg>
                                                         </ion-icon>
                                                         {% endif %} {% if balance.value >= 0 %}
-                                                        <span class="text-white balAmount font-weight-bold" style="font-size: 2rem;">+{{ balance.value|floatformat:2}}</span> {% else %}
-                                                        <span class="text-white balAmount font-weight-bold" style="font-size: 2rem;">{{ balance.value|floatformat:2}}</span> {% endif %}
+                                                        <span class="balAmount font-weight-bold" style="font-size: 2rem;color: #a3d9a5;">+{{ balance.value|floatformat:2}}</span> {% else %}
+                                                        <span class="balAmount font-weight-bold" style="font-size: 2rem;color: #ff6961;">{{ balance.value|floatformat:2}}</span> {% endif %}
                                                         <span class="text-white font-weight-bold last-balance-title mb-0">{{ balance.money_type }}</span>
                                                     </div>
 
@@ -381,29 +379,20 @@
 <script>
     function modal_funtion(button, password, is_superuser) {
 
-        var password_match = password;
+        let password_match = password;
 
         let description = document.getElementById("id_description_form");
         let amount = document.getElementById("id_amount_form");
         let money_type = document.getElementById("id_money_type");
         let modal_body = document.getElementById("modal-body_confirmation");
-
-        console.log(amount.value);
-
-        modal_body.innerHTML = '';
-        var insert = `<span>Monto: ${amount.value}</span>
-        <span>Descripcion: ${description}</span>
-        <span>Divisa: ${modal_body.innerHTML}</span>`;
-
-        if (is_superuser) {
-            superuser = `<label> Password: ${password} </label> `;
-        } else {
-            superuser = ''
-        }
+        let insert = `<p>Monto: <span class="text-warning font-weight-bold">${amount.value}</span></p>
+        <p>Descripcion: <span class="text-warning font-weight-bold">${description.value}</span></p>
+        <p>Divisa: <span class="text-warning font-weight-bold">${money_type.value}</span></p>`;
+        modal_body.innerHTML = insert
 
         if (button === 'egreso') {
-            var input = `<input required name="password_confirm" id="password_confirm" type="password" class="form-control" placeholder="Ingrese contraseña de confirmacion">`;
-            insert = insert + '' + superuser + '' + input;
+            let input = `<input required name="password_confirm" id="password_confirm" type="password" class="form-control" placeholder="Ingrese contraseña de confirmacion">`;
+            insert = insert + '' + input;
             modal_body.innerHTML = insert;
         }
 
@@ -425,7 +414,7 @@
                 const errorMessage = document.createElement('span');
                 errorMessage.textContent = 'La contraseña ingresada no es correcta';
                 errorMessage.classList.add('error-message');
-                errorMessage.style.color = 'red';
+                errorMessage.style.color = '#ff6961';
                 passwordConfirmInput.insertAdjacentElement('afterend', errorMessage);
 
                 // Evitar que se envíe el formulario
@@ -523,10 +512,10 @@
 
         if (negativeSign == '-') {
             var amountHtml = '<span class="animate__fadeInDown box-amount text-danger font-weight-bold" style="font-size: 2rem; font-weight: 300;animation-duration: 1s !important;">' + negativeSign + amount + '</span>';
-            var currencyHtml = '<span class="box-currency text-danger font-weight-bold">' + currency + '</span>';
+            var currencyHtml = '<span class="box-currency text-warning font-weight-bold">' + currency + '</span>';
         } else {
             var amountHtml = '<span class="animate__fadeInDown box-amount text-white font-weight-bold" style="font-size: 2rem; font-weight: 300;animation-duration: 1s !important;">' + negativeSign + amount + '</span>';
-            var currencyHtml = '<span class="box-currency text-white font-weight-bold">' + currency + '</span>';
+            var currencyHtml = '<span class="box-currency text-warning font-weight-bold">' + currency + '</span>';
         }
 
 

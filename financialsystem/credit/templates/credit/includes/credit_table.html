@@ -1,0 +1,85 @@
+{% if credits %}
+<table class="table table-responsive-lg table-striped table-hover ">
+    <thead class="table-primary text-white">
+        <tr>
+            <th scope="col"><i class="fas fa-hand-holding-usd text-warning"></i> Solicito</th>
+            <th scope="col"><i class="fas fa-money-check-alt text-warning"></i> Devolvio</th>
+            <th scope="col"><i class="fas fa-list-ol text-warning"></i> Cuotas</th>
+            <th scope="col"><i class="fas fa-dollar-sign text-warning"></i> Monto</th>
+            <th scope="col"><i class="fas fa-tasks text-warning"></i> Estado</th>
+            <th class="th-client" scope="col"><i class="fas fa-user text-warning"></i> Cliente</th>
+            <th scope="col"><i class="fas fa-user-tie text-warning"></i> Asesor</th>
+            <th scope="col"><i class="fas fa-calendar-plus text-warning"></i> Ingreso</th>
+            <th scope="col"><i class="fas fa-calendar-check text-warning"></i> Finalizo</th>
+            {% if user.is_superuser %}
+            <th scope="col"><i class="fas fa-cogs text-warning"></i> Acciones</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for credit in credits %}
+        <tr>
+            <td class="amount">{{credit.amount}}</td>
+            <td class="repayment_amount">{{credit.credit_repayment_amount}}</td>
+            <td class="installment_num">{{credit.installment_num}}</td>
+            <td class="installments_amount">{{credit.installments.last.amount}}</td>
+            <td class="condition">
+                {% if credit.condition == "A Tiempo" %}
+                <i class="fas fa-play-circle text-info"></i> {% elif credit.condition == "Pagado" %}
+                <i class="fas fa-check-circle text-success"></i> {% endif %}
+            </td>
+            <td class="client"><a href="{% url 'clients:detail' credit.client.pk %}">{{credit.client}}</a></td>
+            <td class="adviser"><a href="{% url 'advisers:detail' credit.client.adviser.pk %}">{{credit.client.adviser}}</a></td>
+            <td class="start_date">{{credit.start_date|date}}</td>
+            <td class="end_date">{{credit.end_date|date}}</td>
+            {% if user.is_superuser %}
+            <td>
+                <a type="button " class="btn" data-toggle="modal" data-target="#exampleModal{{credit.instance.pk}} "><i class="fas fa-trash-alt text-danger "></i> &nbsp;</a>
+                <!--Modal-->
+                <div class="modal fade " id="exampleModal{{credit.instance.pk}} " tabindex="-1 " role="dialog " aria-labelledby="exampleModalLabel{{credit.instance.pk}} " aria-hidden="true">
+                    <div class="modal-dialog " role="document ">
+                        <div class="modal-content bg-primary text-white">
+                            <div class="modal-header ">
+                                <h5 class="modal-title " id="exampleModalLabel ">Eliminar credito</h5>
+                            </div>
+                            <form action="{% url 'credits:delete' credit.pk %} " method="POST ">
+                                {% csrf_token %}
+                                <div class="modal-body ">
+                                    <span>Esta seguro que desea borrar al credito de </span>
+                                    <strong>{{ client }} </strong>?
+                                </div>
+                                <div class="modal-footer ">
+                                    <button class="btn btn-danger ">Si, borrar</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--End Modal-->
+                <a href="{% url 'credits:edit_credit' credit.pk %} "><i class="fas fa-edit text-info "></i></a>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class=" ">
+    <ul class="pagination justify-content-center ">
+        {% if credits.has_previous %}
+        <li class="page-item "><a class="page-link " href="?page=1 ">&laquo; primero</a></li>
+        <li class="page-item "><a class="page-link " href="?page={{ credits.previous_page_number }} ">anterior</a></li> {% endif %}
+
+        <li class="page-item ">
+            <a class="page-link ">
+                {{ credits.number }} of {{ credits.paginator.num_pages }}.
+            </a> {% if credits.has_next %}
+        </li>
+        <li class="page-item "><a class="page-link " href="?page={{ credits.next_page_number }} ">siguiente</a></li>
+        <li class="page-item "><a class="page-link " href="?page={{ credits.paginator.num_pages }} ">ultimo &raquo;</a> {% endif %}</li>
+    </ul>
+</div>
+{% else %}
+<h5 class="title font-weight-normal ">No hay Creditos Registrados</h5>
+{% endif %}

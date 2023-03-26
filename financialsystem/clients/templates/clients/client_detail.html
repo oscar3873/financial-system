@@ -11,7 +11,7 @@
     </div>
     {% endfor %} {% endif %}
     <section>
-        <div class="row justify-content-center">
+        <div class="row">
             <div class="col-xl-3 col-sm-3 col-12 p-3">
                 <!-- Swiper -->
                 <div class="swiper SwiperCards">
@@ -34,7 +34,7 @@
                                         <div class="led-danger"></div>
                                         {% endif %}
 
-                                        <span class="text-white" style="font-size: 2rem">{{client.score}}</span>
+                                        <span class="text-white font-weight-bold" style="font-size: 2rem">{{client.score}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -71,72 +71,101 @@
                         <span>Agregar nuevo credito</span>
                     </a>
                 </div>
-            </div>
-            <div class="col-xl-5 col-sm-6 col-12 p-3">
-                <!-- Swiper -->
-                <div class="swiper SwiperData">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide" style="height: auto;">
-                            <div class="card bg-primary text-white">
-                                <h5 class="title pt-3 text-center"><i class="fas fa-id-card text-warning"></i> Datos Personales</h5>
-                                <div class="d-flex justify-content-around">
-                                    <div class="px-2">
-                                        <p><span>Domicilio: </span><strong class="text-warning">{{client.address}}</strong></p>
-                                        <p><span>Estado civil: </span><strong class="text-warning">{{client.get_civil_status_display}}</strong></p>
-                                        <p><span>Profesion: </span><strong class="text-warning">{{client.profession}}</strong></p>
-                                    </div>
-                                    <div>
-                                        <p><span>DNI: </span><strong class="text-warning">{{client.dni}}</strong></p>
-                                        <p><span>Domicilio Laboral: </span><strong class="text-warning">{{client.job_address}}</strong></p>
-                                        <p><span>Correo: </span><strong class="text-warning">{{client.email}}</strong></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide" style="height: auto;">
-                            <div class="card bg-primary text-white">
-                                <h5 class="title pt-3 text-center"><i class="fas fa-id-card text-warning"></i> Datos Personales</h5>
-                                <div class="d-flex justify-content-around">
-                                    <div class="px-2">
-                                        <p><span>Domicilio: </span><strong class="text-warning">{{client.address}}</strong></p>
-                                        <p><span>Estado civil: </span><strong class="text-warning">{{client.get_civil_status_display}}</strong></p>
-                                        <p><span>Profesion: </span><strong class="text-warning">{{client.profession}}</strong></p>
-                                    </div>
-                                    <div>
-                                        <p><span>DNI: </span><strong class="text-warning">{{client.dni}}</strong></p>
-                                        <p><span>Domicilio Laboral: </span><strong class="text-warning">{{client.job_address}}</strong></p>
-                                        <p><span>Correo: </span><strong class="text-warning">{{client.email}}</strong></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-            </div>
-            <div class="col-xl-4 col-sm-6 col-12 p-3">
-            </div>
-        </div>
-        <div class="row mb-4">
-            <div class="col-xl-3 col-sm-6 col-12 p-3">
                 <div class="card bg-primary text-white media p-4">
-                    <h5 class="title py-3">Registro</h5>
+                    <h5 class="title py-3"><i class="fas fa-user-edit text-warning"></i> Registro</h5>
                     <p class="m-0">Asesor Financiero</p>
                     <p><a class="text-warning" href="{% url 'advisers:detail' client.adviser.pk %}"><strong>{{client.adviser}}</strong></a></p>
                     <p class="m-0">Fecha de Entrada al sistema</p>
                     <p><strong>{{client.created_at|date}}</strong></p>
                     <h5 class="title pt-3">Creditos</h5>
                     {% if credits %}
-                    <p>Cantidad de Creditos </p>
-                    <p>Tiene un credito activo</p>
+                    <p>Creditos solicitados <span class="font-weight-bold text-warning">{{count_credits}}</span></p>
+                    <p>Creditos activo <span class="font-weight-bold text-warning">{{count_credits_active}}</span></p>
                     {% else %}
                     <p>No se registraron Creditos</p>
                     {% endif %}
                 </div>
             </div>
+            <div class="col-xl-9 col-sm-9 col-12 p-3">
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <!-- Swiper -->
+                        <div class="swiper SwiperData">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide" style="height: auto;">
+                                    <div class="card bg-primary text-white">
+                                        <h5 class="title pt-3 text-center"><i class="fas fa-id-card text-warning"></i> Datos Personales</h5>
+                                        <div class="d-flex justify-content-around">
+                                            <div class="px-2">
+                                                <p><span>Domicilio: </span><strong class="text-warning">{{client.address}}</strong></p>
+                                                <p><span>Estado civil: </span><strong class="text-warning">{{client.get_civil_status_display}}</strong></p>
+                                                <p><span>Profesion: </span><strong class="text-warning">{{client.profession}}</strong></p>
+                                            </div>
+                                            <div>
+                                                <p><span>DNI: </span><strong class="text-warning">{{client.dni}}</strong></p>
+                                                <p><span>Domicilio Laboral: </span><strong class="text-warning">{{client.job_address}}</strong></p>
+                                                <p><span>Correo: </span><strong class="text-warning">{{client.email}}</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide" style="height: auto;">
+                                    <div class="card bg-primary text-white">
+                                        <h5 class="title pt-3 text-center"><i class="fas fa-id-card text-warning"></i> Datos Personales</h5>
+                                        <div class="d-flex justify-content-around">
+                                            <div class="px-2">
+                                                <p><span>Domicilio: </span><strong class="text-warning">{{client.address}}</strong></p>
+                                                <p><span>Estado civil: </span><strong class="text-warning">{{client.get_civil_status_display}}</strong></p>
+                                                <p><span>Profesion: </span><strong class="text-warning">{{client.profession}}</strong></p>
+                                            </div>
+                                            <div>
+                                                <p><span>DNI: </span><strong class="text-warning">{{client.dni}}</strong></p>
+                                                <p><span>Domicilio Laboral: </span><strong class="text-warning">{{client.job_address}}</strong></p>
+                                                <p><span>Correo: </span><strong class="text-warning">{{client.email}}</strong></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        {% if next_three_installments %}
+                        <!-- Swiper -->
+                        <div class="swiper SwiperExpiration">
+                            <div class="swiper-wrapper">
+                                {% for installment in next_three_installments %}
+                                <div class="swiper-slide" style="height: auto; overflow: hidden;">
+                                    <div class="card bg-primary text-white" style="overflow: hidden;">
+                                        <div class="card-body">
+                                            <h5 class="title text-center">
+                                                <i class="fas fa-hourglass-half text-warning"></i> Proximos Vencimientos
+                                            </h5>
+                                            <p class="text-center" style="font-size: 1.1rem;">Cuota <span class="text-warning font-weight-bold" style="font-size: 1.1rem;">{{installment.installment_number}}</span></p>
+                                            <p>Fecha: <span class="text-warning font-weight-bold"> {{ installment.end_date|date}}</span></p>
+                                            <p>Monto: <span class="text-warning font-weight-bold"> $ {{ installment.amount }}</span></p>
 
-            {% if credits_active %}
-            <div class="col-xl-9 col-sm-6 col-12 p-3">
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                        {% else %}
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h5 class="title text-center">
+                                    Sin proximos vencimientos
+                                </h5>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if credits_active %}
                 <!-- DICCIONARIO PARA RECORRER COMPLETAMENTE LOS CREDITOS Y FORMULARIOS (PAGOS Y REF.) , CUOTAS Y FORMULARIOS DE PAGO DE REF.-->
                 <!-- credit_active = credito actual | form_payment ( _.0 = formulario de pago - _.1 = formulario de refinanciacion) -->
                 {% for credit_active, form_payment in client_payment.items %}
@@ -149,78 +178,103 @@
                         <button data-card-id="{{ credit_active.id }}" class="toggle-card btn btn-sm btn-white"><i class="fas fa-chevron-up"></i></button>
                     </div>
                     <div class="card-body">
-                        <div class="col-12 col-md-5 mt-4">
-                            <div class="row align-items-center">
-                                <div class="col p-0">
-                                    <span>Monto solicitado:</span>
+                        <div class="row px-3">
+                            <div class="col-12 col-md-5">
+                                <div class="row align-items-center">
+                                    <div class="col p-0">
+                                        <span>Monto solicitado:</span>
+                                    </div>
+                                    <div class="col p-0">
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;">${{credit_active.amount}}</span>
+                                    </div>
                                 </div>
-                                <div class="col p-0">
-                                    <span class="font-weight-bold" style="font-size: 1.2rem;">${{credit_active.amount}}</span>
+                                <div class="row align-items-center">
+                                    <div class="col p-0">
+                                        <span>Monto a devolver:</span>
+                                    </div>
+                                    <div class="col p-0">
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;">$ {{credit_active.credit_repayment_amount}}</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row align-items-center">
-                                <div class="col p-0">
-                                    <span>Monto a devolver:</span>
+                                <div class="row align-items-center">
+                                    <div class="col p-0">
+                                        <span>Cuotas:</span>
+                                    </div>
+                                    <div class="col p-0">
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.installment_num}}</span>
+                                    </div>
                                 </div>
-                                <div class="col p-0">
-                                    <span class="font-weight-bold" style="font-size: 1.2rem;">$ {{credit_active.credit_repayment_amount}}</span>
-                                </div>
-                            </div>
-                            <div class="row align-items-center">
-                                <div class="col p-0">
-                                    <span>Cuotas:</span>
-                                </div>
-                                <div class="col p-0">
-                                    <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.installment_num}}</span>
-                                </div>
-                            </div>
-                            <div class="row align-items-center">
-                                <div class="col-12 p-0">
-                                    <div class="form-group">
-                                        <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
-                                        {% if installments_available %} {% with form_payment.0 as form_payment %}
-                                        <!-- .0 para formulario de refinanciacion -->
-                                        {% include "payment/payment_form.html" %} {% endwith %} {% endif %} {% if credit_active.installments.first.is_paid_installment %}
-                                        <div type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
-                                            <i class="fas fa-sync-alt text-info"></i>
-                                            <span onclick="get_id(`{{credit_active.pk}}`)">Refinanciar</span>
-                                        </div>
-                                        <!--Modal de refinanciacion-->
-                                        <div class="modal fade" id="Refinancing{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="Refinancing{{credit_active.pk}}" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content bg-primary text-white">
-                                                    <form action="{% url 'credits:refinance' credit_active.pk %}" method="POST">
-                                                        <div class="modal-header">
-                                                            <h4 class="modal-title" id="exampleModalLabel">Refinanciacion de Cuotas</h4>
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            {% csrf_token %} {% with form_payment.1 as form_refinance %}
-                                                            <!-- .1 para formulario de refinanciacion -->
-                                                            {{form_refinance.as_p}} {% endwith %}
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-success">Refinanciar</button>
-                                                            <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
-                                                        </div>
-                                                    </form>
+                                <div class="row align-items-center">
+                                    <div class="col-12 p-0">
+                                        <div class="form-group">
+                                            <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
+                                            {% if installments_available %} {% with form_payment.0 as form_payment %}
+                                            <!-- .0 para formulario de refinanciacion -->
+                                            {% include "payment/payment_form.html" %} {% endwith %} {% endif %} {% if credit_active.installments.first.is_paid_installment %}
+                                            <div type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
+                                                <i class="fas fa-sync-alt text-info"></i>
+                                                <span onclick="get_id(`{{credit_active.pk}}`)">Refinanciar</span>
+                                            </div>
+                                            <!--Modal de refinanciacion-->
+                                            <div class="modal fade" id="Refinancing{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="Refinancing{{credit_active.pk}}" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content bg-primary text-white">
+                                                        <form action="{% url 'credits:refinance' credit_active.pk %}" method="POST">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title" id="exampleModalLabel">Refinanciacion de Cuotas</h4>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                {% csrf_token %} {% with form_payment.1 as form_refinance %}
+                                                                <!-- .1 para formulario de refinanciacion -->
+                                                                {{form_refinance.as_p}} {% endwith %}
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button class="btn btn-success">Refinanciar</button>
+                                                                <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            {% endif %}
                                         </div>
-                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-12 col-md-7">
+                                <!-- Swiper -->
+                                <div class="swiper SwiperExpiration">
+                                    <div class="swiper-wrapper">
+                                        {% for last_three_payments in last_three_payments_by_credit_list %} {% for payment in last_three_payments %}
+                                        <div class="swiper-slide" style="height: auto; overflow: hidden;">
+                                            <div class="card bg-success text-white" style="overflow: hidden;">
+                                                <div class="card-body">
+                                                    <h5 class="title text-center">
+                                                        <i class="fas fa-check"></i> Ultimos pagos
+                                                    </h5>
+                                                    <p class="text-center" style="font-size: 1.1rem;"><span class=" font-weight-bold" style="font-size: 1.1rem;">{{payment.installment}}</span></p>
+                                                    <p>Pagado el <span class=" font-weight-bold">{{ payment.payment_date }}</span></p>
+                                                    <p>Monto: <span class=" font-weight-bold"> $ {{ payment.amount }}</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %} {% endfor %}
+                                    </div>
+                                    <div class="swiper-pagination"></div>
+                                </div>
+                            </div>
                         </div>
-                        <table class="table table-lg-responsive table-striped table-hover">
+
+                        <table class="table table-responsive-lg table-striped table-hover">
                             <thead class="table-primary text-white">
                                 <tr>
                                     <th scope="col"><i class="fas fa-coins text-warning"></i> Cuota</th>
                                     <th scope="col"><i class="fas fa-dollar-sign text-warning"></i> Monto</th>
                                     <th scope="col"><i class="fas fa-calendar-alt text-warning"></i> Vencimiento</th>
-                                    <th scope="col"><i class="fas fa-check-circle text-warning"></i> Estado</th>
+                                    <th scope="col"><i class="fas fa-tasks text-warning"></i> Estado</th>
 
                                     {% if installments_available %}
                                     <th scope="col"><i class="fas fa-cog text-warning"></i> Acciones</th>
@@ -285,35 +339,57 @@
                                 {% endif %} {% endwith %} {% endfor %}
                             </tbody>
                         </table>
-                        <div class="card-footer p-1 bg-primary rounded-bottom"></div>
                     </div>
-                    {% endfor %}
                 </div>
-                {% else %}
-                <div class="col-xl-9 col-sm-6 col-12 p-3 text-center">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="title-card" class="d-flex p-0 m-0 align-items-center">
-                                <div class="led-danger"></div>
-                                <h5 class="title pl-3 m-0">Sin creditos activos</h5>
-                            </div>
+                {% endfor %} {% else %}
+                <div class="card plegable-card mt-2">
+                    <div class="card-body">
+                        <div id="title-card" class="d-flex p-0 m-0 align-items-center">
+                            <div class="led-danger"></div>
+                            <h5 class="title pl-3 m-0">Sin creditos activos</h5>
                         </div>
                     </div>
                 </div>
                 {% endif %}
-
             </div>
-            <div class="row mb-4">
-                <div class="col-xl-3 col-sm-6 col-12 p-3">
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card box-shadow mt-2">
+                    <div class="card-body">
+                        <h4 class="card-title"><i class="fas fa-history"></i> Historial</h4>
+                        {% include 'credit/includes/credit_table.html' %}
+                    </div>
                 </div>
             </div>
+        </div>
+
     </section>
 </main>
 <script type="module">
     import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.esm.browser.min.js';
 </script>
-
-<!--Swipper DataClient-->
+<!--Swipper ExpirationData-->
+<script>
+    var swiper = new Swiper(".SwiperExpiration", {
+        effect: "cards",
+        pagination: {
+            el: ".swiper-pagination",
+            dynamicBullets: true,
+        },
+    });
+</script>
+<!--Swipper PaymentData-->
+<script>
+    var swiper = new Swiper(".SwiperPayment", {
+        effect: "cards",
+        pagination: {
+            el: ".swiper-pagination",
+            dynamicBullets: true,
+        },
+    });
+</script>
+<!--Swipper ClientData-->
 <script>
     var swiper = new Swiper(".SwiperData", {
         effect: 'flip',
@@ -452,6 +528,27 @@
                 });
             }
         });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const thClient = document.querySelector('.th-client');
+
+        if (thClient) {
+            // Ocultar la columna de encabezado correspondiente al cliente
+            thClient.style.display = 'none';
+
+            // Obtener todas las filas de la tabla
+            const rows = document.querySelectorAll('tbody tr');
+
+            // Iterar sobre las filas y ocultar la celda correspondiente al cliente
+            rows.forEach(row => {
+                const clientCell = row.querySelector('.client');
+                if (clientCell) {
+                    clientCell.style.display = 'none';
+                }
+            });
+        }
     });
 </script>
 {% endblock content %}

@@ -4,10 +4,14 @@ from django.contrib import messages
 
 from django.db.models import Count
 
+from django.core.paginator import Paginator
+
 from babel.dates import format_date
 from clients.filters import ListingFilter
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
+from credit.models import Installment
+from payment.models import Payment
 from .utils import all_properties_client
 
 from django.utils import timezone
@@ -145,14 +149,12 @@ class ClientUpdateView(UpdateView):
         """
         Muestra un error en caso de formulario invalido.
         """
-        print("Esto re invalido amigoooo", form.errors)
         return super().form_invalid(form)
     
     def form_valid(self, form):
         """
         Actualiza el cliente y sus telefonos.
         """
-        print("Estoy aca amigo")
         response = super().form_valid(form)
         phone_formset = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
         phone_formset.save()
@@ -176,12 +178,11 @@ class ClientDetailView(DetailView):
     """
     model = Client
     template_name = 'clients/client_detail.html'
-    
+    paginate_by = 4
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
-
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
@@ -189,12 +190,49 @@ class ClientDetailView(DetailView):
         """
         refresh_condition()
         context = super().get_context_data(**kwargs)
-
         context["credits"] = context["client"].credits.all()
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
         context["credits_active"] = credits_active
+        context["count_credits"] = context["credits"].count()
+        context["count_credits_active"] = context["credits_active"].count()
+        paginator = Paginator(context["credits"], self.paginate_by)
+        page_number = self.request.GET.get('page')    # Obtener el número de página actual
 
+        # Obtener la página actual del objeto Paginator
+        page_obj = paginator.get_page(page_number)
+        # Agregar la página actual al contexto
+        context["credits"] = page_obj
 
+        if credits_active:
+            next_installments = []
+            for credit in credits_active:
+                normal_installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
+                refinance_installments = Installment.objects.filter(refinance__installment_ref__credit=credit).exclude(condition='Pagada')
+
+                all_installments = normal_installments | refinance_installments
+                next_installments.extend(all_installments.filter(end_date__gte=datetime.now()).values('credit', 'end_date', 'amount', 'installment_number'))
+
+            next_installments.sort(key=lambda x: x['end_date'])
+            next_three_installments = next_installments[:3]
+
+            context['next_three_installments'] = next_three_installments
+
+            last_three_payments_by_credit_list = []
+            for credit in credits_active:
+                # Get the related payments for the credit, order by payment_date in descending order, and get the first three
+                last_three_normal_payments = Payment.objects.filter(installment__in=credit.installments.all()).order_by('-payment_date')[:3]
+                # Combine the lists of payments and sort them by payment_date in descending order
+                combined_payments = sorted(list(last_three_normal_payments), key=lambda x: x.payment_date, reverse=True)
+
+                # Get the first three payments from the combined list
+                last_three_payments = combined_payments[:3]
+
+                # Append the last three payments to the list for this credit
+                last_three_payments_by_credit_list.append(last_three_payments)
+
+            # Add the last_three_payments_by_credit_list to the context
+            context["last_three_payments_by_credit_list"] = last_three_payments_by_credit_list
+        
         forms_payments = []
         form_refinancings = []
         installments_by_credit = {}
@@ -239,7 +277,6 @@ class ClientDetailView(DetailView):
             dicc[key] = value
         
         context["client_payment"] = dicc
-        print(dicc)
         return context
 
     
