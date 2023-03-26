@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from django import forms
 from credit.models import Installment
-
+from django.utils import timezone
 from payment.models import Payment
 
 class PaymentForm(forms.ModelForm):
@@ -37,12 +37,12 @@ class PaymentForm(forms.ModelForm):
 
     payment_date = forms.DateField(
         label="Fecha de Pago",
-        required=True,
-        widget=  forms.NumberInput(attrs={
-            'class': 'form-control',
-            'type': 'date',
-            'value': datetime.now().date()
-            })
+        required=True
+    )
+
+    payment_time = forms.TimeField(
+        label="Fecha de Pago",
+        required=True
     )
 
     payment_method = forms.ChoiceField(
@@ -55,15 +55,26 @@ class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         fields = ["amount", "payment_date", "payment_method"]
+
     
     def __init__(self,installments,*args, **kwargs):
         """
         Formulario de Pagos. Mediante 'checkboxs', selecciona cuotas a pagar.
         """
         super(PaymentForm, self).__init__(*args, **kwargs)
-        self.prefix = "payment"
 
         self.fields['amount_paid'].initial = Decimal((sum([installment.amount for installment in installments]))/2)
+        self.fields['payment_date'].widget= forms.DateInput(attrs={ # CAMBIO DE POSICION DEL WIDGET POR BUG (NO ACTUALIZABA FECHA)
+            'class': 'form-control',
+            'type': 'date',
+            'value': timezone.now().date()
+            })
+        
+        self.fields['payment_time'].widget= forms.TimeInput(attrs={ # CAMBIO DE POSICION DEL WIDGET POR BUG (NO ACTUALIZABA HORA)
+            'class': 'form-control',
+            'type': 'time',
+            'value': datetime.now().time().strftime('%H:%M')
+            })
 
         if installments.count() > 0:
             for installment in installments:

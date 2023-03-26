@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -122,6 +123,11 @@ def make_payment_installment(request, pk):
 
     if request.method == 'POST' and form.is_valid():
         payment = form.save(commit=False)
+        payment_date = form.cleaned_data['payment_date']
+        payment_time = form.cleaned_data['payment_time']
+        
+        # Unir los valores de payment_date y payment_time en un solo objeto datetime
+        payment.payment_date = datetime.combine(payment_date, payment_time)
         
         installment_ = list(installments.all())
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
@@ -148,6 +154,6 @@ def make_payment_installment(request, pk):
             score = round((points_per_installments/installments_score) * count_value)
             client.score += score
             client.save()
-
+    else: print(form.errors)
     return redirect('clients:detail', pk=client.pk)
     

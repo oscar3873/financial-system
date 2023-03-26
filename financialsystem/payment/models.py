@@ -43,7 +43,7 @@ class Payment(models.Model):
             return super().__str__()
 
     class Meta:
-        ordering = ["created_at"]
+        ordering = ["-created_at"]
 
 
 #--------------------------- SEÑALES PARA PAYMENT -------------------------------------

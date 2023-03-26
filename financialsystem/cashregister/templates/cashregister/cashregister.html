@@ -386,7 +386,15 @@
         let amount = document.getElementById("id_amount_form");
         let money_type = document.getElementById("id_money_type_form");
         let modal_body = document.getElementById("modal-body_confirmation");
-        let insert = `<p>Monto: <span class="text-warning font-weight-bold">${amount.value}</span></p>
+
+        let formattedAmount = Number(amount.value).toLocaleString('es-ES', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            useGrouping: true,
+            });
+
+        let insert = `<p>Monto: <span class="text-warning font-weight-bold">${formattedAmount}</span></p>
         <p>Descripcion: <span class="text-warning font-weight-bold">${description.value}</span></p>
         <p>Divisa: <span class="text-warning font-weight-bold">${money_type.value}</span></p>`;
         modal_body.innerHTML = insert

@@ -175,6 +175,7 @@ class AssociateCreateView(CreateView):
             credit = form.save(commit=False)
             credit.is_new = True
             credit.client = client
+            credit.mov = create_movement(credit, self.request.user.adviser)
             credit.save()
 
             # Validar el formulario de garantía
