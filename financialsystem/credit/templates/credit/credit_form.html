@@ -7,6 +7,15 @@
     <form class="d-block" method="post">
         {% csrf_token %}
         <section class="row">
+            <div class="col-md-4 order-first order-md-last">
+                {% if not is_add %}
+                <div class="form-group">
+                    <label for="search-input"><h4>Buscar Cliente</h4></label>
+                    <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
+                </div>
+                {% endif %}
+                <ul id="search-results" class="list-group text-dark mt-3"></ul>
+            </div>
             <div class="col-md-8">
                 <div class="card box-shadow bg-primary text-white">
                     <div class="card-header">
@@ -53,16 +62,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                {% if not is_add %}
-                <div class="form-group">
-                    <label for="search-input"><h4>Buscar Cliente</h4></label>
-                    <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
-                </div>
-                {% endif %}
-                <ul id="search-results" class="list-group text-dark mt-3"></ul>
-            </div>
         </section>
+
     </form>
 </main>
 

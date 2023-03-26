@@ -11,7 +11,7 @@
     </div>
     {% endfor %} {% endif %}
     <section>
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-xl-3 col-sm-3 col-12 p-3">
                 <!-- Swiper -->
                 <div class="swiper SwiperCards">
@@ -86,8 +86,8 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="col-xl-9 col-sm-9 col-12 p-3">
-                <div class="row">
+            <div class="col-xl-9 col-sm-9 col-12">
+                <div class="row justify-content-center">
                     <div class="col-12 col-md-6">
                         <!-- Swiper -->
                         <div class="swiper SwiperData">
@@ -130,7 +130,7 @@
                             <div class="swiper-pagination"></div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 mb-3">
+                    <div class="col-8 col-md-6 mt-lg-0 mt-3 mb-3">
                         {% if next_three_installments %}
                         <!-- Swiper -->
                         <div class="swiper SwiperExpiration">
@@ -178,7 +178,7 @@
                         <button data-card-id="{{ credit_active.id }}" class="toggle-card btn btn-sm btn-white"><i class="fas fa-chevron-up"></i></button>
                     </div>
                     <div class="card-body">
-                        <div class="row px-3">
+                        <div class="row px-3 justify-content-center">
                             <div class="col-12 col-md-5">
                                 <div class="row align-items-center">
                                     <div class="col p-0">
@@ -204,7 +204,7 @@
                                         <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.installment_num}}</span>
                                     </div>
                                 </div>
-                                <div class="row align-items-center">
+                                <div class="row align-items-center justify-content-center">
                                     <div class="col-12 p-0">
                                         <div class="form-group">
                                             <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
@@ -244,20 +244,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-7">
+                            <div class="col-8 col-md-6">
                                 <!-- Swiper -->
                                 <div class="swiper SwiperExpiration">
                                     <div class="swiper-wrapper">
                                         {% for last_three_payments in last_three_payments_by_credit_list %} {% for payment in last_three_payments %}
                                         <div class="swiper-slide" style="height: auto; overflow: hidden;">
-                                            <div class="card bg-success text-white" style="overflow: hidden;">
+                                            <div class="card bg-primary text-white box-shadow" style="overflow: hidden;">
                                                 <div class="card-body">
                                                     <h5 class="title text-center">
-                                                        <i class="fas fa-check"></i> Ultimos pagos
+                                                        <i class="fas fa-check text-warning"></i> Ultimos pagos
                                                     </h5>
-                                                    <p class="text-center" style="font-size: 1.1rem;"><span class=" font-weight-bold" style="font-size: 1.1rem;">{{payment.installment}}</span></p>
-                                                    <p>Pagado el <span class=" font-weight-bold">{{ payment.payment_date }}</span></p>
-                                                    <p>Monto: <span class=" font-weight-bold"> $ {{ payment.amount }}</span></p>
+
+                                                    {% if payment.installment %}
+                                                    <p class="text-center"><span>{{payment.installment}}</span></p>
+                                                    {% else %}
+                                                    <p class="text-center"><span>{{payment.installment_ref}}</span></p>
+                                                    {% endif %}
+                                                    <p>Pagado el <span class=" font-weight-bold text-warning">{{ payment.payment_date }}</span></p>
+                                                    <p>Monto: <span class=" font-weight-bold text-warning"> $ {{ payment.amount }}</span></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -302,7 +307,7 @@
                                 {% if installments.1.0 %}
                                 <tr class="collapse" id="collapseRefinancing-{{ installment.pk }}">
                                     <td class="px-3" colspan="5">
-                                        <table class="table table-responsive-lg">
+                                        <table class="table table-responsive-lg table-striped table-hover">
                                             <thead class="table text-white">
                                                 <h5 class="card-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-sync text-info"></i>&nbsp;{{installments.1.0}}</h5>
                                             </thead>
@@ -353,7 +358,7 @@
                 {% endif %}
             </div>
         </div>
-        <div class="row">
+        <div class=" justify-content-center">
             <div class="col-12">
                 <div class="card box-shadow mt-2">
                     <div class="card-body">

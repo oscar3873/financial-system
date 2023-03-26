@@ -87,9 +87,9 @@
             </article>
         </div>
         <!--Lista de Notas-->
-        <aside class="col-12 col-lg-4 col-md-4 my-4">
-            <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-white box-shadow rounded border" style="width: 350px;">
-                <a href="{% url 'notes:list' %}" class="d-flex align-items-center justify-content-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+        <aside class="col-10 col-lg-4 col-md-4 my-4">
+            <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-white box-shadow rounded border">
+                <a href="{% url 'notes:list' %}" class="d-flex align-items-center justify-content-center flex-shrink-0 link-dark text-decoration-none border-bottom">
                     <i class="fa-solid fa-list-check text-warning"></i> &nbsp;
                     <h5 class="fs-5 fw-semibold m-0 text-primary"> Tus Notas Recordatorias</h5>
                 </a>
@@ -113,7 +113,7 @@
     <section class="row mt-4">
         <!--Tabla de Clientes-->
         <div class="container">
-            <table class="table table-striped m-0 box-shadow table-hover">
+            <table class="table table-striped m-0 box-shadow table-hover table-responsive">
                 <thead class="table-light">
                     <tr>
                         <th scope="col"><i class="fa-solid fa-user"></i> Cliente</th>

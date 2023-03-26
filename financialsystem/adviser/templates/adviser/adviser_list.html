@@ -2,7 +2,7 @@
 <!--Main-->
 <link href="{% static 'adviser/css/adviser.css' %}" rel="stylesheet">
 <main class="container my-4">
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Asesores</h4>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Perfil</h4>
     <!--Seccion 1-->
     {% if messages %} {% for message in messages %}
     <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
@@ -53,7 +53,7 @@
                         <span>Cargar Nuevo Asesor</span>
                     </a>
                 </div>
-                {% include "interest/setting_form.html" %}  
+                {% include "interest/setting_form.html" %}
             </div>
             <div class="col-xl-6 col-sm-6 col-lg-6">
                 <div class="col-xl-12 col-sm-12 col-lg-12">
@@ -81,7 +81,7 @@
                                     <tbody>
                                         {% for adviser in advisers %}
                                         <tr class="open-offcanvas" style="cursor: pointer;" data-info='{"first_name":"{{client.first_name}}","last_name":"{{client.last_name}}","dni":"{{client.dni}}","email":"{{client.email}}","created_at":"{{client.created_at}}","adviser":"{{client.adviser}}","address":"{{client.address}}","id":"{{client.id}}","adviser_id":"{{client.adviser.id}}","job_address":"{{client.job_address}}","profession":"{{client.profession}}","score":"{{client.score}}","civil_status":"{{client.get_civil_status_display}}","phone_numbers":"{{client.phonenumberclient_set.all}}"}'>
-                                            <td>{{adviser.user.first_name}} {{adviser.user.last_name}}</td>
+                                            <td><a href="{% url 'advisers:detail' adviser.pk %}">{{adviser.user.first_name}} {{adviser.user.last_name}}</a></td>
                                             <td>{{adviser.user.dni}}</td>
                                             <td>{{adviser.created_at|date}}</td>
                                         </tr>

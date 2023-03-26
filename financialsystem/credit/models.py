@@ -60,10 +60,11 @@ class Refinancing(models.Model):
     lastup = models.DateField(null=True, blank=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="refinancing", help_text="Credito de la cuota", null=True, blank=True)
     
     def __str__(self) -> str:
         installment_numbers = [str(installment.installment_number) for installment in self.installment_ref.all()]
-        return "Refinanciacion de las cuotas: {}".format(", ".join(installment_numbers))
+        return "Refinanciacion de la cuota: {}".format(", ".join(installment_numbers))
 
     class Meta:
         ordering = ["-created_at"]

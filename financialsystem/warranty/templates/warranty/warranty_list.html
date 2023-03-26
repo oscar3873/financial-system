@@ -33,7 +33,7 @@
         </div>
         <div class="row mb-4">
             <div class="col-xl-3 col-sm-6 col-12 p-3">
-                <a name="" id="" class="btn btn-primary rounded p-3" href="{% url 'warrantys:create' %}" role="button">
+                <a name="" id="" class="btn btn-secondary rounded p-3" href="{% url 'warrantys:create' %}" role="button">
                     <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     <span>Ingresar Nuevo Empeño</span>
                 </a>
@@ -73,7 +73,8 @@
             <thead class="table-light">
                 <tr>
                     {% for name_prop in properties %}
-                    <th scope="col">{{name_prop}}</th>  <!-- AGREGAR EL ESTADO DE VENDIDO BOOLEANO (is_selled)-->
+                    <th scope="col">{{name_prop}}</th>
+                    <!-- AGREGAR EL ESTADO DE VENDIDO BOOLEANO (is_selled)-->
                     {% endfor %} {% if user.is_superuser %}
                     <th scope="col">Acciones</th>
                     {% endif %}
@@ -116,8 +117,7 @@
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            {% csrf_token %}
-                                            {{form_sell.as_p}}
+                                            {% csrf_token %} {{form_sell.as_p}}
                                         </div>
                                         <div class="modal-footer">
                                             <button class="btn btn-success">Refinanciar</button>

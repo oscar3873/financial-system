@@ -93,7 +93,7 @@ class CreditListView(LoginRequiredMixin, ListView):
     Lista de creditos.
     """
     model = Credit
-    template_name = 'credits/credit_list.html'
+    template_name = 'credit/credit_list.html'
     ordering = ['-id']
     paginate_by = 5
     
@@ -130,7 +130,16 @@ class CreditDetailView(DetailView):
     Detalle	del credito.
     """
     model = Credit
-    template_name = 'credits/credit_detail.html'
+    template_name = 'credit/credit_detail.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        installments = context["credit"].installments.all()
+        context["installments"] = installments
+        ref_in_installments = Installment.objects.filter(credit=context["credit"], is_refinancing_installment=True)
+        # Crea una lista de todas las cuotas refinanciadas de los objetos en la lista ref_in_installments
+        installments_ref = [inst_ref for inst in ref_in_installments for inst_ref in inst.refinance.installments.all()]
+        context["installments_ref"] = installments_ref
+        return context
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"

@@ -1,5 +1,5 @@
 from payment.models import Payment
-from credit.models import Installment
+from credit.models import Installment, InstallmentRefinancing
 
 def all_properties_paymnet():
     return ['Monto','Forma de Pago','Detalle','Fecha']
@@ -10,11 +10,13 @@ def payment_create(payment, installment):
         'payment_date': payment.payment_date,
         'adviser': payment._adviser,
         'payment_method': payment.payment_method,
-        'installment': installment
     }
+    
     if isinstance(installment, Installment):
+        payment_dict['installment'] = installment
         payment_dict['detail'] = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.credit.client, payment._adviser)
     else:
+        payment_dict['installment_ref'] = installment
         payment_dict['detail'] = 'COBRO CUOTA REFINANCIADA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.refinancing.installment_ref.last().credit.client, payment._adviser)
         
     Payment.objects.create(**payment_dict)

@@ -39,7 +39,7 @@ class WarrantyForm(forms.ModelForm):
     )
 
     purchase_papers = forms.BooleanField(
-        label= 'Papeles de compra',
+        label= 'Papeles',
         initial= False,
     )
 
@@ -94,7 +94,7 @@ class SellForm(forms.ModelForm):
     )
 
     sell_date = forms.DateTimeField(
-        label="Fecha de Entrada",
+        label="Fecha",
         required=True,
         widget=  forms.DateInput(attrs={
             'type': 'date',
@@ -153,7 +153,7 @@ class WarrantyUpdateForm(forms.ModelForm):
     )
 
     purchase_papers = forms.BooleanField(
-        label= 'Papeles de compra',
+        label= 'Papeles',
         initial= False,
     )
 

@@ -18,8 +18,8 @@
     </thead>
     <tbody>
         {% for credit in credits %}
-        <tr>
-            <td class="amount">{{credit.amount}}</td>
+        <tr style="cursor: pointer;">
+            <td class="amount"><a href="{% url 'credits:detail' credit.pk %}">{{credit.amount}}</a></td>
             <td class="repayment_amount">{{credit.credit_repayment_amount}}</td>
             <td class="installment_num">{{credit.installment_num}}</td>
             <td class="installments_amount">{{credit.installments.last.amount}}</td>

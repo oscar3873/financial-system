@@ -43,8 +43,7 @@
                                 <strong>{{user.email}}</strong>
                             </a>
                             <div class="dropdown-menu text-small box-shadow bg-primary" aria-labelledby="dropdownUser1">
-                                <a class="dropdown-item bg-primary text-white" href="#">Perfil</a>
-                                <a class="dropdown-item bg-primary text-white" href="#">Configuraciones</a>
+                                <a class="dropdown-item bg-primary text-white" href="{% url 'advisers:list' %}">Perfil</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item bg-primary text-white" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
                             </div>
@@ -85,10 +84,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-light m-2" href="{% url 'warrantys:list' %}"><i class="fa-solid fa-landmark"></i> Empeños</a>
-                        </li>
-                        {% endif %} {% if user.is_superuser %}
-                        <li class="nav-item">
-                            <a class="nav-link font-weight-light m-2" href="{% url 'advisers:list' %}"><i class="fa-solid fa-users-gear"></i> Asesores</a>
                         </li>
                         {% endif %}
                     </ul>

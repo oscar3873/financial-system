@@ -1,0 +1,95 @@
+{% extends "core/base.html" %} {% block content %} {% load static %}
+<!--Main-->
+<link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
+<main class="container my-4">
+    <a href="{% url 'clients:detail' credit.client.pk %}">
+        <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">
+            {{credit}} {% if credit.is_active %}
+            <i class="fas fa-play-circle text-warning"></i> {% else %}
+            <i class="fa fa-check-circle text-success"></i> {% endif %}
+        </h4>
+    </a>
+
+    {% if credit.is_active %}
+    <small class="muted text-warning font-weight-bold">credito activo</small> {% else %}
+    <small class="muted text-success">credito saldado</small> {% endif %}
+
+    <!--Seccion 1-->
+    {% if messages %} {% for message in messages %}
+    <div class=" alert alert-primary alert-dismissible " role="alert ">
+        <span type="button " class="close " data-dismiss="alert " aria-label="Close "><span aria-hidden="true ">&times;</span></span>
+        <span class="font-weight-light ">{{ message }}</span>
+    </div>
+    {% endfor %} {% endif %}
+    <section class="my-4">
+        <div class="row">
+            <div class="col-12">
+                <p>Credito realizado el <span class="font-weight-bold">{{credit.start_date}}</span> realizado por <a href="{% url 'advisers:detail' credit.client.adviser.pk %}">{{credit.client.adviser}}</a> por un monto de <span class="font-weight-bold">$ {{credit.amount}}</span>                    en <span class="font-weight-bold">{{credit.installment_num}} cuotas </span> con un monto inicial a devolver de <span class="font-weight-bold">$ {{credit.credit_repayment_amount}}</span> <span class="text-primary">(monto sin contar refinanciaciones y atrasos
+                    )</span></p>
+            </div>
+        </div>
+        <h5 class="text-center title my-4">Cuotas</h5>
+        <div class="row flex-wrap justify-content-around">
+            {% for installment in installments %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card box-shadow" style="width: 100%;">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between">
+                            <span class="card-title">Cuota {{installment.installment_number}}</span> {% if installment.is_paid_installment %}
+                            <i class="fa fa-check-circle text-success"></i> {% elif installment.is_refinancing_installment %}
+                            <i class="fa fa-sync text-info"></i> {% else %}
+                            <i class="fas fa-clock text-warning"></i> {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Monto <span class="font-weight-bold">$ {{installment.amount}}</span></p>
+                        <p class="card-text">Vencimiento el <span class="font-weight-bold">{{installment.end_date|date}}</span></p>
+                        {% if installment.is_refinancing_installment %}
+                        <p class="card-text"><i class="fa fa-recycle text-info"></i> La cuota tiene refinanciacion</p>
+                        {% endif %} {% if installment.is_paid_installment %}
+                        <p class="card-text"><i class="fa fa-check-circle text-success"></i> Pagada el <span class="font-weight-bold">{{installment.payment_date}}</span></p>
+                        {% elif installment.condition == "A Tiempo"%}
+                        <p class="card-text"><i class="fa fa-exclamation-triangle text-warning"></i> Cuota a tiempo</p>
+                        {% elif installment.condition == "Vencida"%}
+                        <p class="card-text"><i class="fa fa-exclamation-circle"></i> Cuota vencida</p>
+                        {% else %} {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <h5 class="text-center title my-4">Cuotas de refinanciacion</h5>
+        <div class="row flex-wrap justify-content-around">
+            {% for installment in installments_ref %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card box-shadow" style="width: 100%;">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between">
+                            <span class="card-title">{{installment}}</span> {% if installment.is_paid_installment %}
+                            <i class="fa fa-check-circle text-success"></i> {% elif installment.is_refinancing_installment %}
+                            <i class="fa fa-sync text-info"></i> {% else %}
+                            <i class="fas fa-clock text-warning"></i> {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Monto <span class="font-weight-bold">$ {{installment.amount}}</span></p>
+                        <p class="card-text">Vencimiento el <span class="font-weight-bold">{{installment.end_date|date}}</span></p>
+                        {% if installment.is_refinancing_installment %}
+                        <p class="card-text"><i class="fa fa-recycle text-info"></i> La cuota tiene refinanciacion</p>
+                        {% endif %} {% if installment.is_paid_installment %}
+                        <p class="card-text"><i class="fa fa-check-circle text-success"></i> Pagada el <span class="font-weight-bold">{{installment.payment_date}}</span></p>
+                        {% elif installment.condition == "A Tiempo"%}
+                        <p class="card-text"><i class="fa fa-exclamation-triangle text-warning"></i> Cuota a tiempo</p>
+                        {% elif installment.condition == "Vencida"%}
+                        <p class="card-text"><i class="fa fa-exclamation-circle"></i> Cuota vencida</p>
+                        {% else %} {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    <!--Seccion 2-->
+</main>
+
+{% endblock content %}
