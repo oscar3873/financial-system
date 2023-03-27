@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 import copy
 
@@ -211,14 +212,23 @@ def buscar_clientes_view(request):
     search_term = request.GET.get('search_term')
 
     if search_term:
-        # Realizar la búsqueda de clientes que coincidan con el término de búsqueda
+        # Separar el término de búsqueda en palabras
+        search_words = search_term.split()
+
+        # Buscar clientes por nombre completo en cualquier orden
         clientes = Client.objects.filter(
-            first_name__startswith=search_term
-        ) | Client.objects.filter(
-            last_name__startswith=search_term
-        ) | Client.objects.filter(
-            dni__startswith =search_term
+            Q(first_name__icontains=search_term) |
+            Q(last_name__icontains=search_term) |
+            Q(dni__icontains=search_term)
         )
+        if len(search_words) > 2:
+            # Buscar en cualquier combinación de palabras
+            for i in range(1, len(search_words)-1):
+                clientes = clientes.filter(
+                    Q(first_name__icontains=search_words[i]) |
+                    Q(last_name__icontains=search_words[i]) |
+                    Q(dni__icontains=search_words[i])
+                )
         
         # Serializar los resultados como un diccionario de Python
         data = {
