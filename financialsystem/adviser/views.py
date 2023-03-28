@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import update_session_auth_hash
@@ -57,7 +57,7 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
 
     
 
-class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
+class AdviserDetailView(LoginRequiredMixin, DetailView):
     """
     Vista para ver los detalles de un asesor.
     """
@@ -84,16 +84,6 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
         context["commissions"] = Commission.objects.filter(adviser=self.get_object(), is_paid=False)
         context["properties"] = commission_properties()
         return context
-
-    def get_object(self):
-        """
-        Devuelve el objeto asesor correspondiente al id pasado como parámetro en la url.
-        """
-        try:
-            adviser = Adviser.objects.get(id=self.kwargs["pk"])
-            return adviser
-        except Adviser.DoesNotExist:
-            raise Http404
 
 
 #----------------------------------------------------------------
@@ -135,30 +125,10 @@ def pay_commission(request, pk):
     request.session['success_message'] = "La comisión se ha pagado exitosamente." # almacenar mensaje en la sesión
     return redirect('advisers:detail', pk=commission.adviser.id)
 
-@login_required(login_url="/accounts/login/")
-def update_user(request,pk):
-    if request.method == 'POST':
-        user_form = UpdateUserForm(request.POST, instance=request.user)
-        password_form = PasswordChangeForm(request.user, request.POST)
-
-        if user_form.is_valid():
-            user_form.save()
-            messages.success(request, "Usuario actualizado correctamente",'success')
-            return redirect('advisers:detail', pk=pk)
-        
-        elif password_form.is_valid():
-            user = password_form.save()
-            update_session_auth_hash(request, user)
-            messages.success(request, "Contraseña actualizada correctamente",'success')
-            return redirect('advisers:detail', pk=pk)
-    else:
-        user_form = UpdateUserForm(instance=request.user)
-        password_form = PasswordChangeForm(request.user)
-
-    return render(request, 'adviser/adviser_update_form.html', {
-        'user_form': user_form,
-        'password_form': password_form
-    })
+class AdviserUpdateView(UpdateView):
+    model = Adviser
+    fields = ["avatar"]
+    template_name = "adviser/adviser_update_form.html"
 
     
 
