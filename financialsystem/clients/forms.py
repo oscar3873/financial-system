@@ -174,6 +174,13 @@ class PhoneNumberFormClient(forms.ModelForm):
             field.required = False
 
 
+class LegalsForm(forms.Form):
+    
+    go_legals = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget = forms.HiddenInput()
+    )
 #------------------------------------------------------------------
 PhoneNumberFormSet = inlineformset_factory(
     Client, 

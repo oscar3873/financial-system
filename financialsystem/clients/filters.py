@@ -19,8 +19,16 @@ class ListingFilter(django_filters.FilterSet):
         widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre o Apellido'})
     )
 
-    def filter_name_or_lastname(self, queryset, name, value):
-        return queryset.filter(Q(first_name__icontains=value) | Q(last_name__icontains=value))
+    def filter_name_or_lastname(self, value):
+        clients = Client.objects.all()
+        search_terms = value.split()
+
+        for term in search_terms:
+            q_objects = Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(dni__icontains=term)
+            clients = clients.filter(q_objects)
+
+        return clients.distinct()
+
     
     class Meta:
         model = Client

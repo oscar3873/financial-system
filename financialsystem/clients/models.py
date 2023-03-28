@@ -20,6 +20,7 @@ class Client(models.Model):
         ('Regular' , 'Regular'),
         ('Riesgoso' , 'Riesgoso')
     ]
+    is_leagls = models.BooleanField(blank=True, default=False, null=True, verbose_name="Legales")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=50, help_text="First name", verbose_name="Nombre")

@@ -16,7 +16,7 @@ credits_patterns = ([
     path('refinance_detail/<uuid:pk>/', RefinancingDetailView.as_view(), name='refinance_detail'),
     path('installment/<uuid:pk>/update/', InstallmentUpdateView.as_view(), name='installment_update'),
     path('installment_refinanced/<uuid:pk>/update/', InstallmentRefUpdateView.as_view(), name='installmentRef_update'),
-    path('search/', buscar_clientes_view, name='buscar_clientes'),
+    path('search/', search_client, name='buscar_clientes'),
 
 
 ], "credits")

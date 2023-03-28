@@ -208,36 +208,23 @@ class AssociateCreateView(CreateView):
 
 
 @login_required(login_url="/accounts/login/")
-def buscar_clientes_view(request):
-    search_term = request.GET.get('search_term')
-
-    if search_term:
+def search_client(request):
+    search_terms = request.GET.get('search_term').split()
+    clients=Client.objects.all()
+    if search_terms:
         # Separar el término de búsqueda en palabras
-        search_words = search_term.split()
-
-        # Buscar clientes por nombre completo en cualquier orden
-        clientes = Client.objects.filter(
-            Q(first_name__icontains=search_term) |
-            Q(last_name__icontains=search_term) |
-            Q(dni__icontains=search_term)
-        )
-        if len(search_words) > 2:
-            # Buscar en cualquier combinación de palabras
-            for i in range(1, len(search_words)-1):
-                clientes = clientes.filter(
-                    Q(first_name__icontains=search_words[i]) |
-                    Q(last_name__icontains=search_words[i]) |
-                    Q(dni__icontains=search_words[i])
-                )
+        for term in search_terms:
+            q_objects = Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(dni__icontains=term)
+            clients = clients.filter(q_objects)
         
         # Serializar los resultados como un diccionario de Python
         data = {
             'clientes': [
                 {
-                    'id': cliente.id,
-                    'full_name': f'{cliente.first_name} {cliente.last_name}',
-                    'dni': cliente.dni,
-                } for cliente in clientes
+                    'id': client.id,
+                    'full_name': f'{client.first_name} {client.last_name}',
+                    'dni': client.dni,
+                } for client in clients
             ]
         }
     else:

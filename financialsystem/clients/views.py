@@ -8,7 +8,8 @@ from django.db.models import Count
 from django.core.paginator import Paginator
 
 from babel.dates import format_date
-from clients.filters import ListingFilter
+from .filters import ListingFilter
+from .forms import LegalsForm
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
 from credit.models import Installment
@@ -192,6 +193,7 @@ class ClientDetailView(DetailView):
         """
         refresh_condition()
         context = super().get_context_data(**kwargs)
+        context["legal_form"] = LegalsForm()
         context["credits"] = context["client"].credits.all()
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
         context["credits_active"] = credits_active

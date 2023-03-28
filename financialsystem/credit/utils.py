@@ -50,7 +50,7 @@ def for_refresh(obj_with_vencidas):
         else:
             dates = date.today()
 
-        resto = (date.today() - dates).days
+        resto = abs((date.today() - dates).days)
         client.score -= Interest.objects.first().daily_interest*resto
         installment_ven.daily_interests += resto * installment_ven.amount * Decimal(Interest.objects.first().daily_interest/100)
         installment_ven.lastup = date.today()
