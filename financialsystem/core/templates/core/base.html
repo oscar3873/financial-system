@@ -39,7 +39,12 @@
                         {% if request.user.is_authenticated %}
                         <div class="dropdown">
                             <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle mr-2">
+                                {% if user.adviser.avatar %}
+                                <img src="{{user.adviser.avatar.url}}" alt="avatar" width="36" class=" p-2">
+                                {% else %}
+                                <img src="{{user.adviser.avatar.url}}" alt="avatar" width="36" class="p-2">
+
+                                {% endif %}
                                 <strong>{{user.email}}</strong>
                             </a>
                             <div class="dropdown-menu text-small box-shadow bg-primary" aria-labelledby="dropdownUser1">

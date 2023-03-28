@@ -1,5 +1,5 @@
-from decimal import Decimal
 import uuid
+from decimal import Decimal
 from django.db import models
 from clients.models import Client
 from cashregister.models import Movement
