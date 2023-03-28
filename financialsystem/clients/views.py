@@ -9,7 +9,6 @@ from django.core.paginator import Paginator
 
 from babel.dates import format_date
 from .filters import ListingFilter
-from .forms import LegalsForm
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
 from credit.models import Installment
@@ -20,7 +19,7 @@ from .utils import all_properties_client
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 
 #CRUD CLIENT
@@ -193,7 +192,6 @@ class ClientDetailView(DetailView):
         """
         refresh_condition()
         context = super().get_context_data(**kwargs)
-        context["legal_form"] = LegalsForm()
         context["credits"] = context["client"].credits.all()
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
         context["credits_active"] = credits_active
@@ -290,7 +288,14 @@ class ClientDetailView(DetailView):
         context["client_payment"] = dicc
         return context
 
-    
+
+def go_legals(request, pk):
+    if request.method == 'POST':
+        print(request.POST.get('go_legals'))
+        client = Client.objects.get(pk=pk)
+        client.is_legals = True if request.POST.get('go_legals') == 'true' else False
+        client.save()
+    return redirect('clients:detail', pk=pk)  
 
 #BORRADO DE UN CLIENTE
 #------------------------------------------------------------------

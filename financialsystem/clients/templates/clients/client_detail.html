@@ -1,9 +1,52 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
 <!--Main-->
 <link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet">
+
+{% if client.is_legals %}
+    <div class="alert alert-danger text-center" role="alert">
+        <h1 class="font-weight-bold">EN LEGALES</h1>
+    </div>
+    {% if user.is_superuser %}
+        <div>
+            <form action="{% url 'clients:legals' client.pk %}" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-danger" value="false" name="go_legals" id="id_remove_legal_status">Quitar estado legal</button>
+            </form>
+        </div>
+    {% endif %}
+{% else %}
+
 <main class="container my-4">
     <!--Seccion 1-->
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">{{client.first_name}} {{client.last_name}}</h4>
+    {% if user.is_superuser  %}
+    <button class="btn btn-danger" data-toggle="modal" data-target="#Legals" onclick="go_legals()">
+        <i class="fa fa-bell text-white"></i>
+        <span>Legal</span>
+    </button>
+    {% endif %}
+    <div class="modal fade" id="Legals" tabindex="-1" role="dialog" aria-labelledby="Legals" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-primary text-white">
+                <form action="{% url 'clients:legals' client.pk %}" method="POST">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="Legals">Derivar a departamento legal</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Esta seguro de Iniciar procedimientos legales?
+                    </div>
+                    <div class="modal-footer">
+                        {% csrf_token %}
+                        <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {% if messages %} {% for message in messages %}
     <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
         <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
@@ -371,6 +414,7 @@
 
     </section>
 </main>
+{% endif %}
 <script type="module">
     import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.esm.browser.min.js';
 </script>
@@ -442,6 +486,24 @@
         },
     });
 </script>
+
+<script>
+    // Agrega el evento onclick al botón
+    function go_legals(){
+        // const legal = document.getElementById("id_go_legals");
+        const newbtn = document.createElement("button");
+
+        newbtn.classList.add("btn", "btn-danger");
+        newbtn.innerHTML = "LEGAL";
+        newbtn.value = true;
+        newbtn.name = "go_legals";
+        newbtn.id = "id_go_legals";
+
+        const modalFooter = document.querySelector('.modal-footer');
+        modalFooter.insertBefore(newbtn, modalFooter.firstChild);
+    }
+</script>
+
 
 <script>
     function get_id(id) { // CAPTO ID DEL CREDITO PARA LA MANIPULACION DE PAGOS DE SUS CUOTAS
