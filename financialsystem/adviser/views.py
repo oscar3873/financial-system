@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.http import Http404
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
+from django.urls import reverse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView, UpdateView
@@ -129,8 +130,6 @@ class AdviserUpdateView(UpdateView):
     model = Adviser
     fields = ["avatar"]
     template_name = "adviser/adviser_update_form.html"
-
-    
 
 class AdviserDeleteView(DeleteView):
     pass

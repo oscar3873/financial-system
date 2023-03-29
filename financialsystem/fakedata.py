@@ -1,12 +1,17 @@
 import os
 import sys
+import django
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'financialsystem.settings')
+django.setup()
 
 from faker import Faker
 from adviser.models import Adviser
 from clients.models import Client, PhoneNumberClient
 from credit.models import Credit
 from cashregister.models import CashRegister, Movement
+
 
 fake = Faker()
 
