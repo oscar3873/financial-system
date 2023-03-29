@@ -8,7 +8,6 @@ credits_patterns = ([
     path('<uuid:pk>/create_credit/', CreditCreateTo.as_view(), name='associate_credit_for_customer'),
     path('create/', AssociateCreateView.as_view(), name='associate_credit'),
 
-    # path('update/<uuid:pk>/', CreditUpdateView.as_view(), name='update'),
     path('credits/edit/<uuid:pk>/', edit_credit, name='edit_credit'),#------------------------------------------------------------------   NUEVOOOO
 
     path('delete/<uuid:pk>/', client_delete, name='delete'),
@@ -17,6 +16,7 @@ credits_patterns = ([
     path('installment/<uuid:pk>/update/', InstallmentUpdateView.as_view(), name='installment_update'),
     path('installment_refinanced/<uuid:pk>/update/', InstallmentRefUpdateView.as_view(), name='installmentRef_update'),
     path('search/', search_client, name='buscar_clientes'),
+    path('search_credit/', search_credit, name='buscar_creditos'),
 
 
 ], "credits")

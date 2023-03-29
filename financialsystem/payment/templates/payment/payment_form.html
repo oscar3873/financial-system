@@ -58,6 +58,8 @@
 </main>
 
 <script>
+    var assignedFunctions = {};
+
     function get_pk(pk) {
         let checkboxes_p = document.querySelectorAll('input[type="checkbox"][id="form_payment' + pk + '"]');
         var amountElement = document.querySelector("#id_payment-amount" + pk);
@@ -66,9 +68,9 @@
         function sumar() {
             var total = 0;
             checkboxes_p.forEach(function(checkbox) {
-                if (checkbox.checked) {
-                    total += parseFloat(checkbox.value);
-                }
+            if (checkbox.checked) {
+                total += parseFloat(checkbox.value);
+            }
             });
 
             amountElement.innerHTML = total.toFixed(2);
@@ -78,29 +80,37 @@
         function selectAll() {
             var allSelected = true;
             checkboxes_p.forEach(function(checkbox) {
-                if (!checkbox.checked) {
-                    allSelected = false;
-                }
+            if (!checkbox.checked) {
+                allSelected = false;
+            }
             });
             if (allSelected) {
-                checkboxes_p.forEach(function(checkbox) {
-                    checkbox.checked = false;
-                });
+            checkboxes_p.forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
             } else {
-                checkboxes_p.forEach(function(checkbox) {
-                    checkbox.checked = true;
-                });
+            checkboxes_p.forEach(function(checkbox) {
+                checkbox.checked = true;
+            });
             }
 
             sumar();
         }
 
         checkboxes_p.forEach(function(checkbox) {
+            // Verifica si la función ya ha sido asignada antes de volver a asignarla
+            if (!assignedFunctions.hasOwnProperty(checkbox.id)) {
             checkbox.addEventListener("click", sumar);
+            assignedFunctions[checkbox.id] = sumar;
+            }
         });
 
-        selectAllButton.addEventListener("click", selectAll);
-    }
+        // Verifica si la función ya ha sido asignada antes de volver a asignarla
+        if (!assignedFunctions.hasOwnProperty(selectAllButton.id)) {
+            selectAllButton.addEventListener("click", selectAll);
+            assignedFunctions[selectAllButton.id] = selectAll;
+        }
+        }
 </script>
 
 {% endblock content %}

@@ -7,12 +7,82 @@
     <section>
         <form method="post">
             {% csrf_token %}
-            {{ form|crispy }}
-
+            {{ form }}
+            {% if not is_add %}
+            <div class="form-group">
+                <label for="search-input"><h4>Buscar Cliente</h4></label>
+                <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
+            </div>
+            {% endif %}
+            <ul id="search-results" class="list-group text-dark mt-3"></ul>
             <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
         </form>
     </section>
 </main>
 
+<script>
+    const searchInput = document.querySelector('#search-input');
+    const searchResults = document.querySelector('#search-results');
 
+    searchInput.addEventListener('input', (event) => {
+        const searchTerm = event.target.value.trim().toLowerCase();
+
+        if (!searchTerm) {
+            // Limpiar los resultados de búsqueda si no hay término de búsqueda
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        // Realizar la búsqueda de clientes que coincidan con el término de búsqueda
+        fetch(`/credits/search_credit/?search_term=${searchTerm}`)
+            .then(response => response.json())
+            .then(data => {
+                const credits = data.credits;
+                console.log(credits);
+                // Mostrar los resultados de búsqueda
+                searchResults.innerHTML = '';
+                credits.forEach(credit => {
+                    const item = document.createElement('li');
+                    item.style.zIndex = "9999";
+                    item.style.cursor = 'pointer';
+                    item.classList.add('list-group-item', 'client');
+                    item.dataset.clientId = credit.id;
+                    item.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <h6>${credit.full_name}</h6>
+                        </div>
+                    `;
+                    searchResults.appendChild(item);
+                });
+            });
+    });
+
+    searchResults.addEventListener('click', (event) => {
+        const item = event.target.closest('.client');
+        if (!item) {
+            return;
+        }
+
+        const clientId = item.dataset.clientId;
+        const clientName = item.querySelector('h6').textContent;
+
+        // Rellenar el campo del cliente seleccionado y ocultar los resultados de búsqueda
+        searchInput.value = clientName;
+        searchResults.innerHTML = '';
+        // Añadir el id del cliente al formulario
+        const clientIdInput = document.createElement('input');
+        clientIdInput.type = 'hidden';
+        clientIdInput.name = 'selected_client_id';
+        clientIdInput.value = clientId;
+        searchInput.closest('form').appendChild(clientIdInput);
+    });
+    const form = document.querySelector('form');
+    form.addEventListener('submit', (event) => {
+        const selectedClientIdInput = document.querySelector('input[name="selected_client_id"]');
+        if (!selectedClientIdInput) {
+            event.preventDefault();
+            alert('Por favor, seleccione un cliente antes de guardar.');
+        }
+    });
+</script>
 {% endblock content %}

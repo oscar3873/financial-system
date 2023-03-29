@@ -126,12 +126,23 @@ class CreditListView(LoginRequiredMixin, ListView):
         context["properties"] = all_properties_credit()
         return context
     
-class CreditDetailView(DetailView):
+class CreditDetailView(DetailView, LoginRequiredMixin):
     """
     Detalle	del credito.
     """
     model = Credit
     template_name = 'credit/credit_detail.html'
+
+    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('credits:list')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         installments = context["credit"].installments.all()
@@ -142,17 +153,13 @@ class CreditDetailView(DetailView):
         context["installments_ref"] = installments_ref
         return context
 
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
-
     def get_object(self):
         return get_object_or_404(Credit, pk=self.kwargs['pk'])
 
 
 #ASOCIACION MEDIANTE CREACION DE UN CREDITO
 #------------------------------------------------------------------   
-class AssociateCreateView(CreateView):
+class AssociateCreateView(CreateView, LoginRequiredMixin):
     """
     Asocia un credito por crear a un cliente .
     """
@@ -162,6 +169,12 @@ class AssociateCreateView(CreateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('credits:list')
 
     def get_context_data(self, **kwargs):
         """
@@ -232,11 +245,37 @@ def search_client(request):
 
     return JsonResponse(data)
 
+@login_required(login_url="/accounts/login/")
+def search_credit(request):
+    search_terms = request.GET.get('search_term').split()
+    print(search_terms)
+    credits=Credit.objects.all()
+    if search_terms:
+        # Separar el término de búsqueda en palabras
+        for term in search_terms:
+            q_objects = Q(client__first_name__icontains=term) | Q(client__last_name__icontains=term) | Q(client__dni__icontains=term)
+            credits = credits.filter(q_objects)
+        
+        print(credits)
+        # Serializar los resultados como un diccionario de Python
+        data = {
+            'credits': [
+                {
+                    'id': credit.id,
+                    'full_name': f'{credit.detail_str()}',
+                } for credit in credits
+            ]
+        }
+    else:
+        data = {'credits': []}
+
+    return JsonResponse(data)
+
 
 
 #CREACION DE UN CREDITO
 #------------------------------------------------------------------     
-class CreditCreateTo(CreateView):
+class CreditCreateTo(CreateView, LoginRequiredMixin):
     """
     Creacion de un credito para un cliente desde detail.
     """	
@@ -247,6 +286,12 @@ class CreditCreateTo(CreateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('credits:list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -350,7 +395,7 @@ def refinance_installment (request, pk):
     return redirect('clients:detail', pk=credit.client.pk)
         
 #----------------------------------------------------------------
-class RefinancingDetailView(DetailView):
+class RefinancingDetailView(DetailView, LoginRequiredMixin):
     """
     Detalle de refinanciacion.
     """
@@ -361,6 +406,12 @@ class RefinancingDetailView(DetailView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('credits:list')
+        
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los refinanciamientos de la base de datos para usarlos en el contexto y poder pagarlos con PaymentsForm.
@@ -405,6 +456,12 @@ class InstallmentUpdateView(UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('credits:list')
+        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['installment'] = self.object

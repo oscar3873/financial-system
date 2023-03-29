@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 
 from django.urls import reverse_lazy
 
@@ -29,7 +29,11 @@ class NoteListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
-    
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('notes:list')
 
     def get_context_data(self, **kwargs):
         """
@@ -56,7 +60,13 @@ class NoteDetailView(LoginRequiredMixin, DetailView):
     
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('notes:list')
+           
     def get_object(self):
         """
         Retorna un objeto que será utilizado para renderizar la vista.
@@ -72,7 +82,13 @@ class NoteCreateView(CreateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('notes:list')
+          
     def form_valid(self, form):
         if form.is_valid():
             note = form.save(commit=False)
@@ -107,7 +123,13 @@ class NoteDeleteView(DeleteView):
 
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('notes:list')
+            
     def get_success_url(self) -> str:
         """
         Redirecciona al listado de notas, con un mensaje de creacion exitosa.
@@ -125,7 +147,13 @@ class NoteUpdateView(UpdateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('notes:list')
+           
     def get_form_kwargs(self):
         """
         Función que se encarga de obtener los parámetros del formulario.

@@ -95,7 +95,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "financialsystem.wsgi.application"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 14400
+SESSION_COOKIE_AGE = 10
 THOUSAND_SEPARATOR = '.'
 
 
@@ -176,7 +176,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = 'home'
 
 EMAIL_HOST = 'smtp.mailgun.org'

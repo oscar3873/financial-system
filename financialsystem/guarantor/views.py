@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from babel.dates import format_date
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 
 from django.urls import reverse_lazy
 
@@ -32,7 +32,11 @@ class GuarantorListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('guarantors:list')   
     
     def get_context_data(self, **kwargs):
         """
@@ -87,7 +91,13 @@ class GuarantorDetailView(LoginRequiredMixin, DetailView):
     
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('guarantors:list')
+           
     def get_object(self):
         """
         Retorna un objeto que será utilizado para renderizar la vista.
@@ -106,7 +116,13 @@ class GuarantorCreateView(CreateView):
 
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('guarantors:list')
+           
     def get_success_url(self) -> str:
         """
         Redirecciona al listado de garantes, con un mensaje de creacion exitosa.
@@ -124,7 +140,13 @@ class GuarantorDeleteView(DeleteView):
 
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('guarantors:list')
+           
     def get_success_url(self) -> str:
         """
         Redirecciona al listado de garantes, con un mensaje de eliminacion exitosa.
@@ -145,7 +167,13 @@ class GuarantorUpdateView(UpdateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('guarantors:list')
+        
     def form_invalid(self, form):
         """
         Devuelve los datos preciamente ingresados, cuando el formulario es invalido.

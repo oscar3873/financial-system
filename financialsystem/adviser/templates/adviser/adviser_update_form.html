@@ -1,44 +1,169 @@
 {% extends "core/base.html" %}
 
 {% block content %}
-
+{% if messages %} {% for message in messages %}
+<div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
+    <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+    <span class="font-weight-light">{{ message }}</span>
+</div>
+{% endfor %} {% endif %}
 <main class="container my-4">
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Actualizar Datos</h4>
     <section>
         <div class="row justify-content-center align-items-start">
-            <div class="col-md-9 p-1">
-                <form method="post">
-                    {% csrf_token %}
-                    {{ user_form.as_p }}
-                    <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
-                </form>
-            </div>
-            <div class="col-md-3 p-1">
-                <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#passwordModal">
-                    Actualizar Contraseña
-                </button>
-                <!-- Modal -->
-                <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="passwordModalLabel">Actualizar Contraseña</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>
+            <div class="card bg-primary text-white box-shadow">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ user_form.as_p }}
+                        <!-- <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar"> -->
+                    
+
+                        <button class="btn btn-secondary mt-4 mb-4" type="button" data-toggle="collapse" data-target="#passwordCollapse" id="openCollapse">
+                            Actualizar Contraseña
+                        </button>
+                        <!-- Collapse -->
+                        <div class="collapse" id="passwordCollapse" tabindex="-1" role="dialog" aria-labelledby="passwordCollapseLabel" aria-hidden="true">
+                            <label for="id_old_password">Contraseña Actual</label>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <input id="id_old_password" type="password" class="form-control" name="old_password">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary text-white" type="button" id="showOldPassword">Mostrar</button>
+                                    </div>
+                                </div>
+                                <span class="text-danger" id="oldpasswordError"></span>
                             </div>
-                            <div class="modal-body">
-                                <form method="post">
-                                    {% csrf_token %}
-                                    {{ password_form.as_p }}
-                                    <input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Guardar">
-                                </form>
+
+                            <div class="mb-3">
+                                <label for="id_new_password1">Contraseña Nueva</label>
+                                <div class="input-group">
+                                    <input id="id_new_password1" type="password" class="form-control" name="new_password1">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary text-white" type="button" id="showPassword1">Mostrar</button>
+                                    </div>
+                                </div>
+                                <span class="text-danger" id="passwordError1"></span>
                             </div>
+
+                            <div class="mb-3"> 
+                                <label for="id_new_password2">Confirmar Contraseña</label>
+                                <div class="input-group">
+                                    <input id="id_new_password2" type="password" class="form-control" name="new_password2">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary text-white" type="button" id="showPassword2">Mostrar</button>
+                                    </div>
+                                </div>
+                                <span class="text-danger" id="passwordError2"></span>
+                            </div>
+                            <button type="button" class="btn btn-warning" data-toggle="collapse" data-target="#passwordCollapse" id="cancelcollapse">Cancelar</button>
                         </div>
-                    </div>
+                        <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar" id="Boton_save">
+
+                    </form>
+                    <a href="{% url 'advisers:detail' adviser.pk %}"><input class="btn btn-secondary btn-block mt-4 rounded p-3" value="Volver"></a>
+                        
                 </div>
             </div>
         </div>
     </section>
 </main>
+
+<script>
+    // Define variables using const or let
+    const openCollapse = document.getElementById("openCollapse");
+    const showOldPassword = document.getElementById("showOldPassword");
+    const showPassword1 = document.getElementById("showPassword1");
+    const showPassword2 = document.getElementById("showPassword2");
+    const oldpassword = document.getElementById("id_old_password");
+    const password1 = document.getElementById("id_new_password1");
+    const password2 = document.getElementById("id_new_password2");
+    const oldpasswordError = document.getElementById("oldpasswordError");
+    const passwordError1 = document.getElementById("passwordError1");
+    const passwordError2 = document.getElementById("passwordError2");
+    const cancel = document.getElementById("cancelcollapse");
+    const save = document.getElementById("Boton_save");
+
+    // Use functions for repetitive code
+    function togglePasswordVisibility(passwordInput, showButton) {
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            showButton.innerHTML = "Ocultar";
+        } else {
+            passwordInput.type = "password";
+            showButton.innerHTML = "Mostrar";
+        }
+    }
+
+    function resetPasswords() {
+        password1.disabled = true;
+        password2.disabled = true;
+        password1.value = '';
+        password2.value = '';
+        password1.style.backgroundColor = "#BABABA";
+        password2.style.backgroundColor = "#BABABA";
+    }
+
+    function resetAll() {
+        save.disabled = value;
+        oldpassword.value = '';
+        passwordError1.innerHTML = '';
+        passwordError2.innerHTML = '';
+        oldpasswordError.innerHTML = '';
+        resetPasswords();
+    }
+
+    function validatePassword() {
+        if (`{{password_user}}` !== oldpassword.value ) {
+            oldpasswordError.innerHTML = "Contraseña inválida";
+            resetPasswords();
+            save.disabled = true; // desactiva el botón "Guardar"
+        } else {
+            oldpasswordError.innerHTML = "";
+            password1.disabled = false;
+            password2.disabled = false;
+            password1.style.backgroundColor = "white";
+            password2.style.backgroundColor = "white";
+        }
+
+        if (password1.value.length < 8 && password1.value.length > 0) {
+            passwordError1.innerHTML = "La contraseña debe tener al menos 8 caracteres";
+            save.disabled = true; // desactiva el botón "Guardar"
+        } else {
+            passwordError1.innerHTML = "";
+    
+            if (password2.value !== password1.value) {
+                passwordError2.innerHTML = "Las contraseñas no coinciden";
+                save.disabled = true; // desactiva el botón "Guardar"
+            } else {
+                passwordError2.innerHTML = "";
+                save.disabled = false; // activa el botón "Guardar"
+            }
+        }
+    }
+
+    // Use addEventListener instead of onclick for better performance
+    showOldPassword.addEventListener("click", () => togglePasswordVisibility(oldpassword, showOldPassword));
+    showPassword1.addEventListener("click", () => togglePasswordVisibility(password1, showPassword1));
+    showPassword2.addEventListener("click", () => togglePasswordVisibility(password2, showPassword2));
+
+    oldpassword.addEventListener("input", validatePassword);
+    password1.addEventListener("input", validatePassword);
+    password2.addEventListener("input", validatePassword);
+
+    let value = false;
+    cancel.addEventListener('click', () => {
+        value = !value;
+        resetAll();
+    });
+
+    openCollapse.addEventListener('click', () => {
+        value = !value;
+        resetAll();
+    });
+
+</script>
+
+
+
 {% endblock content %}

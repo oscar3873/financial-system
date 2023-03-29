@@ -124,7 +124,7 @@ class ClientListView(LoginRequiredMixin, ListView):
 
 #ACTUALIZACION DE UN CLIENTE
 #-----------------------------------------------------------------
-class ClientUpdateView(UpdateView):
+class ClientUpdateView(UpdateView , LoginRequiredMixin):
     """
     Actualiza el client y sus telefonos.
     """
@@ -174,7 +174,7 @@ class ClientUpdateView(UpdateView):
 
 #DETALLE DE CLIENTE
 #------------------------------------------------------------------
-class ClientDetailView(DetailView):
+class ClientDetailView(DetailView , LoginRequiredMixin):
     """
     Detalle de un cliente.
     """
@@ -185,11 +185,18 @@ class ClientDetailView(DetailView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('clients:list')
+    
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         Con Formularios de Pago y Refianciacion para realizar las respectivas actividades dentro del msimo template.
         """
+
         refresh_condition()
         context = super().get_context_data(**kwargs)
         context["credits"] = context["client"].credits.all()
@@ -299,7 +306,7 @@ def go_legals(request, pk):
 
 #BORRADO DE UN CLIENTE
 #------------------------------------------------------------------
-class ClientDelete(DeleteView):
+class ClientDelete(DeleteView , LoginRequiredMixin):
     """
     Borra un cliente.
     """
@@ -334,7 +341,7 @@ def delete_phone_number(request, pk):
 
 #CONSULTA
 #------------------------------------------------------------------
-class QueryView(ListView):
+class QueryView(ListView , LoginRequiredMixin):
     """
     Consulta de clientes.
     """
@@ -344,7 +351,7 @@ class QueryView(ListView):
     # Se especifica la URL de inicio de sesión y el campo de redirección
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+        
     def get(self, request, *args, **kwargs):
         """
         Obtiene el numero DNI ingresado en el search e intenta matchear.

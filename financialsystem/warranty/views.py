@@ -15,6 +15,7 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
+from credit.models import Credit
 from .models import Warranty
 from .forms import WarrantyForm, SellForm, WarrantyUpdateForm
 from .filters import ListingFilter
@@ -91,7 +92,29 @@ class WarrantyCreateView(CreateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('warrantys:list')
+
+    def form_valid(self, form):
+        """
+        Validacion del formulario de credito.
+        """
+        if form.is_valid():
+            # Recuperar el ID del cliente seleccionado
+            selected_client_id = self.request.POST.get('selected_client_id')
+            # Asignar el crédito al cliente correspondiente
+            credit = get_object_or_404(Credit, pk=selected_client_id)
+            article = form.save(commit=False)
+            article.credit = credit
+            article.save()
+
+        return super().form_valid(form)
     
+
     def get_success_url(self) -> str:
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.
@@ -109,7 +132,13 @@ class WarrantyDeleteView(DeleteView):
 
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('warrantys:list')
+            
     def get_success_url(self) -> str:
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.
@@ -130,6 +159,12 @@ class WarrantyUpdateView(UpdateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect('warrantys:list')
 
     def form_valid(self, form):
         if not form.instance.is_selled:

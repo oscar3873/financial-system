@@ -35,9 +35,10 @@ def for_refresh(obj_with_vencidas):
         if isinstance(installment_ven, Installment):
             client = installment_ven.credit.client
             if not installment_ven.is_refinancing_installment:
-                installment_ven.condition = 'Vencida' # PORQUE LAS CUOTAS NORMALES TIENE UN CAMPO CONDITION
+                installment_ven.condition = 'Vencida'
         else:
             client = installment_ven.refinancing.installment_ref.last().credit.client
+            installment_ven.condition = 'Vencida' 
 
         installment_ven.is_caduced_installment = True
 
@@ -61,7 +62,7 @@ def for_refresh(obj_with_vencidas):
 def refresh_installments_credits():
     for model in [Refinancing, Credit]:
         credits_WPI = model.objects.filter(installments__condition='Pagada')
-        for credit in credits_WPI:
+        for credit in credits_WPI: # WPI = With Paid Installments
             if credit.installments.filter(is_paid_installment=True).count() == credit.installments.count():
                 if isinstance(credit, Credit):
                     credit.condition = 'Pagado'

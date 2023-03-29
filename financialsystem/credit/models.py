@@ -42,6 +42,12 @@ class Credit(models.Model):
         else:
             return super().__str__()
         
+    def detail_str(self):
+        if self.client:
+            return "Credito de {} {} | Monto ${} | Cuotas: {} | Fecha de alta: {}".format(self.client.first_name, self.client.last_name, self.amount, self.installment_num, self.created_at.date().strftime('%d/%m/%Y'))
+        else:
+            return self.__str__()
+        
     class Meta:
         ordering = ["-created_at"]
             
@@ -104,16 +110,17 @@ class Installment(models.Model):
         
 #CUOTA DE REFINANCIACION
 class InstallmentRefinancing(models.Model):
-    CHOICE = [
+    CONDITION = [
         ('Pagada', 'Pagada'),
-        ('A Tiempo','A Tiempo'),
+        ('Vencida','Vencida'),
+        ('A Tiempo','A Tiempo')
         ]
 
     is_caduced_installment = models.BooleanField(default=False , help_text="La cuota esta vencida")
     is_paid_installment = models.BooleanField(default=False, help_text="La cuota esta pagada")
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
+    condition = models.CharField(max_length=15,choices=CONDITION, default='A Tiempo')
     installment_number = models.PositiveSmallIntegerField(help_text="Numero de cuota de la refinanciacion")
     daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")
     refinancing = models.ForeignKey(Refinancing, on_delete=models.CASCADE, related_name="installments", help_text="Refinanciacion de la cuota")

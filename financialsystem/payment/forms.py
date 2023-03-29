@@ -78,7 +78,7 @@ class PaymentForm(forms.ModelForm):
 
         if installments.count() > 0:
             for installment in installments:
-                daily_interests = ' (con interés {})'.format(installment.daily_interests) if installment.daily_interests > 0 else ''
+                daily_interests = ' (interés de ${})'.format(installment.daily_interests) if installment.daily_interests > 0 else ''
 
                 if isinstance(installment,Installment):
                     form = "form_payment%s" % installment.credit.pk
@@ -89,7 +89,7 @@ class PaymentForm(forms.ModelForm):
                     self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installment.refinancing.pk}) # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
                     self.fields['amount_paid'].widget.attrs.update({'id': "id_amount_paid%s" % installment.refinancing.pk}) # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
  
-                attrs = {"value": installment.amount + installment.daily_interests, "id":form}
+                attrs = {"value": (installment.amount + installment.daily_interests), "id":form}
                 
                 # if installment == installments.first():
                 self.fields['Cuota %s %s' % (str(installment.installment_number), daily_interests)] = forms.BooleanField(

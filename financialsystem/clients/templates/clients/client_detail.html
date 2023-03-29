@@ -4,14 +4,35 @@
 
 {% if client.is_legals %}
     <div class="alert alert-danger text-center" role="alert">
-        <h1 class="font-weight-bold">EN LEGALES</h1>
+        <h1 class="font-weight-bold">CLIENTE: {{client.first_name|upper}} {{client.last_name|upper}} <br> EN LEGALES</h1>
     </div>
     {% if user.is_superuser %}
+    <!-- BOTON MODAL -->
         <div>
-            <form action="{% url 'clients:legals' client.pk %}" method="POST">
-                {% csrf_token %}
-                <button class="btn btn-danger" value="false" name="go_legals" id="id_remove_legal_status">Quitar estado legal</button>
-            </form>
+            <button class="btn btn-danger" value="false" name="go_legals" id="id_remove_legal_status" data-toggle="modal" data-target="#Legals_remove">Quitar estado legal</button>
+        </div>
+        <!-- MODAL -->
+        <div class="modal fade" id="Legals_remove" tabindex="-1" role="dialog" aria-labelledby="Legals_remove" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content bg-primary text-white">
+                    <form action="{% url 'clients:legals' client.pk %}" method="POST">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="Legals_remove">Remover el estado legal</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Esta seguro de quitar estado legal?
+                        </div>
+                        <div class="modal-footer">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Quitar</button>
+                            <button type="btn" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     {% endif %}
 {% else %}
@@ -19,7 +40,7 @@
 <main class="container my-4">
     <!--Seccion 1-->
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">{{client.first_name}} {{client.last_name}}</h4>
-    {% if user.is_superuser  %}
+    {% if user.is_superuser %}
     <button class="btn btn-danger" data-toggle="modal" data-target="#Legals" onclick="go_legals()">
         <i class="fa fa-bell text-white"></i>
         <span>Legal</span>
@@ -488,19 +509,19 @@
 </script>
 
 <script>
-    // Agrega el evento onclick al botón
-    function go_legals(){
-        // const legal = document.getElementById("id_go_legals");
-        const newbtn = document.createElement("button");
+    function go_legals() {
+        var modalFooter = document.querySelector('.modal-footer');
+        var existingButton = document.querySelector('#id_go_legals');
 
-        newbtn.classList.add("btn", "btn-danger");
-        newbtn.innerHTML = "LEGAL";
-        newbtn.value = true;
-        newbtn.name = "go_legals";
-        newbtn.id = "id_go_legals";
-
-        const modalFooter = document.querySelector('.modal-footer');
-        modalFooter.insertBefore(newbtn, modalFooter.firstChild);
+        if (!existingButton) {
+            var newButton = document.createElement('button');
+            newButton.classList.add('btn', 'btn-danger');
+            newButton.innerHTML = 'LEGAL';
+            newButton.value = true;
+            newButton.name = 'go_legals';
+            newButton.id = 'id_go_legals';
+            modalFooter.insertBefore(newButton, modalFooter.firstChild);
+        }
     }
 </script>
 
