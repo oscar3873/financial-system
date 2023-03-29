@@ -75,9 +75,8 @@
                     {% for name_prop in properties %}
                     <th scope="col">{{name_prop}}</th>
                     <!-- AGREGAR EL ESTADO DE VENDIDO BOOLEANO (is_selled)-->
-                    {% endfor %} {% if user.is_superuser %}
+                    {% endfor %} 
                     <th scope="col">Acciones</th>
-                    {% endif %}
 
                 </tr>
             </thead>
@@ -101,7 +100,6 @@
                     <td>No</td>
                     {% endif %}
                     <td>{{warranty.created_at}}</td>
-                    {% if user.is_superuser %}
                     <td>
                         {% if not warranty.is_selled %}
                         <a type="button" class="btn" data-toggle="modal" data-target="#sell{{warranty.pk}}"><i class="fa-regular fa-cart-shopping text-success"></i> &nbsp;</a>
@@ -127,8 +125,8 @@
                                 </div>
                             </div>
                         </div>
-                        {% endif %}
-
+                    {% endif %}
+                    {% if user.is_superuser %}
                         <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{warranty.pk}}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
                         <!--Modal-->
                         <div class="modal fade" id="exampleModal{{warranty.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{warranty.pk}}" aria-hidden="true">

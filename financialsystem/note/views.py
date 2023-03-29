@@ -28,14 +28,11 @@ class NoteListView(LoginRequiredMixin, ListView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
-
 
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de las notas que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -57,25 +54,21 @@ class NoteDetailView(LoginRequiredMixin, DetailView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-
-           
+    
     def get_object(self):
         """
         Retorna un objeto que será utilizado para renderizar la vista.
         """	
-        refresh_condition()
         return get_object_or_404(Note, id=self.kwargs['pk'])
 
 #CREACION DE UNA NOTA
-class NoteCreateView(CreateView):
+class NoteCreateView(LoginRequiredMixin, CreateView):
     model = Note
     form_class = NoteForm
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-
-
           
     def form_valid(self, form):
         if form.is_valid():
@@ -103,7 +96,7 @@ class NoteCreateView(CreateView):
 
 #BORRADO DE UNA NOTA
 #------------------------------------------------------------------
-class NoteDeleteView(DeleteView):
+class NoteDeleteView(LoginRequiredMixin, DeleteView):
     """
     Borrar una nota.
     """
@@ -123,7 +116,7 @@ class NoteDeleteView(DeleteView):
 
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
-class NoteUpdateView(UpdateView):
+class NoteUpdateView(LoginRequiredMixin, UpdateView):
     model = Note
     form_class = NoteForm
     template_name_suffix = '_update_form'
@@ -132,8 +125,6 @@ class NoteUpdateView(UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-
-           
     def get_form_kwargs(self):
         """
         Función que se encarga de obtener los parámetros del formulario.

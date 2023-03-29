@@ -212,7 +212,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
 
 #CREACION DE UN CREDITO
 #------------------------------------------------------------------     
-class CreditCreateTo(CreateView, LoginRequiredMixin):
+class CreditCreateTo(LoginRequiredMixin, CreateView):
     """
     Creacion de un credito para un cliente desde detail.
     """	
@@ -328,7 +328,7 @@ def refinance_installment (request, pk):
     return redirect('clients:detail', pk=credit.client.pk)
         
 #----------------------------------------------------------------
-class RefinancingDetailView(DetailView, LoginRequiredMixin):
+class RefinancingDetailView(LoginRequiredMixin, DetailView):
     """
     Detalle de refinanciacion.
     """
@@ -356,7 +356,7 @@ class RefinancingDetailView(DetailView, LoginRequiredMixin):
         return context
 
 #----------------------------------------------------------------
-class InstallmentRefUpdateView(UpdateView):
+class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
     model = InstallmentRefinancing
     form_class = InstallmentRefinancingForm
     template_name = 'installment/installment_ref_update.html'
@@ -376,7 +376,7 @@ class InstallmentRefUpdateView(UpdateView):
         return reverse('credits:refinance_detail', args=[self.object.refinancing.installment_ref.last().pk])
     
 #----------------------------------------------------------------
-class InstallmentUpdateView(UpdateView):
+class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
     model = Installment
     form_class = InstallmentUpdateForm
     template_name = 'installment/installment_update.html'

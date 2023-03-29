@@ -51,7 +51,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
 
 #BORRADO DE UNA NOTA
 #------------------------------------------------------------------
-class PaymentDeleteView(DeleteView):
+class PaymentDeleteView(LoginRequiredMixin, DeleteView):
     """
     Borrado de un pago.
     """
@@ -72,7 +72,7 @@ class PaymentDeleteView(DeleteView):
 
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
-class PaymentUpdateView(UpdateView):
+class PaymentUpdateView(LoginRequiredMixin, UpdateView):
     """
     Actualización de un pago.
     """	

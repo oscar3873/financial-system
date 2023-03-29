@@ -96,7 +96,7 @@ class GuarantorDetailView(LoginRequiredMixin, DetailView):
         return get_object_or_404(Guarantor, id=self.kwargs['pk'])
 
 #CREACION DE UNA NOTA
-class GuarantorCreateView(CreateView):
+class GuarantorCreateView(LoginRequiredMixin, CreateView):
     """
     Crea un nuevo garante.
     """
@@ -118,7 +118,7 @@ class GuarantorCreateView(CreateView):
 
 #BORRADO DE UNA NOTA
 #------------------------------------------------------------------
-class GuarantorDeleteView(DeleteView):
+class GuarantorDeleteView(LoginRequiredMixin, DeleteView):
     """
     Borra un garante.
     """
@@ -138,7 +138,7 @@ class GuarantorDeleteView(DeleteView):
 
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
-class GuarantorUpdateView(UpdateView):
+class GuarantorUpdateView(LoginRequiredMixin, UpdateView):
     """
     Actualiza un garante.
     """	
@@ -149,9 +149,7 @@ class GuarantorUpdateView(UpdateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-
-
-        
+   
     def form_invalid(self, form):
         """
         Devuelve los datos preciamente ingresados, cuando el formulario es invalido.

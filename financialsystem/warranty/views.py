@@ -33,9 +33,7 @@ class WarrantyListView(LoginRequiredMixin, ListView):
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
-    
-    
+    redirect_field_name = 'redirect_to'  
 
     def get_context_data(self, **kwargs):
         """
@@ -81,7 +79,7 @@ class WarrantyDetailView(LoginRequiredMixin, DetailView):
 
 
 #CREACION DE UNA NOTA
-class WarrantyCreateView(CreateView):
+class WarrantyCreateView(LoginRequiredMixin, CreateView):
     """
     Crea un nuevo empeño.
     """
@@ -120,7 +118,7 @@ class WarrantyCreateView(CreateView):
 
 #BORRADO DE UNA NOTA
 #------------------------------------------------------------------
-class WarrantyDeleteView(DeleteView):
+class WarrantyDeleteView(LoginRequiredMixin, DeleteView):
     """
     Borra un empeño.
     """
@@ -140,7 +138,7 @@ class WarrantyDeleteView(DeleteView):
 
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
-class WarrantyUpdateView(UpdateView):
+class WarrantyUpdateView(LoginRequiredMixin, UpdateView):
     """
     Actualiza un empeño.
     """	

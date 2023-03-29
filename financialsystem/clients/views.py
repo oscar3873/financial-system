@@ -124,7 +124,7 @@ class ClientListView(LoginRequiredMixin, ListView):
 
 #ACTUALIZACION DE UN CLIENTE
 #-----------------------------------------------------------------
-class ClientUpdateView(UpdateView , LoginRequiredMixin):
+class ClientUpdateView(LoginRequiredMixin, UpdateView):
     """
     Actualiza el client y sus telefonos.
     """
@@ -174,7 +174,7 @@ class ClientUpdateView(UpdateView , LoginRequiredMixin):
 
 #DETALLE DE CLIENTE
 #------------------------------------------------------------------
-class ClientDetailView(DetailView , LoginRequiredMixin):
+class ClientDetailView (LoginRequiredMixin, DetailView):
     """
     Detalle de un cliente.
     """
@@ -301,7 +301,7 @@ def go_legals(request, pk):
 
 #BORRADO DE UN CLIENTE
 #------------------------------------------------------------------
-class ClientDelete(DeleteView , LoginRequiredMixin):
+class ClientDelete(LoginRequiredMixin, DeleteView):
     """
     Borra un cliente.
     """

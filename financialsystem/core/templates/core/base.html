@@ -42,13 +42,19 @@
                                 {% if user.adviser.avatar %}
                                 <img src="{{user.adviser.avatar.url}}" alt="avatar" width="50" height="50" class="rounded-circle p-2">
                                 {% else %}
-                                <img src="{{user.adviser.avatar.url}}" alt="avatar" width="36" class="p-2">
+                                <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" width="50" height="50" class="rounded-circle p-2">
 
                                 {% endif %}
                                 <strong>{{user.email}}</strong>
                             </a>
                             <div class="dropdown-menu text-small box-shadow bg-primary" aria-labelledby="dropdownUser1">
-                                <a class="dropdown-item bg-primary text-white" href="{% url 'advisers:list' %}">Perfil</a>
+
+                                {% if request.user.is_superuser %}
+                                <!-- Código que se ejecutará si el usuario es superusuario -->
+                                <a class="dropdown-item bg-primary text-white" href="{% url 'advisers:list' %}">Perfil</a> {% else %}
+                                <!-- Código que se ejecutará si el usuario no es superusuario -->
+                                <a class="dropdown-item bg-primary text-white" href="{% url 'advisers:detail' user.adviser.pk %}">Perfil</a> {% endif %}
+
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item bg-primary text-white" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
                             </div>

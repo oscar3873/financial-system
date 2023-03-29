@@ -3,9 +3,10 @@ from decimal import Decimal
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.contrib import messages
+from django.urls import reverse, reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 
@@ -57,7 +58,7 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
 
     
 
-class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
+class AdviserDetailView(LoginRequiredMixin, DetailView):
     """
     Vista para ver los detalles de un asesor.
     """
@@ -84,16 +85,6 @@ class AdviserDetailView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
         context["commissions"] = Commission.objects.filter(adviser=self.get_object(), is_paid=False)
         context["properties"] = commission_properties()
         return context
-
-    def get_object(self):
-        """
-        Devuelve el objeto asesor correspondiente al id pasado como parámetro en la url.
-        """
-        try:
-            adviser = Adviser.objects.get(id=self.kwargs["pk"])
-            return adviser
-        except Adviser.DoesNotExist:
-            raise Http404
 
 
 #----------------------------------------------------------------
@@ -135,32 +126,13 @@ def pay_commission(request, pk):
     request.session['success_message'] = "La comisión se ha pagado exitosamente." # almacenar mensaje en la sesión
     return redirect('advisers:detail', pk=commission.adviser.id)
 
+class AdviserUpdateView(UpdateView):
+    model = Adviser
+    fields = ["avatar"]
+    template_name = "adviser/adviser_update_form.html"
 
-@login_required(login_url="/accounts/login/")
-def update_user(request, pk):
-    adviser = Adviser.objects.get(pk=pk)
-    user_form = UpdateUserForm(instance=adviser.user)
-
-    if request.method == 'POST':
-        user_form = UpdateUserForm(request.POST, instance=adviser.user)
-
-        if user_form.is_valid():
-            user_form.save()
-            password= request.POST.get('new_password2')
-            if password and password== request.POST.get('new_password1'):
-                print("PASO :OOOO")
-                adviser.user.password = password
-                adviser.user.save()
-
-            messages.success(request, 'Los datos se han actualizado correctamente','success')
-            return redirect('advisers:update', pk=pk)
-
-
-    context = {'adviser': adviser, 'user_form': user_form, 'password_user': adviser.user.password}
-
-    return render(request, 'adviser/adviser_update_form.html', context)
-
-
+    def get_success_url(self):
+        return reverse('advisers:detail', args=[self.kwargs['pk']])
     
 
 class AdviserDeleteView(DeleteView):
