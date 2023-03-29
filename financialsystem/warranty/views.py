@@ -93,11 +93,7 @@ class WarrantyCreateView(CreateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('warrantys:list')
+
 
     def form_valid(self, form):
         """
@@ -133,11 +129,7 @@ class WarrantyDeleteView(DeleteView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('warrantys:list')
+
             
     def get_success_url(self) -> str:
         """
@@ -154,18 +146,17 @@ class WarrantyUpdateView(UpdateView):
     """	
     model = Warranty
     form_class = WarrantyUpdateForm
-    template_name_suffix = '_update_form'
+    template_name = 'warranty/warranty_form.html'
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('warrantys:list')
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_update"] = True
+        return context
+    
     def form_valid(self, form):
         if not form.instance.is_selled:
             try:
@@ -174,7 +165,7 @@ class WarrantyUpdateView(UpdateView):
                 pass
 
         return super().form_valid(form)
-    
+
 
     def get_success_url(self) -> str:
         """

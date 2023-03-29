@@ -8,13 +8,13 @@
         <form method="post">
             {% csrf_token %}
             {{ form }}
-            {% if not is_add %}
+            {% if not is_update %}
             <div class="form-group">
                 <label for="search-input"><h4>Buscar Cliente</h4></label>
                 <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
             </div>
-            {% endif %}
             <ul id="search-results" class="list-group text-dark mt-3"></ul>
+            {% endif %}
             <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
         </form>
     </section>

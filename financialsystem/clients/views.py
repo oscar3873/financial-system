@@ -184,12 +184,7 @@ class ClientDetailView(DetailView , LoginRequiredMixin):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('clients:list')
+
     
     def get_context_data(self, **kwargs):
         """

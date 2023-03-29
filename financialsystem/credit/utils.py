@@ -1,8 +1,13 @@
 from datetime import date
 from decimal import Decimal
 
+from django.http import JsonResponse
+
 from commissions.models import Interest
 from .models import Credit, Refinancing, Installment
+from clients.models import Client
+
+from django.db.models import Q
 
 
 def all_properties_credit():
@@ -80,4 +85,51 @@ def refresh_installments_credits():
 
     
 
-    
+def search_client(request):
+    search_terms = request.GET.get('search_term').split()
+    clients=Client.objects.all()
+    if search_terms:
+        # Separar el término de búsqueda en palabras
+        for term in search_terms:
+            q_objects = Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(dni__icontains=term)
+            clients = clients.filter(q_objects)
+        
+        # Serializar los resultados como un diccionario de Python
+        data = {
+            'clientes': [
+                {
+                    'id': client.id,
+                    'full_name': f'{client.first_name} {client.last_name}',
+                    'dni': client.dni,
+                } for client in clients
+            ]
+        }
+    else:
+        data = {'clientes': []}
+
+    return JsonResponse(data)
+
+def search_credit(request):
+    search_terms = request.GET.get('search_term').split()
+    print(search_terms)
+    credits=Credit.objects.all()
+    if search_terms:
+        # Separar el término de búsqueda en palabras
+        for term in search_terms:
+            q_objects = Q(client__first_name__icontains=term) | Q(client__last_name__icontains=term) | Q(client__dni__icontains=term)
+            credits = credits.filter(q_objects)
+        
+        print(credits)
+        # Serializar los resultados como un diccionario de Python
+        data = {
+            'credits': [
+                {
+                    'id': credit.id,
+                    'full_name': f'{credit.detail_str()}',
+                } for credit in credits
+            ]
+        }
+    else:
+        data = {'credits': []}
+
+    return JsonResponse(data)

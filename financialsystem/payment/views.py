@@ -33,11 +33,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('home')    
+  
 
     def get_context_data(self, **kwargs):
         """
@@ -64,11 +60,7 @@ class PaymentDeleteView(DeleteView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('home')
+
             
     def get_success_url(self) -> str:
         """
@@ -92,11 +84,6 @@ class PaymentUpdateView(UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('home')
             
     def get_form_kwargs(self):
         """

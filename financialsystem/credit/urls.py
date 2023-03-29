@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from .utils import *
 
 credits_patterns = ([
     path('create_credit/', crear_credito, name='create_credit'),

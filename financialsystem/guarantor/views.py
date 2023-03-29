@@ -32,11 +32,7 @@ class GuarantorListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('guarantors:list')   
+
     
     def get_context_data(self, **kwargs):
         """
@@ -92,12 +88,6 @@ class GuarantorDetailView(LoginRequiredMixin, DetailView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('guarantors:list')
-           
     def get_object(self):
         """
         Retorna un objeto que será utilizado para renderizar la vista.
@@ -117,11 +107,7 @@ class GuarantorCreateView(CreateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('guarantors:list')
+
            
     def get_success_url(self) -> str:
         """
@@ -141,11 +127,7 @@ class GuarantorDeleteView(DeleteView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('guarantors:list')
+
            
     def get_success_url(self) -> str:
         """
@@ -168,11 +150,7 @@ class GuarantorUpdateView(UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('guarantors:list')
+
         
     def form_invalid(self, form):
         """

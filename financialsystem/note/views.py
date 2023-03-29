@@ -29,11 +29,7 @@ class NoteListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('notes:list')
+
 
     def get_context_data(self, **kwargs):
         """
@@ -61,11 +57,7 @@ class NoteDetailView(LoginRequiredMixin, DetailView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('notes:list')
+
            
     def get_object(self):
         """
@@ -83,11 +75,7 @@ class NoteCreateView(CreateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('notes:list')
+
           
     def form_valid(self, form):
         if form.is_valid():
@@ -124,11 +112,7 @@ class NoteDeleteView(DeleteView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('notes:list')
+
             
     def get_success_url(self) -> str:
         """
@@ -148,11 +132,7 @@ class NoteUpdateView(UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().get(request, *args, **kwargs)
-        else:
-            return redirect('notes:list')
+
            
     def get_form_kwargs(self):
         """
