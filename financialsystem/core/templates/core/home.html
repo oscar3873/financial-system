@@ -22,10 +22,12 @@
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                         <span>Nuevo Credito</span>
                     </a>
+                    {% if request.user.is_superuser %}
                     <a name="" id="" class="btn btn-primary m-2 box-shadow rounded p-3" href="{% url 'signup' %}" role="button">
                         <i class="fa fa-user-plus" aria-hidden="true"></i>
                         <span>Nuevo Asesor</span>
                     </a>
+                    {% endif %}
                 </div>
             </article>
             <!--Cards-->
