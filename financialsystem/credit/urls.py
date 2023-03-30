@@ -13,9 +13,9 @@ credits_patterns = ([
 
     path('delete/<uuid:pk>/', client_delete, name='delete'),
     path('refinancing/<uuid:pk>/', refinance_installment, name='refinance'),
-    path('refinance_detail/<uuid:pk>/', RefinancingDetailView.as_view(), name='refinance_detail'),
+    path('refinance/update/<uuid:pk>/', RefinancingUpdateView.as_view(), name='refinance_update'),
     path('refinance/delete/<uuid:pk>/', refinancing_delete, name='refinance_delete'),
-    path('installment/<uuid:pk>/update/', InstallmentUpdateView.as_view(), name='installment_update'),
+    path('installment/update/<uuid:pk>/', InstallmentUpdateView.as_view(), name='installment_update'),
     path('installment_refinanced/<uuid:pk>/update/', InstallmentRefUpdateView.as_view(), name='installmentRef_update'),
 
     path('search/', search_client, name='buscar_clientes'),

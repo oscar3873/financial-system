@@ -61,7 +61,6 @@ def paid_commission(instance, *args, **kwargs):
     Calcula el valor real de la comisión basado en la última tasa de interés almacenada. 
     Actualiza el monto y la tasa de interés de la instancia, y el tiempo de última actualización.'''
 
-
     if instance.is_paid:
         instance.mov = Movement.objects.create(
             user = instance.adviser,

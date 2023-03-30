@@ -6,29 +6,46 @@
         <span class="font-weight-light">{{ message }}</span>
     </div>
 {% endfor %} {% endif %}
+
 <form method="post">
-    <h1>Actualizar Credito de <a href="{% url 'clients:detail' client.pk %}"><h1>{{client}}</h1></a></h1>
-    <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    {{ formset.management_form }}
-    <div class="container p-0">
-        <div class="row justify-content-start">
-    {% for form in formset %}
-            <div class="col-md-4">
-                <div class="row justify-content-start">
-                    <div class="card my-4">
-                        <div class="card-body">
-                            {{ form.as_p }}
-                        </div>
+    <h1>Actualizar Credito de 
+        <a href="{% url 'clients:detail' client.pk %}">
+            <h1>{{client}}</h1>
+        </a>
+    </h1>
+    <div class="col-md-8">
+        <div class="card bg-primary text-white box-shadow mb-3">
+            <div class="card-body">
+                <h5 class="title p-2">
+                    <i class="fa-solid fa-landmark text-warning"></i> &nbsp; Credito
+                </h5>
+                {% csrf_token  %}
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{form.is_old_credit.label}} {{form.is_old_credit.help_text}}{{form.is_old_credit}}
                     </div>
+                    <div class="form-group col-md-12">
+                        {{form.start_date.label}} {{form.start_date}}
+                    </div>
+                    <div class="form-group col-md-12">
+                        {{form.end_date.label}} {{form.end_date}}
+                    </div>
+                    <div class="form-group col-md-12">
+                        {{form.amount.label}} {{form.amount}}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{form.installment_num.label}} {{form.installment_num}}
+                    </div>
+                    <div class="form-group col-md-4">
+                        {{form.credit_interest.label}} {{form.credit_interest}}
+                    </div>
+                    
                 </div>
             </div>
-        
-      {% endfor %}
+            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+        </div>
     </div>
-</div>
-      <button type="submit">Save Changes</button>
-    </form>
+    <button type="submit">Save Changes</button>
+</form>
   
   {% endblock content %}

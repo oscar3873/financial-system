@@ -2,7 +2,7 @@ from datetime import datetime
 from django import forms
 
 from commissions.models import Interest
-from .models import Credit, Installment, Refinancing
+from .models import *
 from django.forms import inlineformset_factory
 
 #FORMULARIO PARA LA CREACION DEL CLIENTE
@@ -11,7 +11,8 @@ class CreditForm(forms.ModelForm):
 
     is_old_credit = forms.BooleanField(
         label='¿Credito Antigüo?',
-        help_text="Tildar el campo para SI"
+        help_text="Tildar el campo para SI",
+        required=False,
     )
 
     credit_interest = forms.IntegerField(
@@ -109,48 +110,110 @@ class RefinancingForm(forms.ModelForm):
                         required=False,
                         widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref%s" % (credit.pk)})
                     )
-    
+
+
+class RefinancingFormUpdate(forms.Form):
+
+    class Meta:
+        model = Refinancing
+        fields = "__all__"
+        exclude = ["credit", "lastup"]
+
 
 class InstallmentUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Installment
-        fields = ['amount', 'daily_interests', 'end_date', 'payment_date', 'condition']  
+        fields = ['amount', 'daily_interests', 'porcentage_daily_interests', 'start_date', 'end_date', 'payment_date', 'condition']  
         labels = {
             'amount': 'Monto',
             'end_date': 'Fecha de Vencimiento',
+            'start_date': 'Fecha de Inicio',
             'payment_date': 'Fecha de pago',
             'condition': 'Condición',
-            'daily_interests' : 'Intereses generados'
+            'daily_interests' : 'Intereses generados',
+            'porcentage_daily_interests' : 'Porcentaje de interes diario'
         }
         widgets = {
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
-            'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
+            'porcentage_daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
             'payment_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'}, format='%Y-%m-%d'),
             'end_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format='%Y-%m-%d'),
+            'start_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format='%Y-%m-%d'),
         }
-        auto_id = True
+
 
 class InstallmentRefinancingForm(forms.ModelForm):
     
     class Meta:
-        model = Installment
-        fields = ['amount', 'daily_interests', 'end_date', 'payment_date', 'condition']
+        model = InstallmentRefinancing
+        fields = ['amount', 'daily_interests', 'porcentage_daily_interests', 'start_date', 'end_date', 'payment_date', 'condition']  
         labels = {
             'amount': 'Monto',
             'end_date': 'Fecha de Vencimiento',
+            'start_date': 'Fecha de Vencimiento',
             'payment_date': 'Fecha de pago',
             'condition': 'Condición',
-            'daily_interests' : 'Intereses generados'
+            'daily_interests' : 'Intereses generados',
+            'porcentage_daily_interests' : 'Porcentaje de interes diario'
+
         }
         widgets = {
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'readonly':True}),
             'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
+            'porcentage_daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
             'payment_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'}, format= '%Y-%m-%d'),
             'end_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format= '%Y-%m-%d'),
+            'start_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format='%Y-%m-%d'),
         }
         auto_id = True
+
+
+#-------------------------------------------FORMS UPDATE--------------------------------
+class CreditUpdateForm(forms.ModelForm):
+
+    is_old_credit = forms.BooleanField(
+        label='¿Credito Antigüo?',
+        help_text="Tildar el campo para SI",
+        required=False
+    )
+
+    credit_interest = forms.IntegerField(
+        label= "Intereses",
+        required= True,
+        initial= Interest.objects.first().interest_credit,
+        min_value= 0,
+        max_value= 100
+    )
+    
+    amount = forms.DecimalField(
+        label= "Monto Solicitado",
+        required= True,
+    )
+    
+    installment_num = forms.IntegerField(
+        label= "Cuotas",
+        required= True,
+        min_value=1,
+        max_value=12,
+    )
+    
+    class Meta:
+        model = Credit
+        fields = ["is_old_credit","amount", "credit_interest", "installment_num", "start_date", "end_date"]
+        widgets ={
+            'start_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
+            'end_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
+        }
+        input_formats = ['%Y-%m-%d']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})
+
 
 
 

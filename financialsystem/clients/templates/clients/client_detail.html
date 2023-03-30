@@ -72,13 +72,6 @@
             </div>
         </div>
     </div>
-
-    {% if messages %} {% for message in messages %}
-    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
-        <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
-        <span class="font-weight-light">{{ message }}</span>
-    </div>
-    {% endfor %} {% endif %}
     <section>
         <div class="row justify-content-center">
             <div class="col-xl-3 col-sm-3 col-12 p-3">
@@ -243,6 +236,7 @@
                         <div class="d-flex align-items-center">
                             <div class="led-success"></div>
                             <h5 class="title pl-3 m-0">Credito activo</h5>
+                            <div class="ml-3"> <a href="{% url 'credits:edit_credit' credit_active.id %}"><i class="fa fa-edit"></i></a></div>
                         </div>
                         <button data-card-id="{{ credit_active.id }}" class="toggle-card btn btn-sm btn-white"><i class="fas fa-chevron-up"></i></button>
                     </div>
@@ -277,7 +271,7 @@
                                     <div class="col-12 p-0">
                                         <div class="form-group">
                                             <!-- BOTON MODAL PARA PAGOS DE CUOTAS -->
-                                            {% if installments_available %} {% with form_payment.0 as form_payment %}
+                                            {% if form_payment %} {% with form_payment.0 as form_payment %}
                                             <!-- .0 para formulario de refinanciacion -->
                                             {% include "payment/payment_form.html" %} {% endwith %} {% endif %} {% if credit_active.installments.first.is_paid_installment %}
                                             <div type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
@@ -378,8 +372,12 @@
                                     <td class="px-3" colspan="5">
                                         <table class="table table-responsive-lg table-striped table-hover">
                                             <thead class="table text-white">
-                                                <h5 class="card-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-sync text-info"></i>&nbsp;{{installments.1.0}}</h5>
-                                                <div class="text-center"><a href="{% url 'credits:refinance_delete' installments.1.0.pk %}">Eliminar Refinanciacion</a></div>
+                                                <div class="form-group">
+                                                    <h5 class="card-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-sync text-info"></i>&nbsp;{{installments.1.0}}
+                                                        <a href="{% url 'credits:refinance_delete' installments.1.0.pk %}"><i class="fas fa-trash-alt text-danger" ></i></a>
+                                                        <a href="{% url 'credits:refinance_update' installments.1.0.pk %}"><i class="fas fa-edit" ></i></a>
+                                                    </h5>
+                                                </div>
                                             </thead>
                                             <tbody>
                                                 <!-- installments.0 es la cuota // installments.1 es la una lista que contiene la refinanciacion (_.1.0)(refinanciacion) y el formulario de pago de dicha refinanciacion (_.1.1)(formulario de pago) -->

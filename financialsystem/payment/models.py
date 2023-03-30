@@ -83,6 +83,11 @@ def delete_commission(instance, *args, **kwargs):
     Eliminacion 'bidireccional': Elimina la instancia del pago y la comision realizada.
     '''
     try:
+        if instance.payment_mov:
+            instance.payment_mov.delete()
+    except:
+        pass
+    try:
         if instance.commission_to:
             instance.commission_to.delete()
     except: pass

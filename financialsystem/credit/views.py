@@ -1,13 +1,10 @@
-from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import UpdateView, CreateView, ListView, DetailView, DeleteView
+from django.views.generic import UpdateView, CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
 
 import copy
 
@@ -23,7 +20,6 @@ from .forms import *
 from guarantor.forms import GuarantorForm, PhoneNumberFormSetG
 from warranty.forms import WarrantyForm, WarrantyFormSet
 from clients.forms import ClientForm, PhoneNumberFormSet
-from payment.forms import PaymentForm
 
 #CREAR UN CREDITO CON TODOS LOS FORMULARIOS ANIDADOS
 @login_required(login_url="/accounts/login/")
@@ -103,7 +99,6 @@ class CreditListView(LoginRequiredMixin, ListView):
     redirect_field_name = 'redirect_to'
 
     
-    
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los creditos de la base de datos para usarlos en el contexto.
@@ -136,8 +131,6 @@ class CreditDetailView(DetailView, LoginRequiredMixin):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -250,7 +243,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
         """
         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
         """
-        messages.success(self.request, 'Credito creado correctamente', "success")
+        messages.success(self.request, 'Credito creado correctamente',"success")
         return  reverse_lazy('clients:detail', kwargs=self.kwargs)
     
 
@@ -260,29 +253,23 @@ def edit_credit(request, pk):
     
     credit_original = Credit.objects.get(id=pk)
     credit_copy = copy.copy(credit_original)
-    InstallmentFormSet = formset_factory(InstallmentUpdateForm, extra=0)
+    form = CreditUpdateForm(instance=credit_original)
+
     if request.method == 'POST':
-        form = CreditWithInstallmentsForm(request.POST, instance=credit_original)
-        formset = InstallmentFormSet(request.POST, prefix='installments')
-        if form.is_valid() and formset.is_valid():
+        form = CreditUpdateForm(request.POST, instance=credit_original)
+        if form.is_valid():
             credit = form.save(commit=False)
 
-            if (credit_copy.is_paid != credit.is_paid) or (credit_copy.amount != credit.amount) or (credit_copy.credit_interest != credit.credit_interest) or (credit_copy.installment_num != credit.installment_num):
-                credit.is_new = True        
+            if (credit_copy.end_date != credit.end_date) or (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.credit_interest != credit.credit_interest) or (credit_copy.installment_num != credit.installment_num):
+                print('ASDASDA#####################')
+                credit.is_new = True
                 credit.save()
-
-            for form in formset:
-                installment = form.save(commit=False)   
-                installment.credit = credit
                 
             messages.success(request,'Cambios realizados exitosamente')
-            return redirect('credits:edit_credit', pk=credit.pk)
-    else:
-        form = CreditWithInstallmentsForm(instance=credit_original)
-        formset = InstallmentFormSet(prefix='installments', initial=credit_original.installments.values())
+            return redirect('credits:list')
+
     context = {
         'form': form,
-        'formset': formset,
         'client': credit_original.client
         }
     return render(request, 'credit/edit_credit.html', context)
@@ -328,59 +315,56 @@ def refinance_installment (request, pk):
     return redirect('clients:detail', pk=credit.client.pk)
         
 #----------------------------------------------------------------
-class RefinancingDetailView(LoginRequiredMixin, DetailView):
+class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
     """
     Detalle de refinanciacion.
     """
-    model = Installment
-    template_name = 'refinance/refinance_detail.html'
+    model = Refinancing
+    template_name = 'refinance/refinance_update.html'
+    form_class = RefinancingFormUpdate
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-        
-    def get_context_data(self, **kwargs):
-        """
-        Extrae los datos de los refinanciamientos de la base de datos para usarlos en el contexto y poder pagarlos con PaymentsForm.
-        """
-        refresh_condition()
-        refinance = self.get_object().refinance
-        refinance_installments_available = refinance.installments.exclude(condition__in=['Pagada'])
-        context = super().get_context_data(**kwargs)
-        print(refinance_installments_available.all())
-        context['form_payment'] = PaymentForm(installments=refinance_installments_available.all())
-        context['refinance'] = refinance
-        context["amount_installment"] = refinance.installments.last().amount
-        return context
 
+    def get_success_url(self):
+        return reverse('clients:detail', args=[self.object.installment_ref.last().credit.client.pk])
+    
 
+#-------------------------------------------------------------------
 def refinancing_delete(request, pk):
     refinancing = Refinancing.objects.get(pk=pk)
     client = refinancing.installment_ref.first().credit.client
     refinancing.delete()
     return redirect('clients:detail', pk = client.pk)
 
+
 #----------------------------------------------------------------
 class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
     model = InstallmentRefinancing
     form_class = InstallmentRefinancingForm
     template_name = 'installment/installment_ref_update.html'
-    success_url = reverse_lazy('clients:list')
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
     def form_valid(self, form):
+        installment = get_object_or_404(Installment, pk = self.kwargs['pk'])
         if form.is_valid():
-            print(self.object.created_at.date())
-            if self.object.created_at.date() != form.instance.end_date.date():
+            if installment.end_date.date() != form.cleaned_data['end_date'].date():
+                form.instance.daily_interests = 0
                 form.instance.lastup = form.instance.end_date.date()
-        return super().form_valid(form)
 
+            if installment.payment_date is not None:
+                if installment.payment_date.date() != form.cleaned_data['payment_date'].date():
+                    form.instance.condition = 'Pagada'
+
+        return super().form_valid(form)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['installment_ref'] = self.object
+        context['installment'] = self.object
         return context
     
     def get_success_url(self):
@@ -396,14 +380,26 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
     
-    def form_valid(self, form):
-        if form.is_valid():
-            print(self.object.created_at.date())
-            if self.object.created_at.date() != form.instance.end_date.date():
-                form.instance.lastup = form.instance.end_date.date()
-        return super().form_valid(form)
-    
 
+    def form_valid(self, form):
+        installment = get_object_or_404(Installment, pk=self.kwargs['pk'])
+        if form.is_valid():
+            if not installment.payment_date and form.cleaned_data['payment_date']:
+                form.instance.condition = 'Pagada'
+                
+            elif installment.payment_date and not form.cleaned_data['payment_date']:
+                form.instance.condition = 'A Tiempo'
+
+            elif form.cleaned_data['condition'] == 'A Tiempo':
+                form.instance.payment_date = None
+
+            if installment.end_date.date() != form.cleaned_data['end_date'].date():
+                form.instance.daily_interests = 0
+                form.instance.lastup = form.instance.end_date.date()
+
+        return super().form_valid(form)
+
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['installment'] = self.object
