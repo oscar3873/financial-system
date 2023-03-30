@@ -64,7 +64,7 @@ class Refinancing(models.Model):
     
     def __str__(self) -> str:
         installment_numbers = [str(installment.installment_number) for installment in self.installment_ref.all()]
-        return "Refinanciacion de la cuota: {}".format(", ".join(installment_numbers))
+        return "Refinanciacion de la cuota: {} de {}".format(", ".join(installment_numbers), self.credit)
 
     class Meta:
         ordering = ["-created_at"]
@@ -124,6 +124,7 @@ class InstallmentRefinancing(models.Model):
     lastup = models.DateField(null=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="installments_refinancing", help_text="Credito de la cuota", null=True, blank=True)
     
     def __str__(self) -> str:
         return "Cuota {} de la {}".format(self.installment_number, self.refinancing)
@@ -243,7 +244,7 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
         for numberInstallments in range(refinancing.installment_num_refinancing):
             end_date = instance.created_at + timedelta(days=days)
             numberInstms = numberInstallments + 1
-            refinancing.installments.create(installment_number=numberInstms, refinancing=refinancing, amount=amount_installment, end_date=end_date, lastup=end_date)
+            refinancing.installments.create(installment_number=numberInstms, refinancing=refinancing, amount=amount_installment, end_date=end_date, lastup=end_date, credit=instance.credit)
             days += 30
 
 

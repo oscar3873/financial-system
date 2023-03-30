@@ -7,7 +7,8 @@ class PaymentAdmin(admin.ModelAdmin):
         'detail',
         'amount',
         'payment_date',
-        'installment'
+        'installment',
+        'mov',
          )
     
 

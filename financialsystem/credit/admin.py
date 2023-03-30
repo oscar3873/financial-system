@@ -44,6 +44,7 @@ class RefinancingAdmin(admin.ModelAdmin):
     
 class InstallmentRefinancingAdmin(admin.ModelAdmin):
     list_display = (
+        'credit',
         'id',
         'refinancing',
         'installment_number',

@@ -19,7 +19,8 @@
                     <p><i class="fas fa-lock text-warning"></i> Cambiar contraseña <a class="font-weight-bold text-secondary" href="/accounts/password_change">aqui</a></p>
                     {% if user.adviser.avatar %}
                     <img src="{{user.adviser.avatar.url}}" width="100px" height="100px" class="  rounded-circle"> {% else %}
-                    <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" class="rounded-circle p-2  "> {% endif %}
+                    <img src="/media/{{MEDIA_URL}}avatares/default.png" width="100px" height="100px" alt="avatar" class="rounded-circle p-2  "> {% endif %}
+                    <a class="d-block text-secondary font-weight-bold" href="{% url 'advisers:detail' user.adviser.pk %}">Ir a perfil de asesor</a>
                 </div>
             </div>
             <div class="col-xl-6 col-sm-6 col-lg-6">
@@ -46,12 +47,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for adviser in advisers %}
+                                        {% for adviser in advisers %} {% if not request.user.adviser == adviser %}
                                         <tr class="open-offcanvas" style="cursor: pointer;" data-info='{"first_name":"{{client.first_name}}","last_name":"{{client.last_name}}","dni":"{{client.dni}}","email":"{{client.email}}","created_at":"{{client.created_at}}","adviser":"{{client.adviser}}","address":"{{client.address}}","id":"{{client.id}}","adviser_id":"{{client.adviser.id}}","job_address":"{{client.job_address}}","profession":"{{client.profession}}","score":"{{client.score}}","civil_status":"{{client.get_civil_status_display}}","phone_numbers":"{{client.phonenumberclient_set.all}}"}'>
                                             <td><a href="{% url 'advisers:detail' adviser.pk %}">{{adviser.user.first_name}} {{adviser.user.last_name}}</a></td>
                                             <td>{{adviser.user.dni}}</td>
                                             <td>{{adviser.created_at|date}}</td>
                                         </tr>
+                                        {% endif %}
+
                                         <!--Delete Modal-->
                                         <div class="modal fade" id="exampleModal{{client.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{client.pk}}" aria-hidden="true">
                                             <div class="modal-dialog" role="document">

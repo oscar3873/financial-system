@@ -342,6 +342,7 @@ def refinance_installment (request, pk):
             pack = dict(zip(installments, checkboxs_by_form.values()))
             
             refinancing = form.save(commit=False)
+            refinancing.credit = credit
             refinancing.save()
             for installment in pack.keys():
                 if pack[installment]:

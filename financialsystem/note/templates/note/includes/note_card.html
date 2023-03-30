@@ -1,0 +1,21 @@
+<!--Card-->
+<div class="content-card mx-2 my-0" style="max-height: 250px;">
+    <div class="card-big-shadow p-0">
+        <div class="card card-just-text" data-background="color" data-color="{{note.color}}" data-radius="none">
+            <div class="content">
+                <h6 class="category">{{note.title}}</h6>
+                <h4 class="title">
+                    <a class="font-weight-bold text-primary" href="#">
+                    {% if note.user.avatar %}
+                    <img src="{{note.user.avatar.url}}" width="36px" height="36px" class="  rounded-circle">
+                    {% else %}
+                    <img src="/media/{{MEDIA_URL}}avatares/default.png" width="36px" height="36px" alt="avatar" class="rounded-circle p-2  ">
+                    {% endif %}
+                    </a>
+                </h4>
+                <p class="description">{{note.content|truncatewords:5}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end card -->

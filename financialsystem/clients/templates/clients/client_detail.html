@@ -74,7 +74,11 @@
                 <div class="card bg-primary text-white media p-4">
                     <h5 class="title py-3"><i class="fas fa-user-edit text-warning"></i> Registro</h5>
                     <p class="m-0">Asesor Financiero</p>
-                    <p><a class="text-warning" href="{% url 'advisers:detail' client.adviser.pk %}"><strong>{{client.adviser}}</strong></a></p>
+                    <p><a class="text-warning" href="{% url 'advisers:detail' client.adviser.pk %}">
+                        {% if client.adviser.avatar %}
+                        <img src="{{client.adviser.avatar.url}}" width="50px" height="50px" class="  rounded-circle"> {% else %}
+                        <img src="/media/{{MEDIA_URL}}avatares/default.png" width="50px" height="50px" alt="avatar" class="rounded-circle p-2  "> {% endif %}
+                    </a></p>
                     <p class="m-0">Fecha de Entrada al sistema</p>
                     <p><strong>{{client.created_at|date}}</strong></p>
                     <h5 class="title pt-3">Creditos</h5>
