@@ -15,6 +15,15 @@
                                 </h5>
                                 <h5 class="title p-2">Informacion basica</h5>
                                 <div class="form-row">
+                                    <ul class="error-list">
+                                        {% for field in form %} 
+                                            {% for error in field.errors %}
+                                                <li class="text-danger">{{ error }}</li><br> 
+                                            {% endfor %} 
+                                        {% endfor %}
+                                    </ul> 
+                                </div>
+                                <div class="form-row">
                                     <div class="form-group col-md-6">
                                         {{form.first_name.label}} {{form.first_name}}
                                     </div>
@@ -50,12 +59,6 @@
                                     </div>
                                 </div>
                                 <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
-                                <div class="form-row">
-                                    <ul class="error-list">
-                                        {% for form in phone_formset %} {% for field in form %} {% for error in field.errors %}
-                                        <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
-                                    </ul> {{ phone_formset.non_form_errors }}
-                                </div>
                                 <p>
                                     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
                                       Añadir numeros de contacto

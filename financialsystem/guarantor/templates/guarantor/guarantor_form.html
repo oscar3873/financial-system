@@ -1,31 +1,169 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
-<!--Main-->
-<link href="{% static 'cashregister/css/cashregister.css' %}" rel="stylesheet">
 <main class="container my-4">
-    {% load crispy_forms_tags %}
-    <form method="post" id="client_form">
-        {% csrf_token %}
-        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">Informacion del Garante</h5>
-        {{ form|crispy}}
-        <p><input type="submit" class="btn btn-success btn-block mt-4 rounded p-3" value="Confirmar"></p>
-    </form>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-
-    <script>
-        $(document).ready(function() {
-            // when user clicks add more btn of phone_numbers
-            $('.add-phone_numbers').click(function(ev) {
-                ev.preventDefault();
-                var count = $('#item-phone_numbers').children().length;
-                var tmplMarkup = $('#phone_numbers-template').html();
-                var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
-                $('#item-phone_numbers').append(compiledTmpl);
-
-                // update form count
-                $('#id_phone_numbers-TOTAL_FORMS').attr('value', count + 1);
-            });
-        });
-    </script>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de solicitud de servicios</h4>
+    <form class="d-block" method="post">
+        <section class="row">
+        <div class="col-md-4 order-first order-md-last">
+            {% if not is_update %}
+            <div class="form-group">
+                <label for="search-input"><h4>Buscar Cliente</h4></label>
+                <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
+            </div>
+            <ul id="search-results" class="list-group text-dark mt-3"></ul>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card box-shadow bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="title p-2">
+                        <i class="fa-solid fa-user text-warning"></i> &nbsp; Garante
+                    </h5>
+                    <h5 class="title p-2">Informacion basica</h5>
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{form.first_name.label}} {{form.first_name}} <h5 class="text-danger">{{form.first_name.errors}}</h5>
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{form.last_name.label}} {{form.last_name}}<h5 class="text-danger">{{form.last_name.errors}}</h5>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{form.email.label}} {{form.email}}<h5 class="text-danger">{{form.email.errors}}</h5>
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{form.dni.label}} {{form.dni}}<h5 class="text-danger">{{form.dni.errors}}</h5>
+                        </div>
+                        <div class="form-group col-md-3">
+                            {{form.civil_status.label}} {{form.civil_status}}<h5 class="text-danger">{{form.civil_status.errors}}</h5>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{form.address.label}} {{form.address}}<h5 class="text-danger">{{form.address.errors}}</h5>
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{form.job_address.label}} {{form.job_address}}<h5 class="text-danger">{{form.job_address.errors}}</h5>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            {{form.profession.label}} {{form.profession}}<h5 class="text-danger">{{form.profession.errors}}</h5>
+                        </div>
+                    </div>
+                    <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
+                    <div class="form-row">
+                        <ul class="error-list">
+                            {% for form in formsetPhoneG %} {% for field in form %} {% for error in field.errors %}
+                            <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
+                        </ul> {{ formsetPhoneG.non_form_errors }}
+                    </div>
+                    <p>
+                        <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
+                            Añadir numeros de contacto
+                        </button>
+                    </p>
+                    <div class="collapse" id="collapsePNC">
+                        <div class="form-row">
+                            {{formsetPhoneG.management_form}} {% for phone_form in formsetPhoneG %}
+                            <div class="form-group col-md-3">
+                                {{phone_form.phone_number_g.label}} {{phone_form.phone_number_g}}
+                            </div>
+                            <div class="form-group col-md-2">
+                                {{phone_form.phone_type_g.label}} {{phone_form.phone_type_g}}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Registrar Crédito</button>
+                <!-- Agregar el modal -->
+                <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmacionModalLabel">Confirmar registro de servicio</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Está seguro de que desea enviar el formulario del servicio?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </form>
+    </div></section>
 </main>
+<script>
+    const searchInput = document.querySelector('#search-input');
+    const searchResults = document.querySelector('#search-results');
 
+    searchInput.addEventListener('input', (event) => {
+        const searchTerm = event.target.value.trim().toLowerCase();
+
+        if (!searchTerm) {
+            // Limpiar los resultados de búsqueda si no hay término de búsqueda
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        // Realizar la búsqueda de clientes que coincidan con el término de búsqueda
+        fetch(`/credits/search_credit/?search_term=${searchTerm}`)
+            .then(response => response.json())
+            .then(data => {
+                const credits = data.credits;
+                console.log(credits);
+                // Mostrar los resultados de búsqueda
+                searchResults.innerHTML = '';
+                credits.forEach(credit => {
+                    const item = document.createElement('li');
+                    item.style.zIndex = "9999";
+                    item.style.cursor = 'pointer';
+                    item.classList.add('list-group-item', 'client');
+                    item.dataset.clientId = credit.id;
+                    item.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <h6>${credit.full_name}</h6>
+                        </div>
+                    `;
+                    searchResults.appendChild(item);
+                });
+            });
+    });
+
+    searchResults.addEventListener('click', (event) => {
+        const item = event.target.closest('.client');
+        if (!item) {
+            return;
+        }
+
+        const clientId = item.dataset.clientId;
+        const clientName = item.querySelector('h6').textContent;
+
+        // Rellenar el campo del cliente seleccionado y ocultar los resultados de búsqueda
+        searchInput.value = clientName;
+        searchResults.innerHTML = '';
+        // Añadir el id del cliente al formulario
+        const clientIdInput = document.createElement('input');
+        clientIdInput.type = 'hidden';
+        clientIdInput.name = 'selected_client_id';
+        clientIdInput.value = clientId;
+        searchInput.closest('form').appendChild(clientIdInput);
+    });
+    const form = document.querySelector('form');
+    form.addEventListener('submit', (event) => {
+        const selectedClientIdInput = document.querySelector('input[name="selected_client_id"]');
+        if (!selectedClientIdInput) {
+            event.preventDefault();
+            alert('Por favor, seleccione un cliente antes de guardar.');
+        }
+    });
+</script>
 {% endblock content %}

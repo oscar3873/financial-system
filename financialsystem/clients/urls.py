@@ -2,6 +2,7 @@ from django.urls import path
 from .views import *
 clients_patterns = ([
     path('', ClientListView.as_view(), name='list'),
+    path('create/', clientCreate, name='create'),
     path('<uuid:pk>/', ClientDetailView.as_view(), name='detail'),
     path('update/<pk>/', ClientUpdateView.as_view(), name='update'),
     path('delete/<pk>/', ClientDelete.as_view(), name='delete'),

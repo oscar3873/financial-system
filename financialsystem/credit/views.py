@@ -1,7 +1,7 @@
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import UpdateView, CreateView, ListView, DetailView
+from django.views.generic import UpdateView, CreateView, ListView, DetailView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.forms import formset_factory
@@ -75,6 +75,7 @@ def crear_credito(request):
             return redirect('clients:list')
     else:
         print("------------Algun formulario es invalido------------")
+
     context = {
         'cliente_form': client_form,
         'formsetPhoneClient': formsetPhoneClient,
@@ -86,7 +87,6 @@ def crear_credito(request):
     
     return render(request, 'credit/create_credit.html', context)
 
-    
 #LISTA DE CREDITOS
 #------------------------------------------------------------------
 class CreditListView(LoginRequiredMixin, ListView):
@@ -188,7 +188,8 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             credit = form.save(commit=False)
             credit.is_new = True
             credit.client = client
-            credit.mov = create_movement(credit, self.request.user.adviser)
+            if not credit.is_old_credit:
+                credit.mov = create_movement(credit, self.request.user.adviser)
             credit.save()
 
             # Validar el formulario de garantía
@@ -224,8 +225,6 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_add'] = True
@@ -242,7 +241,8 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
             credit = form.save(commit=False)
             credit.is_new = True
             credit.client = self.client
-            credit.mov = create_movement(credit, self.request.user.adviser)
+            if not credit.is_old_credit:
+                credit.mov = create_movement(credit, self.request.user.adviser)
             credit.save()
         return super().form_valid(form)
     
@@ -338,8 +338,6 @@ class RefinancingDetailView(LoginRequiredMixin, DetailView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-
-
         
     def get_context_data(self, **kwargs):
         """
@@ -355,6 +353,13 @@ class RefinancingDetailView(LoginRequiredMixin, DetailView):
         context["amount_installment"] = refinance.installments.last().amount
         return context
 
+
+def refinancing_delete(request, pk):
+    refinancing = Refinancing.objects.get(pk=pk)
+    client = refinancing.installment_ref.first().credit.client
+    refinancing.delete()
+    return redirect('clients:detail', pk = client.pk)
+
 #----------------------------------------------------------------
 class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
     model = InstallmentRefinancing
@@ -366,14 +371,20 @@ class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
+    def form_valid(self, form):
+        if form.is_valid():
+            print(self.object.created_at.date())
+            if self.object.created_at.date() != form.instance.end_date.date():
+                form.instance.lastup = form.instance.end_date.date()
+        return super().form_valid(form)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['installment_ref'] = self.object
-        print(self.object.id)
         return context
     
     def get_success_url(self):
-        return reverse('credits:refinance_detail', args=[self.object.refinancing.installment_ref.last().pk])
+        return reverse('clients:detail', args=[self.object.refinancing.installment_ref.last().credit.client.pk])
     
 #----------------------------------------------------------------
 class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
@@ -384,9 +395,15 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+    
+    def form_valid(self, form):
+        if form.is_valid():
+            print(self.object.created_at.date())
+            if self.object.created_at.date() != form.instance.end_date.date():
+                form.instance.lastup = form.instance.end_date.date()
+        return super().form_valid(form)
+    
 
-
-        
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['installment'] = self.object

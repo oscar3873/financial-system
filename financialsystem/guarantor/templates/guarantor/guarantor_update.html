@@ -1,0 +1,147 @@
+{% extends "core/base.html" %} {% block content %} {% load static %}
+<!--Main-->
+<div class="my-4 py-2">
+    <form class="form" method="post">
+        {% csrf_token %}
+        <div class="row justify-content-center align-items-start">
+            <div class="col-md-9 p-1">
+                <div class="card bg-primary text-white box-shadow mb-3">
+                    <div class="card-body">
+                        <h5 class="title p-2">
+                            <i class="fa-solid fa-user text-warning"></i> &nbsp; {{type_client}}
+                        </h5>
+                        <h5 class="title p-2">Informacion basica</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{form.first_name.label}} {{form.first_name}} <h5 class="text-danger">{{form.first_name.errors}}</h5>
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{form.last_name.label}} {{form.last_name}}<h5 class="text-danger">{{form.last_name.errors}}</h5>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{form.email.label}}
+                                <div class="input-group">
+                                    {{form.email}}
+                                   <div class="input-group-prepend">
+                                       <button type="button" class="btn btn-secondary" id="toggleEditEmail">Editar</button>
+                                   </div>
+                               </div>
+                               <h5 class="text-danger">{{form.email.errors}}</h5>
+                           </div>
+                            <div class="form-group col-md-3">
+                                {{form.dni.label}}
+                                <div class="input-group">
+                                     {{form.dni}}
+                                    <div class="input-group-prepend">
+                                        <button type="button" class="btn btn-secondary" id="toggleEditDni">Editar</button>
+                                    </div>
+                                </div>
+                                <h5 class="text-danger">{{form.dni.errors}}</h5>
+                            </div>
+                            <div class="form-group col-md-3">
+                                {{form.civil_status.label}} {{form.civil_status}}<h5 class="text-danger">{{form.civil_status.errors}}</h5>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{form.address.label}} {{form.address}}<h5 class="text-danger">{{form.address.errors}}</h5>
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{form.job_address.label}} {{form.job_address}}<h5 class="text-danger">{{form.job_address.errors}}</h5>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{form.profession.label}} {{form.profession}}<h5 class="text-danger">{{form.profession.errors}}</h5>
+                            </div>
+                            <div class="form-group col-md-3">
+                                {{form.score.label}}{{form.score}}<h5 class="text-danger">{{form.score.errors}}</h5>
+                            </div>
+                        </div>
+                        <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
+                        <div class="form-row">
+                            <ul class="error-list">
+                                {% for form in phone_formset %} {% for field in form %} {% for error in field.errors %}
+                                <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
+                            </ul> {{ phone_formset.non_form_errors }}
+                        </div>
+                        <p>
+                            <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
+                                Añadir numeros de contacto
+                            </button>
+                        </p>
+                        <div class="collapse" id="collapsePNC">
+                            <div class="form-row">
+                                {{phone_formset.management_form}} {% for phone_form in phone_formset %}
+                                <div class="form-group col-md-3">
+                                    {{phone_form.phone_number_g.label}} {{phone_form.phone_number_g}}
+                                </div>
+                                <div class="form-group col-md-2">
+                                    {{phone_form.phone_type_g.label}} {{phone_form.phone_type_g}}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Registrar Crédito</button>
+            <!-- Agregar el modal -->
+            <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmacionModalLabel">Confirmar registro de servicio</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Está seguro de que desea enviar el formulario del servicio?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dniInput = document.getElementById('id_guarantor-dni');
+            var emailInput = document.getElementById('id_guarantor-email');
+            var toggleEditDni = document.getElementById('toggleEditDni');
+            var toggleEditEmail = document.getElementById('toggleEditEmail');
+
+            dniInput.setAttribute('readonly', 'readonly');
+            emailInput.setAttribute('readonly', 'readonly');
+
+            toggleEditDni.addEventListener('click', function() {
+                if (dniInput.hasAttribute('readonly')) {
+                    dniInput.removeAttribute('readonly');
+                    this.textContent = 'Bloquear';
+                } else {
+                    dniInput.setAttribute('readonly', 'readonly');
+                    this.textContent = 'Editar';
+                }
+            });
+
+            toggleEditEmail.addEventListener('click', function() {
+                if (emailInput.hasAttribute('readonly')) {
+                    emailInput.removeAttribute('readonly');
+                    this.textContent = 'Bloquear';
+                } else {
+                    emailInput.setAttribute('readonly', 'readonly');
+                    this.textContent = 'Editar';
+                }
+            });
+        });
+    </script>
+</body>
+
+{% endblock content %}

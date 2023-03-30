@@ -3,19 +3,20 @@ from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from babel.dates import format_date
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 
 from django.urls import reverse_lazy
 
 #CRUD Guarantor
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import UpdateView, DeleteView
 
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
+from credit.models import Credit
 from .models import Guarantor
-from .forms import GuarantorForm, GuarantorUpdateForm
+from .forms import *
 from .filters import ListingFilter
 
 # Create your views here.
@@ -96,73 +97,91 @@ class GuarantorDetailView(LoginRequiredMixin, DetailView):
         return get_object_or_404(Guarantor, id=self.kwargs['pk'])
 
 #CREACION DE UNA NOTA
-class GuarantorCreateView(LoginRequiredMixin, CreateView):
-    """
-    Crea un nuevo garante.
-    """
-    model = Guarantor
-    form_class = GuarantorForm
-    template_name = "guarantor/guarantor_form.html"
+def guarantorCreateView(request):
+    guarantor_form = GuarantorForm(request.POST or None)
+    formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
 
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
+    if request.method == 'POST':
+        if guarantor_form.is_valid() and formsetPhoneGuarantor.is_valid():
+            guarantor = guarantor_form.save(commit=False)
+            guarantor.adviser = request.user.adviser
+            # Recuperar el ID del cliente seleccionado
+            selected_client_id = request.POST.get('selected_client_id')
+            # Asignar el crédito al cliente correspondiente
+            credit = get_object_or_404(Credit, pk=selected_client_id)
+            guarantor.credit = credit
+            guarantor.save()
+            phone_numbers = formsetPhoneGuarantor.save(commit=False)
+            for phone_number in phone_numbers:
+                if phone_number.phone_number_g:
+                    phone_number.guarantor = guarantor
+                    phone_number.save()
+            messages.success(request, 'El garante se ha guardado exitosamente.','success')
+            return redirect('guarantors:list')
+    else:
+        print("------------Algun formulario es invalido------------")
 
-
-           
-    def get_success_url(self) -> str:
-        """
-        Redirecciona al listado de garantes, con un mensaje de creacion exitosa.
-        """
-        messages.success(self.request, 'Garante creada correctamente', "success")
-        return  reverse_lazy('guarantors:list')
+    context = {
+        'form': guarantor_form,
+        'formsetPhoneG': formsetPhoneGuarantor,
+    }
+    
+    return render(request, 'guarantor/guarantor_form.html', context)
 
 #BORRADO DE UNA NOTA
 #------------------------------------------------------------------
-class GuarantorDeleteView(LoginRequiredMixin, DeleteView):
-    """
-    Borra un garante.
-    """
-    model = Guarantor
-
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
-
-
-           
-    def get_success_url(self) -> str:
-        """
-        Redirecciona al listado de garantes, con un mensaje de eliminacion exitosa.
-        """
-        messages.success(self.request, 'Garante eliminada correctamente', "danger")
-        return  reverse_lazy('guarantors:list')
+def delete_guarantor(request, pk):
+    guarantor = get_object_or_404(Guarantor, pk=pk)
+    guarantor.delete()
+    messages.success(request, 'Garante eliminado correctamente', "danger")
+    return  redirect('guarantors:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
 class GuarantorUpdateView(LoginRequiredMixin, UpdateView):
     """
-    Actualiza un garante.
-    """	
+    Actualiza el client y sus telefonos.
+    """
     model = Guarantor
-    form_class = GuarantorUpdateForm
-    template_name_suffix = '_update_form'
+    form_class = GuarantorForm
+    template_name_suffix = '_update'
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-   
+
+    def get_context_data(self, **kwargs):
+        """
+        Extrae los datos de los clientes (telefonos) que se encuentran en la base de datos para usarlo en el contexto.
+        """
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['phone_formset'] = PhoneNumberFormSetGUpdate(self.request.POST, instance=self.object)
+        else:
+            context['form'] = GuarantorForm(instance = self.object)
+            context['phone_formset'] = PhoneNumberFormSetGUpdate(instance=self.object)
+        return context
+
     def form_invalid(self, form):
         """
-        Devuelve los datos preciamente ingresados, cuando el formulario es invalido.
-        """        
-        form.data = form.data.copy()
-        form.data['guarantor-dni'] = self.object.dni
-        form.data['guarantor-email'] = self.object.email
-
-        return self.render_to_response(self.get_context_data(form=form))
+        Muestra un error en caso de formulario invalido.
+        """
+        return super().form_invalid(form)
+    
+    def form_valid(self, form):
+        """
+        Actualiza el garante y sus telefonos.
+        """
+        response = super().form_valid(form)
+        phone_formset = PhoneNumberFormSetGUpdate(self.request.POST, instance=self.object)
+        phone_formset.save()
+        
+        return response
 
     def get_success_url(self) -> str:
         """
-        Redirecciona al listado de garantes, con un mensaje de actualizacion exitosa.
+        Obtiene la URL de redirección después de que se ha actualizado correctamente.
+        Agrega un mensaje de éxito a la cola de mensajes.
         """	
-        messages.success(self.request, 'Garante actualizada satisfactoriamente', "info")
-        return  reverse_lazy('guarantors:list')
+        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
+        return reverse_lazy('guarantors:list')

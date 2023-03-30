@@ -1,16 +1,23 @@
 from datetime import datetime
 from django import forms
+
+from commissions.models import Interest
 from .models import Credit, Installment, Refinancing
 from django.forms import inlineformset_factory
 
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
 class CreditForm(forms.ModelForm):
-    
+
+    is_old_credit = forms.BooleanField(
+        label='¿Credito Antigüo?',
+        help_text="Tildar el campo para SI"
+    )
+
     credit_interest = forms.IntegerField(
         label= "Intereses",
         required= True,
-        initial= 40,
+        initial= Interest.objects.first().interest_credit,
         min_value= 0,
         max_value= 100
     )
@@ -37,7 +44,7 @@ class CreditForm(forms.ModelForm):
     )
     class Meta:
         model = Credit
-        fields = ["amount", "credit_interest", "installment_num", "start_date"]
+        fields = ["is_old_credit","amount", "credit_interest", "installment_num", "start_date"]
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -108,17 +115,20 @@ class InstallmentUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Installment
-        fields = ['amount', 'end_date', 'payment_date', 'condition']  
+        fields = ['amount', 'daily_interests', 'end_date', 'payment_date', 'condition']  
         labels = {
             'amount': 'Monto',
             'end_date': 'Fecha de Vencimiento',
             'payment_date': 'Fecha de pago',
-            'condition': 'Condición'
+            'condition': 'Condición',
+            'daily_interests' : 'Intereses generados'
         }
         widgets = {
-            'amount': forms.NumberInput(attrs={'class': 'form-control', 'readonly':True}),
-            'payment_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'payment_date','type': 'date'}, format='%Y-%m-%d'),
-            'end_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'end_date','type': 'date'},format='%Y-%m-%d'),
+            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
+            'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
+            'payment_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'}, format='%Y-%m-%d'),
+            'end_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format='%Y-%m-%d'),
         }
         auto_id = True
 
@@ -126,17 +136,19 @@ class InstallmentRefinancingForm(forms.ModelForm):
     
     class Meta:
         model = Installment
-        fields = ['amount', 'end_date', 'payment_date', 'condition']
+        fields = ['amount', 'daily_interests', 'end_date', 'payment_date', 'condition']
         labels = {
             'amount': 'Monto',
             'end_date': 'Fecha de Vencimiento',
             'payment_date': 'Fecha de pago',
-            'condition': 'Condición'
+            'condition': 'Condición',
+            'daily_interests' : 'Intereses generados'
         }
         widgets = {
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'readonly':True}),
-            'payment_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'payment_date','type': 'date'}, format= '%Y-%m-%d'),
-            'end_date': forms.DateInput(attrs={'class': 'form-control datepicker', 'id': 'end_date','type': 'date'},format= '%Y-%m-%d'),
+            'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
+            'payment_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'}, format= '%Y-%m-%d'),
+            'end_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format= '%Y-%m-%d'),
         }
         auto_id = True
 

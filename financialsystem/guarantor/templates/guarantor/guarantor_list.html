@@ -49,12 +49,12 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="my-2 bg-primary border-0 text-white box-shadow card">
+                <div class="my-2 bg-primary border-0 text-white box-shadow card">
                     <a name="" id="" class="btn btn-secondary rounded p-3" href="{% url 'guarantors:create' %}" role="button">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                        <span>Cargar Nuevo Cliente</span>
+                        <span>Cargar Nuevo Garante</span>
                     </a>
-                </div> -->
+                </div>
             </div>
             <div class="col-xl-6 col-sm-6 col-lg-6">
                 <div class="card bg-primary text-white mb-2">
@@ -129,6 +129,29 @@
 
                                         <td>{{guarantor.created_at|date}}</td>
                                     </tr>
+                                    <!-- Agregar el modal -->
+                                    <div class="modal fade" id="GuarantorDelete{{guarantor.id}}" tabindex="-1" role="dialog" aria-labelledby="GuarantorDelete{{guarantor.id}}" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content bg-primary text-white">
+                                                <form action="{% url 'guarantors:delete' guarantor.pk %}">
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title" id="GuarantorDelete{{guarantor.id}}">Eliminacion de Garante</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        ¿Está seguro de eliminar el garante?
+                                                        <p>
+                                                            Garante: <span class="text-warning font-weight-bold">{{guarantor.first_name}} {{guarantor.last_name}}</span>
+                                                        </p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-danger" id="enviarFormulario">Eliminar</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -225,7 +248,7 @@
                 <p class="m-0">Credito asociado: </p>
                 <span><a href="/clients/${info.client_id}" class="text-warning"><strong>${info.credit}</strong></a></span>
                 <h5 class="title pt-3">Acciones</h5>
-                <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal${info.id}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
+                <a type="button" class="btn" data-toggle="modal" data-target="#GuarantorDelete${info.id}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
                 <a href="/guarantors/update/${info.id}" ><i class="fas fa-edit text-info"></i></a>
             </div>
             <div class="card-footer text-muted">

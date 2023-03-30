@@ -18,8 +18,8 @@
                     <p><i class="fas fa-user text-warning"></i> Nombre de usuario: <span class="font-weight-bold">{{user.adviser.user}}</span></p>
                     <p><i class="fas fa-lock text-warning"></i> Cambiar contraseña <a class="font-weight-bold text-secondary" href="/accounts/password_change">aqui</a></p>
                     {% if user.adviser.avatar %}
-                    <img src="{{user.adviser.avatar.url}}" class=" img-fluid"> {% else %}
-                    <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" class="rounded-circle p-2 img-fluid"> {% endif %}
+                    <img src="{{user.adviser.avatar.url}}" width="100px" height="100px" class="  rounded-circle"> {% else %}
+                    <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" class="rounded-circle p-2  "> {% endif %}
                 </div>
             </div>
             <div class="col-xl-6 col-sm-6 col-lg-6">

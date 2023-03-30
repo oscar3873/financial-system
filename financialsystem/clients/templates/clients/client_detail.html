@@ -1,7 +1,12 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
 <!--Main-->
 <link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet">
-
+{% if messages %} {% for message in messages %}
+<div class="alert alert-primary alert-dismissible" role="alert">
+    <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+    <span class="font-weight-light">{{ message }}</span>
+</div>
+{% endfor %} {% endif %}
 {% if client.is_legals %}
     <div class="alert alert-danger text-center" role="alert">
         <h1 class="font-weight-bold">CLIENTE: {{client.first_name|upper}} {{client.last_name|upper}} <br> EN LEGALES</h1>
@@ -374,6 +379,7 @@
                                         <table class="table table-responsive-lg table-striped table-hover">
                                             <thead class="table text-white">
                                                 <h5 class="card-title text-center animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-sharp fa-solid fa-sync text-info"></i>&nbsp;{{installments.1.0}}</h5>
+                                                <div class="text-center"><a href="{% url 'credits:refinance_delete' installments.1.0.pk %}">Eliminar Refinanciacion</a></div>
                                             </thead>
                                             <tbody>
                                                 <!-- installments.0 es la cuota // installments.1 es la una lista que contiene la refinanciacion (_.1.0)(refinanciacion) y el formulario de pago de dicha refinanciacion (_.1.1)(formulario de pago) -->

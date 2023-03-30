@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import validate_email
 from django.forms import inlineformset_factory
+from clients.models import Client
 from guarantor.models import Guarantor, PhoneNumberGuarantor
 
 #FORMULARIO PARA LA CREACION DEL CLIENTE
@@ -138,12 +139,12 @@ class GuarantorUpdateForm(forms.ModelForm):
         if len(str(dni)) < 7 or  len(str(dni)) >= 15:
             raise forms.ValidationError("El DNI debe contener como mínimo 7 y máximo 15 caracteres")
 
-        try:
-            existing_guarantor = Guarantor.objects.get(dni=dni)
-            if self.instance.pk != existing_guarantor.pk:
-                raise forms.ValidationError("Ya existe un Cliente con DNI: %s" % dni )
-        except Guarantor.DoesNotExist:
-            pass
+        existing_guarantor = Guarantor.objects.filter(dni=dni).first()
+        existing_client = Client.objects.filter(dni=dni).first()
+        print(Guarantor.objects.filter(dni=dni).exists(), Client.objects.filter(dni=dni).exists())
+        if Guarantor.objects.filter(dni=dni).exists() or Client.objects.filter(dni=dni).exists():
+            if existing_guarantor != self.instance and existing_client != self.instance:
+                raise forms.ValidationError("El DNI {} ya registra".format(dni))
 
         return dni
 
@@ -171,12 +172,12 @@ class GuarantorUpdateForm(forms.ModelForm):
         except forms.ValidationError:
             raise forms.ValidationError("Ingrese un correo electrónico válido")
 
-        try:
-            existing_guarantor = Guarantor.objects.get(email=email)
-            if self.instance.pk != existing_guarantor.pk:
+        existing_guarantor = Guarantor.objects.filter(email=email).first()
+        existing_client = Client.objects.filter(email=email).first()
+
+        if Guarantor.objects.filter(email=email).exists() or Client.objects.filter(email=email).exists():
+            if existing_guarantor != self.instance and existing_client != self.instance:
                 raise forms.ValidationError("El correo: %s ya esta en uso" % email)
-        except Guarantor.DoesNotExist:
-            pass
 
         return email
 
@@ -219,7 +220,7 @@ class PhoneNumberFormGuarantor(forms.ModelForm):
             return None
         elif not phone_number_g.isdigit():
             raise forms.ValidationError("El número de teléfono debe contener solo dígitos")
-        elif len(phone_number_g) < 8 or len(phone_number_g) > 15:
+        elif len(phone_number_g) > 0 and (len(phone_number_g) < 8 or len(phone_number_g) > 15):
             raise forms.ValidationError("El numero debe contener como minimo 8 y 15 digitos")
         return phone_number_g    
     
@@ -238,5 +239,13 @@ PhoneNumberFormSetG = inlineformset_factory(
     PhoneNumberGuarantor, 
     form = PhoneNumberFormGuarantor,
     extra= 2,
+    can_delete= False,
+)
+
+PhoneNumberFormSetGUpdate = inlineformset_factory(
+    Guarantor, 
+    PhoneNumberGuarantor, 
+    form = PhoneNumberFormGuarantor,
+    extra= 0,
     can_delete= False,
 )

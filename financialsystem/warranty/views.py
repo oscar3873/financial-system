@@ -91,8 +91,6 @@ class WarrantyCreateView(LoginRequiredMixin, CreateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-
-
     def form_valid(self, form):
         """
         Validacion del formulario de credito.
@@ -126,8 +124,6 @@ class WarrantyDeleteView(LoginRequiredMixin, DeleteView):
 
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-
-
             
     def get_success_url(self) -> str:
         """

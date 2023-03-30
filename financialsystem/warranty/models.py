@@ -96,17 +96,18 @@ def sell_commission(instance, *args, **kwargs):
 
 
 def sell_delete(instance, origin=False, *args, **kwargs):
-    print(instance.commission)
-    if instance.commission:
-        instance.commission.delete()
-        instance.article.is_selled = False
-        instance.article.save()
+    try:
+        if instance.commission:
+            instance.commission.delete()
+            instance.article.is_selled = False
+            instance.article.save()
 
-    if not isinstance(origin,Movement):
-        instance.mov.delete()
-        instance.article.is_selled = False
-        instance.article.save()
-
+        if not isinstance(origin,Movement):
+            instance.mov.delete()
+            instance.article.is_selled = False
+            instance.article.save()
+    except:
+        pass
 
 pre_save.connect(sell_commission, sender=Sell)
 post_delete.connect(sell_delete, sender=Sell)

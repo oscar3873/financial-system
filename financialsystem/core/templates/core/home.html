@@ -22,10 +22,12 @@
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                         <span>Nuevo Credito</span>
                     </a>
+                    {% if request.user.is_superuser %}
                     <a name="" id="" class="btn btn-primary m-2 box-shadow rounded p-3" href="{% url 'signup' %}" role="button">
                         <i class="fa fa-user-plus" aria-hidden="true"></i>
                         <span>Nuevo Asesor</span>
                     </a>
+                    {% endif %}
                 </div>
             </article>
             <!--Cards-->
@@ -184,7 +186,7 @@
                         <div class="profile-content">
                             <div class="profile-name py-4">
                                 <p class="p-2 m-0"><i class="fas fa-user-circle text-warning"></i> Nombre Asesor</p>
-                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="img-fluid rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
+                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="  rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
                                 <p><i class="fa-solid fa-envelope text-warning"></i> @correo-asesor</p>
                                 <p><i class="fas fa-phone-alt text-warning"></i> +54-387-456678</p>
                             </div>
@@ -219,7 +221,7 @@
                         <div class="profile-content">
                             <div class="profile-name py-4">
                                 <p class="p-2 m-0"><i class="fas fa-user-circle text-warning"></i> Nombre Asesor</p>
-                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="img-fluid rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
+                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="  rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
                                 <p><i class="fa-solid fa-envelope text-warning"></i> @correo-asesor</p>
                                 <p><i class="fas fa-phone-alt text-warning"></i> +54-387-456678</p>
                             </div>
@@ -254,7 +256,7 @@
                         <div class="profile-content">
                             <div class="profile-name py-4">
                                 <p class="p-2 m-0"><i class="fas fa-user-circle text-warning"></i> Nombre Asesor</p>
-                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="img-fluid rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
+                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="  rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
                                 <p><i class="fa-solid fa-envelope text-warning"></i> @correo-asesor</p>
                                 <p><i class="fas fa-phone-alt text-warning"></i> +54-387-456678</p>
                             </div>

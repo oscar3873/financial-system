@@ -6,8 +6,6 @@ from clients.models import Client, PhoneNumberClient
 #------------------------------------------------------------------
 class ClientForm(forms.ModelForm):
     
-    prefix = "client"
-    
     CIVIL_STATUS = (
         ('S','Soltero'),
         ('C', 'Casado'),
@@ -31,7 +29,7 @@ class ClientForm(forms.ModelForm):
     )
     email = forms.EmailField(
         label= 'Correo',
-        required=True,
+        required=False,
     )
     civil_status = forms.ChoiceField(
         label="Estado Civil",
@@ -44,15 +42,15 @@ class ClientForm(forms.ModelForm):
     )
     profession = forms.CharField(
         label= "Profesion",
-        required=True,
+        required=False,
     )
     address = forms.CharField(
         label= "Domicilio",
-        required=True,
+        required=False,
     )
     job_address = forms.CharField(
         label= "Domicilio Laboral",
-        required=True,
+        required=False,
     )
     
     class Meta:
@@ -94,11 +92,9 @@ class ClientForm(forms.ModelForm):
         if len(str(dni)) < 7 or  len(str(dni)) >= 15:
             raise forms.ValidationError("El DNI debe contener como minimo 7 y maximo 15 caracteres")
 
-        # Verificar si ya existe un objeto con el mismo DNI en la base de datos
-        if not self.instance.pk:
-            if Client.objects.filter(dni=dni).exists():
-                raise forms.ValidationError("Ya existe un Cliente con este DNI")
-
+        if Client.objects.filter(dni=dni).exists():
+            if Client.objects.filter(dni=dni).first() != self.instance:
+                raise forms.ValidationError("Ya existe un Cliente con DNI {}".format(dni))
         return dni
     
     def clean_email(self):
@@ -106,17 +102,15 @@ class ClientForm(forms.ModelForm):
         Validar que el correo electrónico sea válido
         """
         email = self.cleaned_data.get('email')
-        # Validar formato de correo electrónico
-        if not self.instance.pk:
-            try:
-                validate_email(email)
-            except forms.ValidationError:
-                raise forms.ValidationError("Ingrese un correo electrónico válido")
 
-            # Verificar si ya existe un objeto con el mismo correo electrónico en la base de datos
-            if Client.objects.filter(email=email).exists():
-                raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico")
-
+        try:
+            validate_email(email)
+        except forms.ValidationError:
+            raise forms.ValidationError("Ingrese un correo electrónico válido")
+    
+        if Client.objects.filter(email=email).exists():
+            if Client.objects.filter(email=email).first() != self.instance:
+                raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico") 
         return email
 
     def __init__(self, *args, **kwargs):
@@ -124,6 +118,11 @@ class ClientForm(forms.ModelForm):
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
+            
+        if kwargs.get('prefix') == 'guarantor':
+            for field in self.fields.values():
+                field.required = False
+
 
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO
 #------------------------------------------------------------------

@@ -17,50 +17,54 @@
 
                                 <div class="form-row">
                                     {% if garante_form.errors or formsetPhoneGuarantor.errors %}
-                                    <ul class="error-list">
-                                        <li class="text-danger">Hay errores en el formulario de garantes, por favor corríjalos.</li>
-                                    </ul>
-                                    {% endif %} {% for field in cliente_form %} {% if field.errors %}
-                                    <ul class="errorlist">
-                                        {% for error in field.errors %}
-                                        <li class="text-danger">{{ error }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% endif %} {% endfor %}
+                                    {% if formsetPhoneGuarantor.errors.0 != formsetPhoneGuarantor.errors.1 %}
+                                        <ul class="error-list">
+                                            <li class="text-danger">Hay errores en el formulario de garantes, por favor corríjalos.</li>
+                                        </ul>
+                                        {% endif %} {% endif %} 
+                                    <!-- {% for field in cliente_form %} 
+                                        {% if field.errors %}
+                                            <ul class="errorlist">
+                                                {% for error in field.errors %}
+                                                <li class="text-danger">{{ error }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %} 
+                                    {% endfor %} -->
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.first_name.label}} {{cliente_form.first_name}}
+                                        {{cliente_form.first_name.label}} {{cliente_form.first_name}} <h5 class="text-danger">{{cliente_form.first_name.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}
+                                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}<h5 class="text-danger">{{cliente_form.last_name.errors}}</h5>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.email.label}} {{cliente_form.email}}
+                                        {{cliente_form.email.label}} {{cliente_form.email}}<h5 class="text-danger">{{cliente_form.email.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.dni.label}} {{cliente_form.dni}}
+                                        {{cliente_form.dni.label}} {{cliente_form.dni}}<h5 class="text-danger">{{cliente_form.dni.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}
+                                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}<h5 class="text-danger">{{cliente_form.civil_status.errors}}</h5>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.address.label}} {{cliente_form.address}}
+                                        {{cliente_form.address.label}} {{cliente_form.address}}<h5 class="text-danger">{{cliente_form.address.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}
+                                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}<h5 class="text-danger">{{cliente_form.job_address.errors}}</h5>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.profession.label}} {{cliente_form.profession}}
+                                        {{cliente_form.profession.label}} {{cliente_form.profession}}<h5 class="text-danger">{{cliente_form.profession.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.score.label}}{{cliente_form.score}}
+                                        {{cliente_form.score.label}}{{cliente_form.score}}<h5 class="text-danger">{{cliente_form.score.errors}}</h5>
                                     </div>
                                 </div>
                                 <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
@@ -99,6 +103,9 @@
                                     <i class="fa-solid fa-landmark text-warning"></i> &nbsp; Credito
                                 </h5>
                                 <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        {{credito_form.is_old_credit.label}} {{credito_form.is_old_credit.help_text}}{{credito_form.is_old_credit}}
+                                    </div>
                                     <div class="form-group col-md-12">
                                         {{credito_form.start_date.label}} {{credito_form.start_date}}
                                     </div>
@@ -190,10 +197,10 @@
                                 <div class="form-row">
                                     {{formsetPhoneGuarantor.management_form}} {% for phone_formG in formsetPhoneGuarantor %}
                                     <div class="form-group col-md-3">
-                                        {{phone_formG.phone_number_g.label}} {{phone_formG.phone_number_g}}
+                                        {{phone_formG.phone_number_c.label}} {{phone_formG.phone_number_c}}
                                     </div>
                                     <div class="form-group col-md-2">
-                                        {{phone_formG.phone_type_g.label}} {{phone_formG.phone_type_g}}
+                                        {{phone_formG.phone_type_c.label}} {{phone_formG.phone_type_c}}
                                     </div>
                                     {% endfor %}
                                 </div>

@@ -45,12 +45,14 @@ class Interest(models.Model):
     """
     Clase para podes asignar de manera uniboca los intereses por comisiones y puntajes para clientes
     """
+    interest_credit = models.DecimalField(max_digits=5, decimal_places=2, default=40, help_text="Interes general para creditos")
     interest_register = models.DecimalField(max_digits=5, decimal_places=2, default=7.5 , help_text="Comision por registro")
     interest_payment = models.DecimalField(max_digits=5, decimal_places=2, default=5, help_text="Comision por cobro")
     interest_sell = models.DecimalField(max_digits=5, decimal_places=2, default=2 , help_text="Comision por venta")
-    points_score_refinancing = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=2, default=80 , help_text="Puntos de score")
+    points_score_refinancing = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=2, default=80 , help_text="Puntos por refinanciacion pagada")
     points_score_credits = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=2, default=100 , help_text="Puntos por credito pagado")
-    daily_interest = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=2, default=2 , help_text="Disminucion de puntos por retraso diario")
+    daily_interest = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=2, default=5 , help_text="Disminucion de puntos por retraso diario")
+    porcentage_daily_interest = models.DecimalField(null=True, blank=True, max_digits=5, decimal_places=2, default=2 , help_text="Porcentaje de interes por retraso diario")
 
 
 #-------------------------- SEÑALES PARA COMMISSION --------------------------------------

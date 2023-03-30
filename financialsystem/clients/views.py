@@ -18,15 +18,15 @@ from .utils import all_properties_client
 
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 
 
 #CRUD CLIENT
-from django.views.generic import ListView, DetailView, DeleteView, UpdateView
+from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
 
 #FORMS
-from .forms import ClientForm, PhoneNumberFormSetUpdate
+from .forms import ClientForm, PhoneNumberFormSet, PhoneNumberFormSetUpdate
 #MODEL
 from .models import Client, PhoneNumberClient
 from credit.models import Refinancing
@@ -122,6 +122,32 @@ class ClientListView(LoginRequiredMixin, ListView):
         return reverse_lazy('clients:list')
     
 
+
+def clientCreate(request):
+    client_form = ClientForm(request.POST or None)
+    formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
+
+    if request.method == 'POST':
+        if client_form.is_valid and formsetPhoneClient.is_valid:
+            client = client_form.save(commit=False)
+            client.adviser = request.user.adviser
+            client.save()
+            phone_numbers = formsetPhoneClient.save(commit=False)
+            for phone_number in phone_numbers:
+                if phone_number.phone_number_c:
+                    phone_number.client = client
+                    phone_number.save()
+            messages.success(request, 'El cliente se ha guardado exitosamente.','success')
+            return redirect('clients:list')
+
+    context = {
+        'form': client_form,
+        'formsetPhoneClient': formsetPhoneClient,
+    }
+
+    return render(request, 'clients/client_form.html', context)
+
+
 #ACTUALIZACION DE UN CLIENTE
 #-----------------------------------------------------------------
 class ClientUpdateView(LoginRequiredMixin, UpdateView):
@@ -144,6 +170,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         if self.request.POST:
             context['phone_formset'] = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
         else:
+            context['form'] = ClientForm(instance = self.object)
             context['phone_formset'] = PhoneNumberFormSetUpdate(instance=self.object)
         return context
 
@@ -226,7 +253,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
                 # Get the related payments for the credit, order by payment_date in descending order, and get the first three
                 last_three_normal_payments = Payment.objects.filter(installment__in=credit.installments.all()).order_by('-payment_date')[:3]
                 
-                refinancing_installments = Installment.objects.filter(credit=credit, is_refinancing_installment=True)
+                refinancing_installments = Installment.objects.filter(credit=credit, refinance__isnull=False)
                 refinancing_installments_qs = list(itertools.chain(*[installment.refinance.installments.all() for installment in refinancing_installments]))
                 refinancing_installments_qs = InstallmentRefinancing.objects.filter(id__in=[installment_ref.id for installment_ref in refinancing_installments_qs])
 

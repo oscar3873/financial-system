@@ -4,6 +4,10 @@ from commissions.models import Interest
 
 class SettingsInterestForm(forms.ModelForm):
 
+    interest_credit = forms.DecimalField(
+        label="Interes general para creditos"
+    )
+
     interest_register = forms.DecimalField(
         label="Porcentaje de comision por registros"
     )
@@ -28,6 +32,9 @@ class SettingsInterestForm(forms.ModelForm):
         label="Puntaje a disminuir por interes diario"
     )
 
+    porcentage_daily_interest = forms.DecimalField(
+        label="Porcentaje de interes por retraso diario"
+    )
 
     class Meta:
         model = Interest

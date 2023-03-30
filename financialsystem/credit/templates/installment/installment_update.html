@@ -4,7 +4,22 @@
   <h1>Editar cuota {{ installment.installment_number }}</h1>
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    <div>
+      {{ form.amount.label }}{{ form.amount }}
+    </div>
+    <div>
+      {{ form.daily_interests.label }}{{ form.daily_interests }}
+    </div>
+    <div>
+      {{ form.end_date.label }}{{ form.end_date }}
+    </div>
+    <div>
+      {{ form.payment_date.label }}{{ form.payment_date }}
+    </div>
+    <div>
+      {{ form.condition.label }}{{ form.condition }}
+    </div>
     <button type="submit" class="btn btn-primary">Guardar</button>
   </form>
+
 {% endblock %}

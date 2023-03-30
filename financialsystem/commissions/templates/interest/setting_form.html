@@ -21,12 +21,27 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label for="interest_credit">{{ settings_form.interest_credit.label }}</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-warning text-white"><i class="fa fa-globe"></i></span>
+                                    </div>
+                                    {{ settings_form.interest_credit }}
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text "><i class="fa fa-percent"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label for="interest_register">{{ settings_form.interest_register.label }}</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text bg-warning text-white"><i class="fas fa-user-plus"></i></span>
                                     </div>
                                     {{ settings_form.interest_register }}
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-percent"></i></span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -36,6 +51,9 @@
                                         <span class="input-group-text bg-warning text-white"><i class="fas fa-hand-holding-usd"></i></span>
                                     </div>
                                     {{ settings_form.interest_payment }}
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-percent"></i></span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -45,6 +63,9 @@
                                         <span class="input-group-text bg-warning text-white"><i class="fas fa-tags"></i></span>
                                     </div>
                                     {{ settings_form.interest_sell }}
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-percent"></i></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -74,6 +95,18 @@
                                         <span class="input-group-text bg-warning text-white"><i class="fas fa-chart-line"></i></span>
                                     </div>
                                     {{ settings_form.daily_interest }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="porcentage_daily_interest">{{ settings_form.porcentage_daily_interest.label }}</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-warning text-white"><i class="fas fa-chart-line"></i></span>
+                                    </div>
+                                    {{ settings_form.porcentage_daily_interest }}
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-percent"></i></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

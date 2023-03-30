@@ -17,8 +17,8 @@
                         <!-- Avatar -->
                         <div class="col-md-2 text-center">
                             {% if adviser.avatar %}
-                            <img src="{{adviser.avatar.url}}" alt="avatar" class="rounded-circle img-fluid py-3 px-0"> {% else %}
-                            <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" class="rounded-circle img-fluid py-3 px-0"> {% endif %}
+                            <img src="{{adviser.avatar.url}}" alt="avatar" width="100px" height="100px" class="rounded-circle  "> {% else %}
+                            <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" width="100px" height="100px" class="rounded-circle  "> {% endif %}
                             <a class="btn btn-primary" href="{% url 'advisers:update' object.pk %}">Actualizar Avatar</a>
                         </div>
                         <!-- Campos -->
@@ -32,8 +32,8 @@
                         <!-- Avatar -->
                         <div class="col-md-2">
                             {% if adviser.avatar %}
-                            <img src="{{adviser.avatar.url}}" class="rounded-circle img-fluid"> {% else %}
-                            <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" class="rounded-circle p-2 img-fluid"> {% endif %}
+                            <img src="{{adviser.avatar.url}}" width="100px" height="100px" class="rounded-circle  "> {% else %}
+                            <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" width="100px" height="100px" class="rounded-circle p-2  "> {% endif %}
                         </div>
                         <!-- Campos -->
                         <div class="col-md-10">
