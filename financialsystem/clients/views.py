@@ -133,14 +133,12 @@ def clientCreate(request):
             client.adviser = request.user.adviser
             client.save()
             print(request.FILES)
-            # Procesar los archivos de Recibo de Sueldo si se enviaron en la solicitud
-            if request.FILES.getlist('salary'):
-                for imagen in request.FILES.getlist('salary'):
-                    Salary_check.objects.create(
-                        has_stub = True,
-                        salary=imagen,
-                        client=client
-                    )
+            for imagen in request.FILES.getlist('salary'):
+                Salary_check.objects.create(
+                    has_stub = True,
+                    salary = imagen,
+                    client = client
+                )
 
             phone_numbers = formsetPhoneClient.save(commit=False)
             for phone_number in phone_numbers:
@@ -148,11 +146,10 @@ def clientCreate(request):
                     phone_number.client = client
                     phone_number.save()
 
-            messages.success(request, 'El cliente se ha guardado exitosamente.', 'success')
+            messages.success(request, 'El cliente se ha guardado exitosamente.','success')
             return redirect('clients:list')
         else:
             client_form.errors
-
     context = {
         'form': client_form,
         'formsetPhoneClient': formsetPhoneClient,
