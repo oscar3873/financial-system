@@ -125,34 +125,37 @@ class ClientListView(LoginRequiredMixin, ListView):
 
 def clientCreate(request):
     client_form = ClientForm(request.POST or None)
-    formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
+    formset_phone_client = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix="phone_number_client")
 
     if request.method == 'POST':
         if client_form.is_valid():
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
+            
             print(request.FILES)
-            for imagen in request.FILES.getlist('salary'):
-                Salary_check.objects.create(
-                    has_stub = True,
-                    salary = imagen,
-                    client = client
-                )
+            if request.FILES.getlist('salary'):
+                for imagen in request.FILES.getlist('salary'):
+                    Salary_check.objects.create(
+                        has_stub=True,
+                        salary=imagen,
+                        client=client
+                    )
 
-            phone_numbers = formsetPhoneClient.save(commit=False)
+            phone_numbers = formset_phone_client.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_c:
                     phone_number.client = client
                     phone_number.save()
 
-            messages.success(request, 'El cliente se ha guardado exitosamente.','success')
+            messages.success(request, 'El cliente se ha guardado exitosamente.', 'success')
             return redirect('clients:list')
         else:
-            client_form.errors
+            messages.error(request, 'Ocurrió un error al guardar el cliente.', 'danger')
+
     context = {
         'form': client_form,
-        'formsetPhoneClient': formsetPhoneClient,
+        'formsetPhoneClient': formset_phone_client,
     }
 
     return render(request, 'clients/client_form.html', context)
