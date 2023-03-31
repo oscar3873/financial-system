@@ -9,7 +9,7 @@ def default_avatar(adviser):
     try:
         first_letter = adviser.user.first_name[0].upper()
     except:
-        first_letter = adviser.user.usernames[0].upper()
+        first_letter = adviser.user.username[0].upper()
 
     avatar_path = os.path.join('avatares', f'{first_letter}.png')
     print("----------------", avatar_path)

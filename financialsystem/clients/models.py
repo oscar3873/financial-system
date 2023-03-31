@@ -81,6 +81,9 @@ class PhoneNumberClient(models.Model):
 
 
 class Salary_check(models.Model):
+    
+    has_stub = models.BooleanField(default=False)
+
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Recibo de sueldo") #NUEVO , recibo de sueldo
     salary = models.ImageField(upload_to='salary_checks/', blank=True, null=True, default=None)
     # date_admission = models.DateField(default=datetime.now,verbose_name="Fecha de admision")

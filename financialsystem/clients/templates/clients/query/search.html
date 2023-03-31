@@ -1,8 +1,9 @@
 <form class="form" method="get" action="{% url 'clients:query' %}">
     <div class="form-group">
-        <input required type="text" name="search" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
         <i class="fa fa-search" aria-hidden="true"></i>
                 <span>Buscar cliente</span>
+        <input required type="text" name="search" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar Cliente por Nombre, Apellido o DNI">
+        
     </div>
     <ul id="search-results" class="list-group text-dark mt-3"></ul>
 </form>
