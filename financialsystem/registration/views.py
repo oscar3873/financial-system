@@ -9,14 +9,11 @@ from django import forms
 # Create your views here.
 class SignupView(LoginRequiredMixin, CreateView):
     form_class = UserCreationFormWithEmail
-    success_url = reverse_lazy('signup')
+    success_url = reverse_lazy('advisers:list')
     template_name = 'registration/signup.html'
     
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
-    def get_success_url(self) -> str:
-        return reverse_lazy('signup') + '?register'
     
     def get_form(self, form_class=None):
         form = super(SignupView, self).get_form()
@@ -30,5 +27,5 @@ class SignupView(LoginRequiredMixin, CreateView):
             user = form.save()
             adviser_group, created = Group.objects.get_or_create(name = 'adviser_group')
             adviser_group.user_set.add(user)
-        
+
         return form

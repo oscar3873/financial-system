@@ -1,10 +1,74 @@
 <form class="form" method="get" action="{% url 'clients:query' %}">
     <div class="form-group">
-        <input type="number" class="form-control rounded p-3 box-shadow" name="search" aria-describedby="helpId" placeholder="Ingresar DNI o Nombre y Apellido" value="{{ request.GET.search }}">
-
-        <button type="submit" class="btn btn-lg d-block mx-auto my-2  btn-secondary box-shadow">
-                <i class="fa fa-search" aria-hidden="true"></i>
+        <input required type="text" name="search" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
+        <i class="fa fa-search" aria-hidden="true"></i>
                 <span>Buscar cliente</span>
-            </button>
     </div>
+    <ul id="search-results" class="list-group text-dark mt-3"></ul>
 </form>
+<script>
+    const searchInput = document.querySelector('#search-input');
+    const searchResults = document.querySelector('#search-results');
+
+    searchInput.addEventListener('input', (event) => {
+        const searchTerm = event.target.value.trim().toLowerCase();
+
+        if (!searchTerm) {
+            // Limpiar los resultados de búsqueda si no hay término de búsqueda
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        // Realizar la búsqueda de clientes que coincidan con el término de búsqueda
+        fetch(`/credits/search/?search_term=${searchTerm}`)
+            .then(response => response.json())
+            .then(data => {
+                const clientes = data.clientes;
+
+                // Mostrar los resultados de búsqueda
+                searchResults.innerHTML = '';
+                clientes.forEach(cliente => {
+                    const item = document.createElement('li');
+                    item.style.zIndex = "9999";
+                    item.style.cursor = 'pointer';
+                    item.classList.add('list-group-item', 'client');
+                    item.dataset.clientId = cliente.id;
+                    item.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <h6>${cliente.full_name}</h6>
+                            <h6 class="font-weight-bold">&nbsp${cliente.dni}</h6>
+                        </div>
+                    `;
+                    searchResults.appendChild(item);
+                });
+            });
+    });
+
+    searchResults.addEventListener('click', (event) => {
+        const item = event.target.closest('.client');
+        if (!item) {
+            return;
+        }
+
+        const clientId = item.dataset.clientId;
+        const clientName = item.querySelector('h6').textContent;
+
+        // Rellenar el campo del cliente seleccionado y ocultar los resultados de búsqueda
+        searchInput.value = clientName;
+        searchResults.innerHTML = '';
+        // Añadir el id del cliente al formulario
+        const clientIdInput = document.createElement('input');
+        clientIdInput.type = 'hidden';
+        clientIdInput.name = 'selected_client_id';
+        clientIdInput.value = clientId;
+        searchInput.closest('form').appendChild(clientIdInput);
+    });
+    const form = document.querySelector('form');
+    form.addEventListener('submit', (event) => {
+        const selectedClientIdInput = document.querySelector('input[name="selected_client_id"]');
+        if (!selectedClientIdInput) {
+            event.preventDefault();
+            alert('Por favor, seleccione un cliente antes de guardar.');
+        }
+    });
+</script>
