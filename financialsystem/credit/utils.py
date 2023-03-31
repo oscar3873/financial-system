@@ -81,19 +81,16 @@ def refresh_installments_credits():
                 credit.payment_date = credit.installments.last().payment_date
                 credit.is_paid = True
                 credit.save()
-
     
 
 def search_client(request):
     search_terms = request.GET.get('search_term').split()
     clients=Client.objects.all()
     if search_terms:
-        # Separar el término de búsqueda en palabras
         for term in search_terms:
             q_objects = Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(dni__icontains=term)
             clients = clients.filter(q_objects)
         
-        # Serializar los resultados como un diccionario de Python
         data = {
             'clientes': [
                 {
@@ -108,18 +105,17 @@ def search_client(request):
 
     return JsonResponse(data)
 
+
 def search_credit(request):
     search_terms = request.GET.get('search_term').split()
     print(search_terms)
     credits=Credit.objects.all()
     if search_terms:
-        # Separar el término de búsqueda en palabras
         for term in search_terms:
             q_objects = Q(client__first_name__icontains=term) | Q(client__last_name__icontains=term) | Q(client__dni__icontains=term)
             credits = credits.filter(q_objects)
         
         print(credits)
-        # Serializar los resultados como un diccionario de Python
         data = {
             'credits': [
                 {
