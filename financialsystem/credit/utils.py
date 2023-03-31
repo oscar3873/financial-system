@@ -70,13 +70,13 @@ def refresh_installments_credits():
         for credit in credits_WPI: # WPI = With Paid Installments
             if credit.installments.filter(is_paid_installment=True).count() == credit.installments.count():
                 if isinstance(credit, Credit):
-                    credit.condition = 'Pagado'
-                
-                for installment in credit.installment_ref.all():
-                    installment.is_paid_installment = True
-                    installment.condition = 'Pagada'
-                    installment.payment_date = credit.installments.last().payment_date
-                    installment.save()
+                    credit.condition = 'Pagado' 
+                else:
+                    for installment in credit.installment_ref.all():
+                        installment.is_paid_installment = True
+                        installment.condition = 'Pagada'
+                        installment.payment_date = credit.installments.last().payment_date
+                        installment.save()
                     
                 credit.payment_date = credit.installments.last().payment_date
                 credit.is_paid = True
