@@ -1,9 +1,10 @@
 import os
-import sys
-import django
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import random
+from faker import Faker
 
+# Configura Django antes de importar los modelos
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'financialsystem.settings')
+import django
 django.setup()
 
 from faker import Faker
@@ -44,7 +45,7 @@ def create_fake_clients_and_phone_numbers(num_records):
         
         credit = Credit.objects.create(
             interest=40,
-            amount=fake.pydecimal(left_digits=6, right_digits=2, positive=True),
+            amount=fake.pydecimal(left_digits=5, right_digits=2, positive=True),
             installment_num=fake.random_int(min=1, max=12),
             start_date=fake.date_time_this_year(),
             client=client,
@@ -63,3 +64,6 @@ def create_fake_clients_and_phone_numbers(num_records):
         credit.save()
 
         print(f"Credit {credit.pk} created")
+if __name__ == '__main__':
+    num_records = 1000  # Establece el número de registros que deseas crear
+    create_fake_clients_and_phone_numbers(num_records)

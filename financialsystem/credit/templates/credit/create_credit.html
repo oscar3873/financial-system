@@ -16,12 +16,11 @@
                                 <h5 class="title p-2">Informacion basica</h5>
 
                                 <div class="form-row">
-                                    {% if garante_form.errors or formsetPhoneGuarantor.errors %}
-                                    {% if formsetPhoneGuarantor.errors.0 != formsetPhoneGuarantor.errors.1 %}
-                                        <ul class="error-list">
-                                            <li class="text-danger">Hay errores en el formulario de garantes, por favor corríjalos.</li>
-                                        </ul>
-                                        {% endif %} {% endif %} 
+                                    {% if garante_form.errors or formsetPhoneGuarantor.errors %} {% if formsetPhoneGuarantor.errors.0 != formsetPhoneGuarantor.errors.1 %}
+                                    <ul class="error-list">
+                                        <li class="text-danger">Hay errores en el formulario de garantes, por favor corríjalos.</li>
+                                    </ul>
+                                    {% endif %} {% endif %}
                                     <!-- {% for field in cliente_form %} 
                                         {% if field.errors %}
                                             <ul class="errorlist">
@@ -34,37 +33,46 @@
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.first_name.label}} {{cliente_form.first_name}} <h5 class="text-danger">{{cliente_form.first_name.errors}}</h5>
+                                        {{cliente_form.first_name.label}} {{cliente_form.first_name}}
+                                        <h5 class="text-danger">{{cliente_form.first_name.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}<h5 class="text-danger">{{cliente_form.last_name.errors}}</h5>
+                                        {{cliente_form.last_name.label}} {{cliente_form.last_name}}
+                                        <h5 class="text-danger">{{cliente_form.last_name.errors}}</h5>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.email.label}} {{cliente_form.email}}<h5 class="text-danger">{{cliente_form.email.errors}}</h5>
+                                        {{cliente_form.email.label}} {{cliente_form.email}}
+                                        <h5 class="text-danger">{{cliente_form.email.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.dni.label}} {{cliente_form.dni}}<h5 class="text-danger">{{cliente_form.dni.errors}}</h5>
+                                        {{cliente_form.dni.label}} {{cliente_form.dni}}
+                                        <h5 class="text-danger">{{cliente_form.dni.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}<h5 class="text-danger">{{cliente_form.civil_status.errors}}</h5>
+                                        {{cliente_form.civil_status.label}} {{cliente_form.civil_status}}
+                                        <h5 class="text-danger">{{cliente_form.civil_status.errors}}</h5>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.address.label}} {{cliente_form.address}}<h5 class="text-danger">{{cliente_form.address.errors}}</h5>
+                                        {{cliente_form.address.label}} {{cliente_form.address}}
+                                        <h5 class="text-danger">{{cliente_form.address.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}<h5 class="text-danger">{{cliente_form.job_address.errors}}</h5>
+                                        {{cliente_form.job_address.label}} {{cliente_form.job_address}}
+                                        <h5 class="text-danger">{{cliente_form.job_address.errors}}</h5>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        {{cliente_form.profession.label}} {{cliente_form.profession}}<h5 class="text-danger">{{cliente_form.profession.errors}}</h5>
+                                        {{cliente_form.profession.label}} {{cliente_form.profession}}
+                                        <h5 class="text-danger">{{cliente_form.profession.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-3">
-                                        {{cliente_form.score.label}}{{cliente_form.score}}<h5 class="text-danger">{{cliente_form.score.errors}}</h5>
+                                        {{cliente_form.score.label}}{{cliente_form.score}}
+                                        <h5 class="text-danger">{{cliente_form.score.errors}}</h5>
                                     </div>
                                     <div class="form-group col-md-3">
                                         {{cliente_form.has_pay_stub.label}}{{cliente_form.has_pay_stub}}
@@ -258,7 +266,7 @@
                         <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
                     </div>
                 </div>
-                <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Registrar Crédito</button>
+                <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Registrar Cliente</button>
                 <!-- Agregar el modal -->
                 <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">

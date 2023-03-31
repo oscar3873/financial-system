@@ -3,83 +3,91 @@
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de solicitud de servicios</h4>
     <form class="d-block" method="post">
         <section class="row">
-        <div class="col-md-4 order-first order-md-last">
-            {% if not is_update %}
-            <div class="form-group">
-                <label for="search-input"><h4>Buscar Cliente</h4></label>
-                <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
+            <div class="col-md-4 order-first order-md-last">
+                {% if not is_update %}
+                <div class="form-group">
+                    <label for="search-input"><h4>Buscar Cliente</h4></label>
+                    <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
+                </div>
+                <ul id="search-results" class="list-group text-dark mt-3"></ul>
+                {% endif %}
             </div>
-            <ul id="search-results" class="list-group text-dark mt-3"></ul>
-            {% endif %}
-        </div>
-        
-        <div class="col-md-8">
-            <div class="card box-shadow bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="title p-2">
-                        <i class="fa-solid fa-user text-warning"></i> &nbsp; Garante
-                    </h5>
-                    <h5 class="title p-2">Informacion basica</h5>
-                    {% csrf_token %}
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            {{form.first_name.label}} {{form.first_name}} <h5 class="text-danger">{{form.first_name.errors}}</h5>
+
+            <div class="col-md-8">
+                <div class="card box-shadow bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="title p-2">
+                            <i class="fa-solid fa-user text-warning"></i> &nbsp; Garante
+                        </h5>
+                        <h5 class="title p-2">Informacion basica</h5>
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{form.first_name.label}} {{form.first_name}}
+                                <h5 class="text-danger">{{form.first_name.errors}}</h5>
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{form.last_name.label}} {{form.last_name}}
+                                <h5 class="text-danger">{{form.last_name.errors}}</h5>
+                            </div>
                         </div>
-                        <div class="form-group col-md-6">
-                            {{form.last_name.label}} {{form.last_name}}<h5 class="text-danger">{{form.last_name.errors}}</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{form.email.label}} {{form.email}}
+                                <h5 class="text-danger">{{form.email.errors}}</h5>
+                            </div>
+                            <div class="form-group col-md-3">
+                                {{form.dni.label}} {{form.dni}}
+                                <h5 class="text-danger">{{form.dni.errors}}</h5>
+                            </div>
+                            <div class="form-group col-md-3">
+                                {{form.civil_status.label}} {{form.civil_status}}
+                                <h5 class="text-danger">{{form.civil_status.errors}}</h5>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            {{form.email.label}} {{form.email}}<h5 class="text-danger">{{form.email.errors}}</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{form.address.label}} {{form.address}}
+                                <h5 class="text-danger">{{form.address.errors}}</h5>
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{form.job_address.label}} {{form.job_address}}
+                                <h5 class="text-danger">{{form.job_address.errors}}</h5>
+                            </div>
                         </div>
-                        <div class="form-group col-md-3">
-                            {{form.dni.label}} {{form.dni}}<h5 class="text-danger">{{form.dni.errors}}</h5>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{form.profession.label}} {{form.profession}}
+                                <h5 class="text-danger">{{form.profession.errors}}</h5>
+                            </div>
                         </div>
-                        <div class="form-group col-md-3">
-                            {{form.civil_status.label}} {{form.civil_status}}<h5 class="text-danger">{{form.civil_status.errors}}</h5>
+                        <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
+                        <div class="form-row">
+                            <ul class="error-list">
+                                {% for form in formsetPhoneG %} {% for field in form %} {% for error in field.errors %}
+                                <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
+                            </ul> {{ formsetPhoneG.non_form_errors }}
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            {{form.address.label}} {{form.address}}<h5 class="text-danger">{{form.address.errors}}</h5>
-                        </div>
-                        <div class="form-group col-md-6">
-                            {{form.job_address.label}} {{form.job_address}}<h5 class="text-danger">{{form.job_address.errors}}</h5>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            {{form.profession.label}} {{form.profession}}<h5 class="text-danger">{{form.profession.errors}}</h5>
-                        </div>
-                    </div>
-                    <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
-                    <div class="form-row">
-                        <ul class="error-list">
-                            {% for form in formsetPhoneG %} {% for field in form %} {% for error in field.errors %}
-                            <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
-                        </ul> {{ formsetPhoneG.non_form_errors }}
-                    </div>
-                    <p>
-                        <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
+                        <p>
+                            <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
                             Añadir numeros de contacto
                         </button>
-                    </p>
-                    <div class="collapse" id="collapsePNC">
-                        <div class="form-row">
-                            {{formsetPhoneG.management_form}} {% for phone_form in formsetPhoneG %}
-                            <div class="form-group col-md-3">
-                                {{phone_form.phone_number_g.label}} {{phone_form.phone_number_g}}
+                        </p>
+                        <div class="collapse" id="collapsePNC">
+                            <div class="form-row">
+                                {{formsetPhoneG.management_form}} {% for phone_form in formsetPhoneG %}
+                                <div class="form-group col-md-3">
+                                    {{phone_form.phone_number_g.label}} {{phone_form.phone_number_g}}
+                                </div>
+                                <div class="form-group col-md-2">
+                                    {{phone_form.phone_type_g.label}} {{phone_form.phone_type_g}}
+                                </div>
+                                {% endfor %}
                             </div>
-                            <div class="form-group col-md-2">
-                                {{phone_form.phone_type_g.label}} {{phone_form.phone_type_g}}
-                            </div>
-                            {% endfor %}
                         </div>
                     </div>
                 </div>
-            </div>
-            <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Registrar Crédito</button>
+                <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Registrar garante</button>
                 <!-- Agregar el modal -->
                 <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
@@ -98,8 +106,9 @@
                         </div>
                     </div>
                 </div>
-        </form>
-    </div></section>
+    </form>
+    </div>
+    </section>
 </main>
 <script>
     const searchInput = document.querySelector('#search-input');

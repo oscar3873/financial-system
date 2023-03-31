@@ -1,16 +1,11 @@
-{% extends "core/base.html" %} 
-{% load crispy_forms_tags %}{% load static %} 
-
-{% block content %}
+{% extends "core/base.html" %} {% load crispy_forms_tags %}{% load static %} {% block content %}
 <main class="container my-4">
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Crear Crédito</h4>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Registrar Empeño</h4>
     <section>
         <form method="post">
-            {% csrf_token %}
-            {{ form }}
-            {% if not is_update %}
+            {% csrf_token %} {{ form }} {% if not is_update %}
             <div class="form-group">
-                <label for="search-input"><h4>Buscar Cliente</h4></label>
+                <label for="search-input"><h4>Buscar Credito</h4></label>
                 <input required type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
             </div>
             <ul id="search-results" class="list-group text-dark mt-3"></ul>

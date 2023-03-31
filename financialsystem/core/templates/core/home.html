@@ -21,12 +21,12 @@
                     <p>Nombre de usuario:<span class="font-weight-bold"> {{user.username}}</span></p>
                     <!--Botones de  Carga-->
                     <div class="mb-4" role="group" aria-label="Basic example">
-                        <a class="btn my-2 btn-secondary box-shadow" href="{% url 'credits:create_credit' %}" role="button">
+                        <a class="btn btn-secondary rounded mb-2 p-3 box-shadow" href="{% url 'credits:create_credit' %}" role="button">
                             <i class="fa fa-plus-circle" aria-hidden="true"></i>
                             <span>Nuevo Credito</span>
                         </a>
                         {% if request.user.is_superuser %}
-                        <a class="btn my-2 btn-secondary box-shadow" href="{% url 'signup' %}" role="button">
+                        <a class="btn btn-secondary rounded mb-2 p-3 box-shadow" href="{% url 'signup' %}" role="button">
                             <i class="fa fa-user-plus" aria-hidden="true"></i>
                             <span>Nuevo Asesor</span>
                         </a>
@@ -122,7 +122,7 @@
                                     </div>
                                 </li>
                                 {% empty %}
-                                <h5 class="title font-weight-normal text-center">No hay vencimientos</h5>
+                                <p>No hay vencimientos</p>
                                 {% endfor %}
                             </ul>
                             <div class="swiper-pagination"></div>
@@ -140,12 +140,12 @@
                         <!-- Additional required wrapper -->
                         <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
                             {% for note in notes %}
-                            <li class="swiper-slide list-group-item border-0 m-0 p-0">
+                            <li class="swiper-slide list-group-item border-0 m-0 p-0" style="background-color: #F5F7FA;">
                                 <link href="{% static 'note/css/note.css' %}" rel="stylesheet"> {% include "note/includes/note_card.html" %}
                             </li>
                             {% empty %}
                             <li class="swiper-slide list-group-item border-0" style="min-height: 150px;">
-                                <h5 class="title font-weight-normal text-center">No hay notas</h5>
+                                <p>No hay notas</p>
                             </li>
                             {% endfor %}
                         </ul>
@@ -161,14 +161,14 @@
         <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-hand-holding-dollar text-warning "></i>&nbsp; Ultimos Creditos</h5>
         <div class="row justify-content-center">
             <!--Tabla de Clientes del usuario-->
-            {% include "credit/includes/credit_table.html" %}
+            {% include "credit/includes/credit_table.html" with show_link=True %}
         </div>
     </section>
     <section class="mt-4">
         <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-users text-warning "></i>&nbsp; Ultimos Clientes</h5>
         <div class="row justify-content-center">
             <!--Tabla de Clientes del usuario-->
-            {% include "clients/includes/client_table.html" %}
+            {% include "clients/includes/client_table.html" with show_link=True %}
         </div>
     </section>
 </main>

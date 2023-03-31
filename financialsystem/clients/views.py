@@ -47,7 +47,7 @@ class ClientListView(LoginRequiredMixin, ListView):
     model = Client
     template_name = 'clients/client_list.html'
     ordering = ['-created_at']
-    paginate_by = 4
+    paginate_by = 10
     filter_class = ListingFilter
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
@@ -60,9 +60,17 @@ class ClientListView(LoginRequiredMixin, ListView):
         """
         refresh_condition()
         create_cashregister()
-        self.object_list = self.get_queryset()
-        context = super().get_context_data(**kwargs)
+
+        # Obtén los objetos clients filtrados
         clients = self.model.objects.all()
+        filtered_clients = ListingFilter(self.request.GET, clients)
+
+        # Pagina los objetos clients filtrados
+        paginator = Paginator(filtered_clients.qs, self.paginate_by)
+        page = self.request.GET.get('page')
+        clients_paginated = paginator.get_page(page)
+
+        context = super().get_context_data(**kwargs)
         # Etiqueta para el día actual
         today = timezone.now().date()
 
@@ -99,12 +107,13 @@ class ClientListView(LoginRequiredMixin, ListView):
         clients_top_credits = Client.objects.annotate(num_credits=Count('credits')).order_by('-num_credits')[:3]
         # Contextos
         context["count_clients_dict"] = count_clients_dict
-        context["clients"] = clients
         context["clients_top"] = clients_top
         context["clients_top_credits"] = clients_top_credits
         context["score_counts_list"] = score_counts_list
         context["properties"] = all_properties_client()
-        context["listing_filter"] = ListingFilter(self.request.GET, context['clients'])
+        # Reemplaza context["clients"] con los objetos clients paginados
+        context["clients"] = clients_paginated
+        context["listing_filter"] = filtered_clients
         return context
     
     def get_queryset(self):

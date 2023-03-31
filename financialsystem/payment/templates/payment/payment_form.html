@@ -8,7 +8,6 @@
         </div>
     </div>
     <!--Modal-->
-    
     <div class="modal fade" id="exampleModal{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active.pk}}" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content bg-primary text-white">
@@ -22,27 +21,25 @@
                     <div class="modal-body">
                         {% csrf_token %}
 
-                        <p>{{form_payment.amount.label}} {{form_payment.amount}}</p>  
+                        <p>{{form_payment.amount.label}} {{form_payment.amount}}</p>
                         <div class="form-row">
-                        <div class="form-group col-md-4">
-                            {{form_payment.payment_date.label}} {{form_payment.payment_date}}  
-                        </div>
-                        <div class="form-group col-md-4">
-                            {{form_payment.payment_time.label}} {{form_payment.payment_time}}
-                        </div>
-                        </div> 
-                        <p>{{form_payment.payment_method.label}} {{form_payment.payment_method}}</p>  
-                        <p>{{form_payment.amount_paid.label}} {{form_payment.amount_paid}}</p>
-                          
-                        {% for installment_field in form_payment %}
-                        {% if installment_field.name|slice:":5" == 'Cuota' %}
-                            <div class="form-group">
-                                <p>
-                                    {{installment_field.label}}: {{installment_field}}
-                                </p>
+                            <div class="form-group col-md-4">
+                                {{form_payment.payment_date.label}} {{form_payment.payment_date}}
                             </div>
-                        {% endif %}
-                        {% endfor %}
+                            <div class="form-group col-md-4">
+                                {{form_payment.payment_time.label}} {{form_payment.payment_time}}
+                            </div>
+                        </div>
+                        <p>{{form_payment.payment_method.label}} {{form_payment.payment_method}}</p>
+                        <p>{{form_payment.amount_paid.label}} {{form_payment.amount_paid}}</p>
+
+                        {% for installment_field in form_payment %} {% if installment_field.name|slice:":5" == 'Cuota' %}
+                        <div class="form-group">
+                            <p>
+                                {{installment_field.label}}: {{installment_field}}
+                            </p>
+                        </div>
+                        {% endif %} {% endfor %}
                         <input type="button" id="select-all-button{{credit_active.pk}}" value="Seleccionar/Deseleccionar todo" style="background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer;">
 
                     </div>
@@ -68,9 +65,9 @@
             console.log(checkboxes_p);
             var total = 0;
             checkboxes_p.forEach(function(checkbox) {
-            if (checkbox.checked) {
-                total += parseFloat(checkbox.value);
-            }
+                if (checkbox.checked) {
+                    total += parseFloat(checkbox.value);
+                }
             });
 
             amountElement.innerHTML = total.toFixed(2);
@@ -80,18 +77,18 @@
         function selectAll() {
             var allSelected = true;
             checkboxes_p.forEach(function(checkbox) {
-            if (!checkbox.checked) {
-                allSelected = false;
-            }
+                if (!checkbox.checked) {
+                    allSelected = false;
+                }
             });
             if (allSelected) {
-            checkboxes_p.forEach(function(checkbox) {
-                checkbox.checked = false;
-            });
+                checkboxes_p.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
             } else {
-            checkboxes_p.forEach(function(checkbox) {
-                checkbox.checked = true;
-            });
+                checkboxes_p.forEach(function(checkbox) {
+                    checkbox.checked = true;
+                });
             }
 
             sumar();
@@ -100,8 +97,8 @@
         checkboxes_p.forEach(function(checkbox) {
             // Verifica si la función ya ha sido asignada antes de volver a asignarla
             if (!assignedFunctions.hasOwnProperty(checkbox.id)) {
-            checkbox.addEventListener("click", sumar);
-            assignedFunctions[checkbox.id] = sumar;
+                checkbox.addEventListener("click", sumar);
+                assignedFunctions[checkbox.id] = sumar;
             }
         });
 
@@ -110,7 +107,7 @@
             selectAllButton.addEventListener("click", selectAll);
             assignedFunctions[selectAllButton.id] = selectAll;
         }
-        }
+    }
 </script>
 
 {% endblock content %}
