@@ -1,6 +1,6 @@
 <form class="form" method="get" action="{% url 'clients:query' %}">
     <div class="form-group">
-        <input class="form-control rounded p-3 box-shadow" name="search" aria-describedby="helpId" placeholder="Ingresar DNI o Nombre y Apellido" value="{{ request.GET.search }}">
+        <input type="number" class="form-control rounded p-3 box-shadow" name="search" aria-describedby="helpId" placeholder="Ingresar DNI" value="{{ request.GET.search }}">
 
         <button type="submit" class="btn btn-lg d-block mx-auto my-2  btn-secondary box-shadow">
                 <i class="fa fa-search" aria-hidden="true"></i>

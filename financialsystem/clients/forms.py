@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import validate_email
 from django.forms import inlineformset_factory
-from clients.models import Client, PhoneNumberClient, Salary_check
+from clients.models import Client, PhoneNumberClient
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
 
@@ -54,10 +54,14 @@ class ClientForm(forms.ModelForm):
         required=False,
     )
     
+    has_pay_stub = forms.BooleanField(
+        label='Recibo de sueldo',
+        required=False
+    )
 
     class Meta:
         model = Client
-        fields = ['first_name', 'last_name', 'email', 'civil_status', 'dni', 'profession', 'address', 'score', 'job_address']
+        fields = ['first_name', 'last_name', 'email', 'civil_status', 'dni', 'profession', 'address', 'score', 'job_address', 'has_pay_stub']
 
 
     def clean_first_name(self):

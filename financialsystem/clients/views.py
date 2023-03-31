@@ -28,7 +28,7 @@ from django.views.generic import ListView, DetailView, DeleteView, UpdateView, C
 #FORMS
 from .forms import *
 #MODEL
-from .models import Client, PhoneNumberClient, Salary_check
+from .models import Client, PhoneNumberClient
 from credit.models import Refinancing
 from credit.forms import RefinancingForm
 
@@ -133,15 +133,6 @@ def clientCreate(request):
             client.adviser = request.user.adviser
             client.save()
             
-            print(request.FILES)
-            if request.FILES.getlist('salary'):
-                for imagen in request.FILES.getlist('salary'):
-                    Salary_check.objects.create(
-                        has_stub=True,
-                        salary=imagen,
-                        client=client
-                    )
-
             phone_numbers = formset_phone_client.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_c:

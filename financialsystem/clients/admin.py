@@ -4,6 +4,7 @@ from .models import *
 class ClientAdmin(admin.ModelAdmin):
     list_display = (
         'id',
+        'has_pay_stub',
         'first_name',
         'last_name', 
         'address',
@@ -25,15 +26,6 @@ class PhoneNumberAdmin(admin.ModelAdmin):
         'created_at'
     )  
 
-class Salary_checkAdmin(admin.ModelAdmin):
-    list_display = (
-        'salary',
-        'client',
-        # 'date_admission',
-        'created_at',
-        'updated_at',
-    )   
 
 admin.site.register(Client, ClientAdmin)
-admin.site.register(Salary_check, Salary_checkAdmin)
 admin.site.register(PhoneNumberClient, PhoneNumberAdmin)

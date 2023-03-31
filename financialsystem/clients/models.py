@@ -22,6 +22,7 @@ class Client(models.Model):
         ('Riesgoso' , 'Riesgoso')
     ]
     is_legals = models.BooleanField(blank=True, default=False, null=True, verbose_name="Legales")
+    has_pay_stub = models.BooleanField(blank=True, default=False, null=True, verbose_name="Recibo de sueldo")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=50, help_text="First name", verbose_name="Nombre")
@@ -78,11 +79,3 @@ class PhoneNumberClient(models.Model):
     def __str__(self) -> str:
         return self.phone_number_c or ""
     
-
-
-class Salary_check(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Recibo de sueldo") #NUEVO , recibo de sueldo
-    salary = models.ImageField(upload_to='salary_checks/', blank=True, null=True, default=None)
-    # date_admission = models.DateField(default=datetime.now,verbose_name="Fecha de admision")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)

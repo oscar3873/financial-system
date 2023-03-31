@@ -13,7 +13,7 @@ from cashregister.utils import create_movement, create_cashregister
 from .utils import *
 
 from .models import Credit, Installment, InstallmentRefinancing
-from clients.models import Client, Salary_check
+from clients.models import Client
 from guarantor.models import Guarantor
 
 from .forms import *
@@ -39,12 +39,7 @@ def crear_credito(request):
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
-            print(request.FILES)
-            for imagen in request.FILES.getlist('salary'):
-                Salary_check.objects.create(
-                    salary = imagen,
-                    client = client
-                )
+
             phone_numbers = formsetPhoneClient.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_c:

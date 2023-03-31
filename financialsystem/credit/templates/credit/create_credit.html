@@ -66,6 +66,9 @@
                                     <div class="form-group col-md-3">
                                         {{cliente_form.score.label}}{{cliente_form.score}}<h5 class="text-danger">{{cliente_form.score.errors}}</h5>
                                     </div>
+                                    <div class="form-group col-md-3">
+                                        {{cliente_form.has_pay_stub.label}}{{cliente_form.has_pay_stub}}
+                                    </div>
                                 </div>
                                 <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
                                 <div class="form-row">
@@ -89,12 +92,6 @@
                                             {{phone_form.phone_type_c.label}} {{phone_form.phone_type_c}}
                                         </div>
                                         {% endfor %}
-                                    </div>
-                                </div>
-                                <div class="form-group mt-6">
-                                    <h5 class="title p-2"><i class="fa-solid fa-file-text text-warning"></i>&nbsp;Recibo de Sueldo</h5>
-                                    <div id="salary-container">
-                                        <a href="#" id="agregar-salary" class="btn btn-secondary">Agregar imagen</a>
                                     </div>
                                 </div>
                             </div>
@@ -318,48 +315,6 @@
             });
         }
     }
-</script>
-<script>
-    const salaryContainer = document.getElementById('salary-container');
-    const agregarSalaryButton = document.getElementById('agregar-salary');
-
-    agregarSalaryButton.onclick = () => {
-        const salarioInput = document.createElement('input');
-        salarioInput.type = 'file';
-        salarioInput.name = 'salary';
-        salarioInput.accept = 'image/*';
-        salarioInput.style.display = 'none';
-        salarioInput.multiple = true;
-        salaryContainer.appendChild(salarioInput);
-        salarioInput.click();
-
-        salarioInput.onchange = () => {
-            for (let i = 0; i < salarioInput.files.length; i++) {
-                const file = salarioInput.files[i];
-
-                const salaryFileNameContainer = document.createElement('div');
-                salaryFileNameContainer.className = 'salary-file-name-container';
-
-                const salaryFileName = document.createElement('span');
-                salaryFileName.textContent = file.name;
-                salaryFileName.className = 'salary-file-name';
-
-                const deleteSalaryButton = document.createElement('a');
-                deleteSalaryButton.href = '#';
-                deleteSalaryButton.className = 'delete-salary btn btn-sm btn-danger';
-                deleteSalaryButton.textContent = 'Eliminar';
-
-                salaryFileNameContainer.appendChild(salaryFileName);
-                salaryFileNameContainer.appendChild(deleteSalaryButton);
-                salaryContainer.appendChild(salaryFileNameContainer);
-
-                deleteSalaryButton.onclick = () => {
-                    salaryFileNameContainer.remove();
-                    salarioInput.remove();
-                };
-            }
-        };
-    };
 </script>
 
 {% endblock %}
