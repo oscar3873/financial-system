@@ -61,20 +61,10 @@ def paid_commission(instance, *args, **kwargs):
     Calcula el valor real de la comisión basado en la última tasa de interés almacenada. 
     Actualiza el monto y la tasa de interés de la instancia, y el tiempo de última actualización.'''
 
-    if instance.is_paid:
-        instance.mov = Movement.objects.create(
-            user = instance.adviser,
-            amount = instance.amount,
-            cashregister = CashRegister.objects.last(),
-            operation_mode = 'EGRESO',
-            description = 'COMISION %s - %s' % (instance.adviser, instance.type),
-            money_type= instance.money_type
-        )
-    else: # INICIALIZA POR DEFAULT LOS VALORES DEL MOMENTO ALMACENADOS EN Interest 
-        match(instance.type):
-            case 'REGISTRO': instance.interest = Interest.objects.first().interest_register
-            case 'COBRO': instance.interest = Interest.objects.first().interest_payment
-            case _ : instance.interest = Interest.objects.first().interest_sell
+    match(instance.type):
+        case 'REGISTRO': instance.interest = Interest.objects.first().interest_register
+        case 'COBRO': instance.interest = Interest.objects.first().interest_payment
+        case _ : instance.interest = Interest.objects.first().interest_sell
             
 
 def delete_commission_mov(instance, *args, **kwargs):

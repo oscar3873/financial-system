@@ -10,7 +10,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-from .forms import UpdateUserForm
+from cashregister.models import Movement, CashRegister
 
 from braces.views import GroupRequiredMixin
 
@@ -101,29 +101,28 @@ def pay_commission(request, pk):
     '''Función que maneja la vista para pagar una comisión'''
 
     refresh_condition()
-
+    commission = Commission.objects.get(id=pk)
     try:
-        commission = Commission.objects.get(id=pk)
-    except Commission.DoesNotExist:
-        return redirect('advisers:detail', pk=commission.adviser.id)
-
-    if commission.is_paid:
-        messages.error(request, "Esta comisión ya ha sido pagada.")
-        return redirect('advisers:detail', pk=commission.adviser.id)
+        porcentage_value = Decimal(request.POST.get('porcentage'))
+    except :
+        porcentage_value = commission.interest
+    real_value = Decimal(round((commission.amount*100)/commission.interest))  # Calculo para saber el monto original (el 100%)
 
     commission.is_paid = True
-    porcentage_value = Decimal(request.POST.get('porcentage'))
-    real_value = Decimal(round((commission.amount*100)/commission.interest))  # Calculo para saber el monto original (el 100%)
-    
     commission.amount = Decimal(real_value*(porcentage_value/100)) # Monto de la comision   
     commission.operation_amount = real_value 
     commission.interest = Decimal(porcentage_value)
     commission.last_up = datetime.now()
-    
+    commission.mov = Movement.objects.create(
+        user = commission.adviser,
+        amount = commission.amount,
+        cashregister = CashRegister.objects.last(),
+        operation_mode = 'EGRESO',
+        description = 'COMISION %s - %s' % (commission.adviser, commission.type),
+        money_type= commission.money_type
+    )
     commission.save()
-
-    messages.success(request, "La comisión se ha pagado exitosamente.")
-    request.session['success_message'] = "La comisión se ha pagado exitosamente." # almacenar mensaje en la sesión
+    messages.error(request, "Esta comisión ya ha sido pagada.")
     return redirect('advisers:detail', pk=commission.adviser.id)
 
 class AdviserUpdateView(UpdateView):
