@@ -132,11 +132,12 @@ def clientCreate(request):
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
-
+            print(request.FILES)
             # Procesar los archivos de Recibo de Sueldo si se enviaron en la solicitud
             if request.FILES.getlist('salary'):
                 for imagen in request.FILES.getlist('salary'):
                     Salary_check.objects.create(
+                        has_stub = True,
                         salary=imagen,
                         client=client
                     )

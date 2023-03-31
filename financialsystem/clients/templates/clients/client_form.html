@@ -77,13 +77,8 @@
                             </div>
                             <div class="form-group mt-6">
                                 <h5 class="title p-2"><i class="fa-solid fa-file-text text-warning"></i>&nbsp;Recibo de Sueldo</h5>
-                                <div>
-                                    <input type="checkbox" id="agregar-imagen-check" name="check-salary">
-                                    <label for="agregar-imagen-check">Tiene Recibo de sueldo</label>
-                                    <div id="agregar-imagen-collapse" style="display: none;">
-                                        <div id="salary-container"></div>
-                                        <a href="#" id="agregar-salary" class="btn btn-secondary">Agregar Comprobante</a>
-                                    </div>
+                                <div id="salary-container">
+                                    <a href="#" id="agregar-salary" class="btn btn-secondary">Agregar imagen</a>
                                 </div>
                             </div>
                         </div>
@@ -114,15 +109,12 @@
     </div>
 </main>
 <script>
-    const agregarImagenCheck = document.querySelector('#agregar-imagen-check');
-    const agregarImagenCollapse = document.querySelector('#agregar-imagen-collapse');
     const salaryContainer = document.getElementById('salary-container');
     const agregarSalaryButton = document.getElementById('agregar-salary');
     const salarioInput = document.createElement('input');
     salarioInput.type = 'file';
     salarioInput.name = 'salary';
-    salarioInput.accept = 'image/*, application/pdf'; // Acepta solo imágenes y PDFs
-    salarioInput.multiple = true;
+    salarioInput.accept = 'image/*, application/pdf';
     salarioInput.style.display = 'none';
 
     agregarSalaryButton.onclick = () => {
@@ -130,37 +122,27 @@
     };
 
     salarioInput.onchange = () => {
-        const files = salarioInput.files;
-        for (let i = 0; i < files.length; i++) {
-            const salaryFileNameContainer = document.createElement('div');
-            salaryFileNameContainer.className = 'salary-file-name-container';
+        const salaryFileNameContainer = document.createElement('div');
+        salaryFileNameContainer.className = 'salary-file-name-container';
 
-            const salaryFileName = document.createElement('span');
-            salaryFileName.textContent = files[i].name;
-            salaryFileName.className = 'salary-file-name';
+        const salaryFileName = document.createElement('span');
+        salaryFileName.textContent = salarioInput.files[0].name;
+        salaryFileName.className = 'salary-file-name';
 
-            const deleteSalaryButton = document.createElement('a');
-            deleteSalaryButton.href = '#';
-            deleteSalaryButton.className = 'delete-salary btn btn-sm btn-danger';
-            deleteSalaryButton.textContent = 'Eliminar';
+        const deleteSalaryButton = document.createElement('a');
+        deleteSalaryButton.href = '#';
+        deleteSalaryButton.className = 'delete-salary btn btn-sm btn-danger';
+        deleteSalaryButton.textContent = 'Eliminar';
 
-            salaryFileNameContainer.appendChild(salaryFileName);
-            salaryFileNameContainer.appendChild(deleteSalaryButton);
-            salaryContainer.appendChild(salaryFileNameContainer);
+        salaryFileNameContainer.appendChild(salaryFileName);
+        salaryFileNameContainer.appendChild(deleteSalaryButton);
+        salaryContainer.appendChild(salaryFileNameContainer);
 
-            deleteSalaryButton.onclick = () => {
-                salaryFileNameContainer.remove();
-            };
-        }
+        deleteSalaryButton.onclick = () => {
+            salaryFileNameContainer.remove();
+            salarioInput.value = null;
+        };
     };
-
-    agregarImagenCheck.addEventListener('change', () => {
-        if (agregarImagenCheck.checked) {
-            agregarImagenCollapse.style.display = 'block';
-        } else {
-            agregarImagenCollapse.style.display = 'none';
-        }
-    });
 </script>
 
 {% endblock content %}
