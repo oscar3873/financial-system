@@ -128,7 +128,7 @@ def clientCreate(request):
     formset_phone_client = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix="phone_number_client")
 
     if request.method == 'POST':
-        if client_form.is_valid():
+        if client_form.is_valid() and formset_phone_client.is_valid():
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()

@@ -155,6 +155,10 @@ def make_payment_installment(request, pk):
             points_per_installments = interest.points_score_credits if isinstance(installments, Installment) else interest.points_score_refinancing
             score = round((points_per_installments/installments_score) * count_value)
             client.score += score
+
+            if (client.score + score) > 1500:
+                client.score = 1500
+                
             client.save()
             
     return redirect('clients:detail', pk=client.pk)

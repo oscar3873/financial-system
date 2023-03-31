@@ -38,11 +38,13 @@ def refresh_condition():
 def for_refresh(obj_with_vencidas):
     for installment_ven in obj_with_vencidas.filter(end_date__date__lt=date.today()).exclude(condition = 'Pagada'):
         if isinstance(installment_ven, Installment):
-            client = installment_ven.credit.client
+            credit = installment_ven.credit
+            client = credit.client
             if not installment_ven.is_refinancing_installment:
                 installment_ven.condition = 'Vencida'
         else:
-            client = installment_ven.refinancing.installment_ref.last().credit.client
+            credit = installment_ven.refinancing.installment_ref.last().credit
+            client = credit.client
             installment_ven.condition = 'Vencida' 
 
         installment_ven.is_caduced_installment = True
@@ -57,10 +59,23 @@ def for_refresh(obj_with_vencidas):
             dates = date.today()
 
         resto = abs((date.today() - dates).days)
-        client.score -= Interest.objects.first().daily_interest*resto
         installment_ven.daily_interests += resto * installment_ven.amount * Decimal(installment_ven.porcentage_daily_interests/100)
         installment_ven.lastup = date.today()
         installment_ven.save()
+
+        daily_interest = Interest.objects.first().daily_interest
+
+        if isinstance(credit, Credit):
+            if not credit.is_old_credit and (client.score - daily_interest * resto < 1):
+                client.score = 0
+            else:
+                client.score -= daily_interest * resto
+        else:
+            if client.score - daily_interest * resto < 1:
+                client.score = 0
+            else:
+                client.score -= daily_interest * resto
+
         client.save()
 
 

@@ -48,7 +48,7 @@ def crear_credito(request):
                     
             credit = credit_form.save(commit=False)
             credit.client = client
-            credit.is_new = True
+            credit.is_old_credit = False
             if not credit.is_old_credit:
                 credit.mov = create_movement(credit, request.user.adviser)
             credit.save()
@@ -180,7 +180,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             # Asignar el crédito al cliente correspondiente
             client = get_object_or_404(Client, pk=selected_client_id)
             credit = form.save(commit=False)
-            credit.is_new = True
+            credit.is_old_credit = False
             credit.client = client
             if not credit.is_old_credit:
                 credit.mov = create_movement(credit, self.request.user.adviser)
@@ -233,7 +233,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
 
         if form.is_valid():
             credit = form.save(commit=False)
-            credit.is_new = True
+            credit.is_old_credit = False
             credit.client = self.client
             if not credit.is_old_credit:
                 credit.mov = create_movement(credit, self.request.user.adviser)
@@ -262,8 +262,7 @@ def edit_credit(request, pk):
             credit = form.save(commit=False)
 
             if (credit_copy.end_date != credit.end_date) or (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.interest != credit.interest) or (credit_copy.installment_num != credit.installment_num):
-                print('ASDASDA#####################')
-                credit.is_new = True
+                credit.is_old_credit = False
                 credit.save()
                 
             messages.success(request,'Cambios realizados exitosamente')

@@ -20,7 +20,7 @@ class Credit(models.Model):
     is_active = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False, help_text="El credito esta pagado")
     is_old_credit = models.BooleanField(default=False, help_text="Es un credito antiguo")
-    is_new = models.BooleanField(default=False, help_text="Se han modificados algunos campos") # PARA REALIZAR UN UPDATE BASADO EN CAMBIOS DE CAMPOS
+    # is_new = models.BooleanField(default=False, help_text="Se han modificados algunos campos") # PARA REALIZAR UN UPDATE BASADO EN CAMBIOS DE CAMPOS
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
@@ -158,7 +158,7 @@ def repayment_amount_auto(instance, *args, **kwargs):
     """
     credit = instance
     
-    if credit.is_new:
+    if not credit.is_old_credit:
         credit.end_date = (timedelta(days=30)*credit.installment_num) + credit.start_date
         repayment_amount = credit.installment_num*(Decimal(credit.interest/100)*credit.amount)/(1-pow((1+Decimal(credit.interest/100)),(- credit.installment_num)))
         credit.credit_repayment_amount = Decimal(repayment_amount)
@@ -178,7 +178,7 @@ def create_installments_auto(instance, created, *args, **kwargs):
     Borra las cuotas aderidas en caso de actualizacion de campos sencibles:
             ('amount', 'installment_num', 'interest')
     """
-    if instance.is_new or created:
+    if not instance.is_old_credit or created:
         instance.installments.all().delete() # Actualizacion de credito (crea nuevas cuotas en base los nuevos datos del credito, borrando las cuotas anteriores)
         try:
             for installment_with_ref in instance.installments.filter(refinance__isnull=False):
@@ -204,8 +204,9 @@ def create_installments_auto(instance, created, *args, **kwargs):
                 lastup=end_date
                 )
             days += 30
-    if instance.is_new:
-        instance.is_new = False
+
+    if not instance.is_old_credit:
+        instance.is_old_credit = True
         instance.save()
 
 
