@@ -43,7 +43,7 @@ def create_fake_clients_and_phone_numbers(num_records):
         )
         
         credit = Credit.objects.create(
-            credit_interest=40,
+            interest=40,
             amount=fake.pydecimal(left_digits=6, right_digits=2, positive=True),
             installment_num=fake.random_int(min=1, max=12),
             start_date=fake.date_time_this_year(),

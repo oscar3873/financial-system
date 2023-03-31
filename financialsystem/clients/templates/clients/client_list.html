@@ -104,92 +104,11 @@
                     </div>
                 </div>
                 <div class="col-xl-12 col-sm-12 col-lg-12">
-                    {% if clients %}
                     <div class="card box-shadow">
                         <div class="card-body">
                             <h5 class="text-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-users"></i> &nbsp;Clientes</h5>
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-primary text-white">
-                                        <tr>
-                                            <th scope="col">
-                                                <i class="fa fa-user text-warning"></i> Nombre
-                                            </th>
-                                            <th scope="col">
-                                                <i class="fa fa-id-card text-warning"></i> DNI
-                                            </th>
-                                            <th scope="col">
-                                                <i class="fa fa-users text-warning"></i> Asesor
-                                            </th>
-                                            <th scope="col">
-                                                <i class="fa fa-calendar text-warning"></i> Fecha
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for client in page_obj %}
-                                        <tr class="open-offcanvas" style="cursor: pointer;" data-info='{"first_name":"{{client.first_name}}","last_name":"{{client.last_name}}","dni":"{{client.dni}}","email":"{{client.email}}","created_at":"{{client.created_at}}","adviser":"{{client.adviser}}","address":"{{client.address}}","id":"{{client.id}}","adviser_id":"{{client.adviser.id}}","job_address":"{{client.job_address}}","profession":"{{client.profession}}","score":"{{client.score}}","civil_status":"{{client.get_civil_status_display}}","phone_numbers":"{{client.phonenumberclient_set.all}}"}'>
-                                            <td>{{client.first_name}} {{client.last_name}}</td>
-                                            <td>{{client.dni}}</td>
-                                            <td>{{client.adviser}}</td>
-                                            <td>{{client.created_at|date}}</td>
-                                        </tr>
-                                        <!--Delete Modal-->
-                                        <div class="modal fade" id="exampleModal{{client.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{client.pk}}" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content bg-primary text-white">
-                                                    <form method="POST" action="{% url 'clients:delete' client.id %}">
-                                                        {% csrf_token %}
-                                                        <div class="modal-header bg-primary text-white">
-                                                            <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
-                                                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                                                                <span aria-hidden="true">&times;</span>
-                                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <span>Esta seguro que desea borrar al cliente</span>
-                                                            <strong>{{client.first_name}}, {{client.last_name}} </strong>?
-                                                            <p>DNI: <strong>{{ client.dni }}</strong></p>
-                                                            <p>Registrado el <strong>{{client.created_at}}</strong></p>
-                                                            <p>Por el asesor <strong class="text-warning">{{client.adviser}}</strong></p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button class="btn btn-danger">Si, borrar</button>
-                                                            <button type="button" class="btn btn-secondary m-2 p-2" data-dismiss="modal">Cerrar</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--End Delete Modal-->
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="">
-                                <ul class="pagination justify-content-center">
-                                    {% if page_obj.has_previous %}
-                                    <li class="page-item"><a class="page-link bg-primary text-white" href="?page=1">&laquo; primero</a></li>
-                                    <li class="page-item"><a class="page-link bg-primary text-white" href="?page={{ page_obj.previous_page_number }}">anterior</a></li> {% endif %}
-
-                                    <li class="page-item">
-                                        <a class="page-link bg-primary text-white">
-                                    {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                                </a> {% if page_obj.has_next %}
-                                    </li>
-                                    <li class="page-item"><a class="page-link bg-primary text-white" href="?page={{ page_obj.next_page_number }}">siguiente</a></li>
-                                    <li class="page-item"><a class="page-link bg-primary text-white" href="?page={{ page_obj.paginator.num_pages }}">ultimo &raquo;</a> {% endif %}</li>
-                                </ul>
-                            </div>
+                            {% include "clients/includes/client_table.html" %}
                         </div>
-                        <div class="card-footer p-1 bg-primary rounded-bottom"></div>
-                        {% else %}
-                        <div class="card box-shadow">
-                            <div class="card-body">
-                                <h4 class="card-title">No hay clientes registrados</h4>
-                            </div>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>

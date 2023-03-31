@@ -249,7 +249,11 @@
                                                     <td>{{movement.description|truncatewords:2}}</td>
                                                     <td>{{movement.money_type|slice:":4"}}</td>
                                                     <td>{{movement.created_at|date|truncatewords:3}}</td>
-                                                    <td>{{movement.user}}</td>
+                                                    <td>
+                                                        {% if user.adviser.avatar %}
+                                                        <img src="{{movement.user.avatar.url}}" width="36px" height="36px" class="  rounded-circle"> {% else %}
+                                                        <img src="/media/{{MEDIA_URL}}avatares/default.png" width="36px" height="36px" alt="avatar" class="rounded-circle p-2  "> {% endif %}
+                                                    </td>
                                                     {% if user.is_superuser %} {% endif %}
                                                 </tr>
                                                 <!--Delete Modal-->

@@ -71,15 +71,14 @@ def refresh_installments_credits():
             if credit.installments.filter(is_paid_installment=True).count() == credit.installments.count():
                 if isinstance(credit, Credit):
                     credit.condition = 'Pagado'
-                else:
-                    for installment in credit.installment_ref.all():
-                        installment.is_paid_installment = True
-                        installment.condition = 'Pagada'
-                        installment.payment_date = credit.installments.last().payment_date
-                        installment.save()
-                        credit.is_paid = True
-                        credit.payment_date = credit.installments.last().payment_date
-
+                
+                for installment in credit.installment_ref.all():
+                    installment.is_paid_installment = True
+                    installment.condition = 'Pagada'
+                    installment.payment_date = credit.installments.last().payment_date
+                    installment.save()
+                    
+                credit.payment_date = credit.installments.last().payment_date
                 credit.is_paid = True
                 credit.save()
 

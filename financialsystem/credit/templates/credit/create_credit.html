@@ -4,7 +4,7 @@
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de solicitud de servicios</h4>
     <section>
         <div class="my-4 py-2">
-            <form class="form" method="post">
+            <form class="form" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="row justify-content-center align-items-start">
                     <div class="col-md-9 p-1">
@@ -90,7 +90,12 @@
                                         </div>
                                         {% endfor %}
                                     </div>
-
+                                </div>
+                                <div class="form-group mt-6">
+                                    <h5 class="title p-2"><i class="fa-solid fa-file-text text-warning"></i>&nbsp;Recibo de Sueldo</h5>
+                                    <div id="salary-container">
+                                        <a href="#" id="agregar-salary" class="btn btn-secondary">Agregar imagen</a>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
@@ -116,7 +121,7 @@
                                         {{credito_form.installment_num.label}} {{credito_form.installment_num}}
                                     </div>
                                     <div class="form-group col-md-4">
-                                        {{credito_form.credit_interest.label}} {{credito_form.credit_interest}}
+                                        {{credito_form.interest.label}} {{credito_form.interest}}
                                     </div>
                                     <div class="form-group col-md-12">
                                         <span class="m-0" for="monto">Monto a Devolver:</span>
@@ -282,7 +287,7 @@
 
 <script>
     let numero_cuota = document.getElementById("id_installment_num")
-    let interes = document.getElementById("id_credit_interest")
+    let interes = document.getElementById("id_interest")
     let monto = document.getElementById("id_amount")
     let monto_a_devolver = document.getElementById("monto_valor").textContent = "Calculando ...";
     let cuota_a_devolver = document.getElementById("cuota_valor");
@@ -293,7 +298,7 @@
 
     function calcularMonto() {
         var installmentNum = parseInt(document.getElementById("id_installment_num").value);
-        var creditInterest = parseFloat(document.getElementById("id_credit_interest").value);
+        var creditInterest = parseFloat(document.getElementById("id_interest").value);
         var amount = parseFloat(document.getElementById("id_amount").value);
 
         var monto = installmentNum * (creditInterest / 100 * amount) / (1 - Math.pow((1 + creditInterest / 100), (-installmentNum)));
@@ -313,6 +318,48 @@
             });
         }
     }
+</script>
+<script>
+    const salaryContainer = document.getElementById('salary-container');
+    const agregarSalaryButton = document.getElementById('agregar-salary');
+
+    agregarSalaryButton.onclick = () => {
+        const salarioInput = document.createElement('input');
+        salarioInput.type = 'file';
+        salarioInput.name = 'salary';
+        salarioInput.accept = 'image/*';
+        salarioInput.style.display = 'none';
+        salarioInput.multiple = true;
+        salaryContainer.appendChild(salarioInput);
+        salarioInput.click();
+
+        salarioInput.onchange = () => {
+            for (let i = 0; i < salarioInput.files.length; i++) {
+                const file = salarioInput.files[i];
+
+                const salaryFileNameContainer = document.createElement('div');
+                salaryFileNameContainer.className = 'salary-file-name-container';
+
+                const salaryFileName = document.createElement('span');
+                salaryFileName.textContent = file.name;
+                salaryFileName.className = 'salary-file-name';
+
+                const deleteSalaryButton = document.createElement('a');
+                deleteSalaryButton.href = '#';
+                deleteSalaryButton.className = 'delete-salary btn btn-sm btn-danger';
+                deleteSalaryButton.textContent = 'Eliminar';
+
+                salaryFileNameContainer.appendChild(salaryFileName);
+                salaryFileNameContainer.appendChild(deleteSalaryButton);
+                salaryContainer.appendChild(salaryFileNameContainer);
+
+                deleteSalaryButton.onclick = () => {
+                    salaryFileNameContainer.remove();
+                    salarioInput.remove();
+                };
+            }
+        };
+    };
 </script>
 
 {% endblock %}

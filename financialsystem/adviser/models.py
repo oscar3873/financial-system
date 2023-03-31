@@ -1,16 +1,19 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, pre_save, post_delete
+from django.db.models.signals import post_save
 
 import os
 
 def default_avatar(adviser):
-    first_letter = adviser.user.first_name[0].upper()
+    try:
+        first_letter = adviser.user.first_name[0].upper()
+    except:
+        first_letter = adviser.user.usernames[0].upper()
+
     avatar_path = os.path.join('avatares', f'{first_letter}.png')
     print("----------------", avatar_path)
     return avatar_path
-
 
 
 # Create your models here.

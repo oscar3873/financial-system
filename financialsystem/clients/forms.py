@@ -1,9 +1,10 @@
 from django import forms
 from django.core.validators import validate_email
 from django.forms import inlineformset_factory
-from clients.models import Client, PhoneNumberClient
+from clients.models import Client, PhoneNumberClient, Salary_check
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
+
 class ClientForm(forms.ModelForm):
     
     CIVIL_STATUS = (
@@ -53,24 +54,11 @@ class ClientForm(forms.ModelForm):
         required=False,
     )
     
+
     class Meta:
         model = Client
-        fields = "__all__"
-        exclude = ["adviser"]
+        fields = ['first_name', 'last_name', 'email', 'civil_status', 'dni', 'profession', 'address', 'score', 'job_address']
 
-    def clean(self):
-        """
-        Validar que todos los campos estén requeridos
-        """	
-        cleaned_data = super().clean()
-        fields_to_validate = ['first_name', 'last_name', 'address', 'job_address']
-        
-        for field_name in fields_to_validate:
-            field_value = cleaned_data.get(field_name)
-            if not field_value:
-                self.add_error(field_name, 'Este campo es requerido')
-                
-        return cleaned_data
 
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
@@ -119,7 +107,7 @@ class ClientForm(forms.ModelForm):
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
             
-        if kwargs.get('prefix') == 'guarantor':
+        if kwargs.get('prefix') == 'guarantor': # CLIENTES PUEDEN SER TAMBIEN GARANTES DE OTROS CLIENTES
             for field in self.fields.values():
                 field.required = False
 

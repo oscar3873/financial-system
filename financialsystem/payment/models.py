@@ -51,15 +51,29 @@ def up_installment(instance, *args, **kwargs):
     """
     Crea un movimiento luego de guardar el objeto Payment.
     """
-    instance.payment_mov = Movement.objects.create(
-            amount = instance.amount,
-            user = instance.adviser,
-            cashregister = CashRegister.objects.last(),
-            operation_mode = 'INGRESO',
-            description= instance.detail,
-            money_type = instance.payment_method
-            )
-    comission_create_inst(instance)
+    # Verifica si el objeto Payment ya ha sido guardado en la base de datos
+    if instance.mov is None:
+        instance.mov = Movement.objects.create(
+                amount = instance.amount,
+                user = instance.adviser,
+                cashregister = CashRegister.objects.last(),
+                operation_mode = 'INGRESO',
+                description= instance.detail,
+                money_type = instance.payment_method
+        )
+        comission_create_inst(instance)
+        
+    else:
+        # Si el objeto Payment ya existe, actualiza el movimiento correspondiente
+        movement = instance.mov
+        print("-------------------",movement)
+        movement.amount = instance.amount
+        movement.user = instance.adviser
+        movement.cashregister = CashRegister.objects.last()
+        movement.operation_mode = 'INGRESO'
+        movement.description = instance.detail
+        movement.money_type = instance.payment_method
+        movement.save()
 
 
 def comission_create_inst(instance):

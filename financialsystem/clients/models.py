@@ -1,9 +1,10 @@
+from datetime import datetime
 import uuid
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from adviser.models import Adviser
 
-# Create your models here.    
+
 class Client(models.Model):
     
     CivilStatus = (
@@ -58,6 +59,8 @@ class Client(models.Model):
     
     class Meta:
         ordering = ["created_at"]
+
+
 class PhoneNumberClient(models.Model):
     
     PHONETYPE = (
@@ -74,3 +77,12 @@ class PhoneNumberClient(models.Model):
     
     def __str__(self) -> str:
         return self.phone_number_c or ""
+    
+
+
+class Salary_check(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Recibo de sueldo") #NUEVO , recibo de sueldo
+    salary = models.ImageField(upload_to='salary_checks/', blank=True, null=True, default=None)
+    # date_admission = models.DateField(default=datetime.now,verbose_name="Fecha de admision")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

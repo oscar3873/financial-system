@@ -130,10 +130,9 @@ class AdviserUpdateView(UpdateView):
     fields = ["avatar"]
     template_name = "adviser/adviser_update_form.html"
 
-    def get_success_url(self):
-        return reverse('advisers:detail', args=[self.kwargs['pk']])
+    def get_success_url(self) -> str:
+        return reverse('advisers:detail', args=[self.kwargs["pk"]])
     
-
 class AdviserDeleteView(DeleteView):
     pass
 

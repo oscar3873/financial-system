@@ -13,7 +13,7 @@ from cashregister.utils import create_movement, create_cashregister
 from .utils import *
 
 from .models import Credit, Installment, InstallmentRefinancing
-from clients.models import Client
+from clients.models import Client, Salary_check
 from guarantor.models import Guarantor
 
 from .forms import *
@@ -39,6 +39,12 @@ def crear_credito(request):
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
+            print(request.FILES)
+            for imagen in request.FILES.getlist('salary'):
+                Salary_check.objects.create(
+                    salary = imagen,
+                    client = client
+                )
             phone_numbers = formsetPhoneClient.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_c:
@@ -260,7 +266,7 @@ def edit_credit(request, pk):
         if form.is_valid():
             credit = form.save(commit=False)
 
-            if (credit_copy.end_date != credit.end_date) or (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.credit_interest != credit.credit_interest) or (credit_copy.installment_num != credit.installment_num):
+            if (credit_copy.end_date != credit.end_date) or (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.interest != credit.interest) or (credit_copy.installment_num != credit.installment_num):
                 print('ASDASDA#####################')
                 credit.is_new = True
                 credit.save()
@@ -304,6 +310,7 @@ def refinance_installment (request, pk):
             pack = dict(zip(installments, checkboxs_by_form.values()))
             
             refinancing = form.save(commit=False)
+            refinancing.credit = credit
             refinancing.save()
             for installment in pack.keys():
                 if pack[installment]:
@@ -327,8 +334,22 @@ class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['client'] = self.object.installment_ref.first().credit.client
+        return context
+    
+    def form_valid(self, form):
+        if form.is_valid():
+            refinance_copy = copy.copy(self.object)
+            refinance = form.save(commit=False)
+
+            if (refinance_copy.end_date != refinance.end_date) or (refinance_copy.start_date != refinance.start_date) or (refinance_copy.amount != refinance.amount) or (refinance_copy.interest != refinance.interest) or (refinance_copy.installment_num != refinance.installment_num):
+                refinance.is_new = True
+        return super().form_valid(form)
+    
     def get_success_url(self):
-        return reverse('clients:detail', args=[self.object.installment_ref.last().credit.client.pk])
+        return reverse('clients:detail', args=[self.kwargs['client'].pk])
     
 
 #-------------------------------------------------------------------

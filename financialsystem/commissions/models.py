@@ -1,7 +1,7 @@
 from datetime import datetime
 from django.db import models
 
-from cashregister.models import Movement, CashRegister
+from cashregister.models import Movement
 from adviser.models import Adviser
 
 from django.db.models.signals import post_save, pre_save, post_delete

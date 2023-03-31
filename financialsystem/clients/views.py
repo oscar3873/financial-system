@@ -26,9 +26,9 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
 
 #FORMS
-from .forms import ClientForm, PhoneNumberFormSet, PhoneNumberFormSetUpdate
+from .forms import *
 #MODEL
-from .models import Client, PhoneNumberClient
+from .models import Client, PhoneNumberClient, Salary_check
 from credit.models import Refinancing
 from credit.forms import RefinancingForm
 
@@ -128,18 +128,26 @@ def clientCreate(request):
     formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
 
     if request.method == 'POST':
-        if client_form.is_valid and formsetPhoneClient.is_valid:
+        if client_form.is_valid():
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
+            for imagen in request.FILES.getlist('salary'):
+                Salary_check.objects.create(
+                    salary = imagen,
+                    client = client
+                )
+
             phone_numbers = formsetPhoneClient.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_c:
                     phone_number.client = client
                     phone_number.save()
+
             messages.success(request, 'El cliente se ha guardado exitosamente.','success')
             return redirect('clients:list')
-
+        else:
+            client_form.errors
     context = {
         'form': client_form,
         'formsetPhoneClient': formsetPhoneClient,

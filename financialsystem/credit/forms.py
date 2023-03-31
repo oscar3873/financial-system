@@ -15,10 +15,10 @@ class CreditForm(forms.ModelForm):
         required=False,
     )
 
-    credit_interest = forms.IntegerField(
+    interest = forms.IntegerField(
         label= "Intereses",
         required= True,
-        initial= Interest.objects.first().interest_credit,
+        initial= Interest.objects.first().interest_credit if not Interest.DoesNotExist else 40,
         min_value= 0,
         max_value= 100
     )
@@ -45,7 +45,7 @@ class CreditForm(forms.ModelForm):
     )
     class Meta:
         model = Credit
-        fields = ["is_old_credit","amount", "credit_interest", "installment_num", "start_date"]
+        fields = ["is_old_credit","amount", "interest", "installment_num", "start_date"]
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -69,7 +69,7 @@ class RefinancingForm(forms.ModelForm):
         )
     )
 
-    installment_num_refinancing = forms.ChoiceField(
+    installment_num = forms.ChoiceField(
         label= "Numero de Cuotas",
         choices=CHOICES,
         initial=CHOICES[0],
@@ -80,7 +80,7 @@ class RefinancingForm(forms.ModelForm):
 
     class Meta:
         model = Refinancing
-        fields = ["amount", "installment_num_refinancing"]
+        fields = ["amount", "installment_num"]
 
 
     def __init__(self,credit,*args, **kwargs):
@@ -91,7 +91,7 @@ class RefinancingForm(forms.ModelForm):
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
 
         self.fields['amount'].widget.attrs['id'] = 'id_amount{}'.format(credit.pk)  # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
-        self.fields['installment_num_refinancing'].widget.attrs['id'] = 'id_installment_num_refinancing{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
+        self.fields['installment_num'].widget.attrs['id'] = 'id_installment_num{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
 
         for installment in installments:
             if installment == credit.installments.first():
@@ -112,12 +112,29 @@ class RefinancingForm(forms.ModelForm):
                     )
 
 
-class RefinancingFormUpdate(forms.Form):
+class RefinancingFormUpdate(forms.ModelForm):
 
     class Meta:
         model = Refinancing
-        fields = "__all__"
-        exclude = ["credit", "lastup"]
+        fields = ["amount", "interest", "installment_num", "start_date", "end_date", "payment_date"]
+        widgets ={
+            'start_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
+            'end_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
+            'payment_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
+        }
+        labels = {
+            'installment_num':'Numero de cuotas',
+            'interest':'Interes',
+            'amount':'Monto',
+            'start_date': 'Fecha de Inicio',
+            'end_date': 'Fecha de Vencimiento',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name in self.fields:
+            field = self.fields.get(field_name)
+            field.widget.attrs.update({'class': 'form-control'})
 
 
 class InstallmentUpdateForm(forms.ModelForm):
@@ -179,10 +196,10 @@ class CreditUpdateForm(forms.ModelForm):
         required=False
     )
 
-    credit_interest = forms.IntegerField(
+    interest = forms.IntegerField(
         label= "Intereses",
         required= True,
-        initial= Interest.objects.first().interest_credit,
+        initial= Interest.objects.first().interest_credit if not Interest.DoesNotExist else 40,
         min_value= 0,
         max_value= 100
     )
@@ -201,7 +218,7 @@ class CreditUpdateForm(forms.ModelForm):
     
     class Meta:
         model = Credit
-        fields = ["is_old_credit","amount", "credit_interest", "installment_num", "start_date", "end_date"]
+        fields = ["is_old_credit","amount", "interest", "installment_num", "start_date", "end_date"]
         widgets ={
             'start_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
             'end_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
@@ -222,7 +239,7 @@ class CreditUpdateForm(forms.ModelForm):
 class CreditWithInstallmentsForm(forms.ModelForm):
     class Meta:
         model = Credit
-        fields = ['is_active', 'is_paid', 'is_old_credit', 'condition', 'credit_interest', 'amount', 'installment_num', 'start_date', 'end_date']
+        fields = ['is_active', 'is_paid', 'is_old_credit', 'condition', 'interest', 'amount', 'installment_num', 'start_date', 'end_date']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

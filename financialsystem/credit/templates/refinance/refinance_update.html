@@ -1,25 +1,46 @@
-{% extends 'core/base.html' %}
+<!-- credit/edit_credit.html -->
+{% extends "core/base.html" %} {% block content %} {% load static %}
+{% if messages %} {% for message in messages %}
+    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
+        <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+        <span class="font-weight-light">{{ message }}</span>
+    </div>
+{% endfor %} {% endif %}
 
-{% block content %}
-  <h1>Editar cuota {{ installment.installment_number }}</h1>
-  <form method="post">
-    {% csrf_token %}
-    <div>
-      {{ form.amount.label }}{{ form.amount }}
+<form method="post">
+    <h1>
+      Actualizar Refinanciacion de <a href="{% url 'clients:detail' client.pk %}"><h1>{{client}}</h1></a>
+    </h1>
+    <div class="col-md-8">
+        <div class="card bg-primary text-white box-shadow mb-3">
+            <div class="card-body">
+                <h5 class="title p-2">
+                    <i class="fa-solid fa-landmark text-warning"></i> &nbsp; Refinanciacion
+                </h5>
+                {% csrf_token  %}
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{form.start_date.label}} {{form.start_date}}
+                    </div>
+                    <div class="form-group col-md-12">
+                        {{form.end_date.label}} {{form.end_date}}
+                    </div>
+                    <div class="form-group col-md-12">
+                        {{form.amount.label}} {{form.amount}}
+                    </div>
+                    <div class="form-group col-md-2">
+                        {{form.installment_num.label}} {{form.installment_num}}
+                    </div>
+                    <div class="form-group col-md-2">
+                        {{form.interest.label}} {{form.interest}}
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+        </div><button type="submit" class="btn btn-success">Save Changes</button>
     </div>
-    <div>
-      {{ form.daily_interests.label }}{{ form.daily_interests }}
-    </div>
-    <div>
-      {{ form.end_date.label }}{{ form.end_date }}
-    </div>
-    <div>
-      {{ form.payment_date.label }}{{ form.payment_date }}
-    </div>
-    <div>
-      {{ form.condition.label }}{{ form.condition }}
-    </div>
-    <button type="submit" class="btn btn-primary">Guardar</button>
-  </form>
-
-{% endblock %}
+    
+</form>
+  
+  {% endblock content %}

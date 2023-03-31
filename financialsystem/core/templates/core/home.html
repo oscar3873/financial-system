@@ -2,292 +2,189 @@
 <!--Main-->
 <main class="container my-4">
 
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Inicio</h4>
-    <!--Seccion 1-->
-    <section class="row">
-        <div class="col-12 col-lg-8 col-md-8">
+    <div class="row justify-content-md-start justify-content-center">
+        <div class="col-lg-4 col-12">
+            <div class="row justify-content-center">
+                <div class="col-md-5 col-12">
+                    <div class="text-center">
+                        <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">
+                            Panel de
+                            <h4 class="font-weight-bold">{{request.user.first_name}}, {{request.user.last_name}}</h4>
+                        </h4>
+                        {% if request.user.adviser.avatar %}
+                        <img src="{{request.user.adviser.avatar.url}}" alt="avatar" width="100px" height="100px" class="rounded-circle "> {% else %}
+                        <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" width="100px" height="100px" class="rounded-circle  "> {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-7 col-12 text-center">
+                    <p>Correo:<span class="font-weight-bold"> {{user.email}}</span></p>
+                    <p>Nombre de usuario:<span class="font-weight-bold"> {{user.username}}</span></p>
+                    <!--Botones de  Carga-->
+                    <div class="mb-4" role="group" aria-label="Basic example">
+                        <a class="btn my-2 btn-secondary box-shadow" href="{% url 'credits:create_credit' %}" role="button">
+                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                            <span>Nuevo Credito</span>
+                        </a>
+                        {% if request.user.is_superuser %}
+                        <a class="btn my-2 btn-secondary box-shadow" href="{% url 'signup' %}" role="button">
+                            <i class="fa fa-user-plus" aria-hidden="true"></i>
+                            <span>Nuevo Asesor</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-12">
+            {% if messages %} {% for message in messages %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
+                <span class="font-weight-light">{{ message }}</span>
+            </div>
+            {% endfor %} {% endif %}
             <!--Buscador de Clientes-->
-            <article class="container p-0 my-4">
-                {% if messages %} {% for message in messages %}
-                <div class="alert alert-info alert-dismissible" role="alert">
-                    <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
-                    <span class="font-weight-light">{{ message }}</span>
-                </div>
-                {% endfor %} {% endif %} {% include "clients/query/search.html" %}
-            </article>
-            <!--Botones de  Carga-->
-            <article class="container p-0 my-4">
-                <div class="btn-group d-flex flex-sm-row flex-column justify-content-center" role="group" aria-label="Basic example">
-                    <a name="" id="" class="btn btn-primary m-2 rounded box-shadow p-3" href="{% url 'credits:create_credit' %}" role="button">
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                        <span>Nuevo Credito</span>
-                    </a>
-                    {% if request.user.is_superuser %}
-                    <a name="" id="" class="btn btn-primary m-2 box-shadow rounded p-3" href="{% url 'signup' %}" role="button">
-                        <i class="fa fa-user-plus" aria-hidden="true"></i>
-                        <span>Nuevo Asesor</span>
-                    </a>
-                    {% endif %}
-                </div>
-            </article>
-            <!--Cards-->
-            <article class="container p-0 my-4">
-                <div class="card-group text-center">
-                    <!--Movimientos de Caja-->
-                    <div class="card box-shadow border rounded mx-2">
-                        <div class="card-body">
-                            <a href="{% url 'cashregister:list' %}">
-                                <h5 class="card-title p-4 animate__fadeInDown" style="animation-duration: 0.5s !important;">
-                                    <i class="fa-solid fa-cash-register text-warning"></i> Tus Movimientos de Caja
-                                </h5>
-                            </a>
-                            <p class="card-subtitle p-2">
-                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceARS}}</span>
-                                <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceUSD}}</span>
-                                <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceEUR}}</span>
-                                <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceTRANSFER}}</span>
-                                <span class="font-weight-bold text-primary"><small><strong>TRANSFER</strong></small></span>
-                                <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceCREDITO}}</span>
-                                <span class="font-weight-bold text-primary"><small><strong>CREDITO</strong></small></span>
-                                <span class="text-warning"> | </span>
-                                <span class="font-weight-bold text-primary">{{cashregister.total_balanceDEBITO}}</span>
-                                <span class="font-weight-bold text-primary"><small><strong>DEBITO</strong></small></span>
-                            </p>
-                            {% for movement in movements %}
-                            <a href="{% url 'cashregister:detail' movement.id %}" class="card-text d-block p-2">
-                                {% if movement.operation_mode == 'EGRESO' %}
-                                <small class="text-danger"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> ${{movement.amount}}</small> {% else %}
-                                <small class="text-success"><i class="fa-sharp fa-solid fa-money-bill-transfer"></i> ${{movement.amount}}</small> {% endif %}
-                                <small class="font-weight-light"> {{movement.description|truncatewords:2}} </small>
-                                <span class="font-weight-bold">Por <span class="text-warning">{{movement.user}}</span></span>
-                            </a> {% empty %}
-                            <small class="font-weight-light">No hay movimientos registrados</small> {% endfor %}
-                        </div>
-                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
-                    </div>
-                    <!--Proximos Vencimientos-->
-                    <div class="card box-shadow border rounded mx-2">
-                        <div class="card-body">
-                            <h5 class="card-title p-4 animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-calendar text-warning"></i> Proximos Vencimientos</h5>
-                            {% if next_maturities.count > 0 %} {% for next_maturitie in next_maturities %}
-                            <div class="card-text p-2">
-                                <small class="font-weight-bold text-primary"><i class="fa-solid fa-hourglass-end"></i> {{next_maturitie.exp_date|date}} </small>
-                                <small class="font-weight-normal"> Cuota {{next_maturitie.installment_num}}</small>
-                                <small class="font-weight-bold">De <a href="{% url 'clients:detail' next_maturitie.credit.client.id %}" class="text-warning">{{next_maturitie.credit.client}}</a></small>
-                                <small class="font-weight-bold">Por <a href="{% url 'advisers:detail' next_maturitie.credit.client.adviser.pk %}" class="text-warning">{{next_maturitie.credit.client.adviser}}</a></small>
-                            </div>
-                            {% endfor %} {% else %}
-                            <strong class="font-weight-bold text-primary">Wow! Que insólito </strong> {% endif %}
-                        </div>
-                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
-                    </div>
-                </div>
-            </article>
+            {% include "clients/query/search.html" %}
         </div>
-        <!--Lista de Notas-->
-        <aside class="col-10 col-lg-4 col-md-4 my-4">
-            <div class="d-flex m-auto flex-column align-items-stretch flex-shrink-0 bg-white box-shadow rounded border">
-                <a href="{% url 'notes:list' %}" class="d-flex align-items-center justify-content-center flex-shrink-0 link-dark text-decoration-none border-bottom">
-                    <i class="fa-solid fa-list-check text-warning"></i> &nbsp;
-                    <h5 class="fs-5 fw-semibold m-0 text-primary"> Tus Notas Recordatorias</h5>
+    </div>
+    <!--Seccion 1-->
+    <section class="mt-4">
+        <div class="row justify-content-start">
+            <!--Movimientos de Caja-->
+            <div class="col-lg-4 my-2">
+                <div class="card bg-primary text-white box-shadow">
+                    <div class="card-body border-bottom-0">
+                        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-cash-register text-warning"></i>&nbsp;Ultimos movimientos de caja</h5>
+                        <!-- Slider main container -->
+                        <div class="swiper mb-2 bg-primary">
+                            <!-- Additional required wrapper -->
+                            <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
+                                {% for movement in movements %}
+                                <li class="swiper-slide list-group-item bg-primary border-0" style="min-height: 150px;">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <div class="col-8">
+                                            {% if movement.amount >= 0%}
+                                            <span class="font-weight-bold" style="font-size: 2rem; color: #35f257;">+{{movement.amount}}</span> {% else %}
+                                            <span class="font-weight-bold" style="font-size: 2rem; color: #f05540;">{{movement.amount}}</span> {% endif %}
+                                            <span class="text-warning font-weight-bold">
+                                                    {% if movement.money_type == "PESOS" %} ARS {% else %} {{movement.money_type}} {% endif %}
+                                                </span>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="col-4">
+                                                <span>
+                                                    {% if movement.user.avatar %}
+                                                    <img src="{{movement.user.avatar.url}}" width="36px" height="36px" class="  rounded-circle"> {% else %}
+                                                    <img src="/media/{{MEDIA_URL}}avatares/default.png" width="36px" height="36px" alt="avatar" class="rounded-circle p-2  "> {% endif %}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center p-2">
+                                        <a class="text-white" href="{% url 'cashregister:home'  %}">{{movement.description}}</a>
+                                    </div>
+                                    <div class="text-center text-info"><small>{{movement.created_at}}</small></div>
+                                </li>
+                                {% empty %}
+                                <p>No se registro ningun movimiento en caja</p>
+                                {% endfor %}
+                            </ul>
+                            <div class="swiper-pagination"></div>
+                            <!-- If we need scrollbar -->
+                            <div class="d-none swiper-scrollbar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 my-2">
+                <!--Proximos Vencimientos-->
+                <div class="card bg-primary text-white box-shadow">
+                    <div class="card-body border-bottom-0">
+                        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-cash-register text-warning"></i>&nbsp;Proximos vencimientos</h5>
+                        <!-- Slider main container -->
+                        <div class="swiper mb-2 bg-primary">
+                            <!-- Additional required wrapper -->
+                            <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
+                                {% for installment in next_expirations %}
+                                <li class="swiper-slide list-group-item bg-primary border-0" style="min-height: 150px;">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <span class="font-weight-bold text-warning">Monto: &nbsp;</span><span class="font-weight-bold" style="font-size: 2rem; color: #35f257;">+{{installment.amount}}</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <span>
+                                                {% if installment.credit.client.adviser.avatar %}
+                                                <img src="{{installment.credit.client.adviser.avatar.url}}" width="36px" height="36px" class="  rounded-circle"> {% else %}
+                                                <img src="/media/{{MEDIA_URL}}avatares/default.png" width="36px" height="36px" alt="avatar" class="rounded-circle p-2  "> {% endif %}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-center p-2">
+                                        <a class="text-white" href="{% url 'clients:detail' installment.credit.client.pk %}"><span>{{installment}}</span></a>
+                                        <span class="font-weight-bold text-warning">Vence el {{installment.created_at|date}}</span>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                <h5 class="title font-weight-normal text-center">No hay vencimientos</h5>
+                                {% endfor %}
+                            </ul>
+                            <div class="swiper-pagination"></div>
+                            <!-- If we need scrollbar -->
+                            <div class="d-none swiper-scrollbar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 my-2">
+                <!--Notas-->
+                <!-- Slider main container -->
+                <a href="{% url 'notes:list' %}">
+                    <div class="swiper mb-2">
+                        <!-- Additional required wrapper -->
+                        <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
+                            {% for note in notes %}
+                            <li class="swiper-slide list-group-item border-0 m-0 p-0">
+                                <link href="{% static 'note/css/note.css' %}" rel="stylesheet"> {% include "note/includes/note_card.html" %}
+                            </li>
+                            {% empty %}
+                            <li class="swiper-slide list-group-item border-0" style="min-height: 150px;">
+                                <h5 class="title font-weight-normal text-center">No hay notas</h5>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="swiper-pagination"></div>
+                        <!-- If we need scrollbar -->
+                        <div class="d-none swiper-scrollbar"></div>
+                    </div>
                 </a>
-                <div class="list-group list-group-flush border-bottom scrollarea">
-                    {% for note in notes %}
-                    <a href="{% url 'notes:update' note.pk %}" class="list-group-item list-group-item-action p-4 lh-tight" aria-current="true">
-                        <div class="d-flex flex-column flex-sm-row w-100 align-items-center justify-content-between">
-                            <strong class="mb-1 text-primary"> <i class="fa-solid fa-note-sticky"></i> {{note.title}}</strong>
-                            <small class="text-info"><i class="fa-solid fa-calendar"></i> {{note.created_at}}</small>
-                        </div>
-                        <div class="col-10 mb-1 small">{{note.content}}</div>
-                    </a>
-                    {% empty %}
-                    <small class="text-info text-center">No hay notas disponibles</small> {% endfor %}
-                </div>
-                <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
             </div>
-        </aside>
-    </section>
-    <!--Seccion 2-->
-    <section class="row mt-4">
-        <!--Tabla de Clientes-->
-        <div class="container">
-            <table class="table table-striped m-0 box-shadow table-hover table-responsive">
-                <thead class="table-light">
-                    <tr>
-                        <th scope="col"><i class="fa-solid fa-user"></i> Cliente</th>
-                        <th scope="col"><i class="fa-solid fa-signature"></i> Nombre</th>
-                        <th scope="col"><i class="fa-solid fa-user-tie"></i> Por</th>
-                        <th scope="col"><i class="fa-sharp fa-solid fa-circle-dollar-to-slot"></i> Cuota</th>
-                        <th scope="col"><i class="fa-solid fa-money-check"></i> Estado</th>
-                        <!-- <th scope="col">Acciones</th> -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>1</td>
-                        <td>
-                            <div class="alert alert-warning m-0 p-1 text-center rounded-pill" role="alert">
-                                <strong>● Refi</strong>
-                            </div>
-                        </td>
-                        <!-- <td>
-                            <i class="fas fa-trash-alt"></i> &nbsp;
-                            <i class="fas fa-edit"></i>
-                        </td> -->
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>1</td>
-                        <td>
-                            <div class="alert alert-success m-0 p-1 text-center rounded-pill" role="alert">
-                                <strong>● Al dia</strong>
-                            </div>
-                        </td>
-                        <!-- <td>
-                            <i class="fas fa-trash-alt"></i> &nbsp;
-                            <i class="fas fa-edit"></i>
-                        </td> -->
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td colspan="2">Larry the Bird</td>
-                        <td>1</td>
-                        <td>
-                            <div class="alert alert-danger m-0 p-1 text-center rounded-pill" role="alert">
-                                <strong>● Vencida</strong>
-                            </div>
-                        </td>
-                        <!-- <td>
-                            <i class="fas fa-trash-alt"></i> &nbsp;
-                            <i class="fas fa-edit"></i>
-                        </td> -->
-                    </tr>
-                </tbody>
-            </table>
-            <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
         </div>
     </section>
-    <!--Seccion 3-->
-    <section class="row my-4">
-        <div class="container">
-            <div class="row justify-content-between">
-                <!--Card Asesor 1-->
-                <div class="col-md-4">
-                    <div class="profile-card-4 text-center border rounded box-shadow my-4 bg-white">
-                        <div class="profile-content">
-                            <div class="profile-name py-4">
-                                <p class="p-2 m-0"><i class="fas fa-user-circle text-warning"></i> Nombre Asesor</p>
-                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="  rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
-                                <p><i class="fa-solid fa-envelope text-warning"></i> @correo-asesor</p>
-                                <p><i class="fas fa-phone-alt text-warning"></i> +54-387-456678</p>
-                            </div>
-                            <div class="profile-description py-2"><i class="fas fa-calendar-day text-warning"></i> Registrado el: 23/03/2023</div>
-                            <div class="row justify-content-center py-4">
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-users text-warning"></i> Clientes</strong></p>
-                                        <h5>1300</h5>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-money-check-alt text-warning"></i> Cobros</strong></p>
-                                        <h5>250</h5>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-dollar-sign text-warning"></i> Comisiones</strong></p>
-                                        <h5>168</h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
-                    </div>
-                </div>
-                <!--Card Asesor 2-->
-                <div class="col-md-4">
-                    <div class="profile-card-4 text-center border rounded box-shadow my-4 bg-white">
-                        <div class="profile-content">
-                            <div class="profile-name py-4">
-                                <p class="p-2 m-0"><i class="fas fa-user-circle text-warning"></i> Nombre Asesor</p>
-                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="  rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
-                                <p><i class="fa-solid fa-envelope text-warning"></i> @correo-asesor</p>
-                                <p><i class="fas fa-phone-alt text-warning"></i> +54-387-456678</p>
-                            </div>
-                            <div class="profile-description py-2"><i class="fas fa-calendar-day text-warning"></i> Registrado el: 23/03/2023</div>
-                            <div class="row justify-content-center py-4">
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-users text-warning"></i> Clientes</strong></p>
-                                        <h5>1300</h5>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-money-check-alt text-warning"></i> Cobros</strong></p>
-                                        <h5>250</h5>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-dollar-sign text-warning"></i> Comisiones</strong></p>
-                                        <h5>168</h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
-                    </div>
-                </div>
-                <!--Card Asesor 3-->
-                <div class="col-md-4">
-                    <div class="profile-card-4 text-center border rounded box-shadow my-4 bg-white">
-                        <div class="profile-content">
-                            <div class="profile-name py-4">
-                                <p class="p-2 m-0"><i class="fas fa-user-circle text-warning"></i> Nombre Asesor</p>
-                                <img src="{% static 'registration/img/no-avatar-A.png' %}" class="  rounded-circle shadow-4 py-2" style="width: 50px;" alt="avatar-profile">
-                                <p><i class="fa-solid fa-envelope text-warning"></i> @correo-asesor</p>
-                                <p><i class="fas fa-phone-alt text-warning"></i> +54-387-456678</p>
-                            </div>
-                            <div class="profile-description py-2"><i class="fas fa-calendar-day text-warning"></i> Registrado el: 23/03/2023</div>
-                            <div class="row justify-content-center py-4">
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-users text-warning"></i> Clientes</strong></p>
-                                        <h5>1300</h5>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-money-check-alt text-warning"></i> Cobros</strong></p>
-                                        <h5>250</h5>
-                                    </div>
-                                </div>
-                                <div class="col-xs-4">
-                                    <div class="profile-overview m-2">
-                                        <p><strong><i class="fas fa-dollar-sign text-warning"></i> Comisiones</strong></p>
-                                        <h5>168</h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer p-1 bg-secondary rounded-bottom box-shadow"></div>
-                    </div>
-                </div>
-            </div>
+    <section class="mt-4">
+        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-hand-holding-dollar text-warning "></i>&nbsp; Ultimos Creditos</h5>
+        <div class="row justify-content-center">
+            <!--Tabla de Clientes del usuario-->
+            {% include "credit/includes/credit_table.html" %}
+        </div>
+    </section>
+    <section class="mt-4">
+        <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;"><i class="fa-solid fa-users text-warning "></i>&nbsp; Ultimos Clientes</h5>
+        <div class="row justify-content-center">
+            <!--Tabla de Clientes del usuario-->
+            {% include "clients/includes/client_table.html" %}
         </div>
     </section>
 </main>
-
+<script type="module">
+    import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.esm.browser.min.js';
+</script>
+<script>
+    const swiper = new Swiper('.swiper', {
+        autoplay: {
+            delay: 7000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: ".swiper-pagination",
+            dynamicBullets: true,
+        },
+    });
+</script>
 {% endblock content %}

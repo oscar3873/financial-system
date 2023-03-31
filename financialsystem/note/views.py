@@ -74,6 +74,8 @@ class NoteCreateView(LoginRequiredMixin, CreateView):
         if form.is_valid():
             note = form.save(commit=False)
             print('si pasa')
+
+            note.color = "yellow" if self.request.user.is_superuser else "blue"
             note.user = self.request.user.adviser
             form.save()
 
