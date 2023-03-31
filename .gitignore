@@ -5,6 +5,7 @@
 __pycache__
 db.sqlite3
 media/avatar/
+avatar
 #Folders
 # Backup files # 
 *.bak 
