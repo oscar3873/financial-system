@@ -1,7 +1,6 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
 <!--Main-->
-<link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet"> 
-{% if messages %} {% for message in messages %}
+<link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet"> {% if messages %} {% for message in messages %}
 <div class="alert alert-primary alert-dismissible" role="alert">
     <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
     <span class="font-weight-light">{{ message }}</span>
@@ -275,10 +274,10 @@
                                             {% if form_payment %} {% with form_payment.0 as form_payment %}
                                             <!-- .0 para formulario de refinanciacion -->
                                             {% include "payment/payment_form.html" %} {% endwith %}{% endif %} {% if credit_active.installments.first.is_paid_installment %}
-                                            <div type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}">
-                                                <i class="fas fa-sync-alt text-info"></i>
-                                                <span onclick="get_id(`{{credit_active.pk}}`)">Refinanciar</span>
-                                            </div>
+                                            <button type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}" data-id="{{credit_active.pk}}" id="refinancingButton{{credit_active.pk}}">
+                                                <i class="fas fa-sync-alt text-info"></i> Refinanciar
+                                            </button>
+
                                             <!--Modal de refinanciacion-->
                                             <div class="modal fade" id="Refinancing{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="Refinancing{{credit_active.pk}}" aria-hidden="true">
                                                 <div class="modal-dialog" role="document">
@@ -290,15 +289,52 @@
                                                                         <span aria-hidden="true">&times;</span>
                                                                     </button>
                                                             </div>
+                                                            <style>
+                                                                .form-check-label {
+                                                                    margin-bottom: 0;
+                                                                }
+                                                                
+                                                                .form-check-input {
+                                                                    margin-top: 0.5rem;
+                                                                }
+                                                            </style>
+
                                                             <div class="modal-body">
                                                                 {% csrf_token %} {% with form_payment.1 as form_refinance %}
                                                                 <!-- .1 para formulario de refinanciacion -->
-                                                                {{form_refinance.as_p}} {% endwith %}
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <i class="fas fa-dollar-sign"></i> {{form_refinance.amount.label_tag}} {{form_refinance.amount}}
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <i class="fas fa-coins"></i> {{form_refinance.installment_amount.label_tag}} {{form_refinance.installment_amount}}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-3">
+                                                                    <div class="col-12">
+                                                                        <i class="fas fa-list-ol"></i> {{form_refinance.installment_num.label_tag}} {{form_refinance.installment_num}}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-3">
+                                                                    <div class="col-12">
+                                                                        <i class="fas fa-sync-alt"></i>
+                                                                        <span>Cuotas a refinanciar:</span>
+                                                                        <div class="d-flex flex-wrap align-items-center">
+                                                                            {% for field in form_refinance %} {% if "cuota" in field.html_name %}
+                                                                            <div class="form-check form-check-inline m-2">
+                                                                                <label class="form-check-label" for="{{field.auto_id}}">{{field.label}}</label>&nbsp;{{field}}
+                                                                            </div>
+                                                                            {% endif %} {% endfor %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                {% endwith %}
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button class="btn btn-success">Refinanciar</button>
-                                                                <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+                                                                <button class="btn btn-success"><i class="fas fa-sync-alt"></i> Refinanciar</button>
+                                                                <button type="button" class="btn btn-info" data-dismiss="modal"><i class="fas fa-times"></i> Cerrar</button>
                                                             </div>
+
                                                         </form>
                                                     </div>
                                                 </div>
@@ -551,33 +587,25 @@
         }
     }
 </script>
-
-
+<!--Refinancia las cuotas seleccionadas-->
 <script>
-    function get_id(id) { // CAPTO ID DEL CREDITO PARA LA MANIPULACION DE PAGOS DE SUS CUOTAS
-        var id = id;
-
-        const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref' + id + '"]'); //AGREGO ID PARA SABER EXACTAMENTE QUE DE QUE CHECKBOXES SE TRATAN
-        const selector = document.querySelector('#id_installment_num' + id); // ID PARA EL SELECTOR EN CASO DE TENER MUCHOS CREDITOS A REFIANNCIAR
-        const installment_value = document.querySelector('#id_installment_amount' + id);
-        const sumElement = document.querySelector('#id_amount' + id); // ID PARA VER EL MONTO FINAL EN CASO DE QUERER REFIANNCIAR
+    const get_id = (id) => {
+        const checkboxes = document.querySelectorAll(`input[type="checkbox"][data-form-id="form_ref${id}"]`);
+        const selector = document.querySelector(`#id_installment_num${id}`);
+        const installment_value = document.querySelector(`#id_installment_amount${id}`);
+        const sumElement = document.querySelector(`#id_amount${id}`);
         const refInstallmentDetail = document.getElementById('ref-installment-detail');
         const refInstallmentAmount = document.createElement('span');
         let porcentaje;
 
-        refInstallmentAmount.classList.add('text-warning', 'font-weight-bold')
+        refInstallmentAmount.classList.add('text-warning', 'font-weight-bold');
         refInstallmentAmount.style.fontSize = '1.5rem';
 
+        const round_to_nearest_hundred = (x) => {
+            return x % 100 >= 50 ? (Math.floor(x / 100) + 1) * 100 : Math.floor(x / 100) * 100;
+        };
 
-        function round_to_nearest_hundred(x) {
-            if (x % 100 >= 50) {
-                return (Math.floor(x / 100) + 1) * 100;
-            } else {
-                return Math.floor(x / 100) * 100;
-            }
-        }
-
-        function calcularSuma() {
+        const calcularSuma = () => {
             let sum = 0;
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
@@ -601,12 +629,12 @@
             }
             const selectorValue = parseFloat(selector.value);
             const subtotal = round_to_nearest_hundred((sum * (porcentaje + 100) / 100).toFixed(2));
-            const installment_amount = round_to_nearest_hundred((subtotal/selectorValue).toFixed(2));
-            const total = installment_amount*selectorValue;
+            const installment_amount = round_to_nearest_hundred((subtotal / selectorValue).toFixed(2));
+            const total = installment_amount * selectorValue;
 
             sumElement.value = `${total}`;
-            installment_value.value = `${installment_amount}`
-        }
+            installment_value.value = `${installment_amount}`;
+        };
 
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', calcularSuma);
@@ -614,8 +642,20 @@
         if (selector !== null) {
             selector.addEventListener('change', calcularSuma);
         }
-    }
+    };
+    document.addEventListener("DOMContentLoaded", () => {
+        const refinancingButtons = document.querySelectorAll('[data-id]');
+
+        refinancingButtons.forEach((refinancingButton) => {
+            refinancingButton.addEventListener("click", () => {
+                const id = refinancingButton.getAttribute('data-id');
+                get_id(id);
+                console.log("Entre aqui");
+            });
+        });
+    });
 </script>
+
 <script>
     const ledSuccess = document.querySelector('.led-success');
     const ledDanger = document.querySelector('.led-danger');

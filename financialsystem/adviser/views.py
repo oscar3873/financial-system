@@ -99,7 +99,7 @@ def is_admin(user):
 @user_passes_test(is_admin)
 def pay_commission(request, pk):
     '''Función que maneja la vista para pagar una comisión'''
-
+    
     refresh_condition()
     commission = Commission.objects.get(id=pk)
     try:

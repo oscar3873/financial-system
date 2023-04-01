@@ -1,14 +1,14 @@
 {% load static %} {% block content %}
 <main class="main">
     <!-- MODAL FORMULARIO PAYMENT -->
-    <div type="button" class="btn p-0 mt-2" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}" onclick="get_pk(`{{credit_active.pk}}`)">
+    <div type="button" class="btn p-0 mt-2" data-toggle="modal" data-target="#exampleModal{{credit_active.pk}}" id="paymentButton{{credit_active.pk}}">
         <div class="btn btn-primary p-3" role="button">
             <i class="fa-solid fa-receipt text-warning"></i>
             <span>Registrar un Pago</span>
         </div>
     </div>
     <!--Modal-->
-    
+
     <div class="modal fade" id="exampleModal{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active.pk}}" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content bg-primary text-white">
@@ -22,28 +22,25 @@
                     <div class="modal-body">
                         {% csrf_token %}
 
-                        <p>{{form_payment.amount.label}} {{form_payment.amount}}</p>  
+                        <p>{{form_payment.amount.label}} {{form_payment.amount}}</p>
                         <div class="form-row">
-                        <div class="form-group col-md-4">
-                            {{form_payment.payment_date.label}} {{form_payment.payment_date}}  
-                        </div>
-                        <div class="form-group col-md-4">
-                            {{form_payment.payment_time.label}} {{form_payment.payment_time}}
-                        </div>
-                        </div> 
-                        <p>{{form_payment.payment_method.label}} {{form_payment.payment_method}}</p>  
-                        <p>{{form_payment.amount_paid.label}} {{form_payment.amount_paid}}</p>
-                          
-                        {% for installment_field in form_payment %}
-                        {% if installment_field.name|slice:":5" == 'Cuota' %}
-                            <div class="form-group">
-                                <p>
-                                    {{installment_field.label}}: {{installment_field}}
-                                </p>
+                            <div class="form-group col-md-4">
+                                {{form_payment.payment_date.label}} {{form_payment.payment_date}}
                             </div>
-                        {% endif %}
-                        {% endfor %}
+                            <div class="form-group col-md-4">
+                                {{form_payment.payment_time.label}} {{form_payment.payment_time}}
+                            </div>
+                        </div>
+                        <p>{{form_payment.payment_method.label}} {{form_payment.payment_method}}</p>
+                        <p>{{form_payment.amount_paid.label}} {{form_payment.amount_paid}}</p>
 
+                        <div class="d-flex flex-wrap align-items-center">
+                            {% for field in form_payment %} {% if "Cuota" in field.html_name %}
+                            <div class="form-check form-check-inline m-2">
+                                <label class="form-check-label" for="{{field.auto_id}}">{{field.label}}</label>&nbsp;{{field}}
+                            </div>
+                            {% endif %} {% endfor %}
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-success">Pagar</button>
@@ -54,28 +51,36 @@
         </div>
     </div>
 </main>
-
+<!--Pago de las cuotas-->
 <script>
-    function get_pk(pk) {
-        let checkboxes_p = document.querySelectorAll('input[type="checkbox"][id="form_payment' + pk + '"]');
-        var amountElement = document.querySelector("#id_payment-amount" + pk);
+    const get_pk = (pk) => {
+        console.log("modal de refinanciacion");
+        let checkboxes_p = document.querySelectorAll(`input[type="checkbox"][id="form_payment${pk}"]`);
+        let amountElement = document.querySelector(`#id_payment-amount${pk}`);
 
-        function sumar() {
-            var total = 0;
-            checkboxes_p.forEach(function(checkbox) {
-            if (checkbox.checked) {
-                total += parseFloat(checkbox.value);
-            }
+        const sumar = () => {
+            let total = 0;
+            checkboxes_p.forEach(checkbox => {
+                if (checkbox.checked) {
+                    total += parseFloat(checkbox.value);
+                }
             });
 
             amountElement.innerHTML = total.toFixed(2);
             amountElement.value = total.toFixed(2);
-        }
+        };
 
-        checkboxes_p.forEach(function(checkbox) {
+        checkboxes_p.forEach(checkbox => {
             checkbox.addEventListener("click", sumar);
         });
-    }
+    };
+    document.addEventListener("DOMContentLoaded", () => {
+        const paymentButton = document.getElementById(`paymentButton{{credit_active.pk}}`);
+        if (paymentButton !== null) {
+            paymentButton.addEventListener("click", () => {
+                get_pk("{{credit_active.pk}}");
+            });
+        }
+    });
 </script>
-
 {% endblock content %}

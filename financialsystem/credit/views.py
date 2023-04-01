@@ -304,9 +304,9 @@ def refinance_installment (request, pk):
     if request.method == 'POST':
         if form.is_valid():
             installments = Installment.objects.filter(credit=credit, condition__in=['Vencida','A Tiempo'])
-            checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
+            checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('cuota')}
             pack = dict(zip(installments, checkboxs_by_form.values()))
-            
+            print(form.cleaned_data, pack)
             refinancing = form.save(commit=False)
             refinancing.credit = credit
             refinancing.is_new = True

@@ -1,48 +1,62 @@
-{% extends 'core/base.html' %}
-
-{% block content %}
-  <h1>Editar cuota {{ installment.installment_number }}</h1>
-  <form method="post">
-      {% csrf_token %}
-      <div>
-        {{ form.amount.label }}
-        <div class="input-group">
-          {{ form.amount }}
-          <button type="button" id="enable-amount-btn" class="btn btn-primary">Editar monto</button>
+{% extends 'core/base.html' %} {% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card text-white bg-primary">
+                <div class="card-header">
+                    <h2 class="mb-0">Editar cuota {{ installment.installment_number }}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_amount">{{ form.amount.label }}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                </div>
+                                {{ form.amount }}
+                                <div class="input-group-append">
+                                    <button type="button" id="enable-amount-btn" class="btn btn-primary">Editar monto</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_daily_interests">{{ form.daily_interests.label }}</label> {{ form.daily_interests }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_porcentage_daily_interests">{{ form.porcentage_daily_interests.label }}</label> {{ form.porcentage_daily_interests }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_start_date">{{ form.start_date.label }}</label> {{ form.start_date }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_end_date">{{ form.end_date.label }}</label> {{ form.end_date }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_payment_date">{{ form.payment_date.label }}</label> {{ form.payment_date }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_condition">{{ form.condition.label }}</label>
+                            <div class="input-group">
+                                {{ form.condition }}
+                                <div id="refinance-msg" style="display: none; margin-left: 10px;">SI DESEA REFINANCIAR DICHA CUOTA, HACERLO DESDE LA PESTAÑA ANTERIOR > boton REFINANCIAR</div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-secondary"><i class="fas fa-save text-warning"></i> Guardar</button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
-      <div>
-        {{ form.daily_interests.label }}{{ form.daily_interests }}
-      </div>
-      <div>
-        {{ form.porcentage_daily_interests.label }}{{ form.porcentage_daily_interests}}
-      </div>
-      <div>
-        {{ form.start_date.label }}{{ form.start_date }}
-      </div>
-      <div>
-        {{ form.end_date.label }}{{ form.end_date }}
-      </div>
-      <div>
-        {{ form.payment_date.label }}{{ form.payment_date }}
-      </div>
-      <div>
-        {{ form.condition.label }}
-        <div class="input-group">
-          {{ form.condition }}
-          <div id="refinance-msg" style="display: none; margin-left: 10px;">SI DESEA REFINANCIAR DICHA CUOTA, HACERLO DESDE LA PESTAÑA ANTERIOR > boton REFINANCIAR</div>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary">Guardar</button>
-  </form>
+    </div>
+</div>
+<script src="http://momentjs.com/downloads/moment.min.js"></script>
 
-  <script src="http://momentjs.com/downloads/moment.min.js"></script>
-
-  <script>
+<script>
     var conditionSelect = document.getElementById("id_condition");
     var refinanceMsg = document.getElementById("refinance-msg");
 
-    conditionSelect.addEventListener("change", function () {
+    conditionSelect.addEventListener("change", function() {
         if (conditionSelect.value === "Refinanciada") {
             refinanceMsg.style.display = "block";
         } else {
@@ -58,7 +72,7 @@
     amountInput.readOnly = true;
 
     // Agregar un manejador de eventos para habilitar/deshabilitar el campo de cantidad
-    enableAmountBtn.addEventListener("click", function () {
+    enableAmountBtn.addEventListener("click", function() {
         if (amountInput.readOnly) {
             amountInput.classList.remove("readonly");
             amountInput.readOnly = false;
@@ -81,15 +95,15 @@
     porcentageInput.addEventListener("input", calculateDailyInterests);
 
     function calculateDailyInterests() {
-      
-      var end_date = moment(endDateInput.value).startOf('day');
-      var payment_date = paymentDateInput.value ? paymentDateInput.value : new Date();
-      payment_date = moment(payment_date).startOf('day');
-      var porcentage = porcentageInput.value ? porcentageInput.value : 0;
-      var days_diff = payment_date.diff(end_date, 'days');
-      var daily_interests = Math.round(amountInput.value * porcentage/100 * days_diff);
-      dailyInterestsInput.value = daily_interests.toFixed(2);
-      
+
+        var end_date = moment(endDateInput.value).startOf('day');
+        var payment_date = paymentDateInput.value ? paymentDateInput.value : new Date();
+        payment_date = moment(payment_date).startOf('day');
+        var porcentage = porcentageInput.value ? porcentageInput.value : 0;
+        var days_diff = payment_date.diff(end_date, 'days');
+        var daily_interests = Math.round(amountInput.value * porcentage / 100 * days_diff);
+        dailyInterestsInput.value = daily_interests.toFixed(2);
+
     }
 </script>
 
