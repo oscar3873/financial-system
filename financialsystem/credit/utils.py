@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.http import JsonResponse
 
 from commissions.models import Interest
+from core.utils import round_to_nearest_special
 from .models import Credit, Refinancing, Installment
 from clients.models import Client
 
@@ -54,29 +55,28 @@ def for_refresh(obj_with_vencidas):
 
         elif installment_ven.daily_interests == 0:
             dates = installment_ven.end_date.date()
-
         else:
             dates = date.today()
 
         resto = abs((date.today() - dates).days)
-        installment_ven.daily_interests += resto * installment_ven.amount * Decimal(installment_ven.porcentage_daily_interests/100)
+        daily_interes = resto * installment_ven.amount * Decimal(installment_ven.porcentage_daily_interests/100)
+        installment_ven.daily_interests += round_to_nearest_special(daily_interes)
         installment_ven.lastup = date.today()
         installment_ven.save()
 
-        daily_interest = Interest.objects.first().daily_interest
+        daily_interest = Interest.objects.all()[0].daily_interest
 
         if isinstance(credit, Credit):
             if not credit.is_old_credit and (client.score - daily_interest * resto < 1):
                 client.score = 0
             else:
-                client.score -= daily_interest * resto
+                new_score = client.score - daily_interest * resto
+                client.score = max(0, min(new_score, 1500))
         else:
-            if client.score - daily_interest * resto < 1:
-                client.score = 0
-            else:
-                client.score -= daily_interest * resto
+            new_score = client.score - daily_interest * resto
+            client.score = max(0, min(new_score, 1500))
 
-        # client.save()
+        client.save()
 
 
 def refresh_installments_credits():
@@ -123,14 +123,13 @@ def search_client(request):
 
 def search_credit(request):
     search_terms = request.GET.get('search_term').split()
-    print(search_terms)
+
     credits=Credit.objects.all()
     if search_terms:
         for term in search_terms:
             q_objects = Q(client__first_name__icontains=term) | Q(client__last_name__icontains=term) | Q(client__dni__icontains=term)
             credits = credits.filter(q_objects)
         
-        print(credits)
         data = {
             'credits': [
                 {

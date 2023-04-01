@@ -34,63 +34,83 @@
         </div>
       </div>
       <button type="submit" class="btn btn-primary">Guardar</button>
-  </form>
+</form>
 
-  <script src="http://momentjs.com/downloads/moment.min.js"></script>
+<script src="http://momentjs.com/downloads/moment.min.js"></script>
 
-  <script>
-    var conditionSelect = document.getElementById("id_condition");
-    var refinanceMsg = document.getElementById("refinance-msg");
-
-    conditionSelect.addEventListener("change", function () {
-        if (conditionSelect.value === "Refinanciada") {
-            refinanceMsg.style.display = "block";
-        } else {
-            refinanceMsg.style.display = "none";
-        }
-    });
-
-    var amountInput = document.getElementById("id_amount");
-    var enableAmountBtn = document.getElementById("enable-amount-btn");
-
-    // Agregar la clase "readonly" al cargar la página
-    amountInput.classList.add("readonly");
-    amountInput.readOnly = true;
-
-    // Agregar un manejador de eventos para habilitar/deshabilitar el campo de cantidad
-    enableAmountBtn.addEventListener("click", function () {
-        if (amountInput.readOnly) {
-            amountInput.classList.remove("readonly");
-            amountInput.readOnly = false;
-            enableAmountBtn.textContent = "Deshabilitar monto";
-        } else {
-            amountInput.classList.add("readonly");
-            amountInput.readOnly = true;
-            enableAmountBtn.textContent = "Editar monto";
-        }
-    });
-
-    // Agregar manejadores de eventos para los campos de fecha y porcentaje
-    var endDateInput = document.getElementById("id_end_date");
-    var paymentDateInput = document.getElementById("id_payment_date");
-    var porcentageInput = document.getElementById("id_porcentage_daily_interests");
-    var dailyInterestsInput = document.getElementById("id_daily_interests");
-
-    endDateInput.addEventListener("change", calculateDailyInterests);
-    paymentDateInput.addEventListener("change", calculateDailyInterests);
-    porcentageInput.addEventListener("input", calculateDailyInterests);
-
-    function calculateDailyInterests() {
-      
-      var end_date = moment(endDateInput.value).startOf('day');
-      var payment_date = paymentDateInput.value ? paymentDateInput.value : new Date();
-      payment_date = moment(payment_date).startOf('day');
-      var porcentage = porcentageInput.value ? porcentageInput.value : 0;
-      var days_diff = payment_date.diff(end_date, 'days');
-      var daily_interests = Math.round(amountInput.value * porcentage/100 * days_diff);
-      dailyInterestsInput.value = daily_interests.toFixed(2);
-      
+<script>
+function roundToNearestSpecial(x) {
+  if (Number.isInteger(x)) {
+    return x;
+  } else if (x < 100) {
+    if (x % 10 >= 5) {
+      return Math.ceil(x / 10) * 10 - 10;
+    } else {
+      return Math.floor(x / 10) * 10;
     }
+  } else {
+    return Math.round(x);
+  }
+}
+
+
+var conditionSelect = document.getElementById("id_condition");
+var refinanceMsg = document.getElementById("refinance-msg");
+
+conditionSelect.addEventListener("change", function () {
+    if (conditionSelect.value === "Refinanciada") {
+        refinanceMsg.style.display = "block";
+    } else {
+        refinanceMsg.style.display = "none";
+    }
+});
+
+var amountInput = document.getElementById("id_amount");
+var enableAmountBtn = document.getElementById("enable-amount-btn");
+
+// Agregar la clase "readonly" al cargar la página
+amountInput.classList.add("readonly");
+amountInput.readOnly = true;
+
+// Agregar un manejador de eventos para habilitar/deshabilitar el campo de cantidad
+enableAmountBtn.addEventListener("click", function () {
+    if (amountInput.readOnly) {
+        amountInput.classList.remove("readonly");
+        amountInput.readOnly = false;
+        enableAmountBtn.textContent = "Deshabilitar monto";
+    } else {
+        amountInput.classList.add("readonly");
+        amountInput.readOnly = true;
+        enableAmountBtn.textContent = "Editar monto";
+    }
+});
+
+// Agregar manejadores de eventos para los campos de fecha y porcentaje
+var endDateInput = document.getElementById("id_end_date");
+var startDateInput = document.getElementById("id_start_date");
+var paymentDateInput = document.getElementById("id_payment_date");
+var porcentageInput = document.getElementById("id_porcentage_daily_interests");
+var dailyInterestsInput = document.getElementById("id_daily_interests");
+
+endDateInput.addEventListener("change", calculateDailyInterests);
+startDateInput.addEventListener("change", calculateDailyInterests)
+paymentDateInput.addEventListener("change", calculateDailyInterests);
+porcentageInput.addEventListener("input", calculateDailyInterests);
+
+function calculateDailyInterests() {
+  const end_date = moment(endDateInput.value).startOf('day');
+  const start_date = moment(startDateInput.value).startOf('day');
+  const payment_date = moment(paymentDateInput.value || new Date()).startOf('day');
+  const porcentage = porcentageInput.value || 0;
+
+  const days_diff_s_e = end_date.diff(start_date, 'days');
+  const days_diff_s_p = payment_date.diff(start_date, 'days');
+  const days_diff = days_diff_s_p > days_diff_s_e ? days_diff_s_e : days_diff_s_p;
+
+  const daily_interests = Math.round(amountInput.value * porcentage/100 * days_diff);
+  dailyInterestsInput.value = roundToNearestSpecial(daily_interests).toFixed(2);
+}
+
 </script>
 
 {% endblock %}
