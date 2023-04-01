@@ -133,7 +133,10 @@ def make_payment_installment(request, pk):
         payment.payment_date = datetime.combine(payment_date, payment_time)
         
         installment_ = list(installments.all())
-        checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('Cuota')}
+        checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('cuota')}
+
+        print(form.cleaned_data)
+
         pack = dict(zip(installment_, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
         payment._adviser = request.user.adviser
