@@ -9,6 +9,7 @@ from credit.models import Credit
 from adviser.models import Adviser
 from commissions.models import Commission, Interest
 from cashregister.models import Movement, CashRegister
+from core.utils import round_to_nearest_hundred
 # Create your models here.
 
 class Warranty(models.Model):
@@ -73,6 +74,7 @@ def sell_commission(instance, *args, **kwargs):
     """
     Crea una comision por venta.
     """
+    instance.amount = round_to_nearest_hundred(instance.amount)
     if not instance.commission:
         amount = instance.amount*Interest.objects.first().interest_sell/Decimal(100)
         instance.commission = Commission.objects.create(

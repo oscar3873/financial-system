@@ -232,7 +232,7 @@ class MovementDeleteView(DeleteView):
         Agrega un mensaje de éxito a la cola de mensajes.
         """
         messages.success(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()), "danger")
-        return reverse_lazy('cashregister:list')
+        return reverse_lazy('cashregister:home')
 
 
 #ACTUALIZACION DE UN MOVIMIENTO

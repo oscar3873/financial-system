@@ -5,6 +5,10 @@ from django.db import models
 from djmoney.models.fields import MoneyField
 from django.db.models.signals import post_save, post_delete, pre_save
 from adviser.models import Adviser
+from decimal import Decimal, ROUND_HALF_EVEN
+
+from core.utils import round_to_nearest_hundred
+
 
 # from adviser.models import Adviser
 
@@ -92,9 +96,11 @@ def operation_type_validate(instance, *args, **kwargs):
     """
     if not CashRegister.objects.exists():
         instance.cashregister = CashRegister.objects.create()
-    instance.amount = abs(instance.amount)
+    instance.amount = round_to_nearest_hundred(abs(instance.amount))
     if instance.operation_mode == 'EGRESO':
         instance.amount = -instance.amount
+    print(instance.amount)
+
 
 
 pre_save.connect(operation_type_validate, sender=Movement)

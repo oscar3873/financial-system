@@ -6,7 +6,7 @@ from cashregister.models import Movement
 from django.db.models.signals import post_save, pre_save, pre_delete, post_delete
 from datetime import datetime, timedelta
 
-from commissions.models import Interest
+from core.utils import round_to_nearest_hundred
 # Create your models here.
 #CREDITO
 
@@ -158,10 +158,13 @@ def repayment_amount_auto(instance, *args, **kwargs):
     """
     credit = instance
     
+
     if not credit.is_old_credit:
         credit.end_date = (timedelta(days=30)*credit.installment_num) + credit.start_date
-        repayment_amount = credit.installment_num*(Decimal(credit.interest/100)*credit.amount)/(1-pow((1+Decimal(credit.interest/100)),(- credit.installment_num)))
-        credit.credit_repayment_amount = Decimal(repayment_amount)
+        credit.amount = round_to_nearest_hundred(credit.amount)
+        installment_value = round_to_nearest_hundred((Decimal(credit.interest/100)*credit.amount)/(1-pow((1+Decimal(credit.interest/100)),(- credit.installment_num))))
+        repayment_amount = credit.installment_num*installment_value
+        credit.credit_repayment_amount = round_to_nearest_hundred(repayment_amount)
         credit.is_paid = False
         instance.condition = 'A Tiempo'
         
@@ -170,6 +173,8 @@ def repayment_amount_auto(instance, *args, **kwargs):
     if instance.is_paid:
         instance.is_active = False
         instance.condition = 'Pagado'
+
+    
 
 
 def create_installments_auto(instance, created, *args, **kwargs):
@@ -211,6 +216,7 @@ def create_installments_auto(instance, created, *args, **kwargs):
 
 
 def update_installment(instance, *args, **kwargs):
+    instance.amount = round_to_nearest_hundred(instance.amount+instance.daily_interests)
     if instance.condition == 'Pagada':
         instance.is_paid_installment = True
     elif instance.condition == 'Vencida':
@@ -262,14 +268,13 @@ def refinancing_repayment_amount_auto(instance, *args, **kwargs):
             case 9: refinancing.interest = 75
             case _: refinancing.interest = 100
 
-        
+        refinancing.amount = round_to_nearest_hundred(refinancing.amount)
         repayment_amount = refinancing.amount
         refinancing.refinancing_repayment_amount = Decimal(repayment_amount)
-        refinancing.amount = Decimal(refinancing.amount / Decimal(1 + float(refinancing.interest) / 100))
+        refinancing.amount = round_to_nearest_hundred(refinancing.amount / Decimal(1 + float(refinancing.interest) / 100))
         refinancing.end_date = datetime.now() + timedelta(days=30)*refinancing.installment_num
 
     refinancing.is_new = False
-
 
 def create_installmentsR_auto(instance, created, *args, **kwargs):
     """

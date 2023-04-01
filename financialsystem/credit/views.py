@@ -47,6 +47,7 @@ def crear_credito(request):
                     phone_number.save()
                     
             credit = credit_form.save(commit=False)
+            credit.amount = round_to_nearest_hundred(credit.amount)
             credit.client = client
             credit.is_old_credit = False
             if not credit.is_old_credit:
@@ -182,6 +183,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             credit = form.save(commit=False)
             credit.is_old_credit = False
             credit.client = client
+            credit.amount = round_to_nearest_hundred(credit.amount)
             if not credit.is_old_credit:
                 credit.mov = create_movement(credit, self.request.user.adviser)
             credit.save()
@@ -235,6 +237,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
             credit = form.save(commit=False)
             credit.is_old_credit = False
             credit.client = self.client
+            credit.amount = round_to_nearest_hundred(credit.amount)
             if not credit.is_old_credit:
                 credit.mov = create_movement(credit, self.request.user.adviser)
             credit.save()

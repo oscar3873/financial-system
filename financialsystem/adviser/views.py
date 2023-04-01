@@ -109,7 +109,7 @@ def pay_commission(request, pk):
     real_value = Decimal(round((commission.amount*100)/commission.interest))  # Calculo para saber el monto original (el 100%)
 
     commission.is_paid = True
-    commission.amount = Decimal(real_value*(porcentage_value/100)) # Monto de la comision   
+    commission.amount = round_to_nearest_hundred(real_value*(porcentage_value/100)) # Monto de la comision   
     commission.operation_amount = real_value 
     commission.interest = Decimal(porcentage_value)
     commission.last_up = datetime.now()

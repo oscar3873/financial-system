@@ -4,7 +4,9 @@ from django.db import models
 from cashregister.models import Movement
 from adviser.models import Adviser
 
-from django.db.models.signals import post_save, pre_save, post_delete
+from django.db.models.signals import pre_save, post_delete
+
+from core.utils import round_to_nearest_hundred
 
 
 # Create your models here.
@@ -60,7 +62,7 @@ def paid_commission(instance, *args, **kwargs):
     '''Actualiza la comisión de una instancia si ha sido pagada. 
     Calcula el valor real de la comisión basado en la última tasa de interés almacenada. 
     Actualiza el monto y la tasa de interés de la instancia, y el tiempo de última actualización.'''
-
+    instance.amount = round_to_nearest_hundred(instance.amount)
     match(instance.type):
         case 'REGISTRO': instance.interest = Interest.objects.first().interest_register
         case 'COBRO': instance.interest = Interest.objects.first().interest_payment

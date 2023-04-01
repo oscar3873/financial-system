@@ -1,5 +1,5 @@
 from payment.models import Payment
-from credit.models import Installment, InstallmentRefinancing
+from credit.models import Installment
 
 def all_properties_paymnet():
     return ['Monto','Forma de Pago','Detalle','Fecha']
@@ -33,7 +33,6 @@ def pay_installment(payment, installments, amount_paid):
             installment.condition = 'Pagada'
             installment.is_paid_installment = True
             installment.payment_date = payment.payment_date
-            print("AQUIIIII")
             installment.save()
 
             payment_create(payment, installment)

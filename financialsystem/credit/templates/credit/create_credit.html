@@ -300,13 +300,21 @@
     interes.addEventListener("input", calcularMonto);
     monto.addEventListener("input", calcularMonto);
 
+    function round_to_nearest_hundred(x) {
+        if (x % 100 >= 50) {
+            return (Math.floor(x / 100) + 1) * 100;
+        } else {
+            return Math.floor(x / 100) * 100;
+        }
+    }
 
     function calcularMonto() {
         var installmentNum = parseInt(document.getElementById("id_installment_num").value);
         var creditInterest = parseFloat(document.getElementById("id_interest").value);
         var amount = parseFloat(document.getElementById("id_amount").value);
 
-        var monto = installmentNum * (creditInterest / 100 * amount) / (1 - Math.pow((1 + creditInterest / 100), (-installmentNum)));
+        var installment_value = round_to_nearest_hundred((creditInterest / 100 * amount) / (1 - Math.pow((1 + creditInterest / 100), (-installmentNum))))
+        var monto = installmentNum * installment_value;
 
         if (isNaN(monto)) {
             monto = "Caculando ..."
@@ -316,7 +324,7 @@
                 style: "currency",
                 currency: "ARS"
             });
-            montoCuota = parseFloat((monto / installmentNum).toFixed(2));
+            montoCuota = round_to_nearest_hundred(parseFloat((monto / installmentNum).toFixed(2)));
             cuota_a_devolver.textContent = montoCuota.toLocaleString("es-AR", {
                 style: "currency",
                 currency: "ARS"

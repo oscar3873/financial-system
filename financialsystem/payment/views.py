@@ -20,6 +20,7 @@ from commissions.models import Interest
 from .utils import *
 from .models import Payment
 from .forms import PaymentForm
+from core.utils import round_to_nearest_hundred
 
 # Create your views here.
 class PaymentListView(LoginRequiredMixin, ListView):
@@ -113,13 +114,13 @@ def make_payment_installment(request, pk):
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments_score = refinancing.installments.all().count()
         installments = refinancing.installments.exclude(condition='Pagada')
-        installment_amount = refinancing.installments.first().amount
+        installment_amount = round_to_nearest_hundred(refinancing.installments.first().amount)
         client = refinancing.installment_ref.last().credit.client
     except:
         credit = get_object_or_404(Credit, pk=pk)
         installments_score = credit.installments.all().count()
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-        installment_amount = credit.installments.first().amount
+        installment_amount = round_to_nearest_hundred(credit.installments.first().amount)
         client = credit.client
 
     form = PaymentForm(installments, request.POST or None)
@@ -144,7 +145,7 @@ def make_payment_installment(request, pk):
         else:
             for installment in pack.keys():
                 if pack[installment]:
-                    payment.amount = installment.amount
+                    payment.amount = round_to_nearest_hundred(installment.amount)
                     installment.condition = 'Pagada'
                     installment.is_paid_installment = True
                     installment.payment_date = payment.payment_date
@@ -156,7 +157,7 @@ def make_payment_installment(request, pk):
             score = round((points_per_installments/installments_score) * count_value)
             client.score += score
 
-            if (client.score + score) > 1500:
+            if (client.score + score) >= 1499:
                 client.score = 1500
                 
             client.save()
