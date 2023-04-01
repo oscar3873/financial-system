@@ -91,13 +91,8 @@ class PaymentForm(forms.ModelForm):
  
                 attrs = {"value": (installment.amount + installment.daily_interests), "id":form}
                 
-                # if installment == installments.first():
-                self.fields['Cuota %s %s' % (str(installment.installment_number), daily_interests)] = forms.BooleanField(
+
+                self.fields['cuota_%s' % (str(installment.installment_number))] = forms.BooleanField(
                     label='Cuota %s %s' % (str(installment.installment_number), daily_interests),required=False,
                     widget=forms.CheckboxInput(attrs=attrs)
                 )
-                # else:
-                #     self.fields['Cuota %s %s' % (str(installment.installment_number), daily_interests)] = forms.BooleanField(
-                #         label='Cuota %s %s' % (str(installment.installment_number), daily_interests),required=False,
-                #         widget=forms.CheckboxInput(attrs=attrs)
-                #     )

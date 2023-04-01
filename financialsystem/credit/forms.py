@@ -103,20 +103,27 @@ class RefinancingForm(forms.ModelForm):
         
         for installment in installments:
             if installment == credit.installments.first():
-                self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
+                self.fields['cuota_%s' %str(installment.installment_number)] = forms.BooleanField(
                     label='Cuota %s%s' % (
                         installment.installment_number,
                         ' (intereses acumulados $ %s)' % installment.daily_interests if installment.daily_interests > 0 else ''),
                         required=True,
-                        widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref%s" % (credit.pk)})
+                        widget=forms.CheckboxInput(attrs={
+                            "class": "form-check", 
+                            "value": installment.amount+installment.daily_interests, 
+                            "data-form-id": "form_ref%s" % (credit.pk)
+                        })
                     )
             else:
-                self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(
+                self.fields['cuota_%s' %str(installment.installment_number)] = forms.BooleanField(
                    label='Cuota %s%s' % (
                         installment.installment_number,
                         ' (intereses acumulados $ %s)' % installment.daily_interests if installment.daily_interests > 0 else ''),
                         required=False,
-                        widget=forms.CheckboxInput(attrs={"value": installment.amount+installment.daily_interests, "data-form-id": "form_ref%s" % (credit.pk)})
+                        widget=forms.CheckboxInput(attrs={
+                            "class": "form-check", 
+                            "value": installment.amount+installment.daily_interests, 
+                            "data-form-id": "form_ref%s" % (credit.pk)})
                     )
 
 

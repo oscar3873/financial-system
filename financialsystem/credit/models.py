@@ -6,10 +6,14 @@ from cashregister.models import Movement
 from django.db.models.signals import post_save, pre_save, pre_delete, post_delete
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+from django.utils import timezone
+
 
 from core.utils import round_to_nearest_hundred
 # Create your models here.
 #CREDITO
+
+date = timezone.now
 
 class Credit(models.Model):
     CHOICE = [
@@ -31,7 +35,7 @@ class Credit(models.Model):
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="credits")
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
-    start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=datetime.now, null=True)
+    start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=date, null=True)
     end_date = models.DateTimeField(verbose_name='Fecha de Finalizacion del Credito', null=True)
     payment_date = models.DateTimeField(verbose_name="Fecha de Pago",blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -67,7 +71,7 @@ class Refinancing(models.Model):
     payment_date = models.DateTimeField(help_text="Fecha de Pago", null=True, blank=True)
     # lastup = models.DateField(null=True, blank=True) #PARA CALCULO DE INTERESES DIARIOS
     end_date = models.DateTimeField(verbose_name='Fecha de Finalizacion de Refinanciacion', null=True)
-    start_date = models.DateTimeField(default=datetime.now, null=True)
+    start_date = models.DateTimeField(default=date, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="refinancing", help_text="Credito de la cuota", null=True, blank=True)
@@ -101,8 +105,8 @@ class Installment(models.Model):
     installment_number = models.PositiveSmallIntegerField(help_text="Numero de cuota del credito")
     daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=0, help_text="Intereses diarios")
     porcentage_daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=2, help_text="Intereses diarios")
-    start_date = models.DateTimeField(default=datetime.now, null=True)
-    end_date = models.DateTimeField(null=True)
+    start_date = models.DateTimeField(default=date, null=True)
+    end_date = models.DateTimeField(null=True, default=None)
     payment_date = models.DateTimeField(help_text="Fecha de Pago", null=True, blank=True)
     condition = models.CharField(max_length=15,choices=CONDITION, default='A Tiempo')
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="installments", help_text="Credito de la cuota")
@@ -138,8 +142,8 @@ class InstallmentRefinancing(models.Model):
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota de refinanciacion")
     original_amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota")
     payment_date = models.DateTimeField(verbose_name="Fecha de Pago",blank=True, null=True)
-    start_date = models.DateTimeField(default=datetime.now, verbose_name='Fecha de Inicio')
-    end_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True)
+    start_date = models.DateTimeField(default=date, verbose_name='Fecha de Inicio')
+    end_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True, default=None)
     lastup = models.DateField(null=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -289,7 +293,8 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
                 installment_number=numberInstms, 
                 start_date = start_date,
                 credit= refinancing.credit, 
-                amount= amount_installment, 
+                amount= amount_installment,
+                original_amount=amount_installment,
                 end_date=end_date,
                 lastup=end_date
                 )
