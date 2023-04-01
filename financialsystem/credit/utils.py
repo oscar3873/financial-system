@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.http import JsonResponse
 
 from commissions.models import Interest
-from core.utils import round_to_nearest_special
+from core.utils import round_to_nearest_special, round_to_nearest_hundred
 from .models import Credit, Refinancing, Installment
 from clients.models import Client
 
@@ -49,7 +49,6 @@ def for_refresh(obj_with_vencidas):
             installment_ven.condition = 'Vencida' 
 
         installment_ven.is_caduced_installment = True
-
         if installment_ven.lastup != date.today():
             dates = installment_ven.lastup
 
@@ -59,10 +58,14 @@ def for_refresh(obj_with_vencidas):
             dates = date.today()
 
         resto = abs((date.today() - dates).days)
-        daily_interes = resto * installment_ven.amount * Decimal(installment_ven.porcentage_daily_interests/100)
-        installment_ven.daily_interests += round_to_nearest_special(daily_interes)
-        installment_ven.lastup = date.today()
-        installment_ven.save()
+        daily_interes = round_to_nearest_special(resto * installment_ven.original_amount * Decimal(installment_ven.porcentage_daily_interests/100))
+
+        if daily_interes > 0:
+            installment_ven.daily_interests = daily_interes
+            installment_ven.amount = installment_ven.original_amount + daily_interes
+            installment_ven.amount = round_to_nearest_hundred(installment_ven.amount)
+            installment_ven.lastup = date.today()
+            installment_ven.save()
 
         daily_interest = Interest.objects.all()[0].daily_interest
 

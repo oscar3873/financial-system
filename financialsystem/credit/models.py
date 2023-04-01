@@ -107,6 +107,7 @@ class Installment(models.Model):
     condition = models.CharField(max_length=15,choices=CONDITION, default='A Tiempo')
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="installments", help_text="Credito de la cuota")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota")
+    original_amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota")
     lastup = models.DateField(null=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -135,6 +136,7 @@ class InstallmentRefinancing(models.Model):
     porcentage_daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=2, help_text="Intereses diarios")
     refinancing = models.ForeignKey(Refinancing, on_delete=models.CASCADE, related_name="installments", help_text="Refinanciacion de la cuota")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota de refinanciacion")
+    original_amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota")
     payment_date = models.DateTimeField(verbose_name="Fecha de Pago",blank=True, null=True)
     start_date = models.DateTimeField(default=datetime.now, verbose_name='Fecha de Inicio')
     end_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True)
@@ -200,7 +202,8 @@ def create_installments_auto(instance, created, *args, **kwargs):
                 installment_number=numberInstms, 
                 start_date = start_date,
                 credit= credit, 
-                amount= amount_installment, 
+                amount= amount_installment,
+                original_amount = amount_installment,
                 end_date=end_date,
                 lastup=end_date
                 )
@@ -212,7 +215,6 @@ def create_installments_auto(instance, created, *args, **kwargs):
 
 
 def update_installment(instance, *args, **kwargs):
-    instance.amount = round_to_nearest_hundred(instance.amount+instance.daily_interests)
     if instance.condition == 'Pagada':
         instance.is_paid_installment = True
     elif instance.condition == 'Vencida':
