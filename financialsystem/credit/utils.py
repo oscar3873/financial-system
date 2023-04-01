@@ -66,6 +66,7 @@ def for_refresh(obj_with_vencidas):
 
         daily_interest = Interest.objects.all()[0].daily_interest
 
+        # DISMINUCION DE SCORE EN BASE A INTERESES DIARIOS (MIENTRAS HAYA SIDO UN CREDITO ACTUAL)
         if isinstance(credit, Credit):
             if not credit.is_old_credit and (client.score - daily_interest * resto < 1):
                 client.score = 0

@@ -19,7 +19,7 @@ from .utils import all_properties_client
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 
 
 #CRUD CLIENT
