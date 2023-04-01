@@ -1,6 +1,7 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
 <!--Main-->
-<link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet"> {% if messages %} {% for message in messages %}
+<link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet"> 
+{% if messages %} {% for message in messages %}
 <div class="alert alert-primary alert-dismissible" role="alert">
     <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
     <span class="font-weight-light">{{ message }}</span>
@@ -558,6 +559,7 @@
 
         const checkboxes = document.querySelectorAll('input[type="checkbox"][data-form-id="form_ref' + id + '"]'); //AGREGO ID PARA SABER EXACTAMENTE QUE DE QUE CHECKBOXES SE TRATAN
         const selector = document.querySelector('#id_installment_num' + id); // ID PARA EL SELECTOR EN CASO DE TENER MUCHOS CREDITOS A REFIANNCIAR
+        const installment_value = document.querySelector('#id_installment_amount' + id);
         const sumElement = document.querySelector('#id_amount' + id); // ID PARA VER EL MONTO FINAL EN CASO DE QUERER REFIANNCIAR
         const refInstallmentDetail = document.getElementById('ref-installment-detail');
         const refInstallmentAmount = document.createElement('span');
@@ -565,6 +567,15 @@
 
         refInstallmentAmount.classList.add('text-warning', 'font-weight-bold')
         refInstallmentAmount.style.fontSize = '1.5rem';
+
+
+        function round_to_nearest_hundred(x) {
+            if (x % 100 >= 50) {
+                return (Math.floor(x / 100) + 1) * 100;
+            } else {
+                return Math.floor(x / 100) * 100;
+            }
+        }
 
         function calcularSuma() {
             let sum = 0;
@@ -589,8 +600,12 @@
                     break;
             }
             const selectorValue = parseFloat(selector.value);
-            const total = (sum * (porcentaje + 100) / 100).toFixed(2);
+            const subtotal = round_to_nearest_hundred((sum * (porcentaje + 100) / 100).toFixed(2));
+            const installment_amount = round_to_nearest_hundred((subtotal/selectorValue).toFixed(2));
+            const total = installment_amount*selectorValue;
+
             sumElement.value = `${total}`;
+            installment_value.value = `${installment_amount}`
         }
 
         checkboxes.forEach(checkbox => {

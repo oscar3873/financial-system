@@ -148,10 +148,10 @@ def clientCreate(request):
                     phone_number.client = client
                     phone_number.save()
 
-            messages.success(request, 'El cliente se ha guardado exitosamente.', 'success')
+            messages.success(request, 'El cliente se ha guardado exitosamente.')
             return redirect('clients:list')
         else:
-            messages.error(request, 'Ocurrió un error al guardar el cliente.', 'danger')
+            messages.error(request, 'Ocurrió un error al guardar el cliente.')
 
     context = {
         'form': client_form,
@@ -209,7 +209,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         Obtiene la URL de redirección después de que se ha actualizado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """	
-        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
+        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()))
         return reverse_lazy('clients:list')
 
 
@@ -357,7 +357,7 @@ class ClientDelete(LoginRequiredMixin, DeleteView):
         Obtiene la URL de redirección después de que se ha borrado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """	
-        messages.success(self.request, 'Cliente eliminado correctamente', "danger")
+        messages.warning(self.request, 'Cliente eliminado correctamente')
         return  reverse_lazy('clients:list')
 
     

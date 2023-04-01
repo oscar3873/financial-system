@@ -93,7 +93,7 @@ class NoteCreateView(LoginRequiredMixin, CreateView):
         """
         Redirecciona al listado de notas, con un mensaje de creacion exitosa.
         """
-        messages.success(self.request, 'Nota creada correctamente', "success")
+        messages.success(self.request, 'Nota creada correctamente')
         return  reverse_lazy('notes:list')
 
 #BORRADO DE UNA NOTA
@@ -107,13 +107,12 @@ class NoteDeleteView(LoginRequiredMixin, DeleteView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-
-            
+    
     def get_success_url(self) -> str:
         """
         Redirecciona al listado de notas, con un mensaje de creacion exitosa.
         """
-        messages.success(self.request, 'Nota eliminada correctamente', "danger")
+        messages.warning(self.request, 'Nota eliminada correctamente')
         return  reverse_lazy('notes:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -139,5 +138,5 @@ class NoteUpdateView(LoginRequiredMixin, UpdateView):
         """
         Redirecciona al listado de notas, con un mensaje de creacion exitosa.
         """
-        messages.success(self.request, 'Nota actualizada satisfactoriamente', "info")
+        messages.info(self.request, 'Nota actualizada satisfactoriamente')
         return  reverse_lazy('notes:list')

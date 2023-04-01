@@ -147,7 +147,7 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         """
         Método que redirige al usuario a la página de inicio después de crear un nuevo movimiento.
         """
-        messages.success(self.request,"Movimiento realizado exitosamente!","success")
+        messages.success(self.request,"Movimiento realizado exitosamente!")
         return reverse_lazy('cashregister:home')
 
 #LISTA DE MOVIMIENTOS
@@ -231,7 +231,7 @@ class MovementDeleteView(DeleteView):
         Obtiene la URL de redirección después de que se ha eliminado correctamente un objeto Movement.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.success(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()), "danger")
+        messages.error(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()))
         return reverse_lazy('cashregister:home')
 
 
@@ -263,5 +263,5 @@ class MovementUpdateView(UpdateView):
         Obtiene la URL de redirección después de que se ha actualizado correctamente un objeto Movement.
         Agrega un mensaje de éxito a la cola de mensajes.
         """	
-        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
+        messages.info(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()))
         return  reverse_lazy('cashregister:home')

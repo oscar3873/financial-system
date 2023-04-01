@@ -111,7 +111,7 @@ class WarrantyCreateView(LoginRequiredMixin, CreateView):
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.
         """
-        messages.success(self.request, 'Articulo creado correctamente', "success")
+        messages.success(self.request, 'Articulo creado correctamente')
         return  reverse_lazy('warrantys:list')
 
 #BORRADO DE UNA NOTA
@@ -129,7 +129,7 @@ class WarrantyDeleteView(LoginRequiredMixin, DeleteView):
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.
         """
-        messages.success(self.request, 'Articulo eliminado correctamente', "danger")
+        messages.warning(self.request, 'Articulo eliminado correctamente')
         return  reverse_lazy('warrantys:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -165,7 +165,7 @@ class WarrantyUpdateView(LoginRequiredMixin, UpdateView):
         """
         Devuelve la URL de la vista que se debe redireccionar a la lista.
         """
-        messages.success(self.request, 'Articulo actualizado satisfactoriamente', "info")
+        messages.info(self.request, 'Articulo actualizado satisfactoriamente')
         return  reverse_lazy('warrantys:list')
 
 

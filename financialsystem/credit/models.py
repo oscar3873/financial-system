@@ -5,6 +5,7 @@ from clients.models import Client
 from cashregister.models import Movement
 from django.db.models.signals import post_save, pre_save, pre_delete, post_delete
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from core.utils import round_to_nearest_hundred
 # Create your models here.
@@ -175,8 +176,6 @@ def repayment_amount_auto(instance, *args, **kwargs):
         instance.condition = 'Pagado'
 
     
-
-
 def create_installments_auto(instance, created, *args, **kwargs):
     """
     Crea las cuotas del credito.
@@ -190,16 +189,13 @@ def create_installments_auto(instance, created, *args, **kwargs):
                 installment_with_ref.refiannce.delete()
         except: pass
         credit = instance
-        days = 30
         amount_installment = Decimal(credit.credit_repayment_amount/credit.installment_num)
-        for numberInstallments in range(credit.installment_num):
-            end_date = credit.start_date + timedelta(days=days)
-            numberInstms = numberInstallments + 1
-            if numberInstallments == 1:
-                start_date = credit.start_date
-            else:
-                start_date = credit.start_date + timedelta(days=days)
 
+        start_date = credit.start_date
+        for numberInstallments in range(credit.installment_num):
+            end_date = start_date + relativedelta(months=+1)
+            numberInstms = numberInstallments + 1
+            
             credit.installments.create(
                 installment_number=numberInstms, 
                 start_date = start_date,
@@ -208,7 +204,7 @@ def create_installments_auto(instance, created, *args, **kwargs):
                 end_date=end_date,
                 lastup=end_date
                 )
-            days += 30
+            start_date = end_date
 
     if not instance.is_old_credit:
         instance.is_old_credit = True
@@ -268,11 +264,9 @@ def refinancing_repayment_amount_auto(instance, *args, **kwargs):
             case 9: refinancing.interest = 75
             case _: refinancing.interest = 100
 
-        refinancing.amount = round_to_nearest_hundred(refinancing.amount)
-        repayment_amount = refinancing.amount
-        refinancing.refinancing_repayment_amount = Decimal(repayment_amount)
+        refinancing.refinancing_repayment_amount = refinancing.amount
         refinancing.amount = round_to_nearest_hundred(refinancing.amount / Decimal(1 + float(refinancing.interest) / 100))
-        refinancing.end_date = datetime.now() + timedelta(days=30)*refinancing.installment_num
+        refinancing.end_date = refinancing.start_date + relativedelta(months=int(refinancing.installment_num))
 
     refinancing.is_new = False
 
@@ -282,25 +276,22 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
     """
     if created:
         refinancing = instance
-        days = 30
         amount_installment = Decimal(refinancing.refinancing_repayment_amount/refinancing.installment_num)
+
+        start_date = instance.start_date
         for numberInstallments in range(refinancing.installment_num):
-            end_date = instance.created_at + timedelta(days=days)
-            if numberInstallments == 1:
-                start_date = refinancing.start_date
-            else:
-                start_date = refinancing.start_date + timedelta(days=days)
+            end_date = start_date + relativedelta(months=+1)
             numberInstms = numberInstallments + 1
+            
             refinancing.installments.create(
-                installment_number=numberInstms,
-                refinancing=refinancing,
+                installment_number=numberInstms, 
                 start_date = start_date,
-                amount=amount_installment, 
-                end_date=end_date, 
-                lastup=end_date,
-                credit=instance.credit
+                credit= refinancing.credit, 
+                amount= amount_installment, 
+                end_date=end_date,
+                lastup=end_date
                 )
-            days += 30
+            start_date = end_date
 
 def installment_reset_refinance(instance, *args, **kwargs):
     try:

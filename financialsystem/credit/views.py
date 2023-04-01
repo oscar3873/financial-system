@@ -203,7 +203,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
         """ 
         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
         """
-        messages.success(self.request, 'Credito creado correctamente', "success")
+        messages.success(self.request, 'Credito creado correctamente')
         return  reverse_lazy('credits:list')
 
 
@@ -247,7 +247,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
         """
         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
         """
-        messages.success(self.request, 'Credito creado correctamente',"success")
+        messages.success(self.request, 'Credito creado correctamente')
         return  reverse_lazy('clients:detail', kwargs=self.kwargs)
     
 
@@ -268,7 +268,7 @@ def edit_credit(request, pk):
                 credit.is_old_credit = False
                 credit.save()
                 
-            messages.success(request,'Cambios realizados exitosamente')
+            messages.info(request,'Cambios realizados exitosamente')
             return redirect('credits:list')
 
     context = {
@@ -280,12 +280,13 @@ def edit_credit(request, pk):
 
 #------------------------------------------------------------------
 @login_required(login_url="/accounts/login/")     
-def client_delete(request, pk):
+def credit_delete(request, pk):
     try:
         cred = get_object_or_404(Credit, pk=pk)
+        client = cred.client
         cred.delete()
-        messages.success(request, 'Credito borrado correctamente', "success")
-        return  redirect('credits:list')
+        messages.warning(request, 'Credito borrado correctamente')
+        return  redirect('clients:detail', pk=client.pk)
     except:
         messages.error(request, 'Hubo un error al intentar', "danger")
         return  redirect('credits:list')
@@ -308,6 +309,7 @@ def refinance_installment (request, pk):
             
             refinancing = form.save(commit=False)
             refinancing.credit = credit
+            refinancing.is_new = True
             refinancing.save()
             for installment in pack.keys():
                 if pack[installment]:

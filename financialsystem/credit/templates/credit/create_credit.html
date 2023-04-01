@@ -313,7 +313,7 @@
         var creditInterest = parseFloat(document.getElementById("id_interest").value);
         var amount = parseFloat(document.getElementById("id_amount").value);
 
-        var installment_value = round_to_nearest_hundred((creditInterest / 100 * amount) / (1 - Math.pow((1 + creditInterest / 100), (-installmentNum))))
+        var installment_value = round_to_nearest_hundred((creditInterest / 100 * amount) / (1 - Math.pow((1 + creditInterest / 100), (-installmentNum))));
         var monto = installmentNum * installment_value;
 
         if (isNaN(monto)) {

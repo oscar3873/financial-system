@@ -11,7 +11,7 @@ credits_patterns = ([
 
     path('credits/edit/<uuid:pk>/', edit_credit, name='edit_credit'),#------------------------------------------------------------------   NUEVOOOO
 
-    path('delete/<uuid:pk>/', client_delete, name='delete'),
+    path('delete/<uuid:pk>/', credit_delete, name='delete'),
     path('refinancing/<uuid:pk>/', refinance_installment, name='refinance'),
     path('refinance/update/<uuid:pk>/', RefinancingUpdateView.as_view(), name='refinance_update'),
     path('refinance/delete/<uuid:pk>/', refinancing_delete, name='refinance_delete'),

@@ -116,7 +116,7 @@ def guarantorCreateView(request):
                 if phone_number.phone_number_g:
                     phone_number.guarantor = guarantor
                     phone_number.save()
-            messages.success(request, 'El garante se ha guardado exitosamente.','success')
+            messages.success(request, 'El garante se ha guardado exitosamente.' )
             return redirect('guarantors:list')
     else:
         print("------------Algun formulario es invalido------------")
@@ -133,7 +133,7 @@ def guarantorCreateView(request):
 def delete_guarantor(request, pk):
     guarantor = get_object_or_404(Guarantor, pk=pk)
     guarantor.delete()
-    messages.success(request, 'Garante eliminado correctamente', "danger")
+    messages.warning(request, 'Garante eliminado correctamente' )
     return  redirect('guarantors:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -183,5 +183,5 @@ class GuarantorUpdateView(LoginRequiredMixin, UpdateView):
         Obtiene la URL de redirección después de que se ha actualizado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """	
-        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()), "info")
+        messages.info(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()))
         return reverse_lazy('guarantors:list')

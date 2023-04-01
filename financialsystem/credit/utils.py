@@ -76,7 +76,7 @@ def for_refresh(obj_with_vencidas):
             else:
                 client.score -= daily_interest * resto
 
-        client.save()
+        # client.save()
 
 
 def refresh_installments_credits():

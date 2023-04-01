@@ -69,6 +69,13 @@ class RefinancingForm(forms.ModelForm):
         )
     )
 
+    installment_amount = forms.CharField(
+        label= "Valor de cuota $",
+        widget=forms.TextInput(
+            attrs={'class': 'form-control bg-primary text-warning font-weight-bold', 'readonly': 'readonly', 'style': 'font-size: 2rem; border: none; user-select: none; outline: none; -webkit-box-shadow: none; -moz-box-shadow: none; box-shadow: none; cursor: default;'}
+        )
+    )
+
     installment_num = forms.ChoiceField(
         label= "Numero de Cuotas",
         choices=CHOICES,
@@ -92,7 +99,8 @@ class RefinancingForm(forms.ModelForm):
 
         self.fields['amount'].widget.attrs['id'] = 'id_amount{}'.format(credit.pk)  # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
         self.fields['installment_num'].widget.attrs['id'] = 'id_installment_num{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
-
+        self.fields['installment_amount'].widget.attrs['id'] = 'id_installment_amount{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
+        
         for installment in installments:
             if installment == credit.installments.first():
                 self.fields['Cuota %s' %str(installment.installment_number)] = forms.BooleanField(

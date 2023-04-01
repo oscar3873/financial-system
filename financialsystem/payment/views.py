@@ -61,14 +61,13 @@ class PaymentDeleteView(LoginRequiredMixin, DeleteView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-
-            
+       
     def get_success_url(self) -> str:
         """
         Obtiene la URL de redirección después de que se ha eliminado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.success(self.request, 'Pago borrada correctamente', "danger")
+        messages.warning(self.request, 'Pago borrada correctamente')
         return  reverse_lazy('payments:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -99,7 +98,7 @@ class PaymentUpdateView(LoginRequiredMixin, UpdateView):
         Obtiene la URL de redirección después de que se ha eliminado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.success(self.request, 'Pago actualizada satisfactoriamente', "info")
+        messages.info(self.request, 'Pago actualizada satisfactoriamente')
         return  reverse_lazy('payments:list')
     
 #REALIZAR DE UN PAGO
