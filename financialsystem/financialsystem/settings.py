@@ -18,7 +18,9 @@ from dotenv import load_dotenv
 # Carga las variables de entorno desde el archivo .env
 load_dotenv()
 
-
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
