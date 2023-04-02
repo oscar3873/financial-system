@@ -35,7 +35,7 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["www.finanx.com.ar", 'finanx.com.ar']
+ALLOWED_HOSTS = ["127.0.0.1","www.finanx.com.ar", 'finanx.com.ar']
 
 
 # Application definition
