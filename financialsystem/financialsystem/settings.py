@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
-import os
 from dotenv import load_dotenv
+from decouple import config
 
 # Carga las variables de entorno desde el archivo .env
 load_dotenv()
@@ -30,12 +30,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["www.finanx.com", 'finanx.com']
+ALLOWED_HOSTS = ["www.finanx.com.ar", 'finanx.com.ar']
 
 
 # Application definition
@@ -80,10 +80,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.security.XContentTypeOptionsMiddleware",
-    "django.middleware.security.XXssProtectionMiddleware",
-    "django.middleware.security.XPermittedCrossDomainPoliciesMiddleware",
 ]
+
 
 ROOT_URLCONF = "financialsystem.urls"
 
@@ -121,14 +119,15 @@ THOUSAND_SEPARATOR = '.'
 # }
 DATABASES = {
     'default': {
-        'ENGINE':'django.db.backends.mysql',
-        'NAME': os.environ.get('DJANGO_DATABASE_NAME'),
-        'USER': os.environ.get('DJANGO_DATABASE_USER'),
-        'PASSWORD': os.environ.get('DJANGO_DATABASE_PASSWORD'),
-        'HOST': os.environ.get('DJANGO_DATABASE_HOST'),
-        'PORT': os.environ.get('DJANGO_DATABASE_PORT'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DJANGO_DATABASE_NAME'),
+        'USER': config('DJANGO_DATABASE_USER'),
+        'PASSWORD': config('DJANGO_DATABASE_PASSWORD'),
+        'HOST': config('DJANGO_DATABASE_HOST'),
+        'PORT': config('DJANGO_DATABASE_PORT', default='3306'),
     }
 }
+
 
 
 # Password validation
@@ -166,7 +165,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -176,7 +175,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-#Formularios con Bootstrap 
+#Formularios con Bootstrap
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
@@ -185,10 +184,10 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = 'home'
 
-EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST')
-EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DJANGO_DEFAULT_FROM_EMAIL')
-EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_PORT'))
-EMAIL_USE_TLS = os.environ.get('DJANGO_EMAIL_USE_TLS') == 'True'
-EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND')
+EMAIL_BACKEND = config('DJANGO_EMAIL_BACKEND')
+EMAIL_HOST = config('DJANGO_EMAIL_HOST')
+EMAIL_PORT = int(config('DJANGO_EMAIL_PORT', default='587'))
+EMAIL_USE_TLS = config('DJANGO_EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('DJANGO_EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('DJANGO_EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DJANGO_DEFAULT_FROM_EMAIL')
