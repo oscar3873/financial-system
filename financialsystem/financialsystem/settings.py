@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
 
 
 
@@ -23,12 +28,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-y%fmoimj#+tghon04@h0@at_z@6mdef%+vc1j#js!sxa+lgv-+"
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*', '192.168.0.18', '192.168.0.25', '192.168.0.29', '192.168.0.27']
+ALLOWED_HOSTS = ["www.finanx.com", 'finanx.com']
 
 
 # Application definition
@@ -73,6 +78,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.security.XContentTypeOptionsMiddleware",
+    "django.middleware.security.XXssProtectionMiddleware",
+    "django.middleware.security.XPermittedCrossDomainPoliciesMiddleware",
 ]
 
 ROOT_URLCONF = "financialsystem.urls"
@@ -103,22 +111,22 @@ THOUSAND_SEPARATOR = '.'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 # DATABASES = {
-#     'default': {
-#         'ENGINE':'django.db.backends.mysql',
-#         'NAME':'finanxdb',
-#         'USER':'root',
-#         'PASSWORD':'Oscar3873',
-#         'HOST':'localhost',
-#         'PORT':'3306',
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+DATABASES = {
+    'default': {
+        'ENGINE':'django.db.backends.mysql',
+        'NAME': os.environ.get('DJANGO_DATABASE_NAME'),
+        'USER': os.environ.get('DJANGO_DATABASE_USER'),
+        'PASSWORD': os.environ.get('DJANGO_DATABASE_PASSWORD'),
+        'HOST': os.environ.get('DJANGO_DATABASE_HOST'),
+        'PORT': os.environ.get('DJANGO_DATABASE_PORT'),
+    }
+}
 
 
 # Password validation
@@ -155,9 +163,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -173,10 +183,10 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = 'home'
 
-EMAIL_HOST = 'smtp.mailgun.org'
-EMAIL_HOST_USER = 'postmaster@sandboxc3ae65cb4e5d49999e00c8d7f96ee9f7.mailgun.org'
-EMAIL_HOST_PASSWORD = '218726616d90ea05ca451bd864db89b2-75cd784d-1846b1af'
-DEFAULT_FROM_EMAIL = 'postmaster@sandboxc3ae65cb4e5d49999e00c8d7f96ee9f7.mailgun.org'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('DJANGO_EMAIL_HOST')
+EMAIL_HOST_USER = os.environ.get('DJANGO_EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.environ.get('DJANGO_DEFAULT_FROM_EMAIL')
+EMAIL_PORT = int(os.environ.get('DJANGO_EMAIL_PORT'))
+EMAIL_USE_TLS = os.environ.get('DJANGO_EMAIL_USE_TLS') == 'True'
+EMAIL_BACKEND = os.environ.get('DJANGO_EMAIL_BACKEND')

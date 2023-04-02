@@ -65,5 +65,5 @@ def create_fake_clients_and_phone_numbers(num_records):
 
         print(f"Credit {credit.pk} created")
 if __name__ == '__main__':
-    num_records = 1000  # Establece el número de registros que deseas crear
+    num_records = 5  # Establece el número de registros que deseas crear
     create_fake_clients_and_phone_numbers(num_records)
