@@ -12,6 +12,7 @@ from adviser.models import Adviser
 from clients.models import Client, PhoneNumberClient
 from credit.models import Credit
 from cashregister.models import CashRegister, Movement
+from guarantor.models import Guarantor
 
 
 fake = Faker()
@@ -23,6 +24,17 @@ def create_fake_clients_and_phone_numbers(num_records):
     for _ in range(num_records):
         adviser = fake.random_element(advisers)
         cash_register = fake.random_element(cash_registers)
+        
+        guarantor = Guarantor.objects.create(
+            first_name=fake.first_name(),
+            last_name=fake.last_name(),
+            email=fake.email(),
+            civil_status=fake.random_element(Client.CivilStatus)[0],
+            dni=fake.random_number(digits=8),
+            profession=fake.job().replace(',', ' '),
+            address=fake.address().replace(',', ' '),
+            job_address=fake.address().replace(',', ' '),
+        )
 
         client = Client.objects.create(
             first_name=fake.first_name(),
@@ -49,8 +61,12 @@ def create_fake_clients_and_phone_numbers(num_records):
             installment_num=fake.random_int(min=1, max=12),
             start_date=fake.date_time_this_year(),
             client=client,
+            guarantor=guarantor,
+            has_pay_stub= fake.pybool(),
         )
         
+
+
         movement = Movement.objects.create(
             amount=credit.amount,
             description=fake.text(max_nb_chars=500),
@@ -65,5 +81,5 @@ def create_fake_clients_and_phone_numbers(num_records):
 
         print(f"Credit {credit.pk} created")
 if __name__ == '__main__':
-    num_records = 1000  # Establece el número de registros que deseas crear
+    num_records = 10  # Establece el número de registros que deseas crear
     create_fake_clients_and_phone_numbers(num_records)

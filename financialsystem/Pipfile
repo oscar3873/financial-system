@@ -52,6 +52,7 @@ typing-extensions = "==4.4.0"
 tzdata = "==2022.7"
 whitenoise = "==6.4.0"
 wrapt = "==1.14.1"
+faker = "*"
 
 [dev-packages]
 
