@@ -30,9 +30,9 @@ def crear_credito(request):
     Creacion de un cliente, credito, garante y empeño, con sus respectivos formularios.
     """
     client_form = ClientForm(request.POST or None)
-    guarantor_form = GuarantorForm(request.POST or None)
+    guarantor_form = GuarantorForm(request.POST or None, prefix = 'credit_created')
     warranty_form = WarrantyForm(request.POST or None)
-    credit_form = CreditForm(request.POST or None)
+    credit_form = CreditForm(request.POST or None, initial = {'adviser':request.user.adviser})
     formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
     
@@ -180,7 +180,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
         context['form'] = CreditForm(initial= self.get_initial())
         context['clients'] = Client.objects.all()
         context['warranty_form'] = WarrantyForm(self.request.POST or None)
-        context['garante_form'] = GuarantorForm(self.request.POST or None, prefix="guarantor")
+        context['garante_form'] = GuarantorForm(self.request.POST or None, prefix="credit_created")
         context['formsetPhoneGuarantor'] = PhoneNumberFormSetG(instance=Guarantor(), prefix="phone_number_guarantor")
 
         return context
@@ -263,7 +263,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
         context['cliente_form'] = CreditForm(initial= self.get_initial())
         context['is_add'] = True
         context['warranty_form'] = WarrantyForm
-        context['garante_form'] = GuarantorForm
+        context['garante_form'] = GuarantorForm(prefix = 'credit_created')
         context['formsetPhoneGuarantor'] = PhoneNumberFormSetG(instance=Guarantor(), prefix = "phone_number_guarantor")
 
         return context
@@ -298,7 +298,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
                 credit.guarantor = guarantor
                 credit.save()
             else:
-                garante_form = GuarantorForm(self.request.POST, prefix="guarantor")
+                garante_form = GuarantorForm(self.request.POST, prefix="credit_created")
 
                 guarantor = garante_form.save(commit=False)
                 if garante_form.cleaned_data["dni"]:            

@@ -113,7 +113,7 @@ class GuarantorDetailView(LoginRequiredMixin, DetailView):
 
 #CREACION DE UNA NOTA
 def guarantorCreateView(request):
-    guarantor_form = GuarantorForm(request.POST or None)
+    guarantor_form = GuarantorForm(request.POST or None, prefix="guarantor")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
 
     if request.method == 'POST':
@@ -159,7 +159,7 @@ class GuarantorUpdateView(LoginRequiredMixin, UpdateView):
     Actualiza el client y sus telefonos.
     """
     model = Guarantor
-    form_class = GuarantorForm
+    form_class = GuarantorUpdateForm
     template_name_suffix = '_update'
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
@@ -174,7 +174,7 @@ class GuarantorUpdateView(LoginRequiredMixin, UpdateView):
         if self.request.POST:
             context['phone_formset'] = PhoneNumberFormSetGUpdate(self.request.POST, instance=self.object)
         else:
-            context['form'] = GuarantorForm(instance = self.object)
+            context['form'] = GuarantorUpdateForm(instance = self.object)
             context['phone_formset'] = PhoneNumberFormSetGUpdate(instance=self.object)
         return context
 

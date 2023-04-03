@@ -12,15 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-from decouple import config
 
-# Carga las variables de entorno desde el archivo .env
-load_dotenv()
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('DJANGO_SECRET_KEY')
+SECRET_KEY = "django-insecure-y%fmoimj#+tghon04@h0@at_z@6mdef%+vc1j#js!sxa+lgv-+"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["www.finanx.com.ar", 'finanx.com.ar']
+ALLOWED_HOSTS = ['*', '192.168.0.18', '192.168.0.25', '192.168.0.29', '192.168.0.27']
 
 
 # Application definition
@@ -82,7 +75,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 ROOT_URLCONF = "financialsystem.urls"
 
 TEMPLATES = [
@@ -110,24 +102,29 @@ THOUSAND_SEPARATOR = '.'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.sqlite3",
 #         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DJANGO_DATABASE_NAME'),
-        'USER': config('DJANGO_DATABASE_USER'),
-        'PASSWORD': config('DJANGO_DATABASE_PASSWORD'),
-        'HOST': config('DJANGO_DATABASE_HOST'),
-        'PORT': config('DJANGO_DATABASE_PORT', default='3306'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE':'django.db.backends.mysql',
+#         'NAME':'finanxdb',
+#         'USER':'root',
+#         'PASSWORD':'Oscar3873',
+#         'HOST':'localhost',
+#         'PORT':'3306',
+#     }
+# }
 
 
 # Password validation
@@ -164,18 +161,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-MEDIA_URL = '/media/'
+STATIC_URL = "static/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-#Formularios con Bootstrap
+#Formularios con Bootstrap 
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
@@ -184,10 +179,29 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = 'home'
 
-EMAIL_BACKEND = config('DJANGO_EMAIL_BACKEND')
-EMAIL_HOST = config('DJANGO_EMAIL_HOST')
-EMAIL_PORT = int(config('DJANGO_EMAIL_PORT', default='587'))
-EMAIL_USE_TLS = config('DJANGO_EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('DJANGO_EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('DJANGO_EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = config('DJANGO_DEFAULT_FROM_EMAIL')
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_HOST_USER = 'postmaster@sandboxc3ae65cb4e5d49999e00c8d7f96ee9f7.mailgun.org'
+EMAIL_HOST_PASSWORD = '218726616d90ea05ca451bd864db89b2-75cd784d-1846b1af'
+DEFAULT_FROM_EMAIL = 'postmaster@sandboxc3ae65cb4e5d49999e00c8d7f96ee9f7.mailgun.org'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+########################################### WSGI SETTINGS ############################################
+
+"""
+WSGI config for financialsystem project.
+
+It exposes the WSGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/4.1/howto/deployment/wsgi/
+"""
+
+import os
+
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "financialsystem.settings")
+
+application = get_wsgi_application()

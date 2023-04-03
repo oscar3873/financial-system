@@ -7,9 +7,7 @@ from guarantor.models import Guarantor, PhoneNumberGuarantor
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
 class GuarantorForm(forms.ModelForm):
-    
-    prefix = 'guarantor'
-    
+        
     CIVIL_STATUS = (
         ('Soltero','Soltero'),
         ('Casado', 'Casado'),
@@ -27,11 +25,13 @@ class GuarantorForm(forms.ModelForm):
     
     email = forms.EmailField(
         label= 'Correo Electrónico',
+        required=False
     )
     
     civil_status = forms.ChoiceField(
         choices= CIVIL_STATUS,
-        label= "Estado Civil"
+        label= "Estado Civil",
+        initial="Soltero"
     )
     
     dni = forms.IntegerField(
@@ -40,14 +40,17 @@ class GuarantorForm(forms.ModelForm):
     
     profession = forms.CharField(
         label= "Profesion",
+        required=False
     )
     
     address = forms.CharField(
         label= "Domicilio",
+        required=False
     )
     
     job_address = forms.CharField(
         label= "Domicilio Laboral",
+        required=False
     )
     
     class Meta:
@@ -60,22 +63,20 @@ class GuarantorForm(forms.ModelForm):
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
-        
         # Eliminar validación requerida
-        for field in self.fields.values():
-            field.required = False    
+        if  kwargs["prefix"] == 'credit_created':
+            for field in self.fields.values():
+                field.required = False    
         
 #FORMULARIO PARA UPDATES
 #-----------------------------------------------------------------
 class GuarantorUpdateForm(forms.ModelForm):
-    
-    prefix = 'guarantor'
-    
+        
     CIVIL_STATUS = (
-        ('S','Soltero'),
-        ('C', 'Casado'),
-        ('V', 'Viudo'),
-        ('D', 'Divorciado')
+        ('Soltero','Soltero'),
+        ('Casado', 'Casado'),
+        ('Viudo', 'Viudo'),
+        ('Divorciado', 'Divorciado')
     )
     
     first_name = forms.CharField(
@@ -88,12 +89,12 @@ class GuarantorUpdateForm(forms.ModelForm):
     )
     email = forms.EmailField(
         label= 'Correo',
-        required=True,
+        required=False,
     )
     civil_status = forms.ChoiceField(
         label="Estado Civil",
         choices= CIVIL_STATUS,
-        required=True,
+        required=False,
     )
     dni = forms.IntegerField(
         label= "DNI",
@@ -101,15 +102,15 @@ class GuarantorUpdateForm(forms.ModelForm):
     )
     profession = forms.CharField(
         label= "Profesion",
-        required=True,
+        required=False,
     )
     address = forms.CharField(
         label= "Domicilio",
-        required=True,
+        required=False,
     )
     job_address = forms.CharField(
         label= "Domicilio Laboral",
-        required=True,
+        required=False,
     )
     
     class Meta:
@@ -117,19 +118,6 @@ class GuarantorUpdateForm(forms.ModelForm):
         fields = "__all__"
         exclude = ["credit"]
 
-    def clean(self):
-        """
-        Validar que todos los campos estén requeridos
-        """	
-        cleaned_data = super().clean()
-        fields_to_validate = ['first_name', 'last_name', 'address', 'job_address']
-        
-        for field_name in fields_to_validate:
-            field_value = cleaned_data.get(field_name)
-            if not field_value:
-                self.add_error(field_name, 'Este campo es requerido')
-                
-        return cleaned_data
     
     def clean_dni(self):
         """
@@ -140,10 +128,8 @@ class GuarantorUpdateForm(forms.ModelForm):
             raise forms.ValidationError("El DNI debe contener como mínimo 7 y máximo 15 caracteres")
 
         existing_guarantor = Guarantor.objects.filter(dni=dni).first()
-        existing_client = Client.objects.filter(dni=dni).first()
-        print(Guarantor.objects.filter(dni=dni).exists(), Client.objects.filter(dni=dni).exists())
-        if Guarantor.objects.filter(dni=dni).exists() or Client.objects.filter(dni=dni).exists():
-            if existing_guarantor != self.instance and existing_client != self.instance:
+        if Guarantor.objects.filter(dni=dni).exists():
+            if existing_guarantor != self.instance :
                 raise forms.ValidationError("El DNI {} ya registra".format(dni))
 
         return dni

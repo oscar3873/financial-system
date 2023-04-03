@@ -61,9 +61,10 @@ class CreditForm(forms.ModelForm):
 
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
+        print(kwargs)
+
         self.adviser = kwargs["initial"].pop('adviser')
         super().__init__(*args, **kwargs)
-
         self.fields['adviser'].initial = self.adviser 
 
         for field_name in self.fields:

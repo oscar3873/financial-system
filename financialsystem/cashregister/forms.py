@@ -1,5 +1,5 @@
 from django import forms
-from crispy_forms.helper import FormHelper
+from .utils import all_properties_mov, create_cashregister
 from cashregister.models import CashRegister, Movement
 from adviser.models import Adviser
 #FORMULARIO PARA LA CREACION DEL CLIENTE
@@ -117,9 +117,6 @@ class CashregisterFormPassword(forms.ModelForm):
     auth_expenses = forms.CharField(
         label="Cambiar contraseña de caja (EGRESO)",
         min_length=1,
-        widget=forms.PasswordInput(
-            attrs={'class': 'form-control mb-2', 'placeholder': 'Contraseña actual: %s'%CashRegister.objects.first().auth_expenses}
-        )
     )
     class Meta:
         model = CashRegister
@@ -127,5 +124,10 @@ class CashregisterFormPassword(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        create_cashregister()
 
-        self.fields['auth_expenses'].initial = CashRegister.objects.first()
+        password = CashRegister.objects.first().auth_expenses
+        self.fields['auth_expenses'].initial = password
+        self.fields["auth_expenses"].widget = forms.PasswordInput(
+            attrs={'class': 'form-control mb-2', 'placeholder': 'Contraseña actual: %s' %password }
+        )
