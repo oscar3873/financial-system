@@ -151,7 +151,7 @@ def clientCreate(request):
             messages.success(request, 'El cliente se ha guardado exitosamente.',"success")
             return redirect('clients:list')
         else:
-            messages.error(request, 'Ocurrió un error al guardar el cliente.',"error")
+            messages.error(request, 'Ocurrió un error al guardar el cliente.',"danger")
 
     context = {
         'form': client_form,
@@ -397,5 +397,5 @@ class QueryView(ListView , LoginRequiredMixin):
             search = self.model.objects.get(dni=dni)
             return redirect('clients:detail', pk=search.pk) # redirecciona al detalle del cliente en caso de encontrarlo
         except :
-            messages.error(request, "Cliente no encontrado", "error")
+            messages.error(request, "Cliente no encontrado", "danger")
         return (redirect('home' if self.request.user.is_authenticated else 'query'))

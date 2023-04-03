@@ -59,6 +59,7 @@ class MovementForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request')
         super(MovementForm, self).__init__(*args, **kwargs)
+
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
@@ -111,3 +112,20 @@ class MovementUpdateForm(forms.ModelForm):
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
+
+class CashregisterFormPassword(forms.ModelForm):
+    auth_expenses = forms.CharField(
+        label="Cambiar contraseña de caja (EGRESO)",
+        min_length=1,
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control mb-2', 'placeholder': 'Contraseña actual: %s'%CashRegister.objects.first().auth_expenses}
+        )
+    )
+    class Meta:
+        model = CashRegister
+        fields = ['auth_expenses']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['auth_expenses'].initial = CashRegister.objects.first()

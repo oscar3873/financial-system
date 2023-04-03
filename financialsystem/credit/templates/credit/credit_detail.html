@@ -15,12 +15,7 @@
     <small class="muted text-success">credito saldado</small> {% endif %}
 
     <!--Seccion 1-->
-    {% if messages %} {% for message in messages %}
-    <div class=" alert alert-primary alert-dismissible " role="alert ">
-        <span type="button " class="close " data-dismiss="alert " aria-label="Close "><span aria-hidden="true ">&times;</span></span>
-        <span class="font-weight-light ">{{ message }}</span>
-    </div>
-    {% endfor %} {% endif %}
+    {% include 'core/message.html' %}
     <section class="my-4">
         <div class="row">
             <div class="col-12">

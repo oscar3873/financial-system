@@ -8,19 +8,16 @@ from .tables import MovementTable
 
 from babel.dates import format_date
 
-from django import forms
-
-from django.shortcuts import get_object_or_404, render
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect, render
 
 from django.urls import reverse_lazy
 
 #CRUD MOVEMENT
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import UpdateView, DeleteView
 from .models import Movement, CashRegister
-from .forms import MovementForm, MovementUpdateForm
+from .forms import MovementForm, MovementUpdateForm , CashregisterFormPassword
 from django.views.generic.edit import FormView
 
 from .filters import DescriptionFilter, ListingFilter, MoneyTypeFilter, AmountFilter, UserFilter
@@ -30,6 +27,21 @@ from django.utils import timezone
 
 
 # Create your views here.
+
+def change_password(request):
+    
+
+    if request.method == 'POST':
+        password_form = CashregisterFormPassword(request.POST, instance=CashRegister.objects.first())
+        if password_form.is_valid():
+            password_form.save()
+            messages.success(request,"Contraseña actualizada correctamente", 'success')
+        else:
+            messages.error(request,"Verifica la contraseña","danger")
+
+    return redirect('cashregister:home')
+
+
 class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
     '''
     Vista general de CashRegister, con autenticación de usuario logeado, con filtrado para los campos de Movement.
@@ -87,7 +99,8 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
             {'money_type':'EUR','label': label_year, 'value': Movement.objects.filter(money_type="EUR").filter(created_at__year=year).aggregate(Sum('amount'))['amount__sum'] or 0},
         ]
         context["balances"] = balances
-    
+
+        context['cash_password'] = CashregisterFormPassword
         context["cashregister"] = CashRegister.objects.last()
         context["lastmovements"] = self.model.objects.all()[:4]
         context["count_movements"] = self.model.objects.all().count()
@@ -112,7 +125,7 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         movement.cashregister = cashregister
 
         if self.request.POST.get('EGRESO') and self.request.POST.get('password_confirm') != cashregister.auth_expenses:
-            messages.error(self.request, "Contraseña incorrecta","error")
+            messages.error(self.request, "Contraseña incorrecta","danger")
             return self.form_invalid(form)
 
         movement.save()
@@ -231,7 +244,7 @@ class MovementDeleteView(DeleteView):
         Obtiene la URL de redirección después de que se ha eliminado correctamente un objeto Movement.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.error(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()),"error")
+        messages.error(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()),"danger")
         return reverse_lazy('cashregister:home')
 
 
