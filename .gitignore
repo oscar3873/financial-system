@@ -7,10 +7,10 @@ db.sqlite3
 media/avatar/
 avatar
 staticfiles
+/static/
+.settings
 #Folders
-# Backup files # 
-*.bak 
-
+# Backup files #
 # If you are using PyCharm # 
 # User-specific stuff
 .idea/**/workspace.xml
