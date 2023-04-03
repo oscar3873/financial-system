@@ -2,10 +2,7 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> {% load static %}
-    <!-- Estilos -->
-    <link href="{% static 'core/vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    {% load static %} {% include "core/head.html" %}
     <link href="{% static 'registration/css/login.css' %}" rel="stylesheet" type='text/css'>
     <title>Login</title>
 </head>
