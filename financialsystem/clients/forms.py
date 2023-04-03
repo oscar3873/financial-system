@@ -54,14 +54,10 @@ class ClientForm(forms.ModelForm):
         required=False,
     )
     
-    has_pay_stub = forms.BooleanField(
-        label='Recibo de sueldo',
-        required=False
-    )
 
     class Meta:
         model = Client
-        fields = ['first_name', 'last_name', 'email', 'civil_status', 'dni', 'profession', 'address', 'score', 'job_address', 'has_pay_stub']
+        fields = ['first_name', 'last_name', 'email', 'civil_status', 'dni', 'profession', 'address', 'score', 'job_address']
 
 
     def clean_first_name(self):

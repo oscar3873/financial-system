@@ -2,6 +2,7 @@ from datetime import datetime
 from django import forms
 
 from commissions.models import Interest
+from adviser.models import Adviser
 from .models import *
 from django.forms import inlineformset_factory
 
@@ -43,15 +44,32 @@ class CreditForm(forms.ModelForm):
             'value': datetime.now().date()
             })
     )
+
+    has_pay_stub = forms.BooleanField(
+        label='Recibo de sueldo',
+        required=False
+    )
+
+    adviser = forms.ModelChoiceField(
+        label="Asesor",
+        queryset=Adviser.objects.all(),
+    )
+
     class Meta:
         model = Credit
-        fields = ["is_old_credit","amount", "interest", "installment_num", "start_date"]
+        fields = ["is_old_credit","amount", "interest", "installment_num", "start_date", "has_pay_stub"]
+
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
+        self.adviser = kwargs["initial"].pop('adviser')
         super().__init__(*args, **kwargs)
+
+        self.fields['adviser'].initial = self.adviser 
+
         for field_name in self.fields:
             field = self.fields.get(field_name)
-            field.widget.attrs.update({'class': 'form-control'})
+            if not isinstance(field, forms.BooleanField):
+                field.widget.attrs.update({'class': 'form-control'})
 
 #-----------------------------------------------------------------
 class RefinancingForm(forms.ModelForm):

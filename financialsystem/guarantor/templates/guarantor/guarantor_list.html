@@ -99,32 +99,98 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for guarantor in page_obj %}
-                                    <tr class="open-offcanvas" data-info='{
-                                        "first_name": "{{guarantor.first_name}}",
-                                        "last_name": "{{guarantor.last_name}}",
-                                        "dni": "{{guarantor.dni}}",
-                                        "email": "{{guarantor.email}}",
-                                        "created_at": "{{guarantor.created_at}}",
-                                        "adviser": "{{guarantor.adviser}}",
-                                        "address": "{{guarantor.address}}",
-                                        "id": "{{guarantor.id}}",
-                                        "client_id": "{{guarantor.credit.client.id}}",
-                                        "job_address": "{{guarantor.job_address}}",
-                                        "profession": "{{guarantor.profession}}",
-                                        "score": "{{guarantor.score}}",
-                                        "civil_status": "{{guarantor.get_civil_status_display}}",
-                                        "phone_numbers": "{{guarantor.phonenumberguarantor_set.all}}",
-                                        "credit": "{{guarantor.credit}}"
-                                    }
-                                    '>
+                                    {% for guarantor in guarantors %}
+                                    <tr class="open-offcanvas" onclick="showOffcanvas(`{{guarantor.id}}`)">    
+                                        <div id="offcanvas{{guarantor.id}}" class="card bg-primary text-white offcanvas">
+                                            <div class="card-body">
+                                                <a href="{% url 'guarantors:detail' guarantor.pk %}"><p class="m-0 text-white text-link" style="font-size: 2rem;text-decoration:none!important;">{{guarantor.first_name}} {{guarantor.last_name}}</p></a>
+                                                <h5 class="m-0">Contacto</h5>
+                                                <ul class="list p-0">
+                                                    {% if guarantor.phonenumberguarantor_set.all %}
+                                                        {% for phone_number in guarantor.phonenumberguarantor_set.all %}
+                                                            <a class="pr-2 font-weight-bold text-warning" href="tel:{{phone_number}}">
+                                                                {{phone_number}}
+                                                            </a>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <div class="pr-2 font-weight-bold text-warning">No hay registros o caducaron</div>
+                                                    {% endif %}
+                                                </ul>
+                                                <p class="m-0">Numero de dni: </p>
+                                                <span><a class="text-warning"><strong>{{guarantor.dni}}</strong></a></span>
+                                                <p class="m-0">Profesion: </p>
+                                                <span>
+                                                    <a class="text-warning">
+                                                        <strong>
+                                                            {% if guarantor.profession %}
+                                                                {{guarantor.profession}}
+                                                            {% else %}
+                                                                No registrado
+                                                            {% endif %}
+                                                        </strong>
+                                                    </a>
+                                                </span>
+                                                <p class="m-0">Domicilio: </p>
+                                                <span>
+                                                    <a class="text-warning">
+                                                        <strong>
+                                                            {% if guarantor.address %}
+                                                                {{guarantor.address}}
+                                                            {% else %}
+                                                                No registrado
+                                                            {% endif %}
+                                                        </strong>
+                                                    </a>
+                                                </span>
+                                                <p class="m-0">Domicilio laboral: </p>
+                                                <span>
+                                                    <a class="text-warning">
+                                                        <strong>
+                                                            {% if guarantor.job_address %}
+                                                                {{guarantor.job_address}}
+                                                            {% else %}
+                                                                No registrado
+                                                            {% endif %}
+                                                        </strong>
+                                                    </a>
+                                                </span>
+                                                <p class="m-0">Estado civil: </p>
+                                                <span><a class="text-warning"><strong>{{guarantor.civil_status}}</strong></a></span>
+                                                <p class="m-0">Credito asociado: </p>
+                                                <span>
+                                                    <strong>
+                                                    {% if guarantor.credits_g.all %}
+                                                        {% for credit in guarantor.credits_g.all %}    
+                                                        <a href="{% url 'clients:detail' credit.client.pk %}" class="text-warning">
+                                                            {{credit}}
+                                                        </a>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <span>No hay registros o caducaron</span> 
+                                                    {% endif %}
+                                                    </strong>
+                                                </span>                                              
+                                                <h5 class="title pt-3">Acciones</h5>
+                                                <a type="button" class="btn" data-toggle="modal" data-target="#GuarantorDelete{{guarantor.id}}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
+                                                <a href="/guarantors/update/{{guarantor.id}}" ><i class="fas fa-edit text-info"></i></a>
+                                            </div>
+                                            <div class="card-footer text-muted">
+                                                <p class="m-0">Fecha y hora de realizacion</p>
+                                                <p><strong>{{guarantor.created_at}}</strong></p>
+                                            </div>
+                                        </div>
+                                    
                                         <td>{{guarantor.first_name}} {{guarantor.last_name}}</td>
                                         <td>{{guarantor.dni}}</td>
 
-                                        {% if guarantor.credit %}
-                                        <td>{{guarantor.credit}}</td>
+                                        {% if guarantor.credits_g.all %}
+                                            {% if guarantor.credits_g.count > 1 %}    
+                                                <td>{{guarantor.credits_g.first}}&nbsp; +{{guarantor.credits_g.count|add:-1}}</td>
+                                            {% else %}
+                                                <td>{{guarantor.credits_g.first}}</td>
+                                            {% endif %}
                                         {% else %}
-                                        <td>No hay registros o fueron borrados</td>
+                                            <td>No hay registros o caducaron</td>
                                         {% endif %}
 
                                         <td>{{guarantor.created_at|date}}</td>
@@ -183,11 +249,9 @@
 
     </section>
     <section>
-
+<div id="overlay"></div>
     </section>
-    <div id="offcanvas" class="card bg-primary text-white offcanvas">
-    </div>
-    <div id="overlay"></div>
+
 </main>
 <script type="module">
     import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.esm.browser.min.js';
@@ -205,66 +269,23 @@
     });
 </script>
 <script>
-    const openButtons = document.querySelectorAll(".open-offcanvas");
-    const offcanvas = document.getElementById("offcanvas");
     const overlay = document.getElementById("overlay");
-    const offcanvasContent = offcanvas.querySelector(".offcanvas");
+    function showOffcanvas(id){
+        const offcanvas = document.getElementById(`offcanvas${id}`);
 
-    openButtons.forEach(button => {
-        button.addEventListener("click", function() {
-            const info = JSON.parse(this.getAttribute("data-info"));
-
-            const regex = /\d+/g;
-
-            const phoneNumbers = [];
-            let match;
-            while ((match = regex.exec(info.phone_numbers.toString())) !== null) {
-
-                phoneNumbers.push(match[0]);
-            }
-
-            if (phoneNumbers.length == 0) {
-                phoneNumbers.push("Sin datos de contacto")
-            }
-
-            const phoneNumbersHtml = phoneNumbers.map(number => `<a class="pr-2 font-weight-bold text-warning" href="tel:${number}">${number}</a>`).join("");
-            offcanvas.innerHTML = `
-            <div class="card-body">
-                <a href="/guarantors/${info.id}"><p class="m-0 text-white text-link" style="font-size: 2rem;text-decoration:none!important;">${info.first_name} ${info.last_name}</p></a>
-                <h5 class="m-0">Contacto</h5>
-                <ul class="list p-0">
-                ${phoneNumbersHtml}
-                </ul>
-                <p class="m-0">Numero de dni: </p>
-                <span><a class="text-warning"><strong>${info.dni}</strong></a></span>
-                <p class="m-0">Profesion: </p>
-                <span><a class="text-warning"><strong>${info.profession}</strong></a></span>
-                <p class="m-0">Domicilio: </p>
-                <span><a class="text-warning"><strong>${info.address}</strong></a></span>
-                <p class="m-0">Domicilio laboral: </p>
-                <span><a class="text-warning"><strong>${info.job_address}</strong></a></span>
-                <p class="m-0">Estado civil: </p>
-                <span><a class="text-warning"><strong>${info.civil_status}</strong></a></span>
-                <p class="m-0">Credito asociado: </p>
-                <span><a href="/clients/${info.client_id}" class="text-warning"><strong>${info.credit}</strong></a></span>
-                <h5 class="title pt-3">Acciones</h5>
-                <a type="button" class="btn" data-toggle="modal" data-target="#GuarantorDelete${info.id}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
-                <a href="/guarantors/update/${info.id}" ><i class="fas fa-edit text-info"></i></a>
-            </div>
-            <div class="card-footer text-muted">
-                <p class="m-0">Fecha y hora de realizacion</p>
-                <p><strong>${info.created_at}</strong></p>
-            </div>
-            `
+        function shownow() {
+            console.log('entre');
             offcanvas.classList.add("open");
             overlay.style.display = "block";
+        };
+        
+        shownow();
 
+        overlay.addEventListener("click", function() {
+            offcanvas.classList.remove("open");
+            overlay.style.display = "none";
         });
-    });
+    };
 
-    overlay.addEventListener("click", function() {
-        offcanvas.classList.remove("open");
-        overlay.style.display = "none";
-    });
 </script>
 {% endblock content %}

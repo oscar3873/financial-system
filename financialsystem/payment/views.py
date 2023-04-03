@@ -67,7 +67,7 @@ class PaymentDeleteView(LoginRequiredMixin, DeleteView):
         Obtiene la URL de redirección después de que se ha eliminado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.warning(self.request, 'Pago borrada correctamente')
+        messages.warning(self.request, 'Pago borrada correctamente', "warning")
         return  reverse_lazy('payments:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -98,7 +98,7 @@ class PaymentUpdateView(LoginRequiredMixin, UpdateView):
         Obtiene la URL de redirección después de que se ha eliminado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.info(self.request, 'Pago actualizada satisfactoriamente')
+        messages.info(self.request, 'Pago actualizada satisfactoriamente',"info")
         return  reverse_lazy('payments:list')
     
 #REALIZAR DE UN PAGO

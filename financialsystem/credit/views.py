@@ -5,6 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db import transaction
+
 
 import copy
 
@@ -35,7 +37,7 @@ def crear_credito(request):
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
     
     if request.method == 'POST':
-        if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid() and guarantor_form.is_valid() and formsetPhoneClient.is_valid() and formsetPhoneGuarantor.is_valid():
+        if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid()  and formsetPhoneClient.is_valid() and guarantor_form.is_valid() and formsetPhoneGuarantor.is_valid():
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
@@ -56,8 +58,8 @@ def crear_credito(request):
             
             guarantor = guarantor_form.save(commit=False)
             if guarantor_form.cleaned_data["dni"]:
-                guarantor.credit = credit
-                guarantor.save()
+                credit.guarantor = credit
+                credit.save()
                 phone_numbers = formsetPhoneGuarantor.save(commit=False)
                 for phone_number in phone_numbers:
                     if phone_number.phone_number_g:
@@ -69,7 +71,7 @@ def crear_credito(request):
                 warranty.credit = credit
                 warranty.save()
             
-            messages.success(request, 'El cliente se ha guardado exitosamente.')
+            messages.success(request, 'El cliente se ha guardado exitosamente.',"success")
             return redirect('clients:list')
     else:
         print("------------Algun formulario es invalido------------")
@@ -150,33 +152,46 @@ class CreditDetailView(DetailView, LoginRequiredMixin):
 
 #ASOCIACION MEDIANTE CREACION DE UN CREDITO
 #------------------------------------------------------------------   
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+
 class AssociateCreateView(CreateView, LoginRequiredMixin):
     """
-    Asocia un credito por crear a un cliente .
+    Asocia un crédito por crear a un cliente.
     """
     model = Credit
     form_class = CreditForm
 
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
+    # CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
+
+    def get_initial(self) :
+        iniitial = super().get_initial()
+        iniitial['adviser'] = self.request.user.adviser
+        return iniitial
+    
 
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         """
         context = super().get_context_data(**kwargs)
+        context['form'] = CreditForm(initial= self.get_initial())
         context['clients'] = Client.objects.all()
-        context['warranty_form'] = WarrantyForm
+        context['warranty_form'] = WarrantyForm(self.request.POST or None)
+        context['garante_form'] = GuarantorForm(self.request.POST or None, prefix="guarantor")
+        context['formsetPhoneGuarantor'] = PhoneNumberFormSetG(instance=Guarantor(), prefix="phone_number_guarantor")
+
         return context
 
+    @transaction.atomic
     def form_valid(self, form):
         """
-        Validacion del formulario de credito.
+        Validación del formulario de crédito.
         """
         if form.is_valid():
             # Recuperar el ID del cliente seleccionado
-            
             selected_client_id = self.request.POST.get('selected_client_id')
             # Asignar el crédito al cliente correspondiente
             client = get_object_or_404(Client, pk=selected_client_id)
@@ -185,7 +200,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             credit.client = client
             credit.amount = round_to_nearest_hundred(credit.amount)
             if not credit.is_old_credit:
-                credit.mov = create_movement(credit, self.request.user.adviser)
+                credit.mov = create_movement(credit, form.cleaned_data['adviser'])
             credit.save()
 
             # Validar el formulario de garantía
@@ -195,15 +210,32 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
                 # Asignar la garantía al crédito correspondiente
                 warranty.credit = credit
                 warranty.save()
-            
-        return super().form_valid(form)
+
+            # Validar el formulario de garante
+            garante_form = GuarantorForm(self.request.POST, prefix="guarantor")
+            guarantor = garante_form.save(commit=False)
+            if garante_form.cleaned_data["dni"]:
+                if garante_form.is_valid():
+                    credit.guarantor = guarantor
+                    credit.save()
+                phone_numbers_form = PhoneNumberFormSetG(self.request.POST, instance=guarantor, prefix="phone_number_guarantor")
+                phone_numbers = phone_numbers_form.save(commit=False)
+                for phone_number in phone_numbers:
+                    if phone_number.phone_number_g:
+                        phone_number.guarantor = guarantor
+                        phone_number.save()
+
+            return super().form_valid(form)
+        else:
+            return self.form_invalid(form)
+
 
     
     def get_success_url(self) -> str:
         """ 
         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
         """
-        messages.success(self.request, 'Credito creado correctamente')
+        messages.success(self.request, 'Credito creado correctamente',"success")
         return  reverse_lazy('credits:list')
 
 
@@ -221,33 +253,74 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
+    def get_initial(self) :
+        iniitial = super().get_initial()
+        iniitial['adviser'] = Client.objects.get(pk=self.kwargs['pk']).adviser
+        return iniitial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['cliente_form'] = CreditForm(initial= self.get_initial())
         context['is_add'] = True
         context['warranty_form'] = WarrantyForm
+        context['garante_form'] = GuarantorForm
+        context['formsetPhoneGuarantor'] = PhoneNumberFormSetG(instance=Guarantor(), prefix = "phone_number_guarantor")
+
         return context
     
+    @transaction.atomic
     def form_valid(self, form):
         """
-        Validacion de formulario de credito.
+        Validación del formulario de crédito.
         """
-        self.client = get_object_or_404(Client, pk=self.kwargs['pk'])
-
         if form.is_valid():
+            # Recuperar el ID del cliente seleccionado
+            client = get_object_or_404(Client, pk=self.kwargs['pk'])
             credit = form.save(commit=False)
             credit.is_old_credit = False
-            credit.client = self.client
+            credit.client = client
             credit.amount = round_to_nearest_hundred(credit.amount)
             if not credit.is_old_credit:
-                credit.mov = create_movement(credit, self.request.user.adviser)
+                credit.mov = create_movement(credit, form.cleaned_data['adviser'])
             credit.save()
-        return super().form_valid(form)
+
+            # Validar el formulario de garantía
+            warranty_form = WarrantyForm(self.request.POST)
+            warranty = warranty_form.save(commit=False)
+            if warranty_form.cleaned_data['article']:
+                warranty.credit = credit
+                warranty.save()
+
+            # Validar el formulario de garante
+            selected_client_id = self.request.POST.get('selected_guarantor_id')
+            if selected_client_id != None:
+                guarantor = Guarantor.objects.get(pk=selected_client_id)
+                credit.guarantor = guarantor
+                credit.save()
+            else:
+                garante_form = GuarantorForm(self.request.POST, prefix="guarantor")
+
+                guarantor = garante_form.save(commit=False)
+                if garante_form.cleaned_data["dni"]:            
+                    if garante_form.is_valid():
+                        credit.guarantor = guarantor
+                        credit.save()
+                        phone_numbers_form = PhoneNumberFormSetG(self.request.POST, instance=guarantor, prefix="phone_number_guarantor")
+                        phone_numbers = phone_numbers_form.save(commit=False)
+                        for phone_number in phone_numbers:
+                            if phone_number.phone_number_g:
+                                phone_number.guarantor = guarantor
+                                phone_number.save()
+
+            return super().form_valid(form)
+        else:
+            return self.form_invalid(form)
     
     def get_success_url(self) -> str:
         """
         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
         """
-        messages.success(self.request, 'Credito creado correctamente')
+        messages.success(self.request, 'Credito creado correctamente', "success")
         return  reverse_lazy('clients:detail', kwargs=self.kwargs)
     
 
@@ -268,7 +341,7 @@ def edit_credit(request, pk):
                 credit.is_old_credit = False
                 credit.save()
                 
-            messages.info(request,'Cambios realizados exitosamente')
+            messages.info(request,'Cambios realizados exitosamente',"info")
             return redirect('credits:list')
 
     context = {
@@ -285,7 +358,7 @@ def credit_delete(request, pk):
         cred = get_object_or_404(Credit, pk=pk)
         client = cred.client
         cred.delete()
-        messages.warning(request, 'Credito borrado correctamente')
+        messages.warning(request, 'Credito borrado correctamente', "warning")
         return  redirect('clients:detail', pk=client.pk)
     except:
         messages.error(request, 'Hubo un error al intentar', "danger")

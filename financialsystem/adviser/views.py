@@ -92,7 +92,7 @@ def is_admin(user):
     if user.is_superuser:
         return user.is_superuser
     else:
-        messages.error('Lo sentimos, no tienes aceso a este apartado')
+        messages.error('Lo sentimos, no tienes aceso a este apartado',"error")
         return False
 
 @login_required(login_url="/accounts/login/")
@@ -122,7 +122,7 @@ def pay_commission(request, pk):
         money_type= commission.money_type
     )
     commission.save()
-    messages.error(request, "Esta comisión ya ha sido pagada.")
+    messages.error(request, "Esta comisión ya ha sido pagada.",'error')
     return redirect('advisers:detail', pk=commission.adviser.id)
 
 class AdviserUpdateView(UpdateView):

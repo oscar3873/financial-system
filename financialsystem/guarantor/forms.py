@@ -11,10 +11,10 @@ class GuarantorForm(forms.ModelForm):
     prefix = 'guarantor'
     
     CIVIL_STATUS = (
-        ('S','Soltero'),
-        ('C', 'Casado'),
-        ('V', 'Viudo'),
-        ('D', 'Divorciado')
+        ('Soltero','Soltero'),
+        ('Casado', 'Casado'),
+        ('Viudo', 'Viudo'),
+        ('Divorciado', 'Divorciado')
     )
     
     first_name = forms.CharField(

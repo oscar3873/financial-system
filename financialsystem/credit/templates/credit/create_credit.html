@@ -113,10 +113,13 @@
                                     <i class="fa-solid fa-landmark text-warning"></i> &nbsp; Credito
                                 </h5>
                                 <div class="form-row">
-                                    <div class="form-group col-md-12">
-                                        {{credito_form.is_old_credit.label}} {{credito_form.is_old_credit.help_text}}{{credito_form.is_old_credit}}
+                                    <div class="form-check form-check-inline col-md-12">
+                                        {{credito_form.is_old_credit.label}}: &nbsp;{{credito_form.is_old_credit}}
                                     </div>
-                                    <div class="form-group col-md-12">
+                                    <div class="form-check form-check-inline col-md-12">
+                                        ¿Presenta {{credito_form.has_pay_stub.label}}?: &nbsp;{{credito_form.has_pay_stub}}
+                                    </div>
+                                    <div class="form-group col-md-12 mt-2">
                                         {{credito_form.start_date.label}} {{credito_form.start_date}}
                                     </div>
                                     <div class="form-group col-md-12">

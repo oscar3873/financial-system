@@ -2,7 +2,7 @@
 <main class="container my-4">
     <a class="btn btn-secondary my-2 rounded p-3" href="{% url 'credits:create_credit' %}" role="button">
         <i class="fa fa-plus-circle" aria-hidden="true"></i>
-        <span>Nuevo Cliente</span>
+        <span>Nuevo Credito</span>
     </a>
     <form class="d-block" method="post">
         {% csrf_token %}
@@ -25,8 +25,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-row">
-                                    <div class="form-group col-md-12">
-                                        {{form.is_old_credit.label}} {{form.is_old_credit.help_text}}{{form.is_old_credit}}
+                                    <div class="form-check form-check-inline col-md-12">
+                                        {{form.is_old_credit.label}}: &nbsp;{{form.is_old_credit}}
+                                    </div>
+                                    <div class="form-check form-check-inline col-md-12">
+                                        ¿Presenta {{form.has_pay_stub.label}}?: &nbsp;{{form.has_pay_stub}}
                                     </div>
                                     <div class="form-group col-md-12">
                                         {{form.start_date.label}} {{form.start_date}}
@@ -34,11 +37,14 @@
                                     <div class="form-group col-md-12">
                                         {{form.amount.label}} {{form.amount}}
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-3">
                                         {{form.installment_num.label}} {{form.installment_num}}
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-3">
                                         {{form.interest.label}} {{form.interest}}
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        {{form.adviser.label}} {{form.adviser}}
                                     </div>
                                 </div>
                             </div>
@@ -51,7 +57,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col-md-12">
                                 <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">Añadir Articulo</button>
                                 <div class="collapse p-4" id="collapsePNC">
@@ -61,6 +67,97 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row mt-2 mb-2">
+                            <div class="col-md-12">
+                            <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseG" aria-expanded="false" aria-controls="collapseG">
+                              Añadir Garante
+                            </button>
+                            <div class="collapse" id="collapseG">
+                                <div class="card bg-primary text-white box-shadow mb-3">
+                                    <div class="card-body">
+
+                                        <!-- BUSCADOR DE GARANTE -->
+                                        <div class="form-group">
+                                            <label for="search-input"><h4>Buscar Garante</h4></label>
+                                            <input type="text" id="search-guarantor-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
+                                        </div>
+                                        <ul id="search-guarantor-results" class="list-group text-dark mt-3"></ul>
+
+
+                                        <div class="text-center"> <strong> O</strong></div>
+                                        <h5 class="title p-2"><i class="fa-solid fa-user text-warning"></i> &nbsp;Nuevo Garante</h5>
+                                        <h5 class="title p-2">Informacion basica</h5>
+                                        <div class="form-row">
+                                            {% for field in garante_form %} {% if field.errors %}
+                                            <ul class="errorlist">
+                                                {% for error in field.errors %}
+                                                <li class="text-danger">{{ error }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %} {% endfor %}
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                {{garante_form.first_name.label}} {{garante_form.first_name}}
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                {{garante_form.last_name.label}} {{garante_form.last_name}}
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                {{garante_form.email.label}} {{garante_form.email}}
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                {{garante_form.dni.label}} {{garante_form.dni}}
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                {{garante_form.civil_status.label}} {{garante_form.civil_status}}
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                {{garante_form.address.label}} {{garante_form.address}}
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                {{garante_form.job_address.label}} {{garante_form.job_address}}
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                {{garante_form.profession.label}} {{garante_form.profession}}
+                                            </div>
+                                        </div>
+                                        <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
+                                        <div class="form-row">
+                                            <ul class="error-list">
+                                                {% for form in formsetPhoneGuarantor %} {% for field in form %} {% for error in field.errors %}
+                                                <li class="text-danger">{{ error }}</li><br> {% endfor %} {% endfor %} {% endfor %}
+                                            </ul> {{ formsetPhoneGuarantor.non_form_errors }}
+                                        </div>
+                                        <p>
+                                            <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNG" aria-expanded="false" aria-controls="collapsePNG">
+                                            Añadir numeros de contacto
+                                            </button>
+                                        </p>
+                                        <div class="collapse" id="collapsePNG">
+                                            <div class="form-row">
+                                                {{formsetPhoneGuarantor.management_form}} {% for phone_formG in formsetPhoneGuarantor %}
+                                                <div class="form-group col-md-3">
+                                                    {{phone_formG.phone_number_g.label}} {{phone_formG.phone_number_g}}
+                                                </div>
+                                                <div class="form-group col-md-2">
+                                                    {{phone_formG.phone_type_g.label}} {{phone_formG.phone_type_g}}
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
                         <input class="btn btn-success btn-block mt-4 rounded p-3" type="submit" value="Guardar">
                     </div>
                 </div>
@@ -69,8 +166,76 @@
 
     </form>
 </main>
+<script>
+    // BUSCADOR DE GARANTE DINAMICO
+    const searchGuarantorInput = document.querySelector('#search-guarantor-input');
+    const searchGuarantorResults = document.querySelector('#search-guarantor-results');
+
+    searchGuarantorInput.addEventListener('input', (event) => {
+        const searchTerm_g = event.target.value.trim().toLowerCase();
+
+        if (!searchTerm_g) {
+            // Limpiar los resultados de búsqueda si no hay término de búsqueda
+            searchGuarantorResults.innerHTML = '';
+            return;
+        }
+
+        // Realizar la búsqueda de clientes que coincidan con el término de búsqueda
+        fetch(`/guarantors/search_guarantor/?search_term_g=${searchTerm_g}`)
+            .then(response => response.json())
+            .then(data => {
+                const guarantors = data.guarantors;
+                console.log(guarantors);
+                // Mostrar los resultados de búsqueda
+                searchGuarantorResults.innerHTML = '';
+                guarantors.forEach(guarantor => {
+                    const item_g = document.createElement('li');
+                    item_g.style.zIndex = "9999";
+                    item_g.style.cursor = 'pointer';
+                    item_g.classList.add('list-group-item', 'client');
+                    item_g.dataset.clientId = guarantor.id;
+                    item_g.innerHTML = `
+                        <div class="d-flex justify-content-between">
+                            <h6>${guarantor.full_name}</h6>
+                            <h6 class="font-weight-bold">&nbsp${guarantor.dni}</h6>
+                        </div>
+                    `;
+                    searchGuarantorResults.appendChild(item_g);
+                });
+            });
+    });
+
+    searchGuarantorResults.addEventListener('click', (event) => {
+        const item_g = event.target.closest('.client');
+        if (!item_g) {
+            return;
+        }
+
+        const guarantorId = item_g.dataset.clientId;
+        const guarantorName = item_g.querySelector('h6').textContent;
+
+        // Rellenar el campo del cliente seleccionado y ocultar los resultados de búsqueda
+        searchGuarantorInput.value = guarantorName;
+        searchGuarantorResults.innerHTML = '';
+        // Añadir el id del cliente al formulario
+        const guarantorIdInput = document.createElement('input');
+        guarantorIdInput.type = 'hidden';
+        guarantorIdInput.name = 'selected_guarantor_id';
+        guarantorIdInput.value = guarantorId;
+        searchGuarantorInput.closest('form').appendChild(guarantorIdInput);
+    });
+    // const form_guarantor = document.querySelector('form');
+    // form_guarantor.addEventListener('submit', (event) => {
+    //     const selectedClientIdInput = document.querySelector('input[name="selected_guarantor_id"]');
+    //     if (!selectedClientIdInput) {
+    //         event.preventDefault();
+    //         alert('Por favor, seleccione un cliente antes de guardar.');
+    //     }
+    // });
+</script>
 
 <script>
+    // BUSCADOR DE CLIENTE DINAMICO
     const searchInput = document.querySelector('#search-input');
     const searchResults = document.querySelector('#search-results');
 

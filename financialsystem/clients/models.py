@@ -21,7 +21,6 @@ class Client(models.Model):
         ('Riesgoso' , 'Riesgoso')
     ]
     is_legals = models.BooleanField(blank=True, default=False, null=True, verbose_name="Legales")
-    has_pay_stub = models.BooleanField(blank=True, default=False, null=True, verbose_name="Recibo de sueldo")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=50, help_text="First name", verbose_name="Nombre")

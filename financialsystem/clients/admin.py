@@ -4,7 +4,6 @@ from .models import *
 class ClientAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'has_pay_stub',
         'first_name',
         'last_name', 
         'address',

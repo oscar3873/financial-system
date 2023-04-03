@@ -10,7 +10,8 @@ from django.urls import reverse_lazy
 #CRUD Guarantor
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import UpdateView
+from django.core.paginator import Paginator
 
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
@@ -33,7 +34,6 @@ class GuarantorListView(LoginRequiredMixin, ListView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-
     
     def get_context_data(self, **kwargs):
         """
@@ -41,9 +41,17 @@ class GuarantorListView(LoginRequiredMixin, ListView):
         """
         refresh_condition()
         create_cashregister()
-        self.object_list = self.get_queryset()
-        context = super().get_context_data(**kwargs)
+
+        # Obtén los objetos clients filtrados
+        guarantors = self.model.objects.all()
+        filtered_guarantors = ListingFilter(self.request.GET, guarantors)
         
+        # Pagina los objetos clients filtrados
+        paginator = Paginator(filtered_guarantors.qs, self.paginate_by)
+        page = self.request.GET.get('page')
+        guarantors_paginated = paginator.get_page(page)
+
+        context = super().get_context_data(**kwargs)
         # Etiqueta para el día actual
         today = timezone.now().date()
 
@@ -65,10 +73,11 @@ class GuarantorListView(LoginRequiredMixin, ListView):
             {'label':label_month, 'value':count_guarantors_this_month},
             {'label':label_year, 'value':count_guarantors_this_year},
         ]
+        
         # Contextos
         context["count_guarantors_dict"] = count_guarantors_dict
-        context["guarantors"] = self.model.objects.all()
-        context["listing_filter"] = ListingFilter(self.request.GET, context['guarantors'])
+        context["guarantors"] = guarantors_paginated
+        context["listing_filter"] = filtered_guarantors
         return context
     
     def get_queryset(self):
@@ -76,8 +85,14 @@ class GuarantorListView(LoginRequiredMixin, ListView):
         Retorna un queryset de objetos que serán utilizados para renderizar la vista.
         """
         queryset = super().get_queryset()
-        return ListingFilter(self.request.GET, queryset=queryset).qs
+        self.filterset = self.filter_class(self.request.GET, queryset=queryset)
+        return self.filterset.qs.order_by(*self.ordering)
 
+    def get_success_url(self) -> str:
+        """
+        Función que se encarga de devolver la URL de la vista actual.
+        """
+        return reverse_lazy('guarantors:list')
 
 class GuarantorDetailView(LoginRequiredMixin, DetailView):
     """
@@ -108,15 +123,16 @@ def guarantorCreateView(request):
             # Recuperar el ID del cliente seleccionado
             selected_client_id = request.POST.get('selected_client_id')
             # Asignar el crédito al cliente correspondiente
-            credit = get_object_or_404(Credit, pk=selected_client_id)
-            guarantor.credit = credit
+            if selected_client_id != None:
+                credit = get_object_or_404(Credit, pk=selected_client_id)
+                guarantor.credit = credit
             guarantor.save()
             phone_numbers = formsetPhoneGuarantor.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_g:
                     phone_number.guarantor = guarantor
                     phone_number.save()
-            messages.success(request, 'El garante se ha guardado exitosamente.' )
+            messages.success(request, 'El garante se ha guardado exitosamente.',"success")
             return redirect('guarantors:list')
     else:
         print("------------Algun formulario es invalido------------")
@@ -133,7 +149,7 @@ def guarantorCreateView(request):
 def delete_guarantor(request, pk):
     guarantor = get_object_or_404(Guarantor, pk=pk)
     guarantor.delete()
-    messages.warning(request, 'Garante eliminado correctamente' )
+    messages.warning(request, 'Garante eliminado correctamente',"warning")
     return  redirect('guarantors:list')
 
 #ACTUALIZACION DE UN MOVIMIENTO
@@ -183,5 +199,6 @@ class GuarantorUpdateView(LoginRequiredMixin, UpdateView):
         Obtiene la URL de redirección después de que se ha actualizado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
         """	
-        messages.info(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()))
+        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()),"success")
         return reverse_lazy('guarantors:list')
+

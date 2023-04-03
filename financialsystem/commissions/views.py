@@ -14,7 +14,7 @@ def setting_parameters(request):
         form = SettingsInterestForm(request.POST, instance=Interest.objects.first())
         if form.is_valid():
             form.save()
-            messages.success(request,"Configuracion completada con exito!")
+            messages.success(request,"Configuracion completada con exito!","success")
         else:
             print(form.errors)
     

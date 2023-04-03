@@ -3,13 +3,14 @@ from decimal import Decimal
 from django.db import models
 from clients.models import Client
 from cashregister.models import Movement
-from django.db.models.signals import post_save, pre_save, pre_delete, post_delete
+from django.db.models.signals import post_save, pre_save, pre_delete
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 
 from core.utils import round_to_nearest_hundred
+from guarantor.models import Guarantor
 # Create your models here.
 #CREDITO
 
@@ -25,7 +26,7 @@ class Credit(models.Model):
     is_active = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False, help_text="El credito esta pagado")
     is_old_credit = models.BooleanField(default=False, help_text="Es un credito antiguo")
-    # is_new = models.BooleanField(default=False, help_text="Se han modificados algunos campos") # PARA REALIZAR UN UPDATE BASADO EN CAMBIOS DE CAMPOS
+    has_pay_stub = models.BooleanField(blank=True, default=False, verbose_name="Recibo de sueldo")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     condition = models.CharField(max_length=15,choices=CHOICE, default='A Tiempo')
@@ -34,6 +35,7 @@ class Credit(models.Model):
     mov = models.OneToOneField(Movement,on_delete=models.SET_NULL,null=True,blank=True)
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="credits")
+    guarantor = models.ForeignKey(Guarantor, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="credits_g")
     installment_num = models.PositiveIntegerField(default=1, null=True, help_text="Numeros de Cuotas")
     start_date = models.DateTimeField(verbose_name='Fecha de Inicio',default=date, null=True)
     end_date = models.DateTimeField(verbose_name='Fecha de Finalizacion del Credito', null=True)

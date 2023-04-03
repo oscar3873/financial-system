@@ -6,6 +6,8 @@ class CreditAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'client',
+        'guarantor',
+        'has_pay_stub',
         'amount',
         'installment_num', 
         'interest',

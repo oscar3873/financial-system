@@ -112,7 +112,7 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         movement.cashregister = cashregister
 
         if self.request.POST.get('EGRESO') and self.request.POST.get('password_confirm') != cashregister.auth_expenses:
-            messages.error(self.request, "Contraseña incorrecta")
+            messages.error(self.request, "Contraseña incorrecta","error")
             return self.form_invalid(form)
 
         movement.save()
@@ -231,7 +231,7 @@ class MovementDeleteView(DeleteView):
         Obtiene la URL de redirección después de que se ha eliminado correctamente un objeto Movement.
         Agrega un mensaje de éxito a la cola de mensajes.
         """
-        messages.error(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()))
+        messages.error(self.request, '{}, realizada el {}, eliminada satisfactoriamente'.format(self.object, self.object.created_at.date()),"error")
         return reverse_lazy('cashregister:home')
 
 
@@ -263,5 +263,5 @@ class MovementUpdateView(UpdateView):
         Obtiene la URL de redirección después de que se ha actualizado correctamente un objeto Movement.
         Agrega un mensaje de éxito a la cola de mensajes.
         """	
-        messages.info(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()))
+        messages.info(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()),"info")
         return  reverse_lazy('cashregister:home')

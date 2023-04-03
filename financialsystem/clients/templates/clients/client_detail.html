@@ -267,6 +267,37 @@
                                         <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.installment_num}}</span>
                                     </div>
                                 </div>
+                                
+                                {% if credit_active.guarantor %}
+                                <div class="row align-items-center">
+                                    <div class="col p-0">
+                                        <span>Garante:</span>
+                                    </div>
+                                    <div class="col p-0">
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.guarantor}}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% if credit_active.has_pay_stub %}
+                                <div class="row align-items-center">
+                                    <div class="col p-0">
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;">PRESENTO RECIBO DE SUELDO</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if credit_active.warranty_client.first %}
+                                <div class="row align-items-center">
+                                    <div class="col p-0">
+                                        <span>Empeño:</span>
+                                    </div>
+                                    <div class="col p-0">
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.warranty_client.first}}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+
                                 <div class="row align-items-center justify-content-center">
                                     <div class="col-12 p-0">
                                         <div class="form-group">
