@@ -21,7 +21,7 @@ from guarantor.models import Guarantor
 
 from .forms import *
 from guarantor.forms import GuarantorForm, PhoneNumberFormSetG
-from warranty.forms import WarrantyForm, WarrantyFormSet
+from warranty.forms import WarrantyForm
 from clients.forms import ClientForm, PhoneNumberFormSet
 
 #CREAR UN CREDITO CON TODOS LOS FORMULARIOS ANIDADOS
@@ -51,7 +51,7 @@ def crear_credito(request):
 
             credit = credit_form.save(commit=False)
             credit.client = client
-            ask_is_old(credit, request.user.adviser)
+            ask_is_old(credit, credit_form.cleaned_data['adviser'])
 
             
             guarantor = guarantor_form.save(commit=False)
