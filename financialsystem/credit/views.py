@@ -11,6 +11,7 @@ from django.db import transaction
 import copy
 
 from cashregister.utils import create_movement, create_cashregister
+from clients.filters import ListingFilter
 
 from .utils import *
 
@@ -49,12 +50,9 @@ def crear_credito(request):
                     phone_number.save()
                     
             credit = credit_form.save(commit=False)
-            credit.amount = round_to_nearest_hundred(credit.amount)
             credit.client = client
-            credit.is_old_credit = False
-            if not credit.is_old_credit:
-                credit.mov = create_movement(credit, request.user.adviser)
-            credit.save()
+            ask_is_old(credit, request.user.adviser)
+
             
             guarantor = guarantor_form.save(commit=False)
             if guarantor_form.cleaned_data["dni"]:
@@ -111,10 +109,10 @@ class CreditListView(LoginRequiredMixin, ListView):
         create_cashregister()
         context = super().get_context_data(**kwargs)
         context["count_credits"] = self.model.objects.all().count()
-        context["credits"] = self.model.objects.all()
+        credits = self.model.objects.all()
         
         # Crear un objeto Paginator para dividir los resultados en páginas
-        paginator = Paginator(context["credits"], self.paginate_by)
+        paginator = Paginator(credits, self.paginate_by)
         page_number = self.request.GET.get('page')    # Obtener el número de página actual
 
         # Obtener la página actual del objeto Paginator
@@ -196,12 +194,8 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             # Asignar el crédito al cliente correspondiente
             client = get_object_or_404(Client, pk=selected_client_id)
             credit = form.save(commit=False)
-            credit.is_old_credit = False
             credit.client = client
-            credit.amount = round_to_nearest_hundred(credit.amount)
-            if not credit.is_old_credit:
-                credit.mov = create_movement(credit, form.cleaned_data['adviser'])
-            credit.save()
+            ask_is_old(credit, form.cleaned_data['adviser'])
 
             # Validar el formulario de garantía
             warranty_form = WarrantyForm(self.request.POST)
@@ -212,7 +206,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
                 warranty.save()
 
             # Validar el formulario de garante
-            garante_form = GuarantorForm(self.request.POST, prefix="guarantor")
+            garante_form = GuarantorForm(self.request.POST, prefix="credit_created")
             guarantor = garante_form.save(commit=False)
             if garante_form.cleaned_data["dni"]:
                 if garante_form.is_valid():
@@ -277,12 +271,8 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
             # Recuperar el ID del cliente seleccionado
             client = get_object_or_404(Client, pk=self.kwargs['pk'])
             credit = form.save(commit=False)
-            credit.is_old_credit = False
             credit.client = client
-            credit.amount = round_to_nearest_hundred(credit.amount)
-            if not credit.is_old_credit:
-                credit.mov = create_movement(credit, form.cleaned_data['adviser'])
-            credit.save()
+            ask_is_old(credit, form.cleaned_data['adviser'])
 
             # Validar el formulario de garantía
             warranty_form = WarrantyForm(self.request.POST)
@@ -299,7 +289,6 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
                 credit.save()
             else:
                 garante_form = GuarantorForm(self.request.POST, prefix="credit_created")
-
                 guarantor = garante_form.save(commit=False)
                 if garante_form.cleaned_data["dni"]:            
                     if garante_form.is_valid():
@@ -337,7 +326,7 @@ def edit_credit(request, pk):
         if form.is_valid():
             credit = form.save(commit=False)
 
-            if (credit_copy.end_date != credit.end_date) or (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.interest != credit.interest) or (credit_copy.installment_num != credit.installment_num):
+            if (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.interest != credit.interest) or (credit_copy.installment_num != credit.installment_num):
                 credit.is_old_credit = False
                 credit.save()
                 
@@ -434,7 +423,7 @@ def refinancing_delete(request, pk):
 #----------------------------------------------------------------
 class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
     model = InstallmentRefinancing
-    form_class = InstallmentRefinancingForm
+    form_class = InstallmentRefinancingUpdateForm
     template_name = 'installment/installment_ref_update.html'
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
@@ -488,6 +477,11 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
             if installment.end_date.date() != form.cleaned_data['end_date'].date():
                 form.instance.daily_interests = 0
                 form.instance.lastup = form.instance.end_date.date()
+            
+            if installment.end_date < installment.start_date:
+                form.instance.end_date = installment.end_date
+                form.instance.start_date = installment.start_date
+                messages.error(self.request,"Error al guardar fechas","danger")
 
         return super().form_valid(form)
 

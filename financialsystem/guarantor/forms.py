@@ -57,6 +57,58 @@ class GuarantorForm(forms.ModelForm):
         model = Guarantor
         fields = "__all__"
         exclude = ["credit"]
+
+    def clean_dni(self):
+        """
+        Validar que el DNI sea válido
+        """
+        dni = self.cleaned_data.get('dni')
+        
+        if self.prefix == 'guarantor':
+            if len(str(dni)) < 7 or  len(str(dni)) >= 15:
+                raise forms.ValidationError("El DNI debe contener como mínimo 7 y máximo 15 caracteres")
+
+            existing_guarantor = Guarantor.objects.filter(dni=dni).first()
+            if Guarantor.objects.filter(dni=dni).exists():
+                if existing_guarantor != self.instance :
+                    raise forms.ValidationError("El DNI {} ya registra".format(dni))
+
+        return dni
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if self.prefix == 'guarantor':
+            if len(first_name) < 3:
+                raise forms.ValidationError("El nombre debe contener al menos 3 caracteres")
+        return first_name
+    
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if self.prefix == 'guarantor':
+            if len(last_name) < 3:
+                raise forms.ValidationError("El apellido debe contener al menos 3 caracteres")
+        return last_name
+
+    def clean_email(self):
+        """
+        Validar que el correo electrónico sea válido
+        """
+        email = self.cleaned_data.get('email')
+
+        # Validar formato de correo electrónico
+        if self.prefix == 'guarantor' and len(email) > 0:
+            try:
+                validate_email(email)
+            except forms.ValidationError:
+                raise forms.ValidationError("Ingrese un correo electrónico válido")
+
+            existing_guarantor = Guarantor.objects.filter(email=email).first()
+
+            if Guarantor.objects.filter(email=email).exists():
+                if existing_guarantor != self.instance :
+                    raise forms.ValidationError("El correo: %s ya esta en uso" % email)
+
+        return email
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -159,10 +211,9 @@ class GuarantorUpdateForm(forms.ModelForm):
             raise forms.ValidationError("Ingrese un correo electrónico válido")
 
         existing_guarantor = Guarantor.objects.filter(email=email).first()
-        existing_client = Client.objects.filter(email=email).first()
 
-        if Guarantor.objects.filter(email=email).exists() or Client.objects.filter(email=email).exists():
-            if existing_guarantor != self.instance and existing_client != self.instance:
+        if Guarantor.objects.filter(email=email).exists():
+            if existing_guarantor != self.instance :
                 raise forms.ValidationError("El correo: %s ya esta en uso" % email)
 
         return email
@@ -186,6 +237,10 @@ class PhoneNumberFormGuarantor(forms.ModelForm):
     
     phone_number_g = forms.CharField(
         label = 'Telefono',
+        required=False,
+        widget=forms.NumberInput(
+        attrs={'type':'number'}
+        )
     )
     
     phone_type_g = forms.ChoiceField(
@@ -206,7 +261,7 @@ class PhoneNumberFormGuarantor(forms.ModelForm):
             return None
         elif not phone_number_g.isdigit():
             raise forms.ValidationError("El número de teléfono debe contener solo dígitos")
-        elif len(phone_number_g) > 0 and (len(phone_number_g) < 8 or len(phone_number_g) > 15):
+        elif len(phone_number_g) > 0 and (len(phone_number_g) < 8 or len(phone_number_g) > 20):
             raise forms.ValidationError("El numero debe contener como minimo 8 y 15 digitos")
         return phone_number_g    
     

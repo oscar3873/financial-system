@@ -41,7 +41,12 @@
 
 <main class="container my-4">
     <!--Seccion 1-->
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">{{client.first_name}} {{client.last_name}}</h4>
+    <a href="{% url 'clients:update' client.pk %}">
+        <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">
+            <i class="fa fa-wrench text-warning" aria-hidden="true"></i>
+            {{client.first_name}} {{client.last_name}}
+        </h4>
+    </a>
     {% if user.is_superuser %}
     <button class="btn btn-danger" data-toggle="modal" data-target="#Legals" onclick="go_legals()">
         <i class="fa fa-bell text-white"></i>

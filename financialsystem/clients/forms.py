@@ -124,7 +124,10 @@ class PhoneNumberFormClient(forms.ModelForm):
     
     phone_number_c = forms.CharField(
         label = 'Telefono',
-        required=False
+        required=False,
+        widget=forms.NumberInput(
+        attrs={'type':'number'}
+        )
     )
     
     phone_type_c = forms.ChoiceField(
@@ -146,7 +149,7 @@ class PhoneNumberFormClient(forms.ModelForm):
             return None
         elif not phone_number_c.isdigit():
             raise forms.ValidationError("El número de teléfono debe contener solo dígitos")
-        elif len(phone_number_c) < 8 or len(phone_number_c) > 15:
+        elif len(phone_number_c) < 8 or len(phone_number_c) > 20:
             raise forms.ValidationError("El numero debe contener como minimo 8 y 15 digitos")
         return phone_number_c
     

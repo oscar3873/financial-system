@@ -1,10 +1,12 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from decimal import Decimal
+from dateutil.relativedelta import relativedelta
 
 from django.http import JsonResponse
 
 from commissions.models import Interest
 from core.utils import round_to_nearest_special, round_to_nearest_hundred
+from cashregister.utils import create_movement
 from .models import Credit, Refinancing, Installment
 from clients.models import Client
 
@@ -37,7 +39,9 @@ def refresh_condition():
 
 
 def for_refresh(obj_with_vencidas):
-    for installment_ven in obj_with_vencidas.filter(end_date__date__lt=date.today()).exclude(condition = 'Pagada'):
+    installments = obj_with_vencidas.filter(end_date__date__lt=date.today()).exclude(condition = 'Pagada')
+    for index, installment_ven in enumerate(list(installments)):
+        print(index, installments.count())
         if isinstance(installment_ven, Installment):
             credit = installment_ven.credit
             client = credit.client
@@ -49,29 +53,32 @@ def for_refresh(obj_with_vencidas):
             installment_ven.condition = 'Vencida' 
 
         installment_ven.is_caduced_installment = True
-        if installment_ven.lastup != date.today():
-            dates = installment_ven.lastup
+        resto = abs((date.today() - installment_ven.end_date.date()).days)
+        if (installment_ven.start_date.date() + relativedelta(months=1)) < installment_ven.end_date.date():
+            print('############# TERMINA EL PLAZO', index)
+            cuotas = obj_with_vencidas.filter(credit=credit)
 
-        elif installment_ven.daily_interests == 0:
-            dates = installment_ven.end_date.date()
-        else:
-            dates = date.today()
+            try:
+                installment = cuotas.get(installment_number = installment_ven.installment_number+1)
+                print('########### AUMENTO OTRA CUOTA',index)
+                installment.amount = installment.amount + Decimal(installment_ven.amount)
+                installment.daily_interests = installment.daily_interests + Decimal(installment_ven.daily_interests)
+                installment.save()
+                installment_ven.condition = "Pagada"
+                installment_ven.save()
+            except :
+                print('############# ACTUALIZA CUOTA ACTUAL', index)
+                fifteen_later = installment_ven.end_date - timedelta(days=15)
+                installment_ven.end_date = fifteen_later
 
-        resto = abs((date.today() - dates).days)
-        daily_interes = round_to_nearest_special(resto * installment_ven.original_amount * Decimal(installment_ven.porcentage_daily_interests/100))
-
-        if daily_interes > 0:
-            installment_ven.daily_interests = daily_interes
-            installment_ven.amount = installment_ven.original_amount + daily_interes
-            installment_ven.amount = round_to_nearest_hundred(installment_ven.amount)
-            installment_ven.lastup = date.today()
-            installment_ven.save()
+        actualice(resto, installment_ven)
+        installment_ven.save()
 
         daily_interest = Interest.objects.all()[0].daily_interest
 
         # DISMINUCION DE SCORE EN BASE A INTERESES DIARIOS (MIENTRAS HAYA SIDO UN CREDITO ACTUAL)
         if isinstance(credit, Credit):
-            if not credit.is_old_credit and (client.score - daily_interest * resto < 1):
+            if client.score - daily_interest * resto < 1:
                 client.score = 0
             else:
                 new_score = client.score - daily_interest * resto
@@ -81,6 +88,13 @@ def for_refresh(obj_with_vencidas):
             client.score = max(0, min(new_score, 1500))
 
         client.save()
+
+
+def actualice(resto, installment_ven):
+    daily_interes = round_to_nearest_special((resto * installment_ven.original_amount * installment_ven.porcentage_daily_interests/100))
+    installment_ven.daily_interests = daily_interes
+    installment_ven.amount = installment_ven.original_amount + daily_interes
+    installment_ven.amount = round_to_nearest_hundred(installment_ven.amount)
 
 
 def refresh_installments_credits():
@@ -128,7 +142,7 @@ def search_client(request):
 def search_credit(request):
     search_terms = request.GET.get('search_term').split()
 
-    credits=Credit.objects.all()
+    credits=Credit.objects.filter(guarantor__isnull=True)
     if search_terms:
         for term in search_terms:
             q_objects = Q(client__first_name__icontains=term) | Q(client__last_name__icontains=term) | Q(client__dni__icontains=term)
@@ -146,3 +160,11 @@ def search_credit(request):
         data = {'credits': []}
 
     return JsonResponse(data)
+
+
+def ask_is_old(credit, adviser):
+    credit.amount = round_to_nearest_hundred(credit.amount)
+    if not credit.is_old_credit:
+        credit.mov = create_movement(credit, adviser)
+    credit.is_old_credit = False
+    credit.save()

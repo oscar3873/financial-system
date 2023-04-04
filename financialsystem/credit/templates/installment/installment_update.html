@@ -17,7 +17,7 @@
                                 </div>
                                 {{ form.amount }}
                                 <div class="input-group-append">
-                                    <button type="button" id="enable-amount-btn" class="btn btn-primary">Editar monto</button>
+                                    <button type="button" id="enable-amount-btn" class="btn btn-secondary">Editar monto</button>
                                 </div>
                             </div>
                         </div>
@@ -53,19 +53,19 @@
 <script src="http://momentjs.com/downloads/moment.min.js"></script>
 
 <script>
-    function roundToNearestSpecial(x) {
-        if (Number.isInteger(x)) {
-            return x;
-        } else if (x < 100) {
-            if (x % 10 >= 5) {
-            return Math.ceil(x / 10) * 10 - 10;
+    document.addEventListener("DOMContentLoaded", function() {
+        function roundToNearestSpecial(x) {
+            if (x < 150) {
+                return Math.round(x / 10) * 10;
             } else {
-            return Math.floor(x / 10) * 10;
+                let base = Math.round(x / 100) * 100;
+                if (x - base < 50) {
+                    return base;
+                } else {
+                    return base + 100;
+                }
             }
-        } else {
-            return Math.round(x);
         }
-    }
 
     let conditionSelect = document.getElementById("id_condition");
     let refinanceMsg = document.getElementById("refinance-msg");
@@ -87,6 +87,7 @@
 
     let amountInput = document.getElementById("id_amount");
     let enableAmountBtn = document.getElementById("enable-amount-btn");
+    const amount_value = parseFloat(`{{installment.original_amount}}`);
 
     // Agregar la clase "readonly" al cargar la página
     amountInput.classList.add("readonly");
@@ -111,7 +112,7 @@
     let paymentDateInput = document.getElementById("id_payment_date");
     let porcentageInput = document.getElementById("id_porcentage_daily_interests");
     let dailyInterestsInput = document.getElementById("id_daily_interests");
-
+    
     endDateInput.addEventListener("change", calculateDailyInterests);
     startDateInput.addEventListener("change", calculateDailyInterests)
     paymentDateInput.addEventListener("change", calculateDailyInterests);
@@ -119,18 +120,19 @@
 
     function calculateDailyInterests() {
         const end_date = moment(endDateInput.value).startOf('day');
-        const start_date = moment(startDateInput.value).startOf('day');
         const payment_date = moment(paymentDateInput.value || new Date()).startOf('day');
         const porcentage = porcentageInput.value || 0;
 
-        const days_diff_s_e = end_date.diff(start_date, 'days');
-        const days_diff_s_p = payment_date.diff(start_date, 'days');
-        const days_diff = days_diff_s_p > days_diff_s_e ? days_diff_s_e : days_diff_s_p;
+        const days_diff_end_pay = payment_date.diff(end_date, 'days');
 
-        const daily_interests = Math.round(amountInput.value * porcentage/100 * days_diff);
-        dailyInterestsInput.value = roundToNearestSpecial(daily_interests).toFixed(2);
+        const days_diff = !isNaN(days_diff_end_pay) && days_diff_end_pay >= 0 ? days_diff_end_pay : 0.00;
+        console.log(amount_value);
+        const daily_interests = Math.round(amount_value * porcentage/100 * days_diff);
+        let interest_final = roundToNearestSpecial(daily_interests).toFixed(2);
+        dailyInterestsInput.value = interest_final;
     }
-
+    calculateDailyInterests();
+});
 </script>
 
 {% endblock %}

@@ -112,7 +112,7 @@ class Installment(models.Model):
     payment_date = models.DateTimeField(help_text="Fecha de Pago", null=True, blank=True)
     condition = models.CharField(max_length=15,choices=CONDITION, default='A Tiempo')
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="installments", help_text="Credito de la cuota")
-    amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota")
+    amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota+Intereses")
     original_amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto de la cuota")
     lastup = models.DateField(null=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)

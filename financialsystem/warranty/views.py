@@ -13,7 +13,6 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
-from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
 from credit.models import Credit
 from .models import Warranty
@@ -39,7 +38,6 @@ class WarrantyListView(LoginRequiredMixin, ListView):
         """
         Extrae los datos de los empeños que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -74,7 +72,6 @@ class WarrantyDetailView(LoginRequiredMixin, DetailView):
         """
         Devuelve el empeño que se encuentra en la URL.
         """
-        refresh_condition()
         return get_object_or_404(Warranty, id=self.kwargs['pk'])
 
 

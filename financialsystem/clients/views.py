@@ -47,7 +47,7 @@ class ClientListView(LoginRequiredMixin, ListView):
     model = Client
     template_name = 'clients/client_list.html'
     ordering = ['-created_at']
-    paginate_by = 10
+    paginate_by = 8
     filter_class = ListingFilter
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
@@ -186,6 +186,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         else:
             context['form'] = ClientForm(instance = self.object)
             context['phone_formset'] = PhoneNumberFormSetUpdate(instance=self.object)
+        context['client'] = self.object
         return context
 
     def form_invalid(self, form):

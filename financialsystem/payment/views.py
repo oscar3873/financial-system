@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime as dt
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -14,7 +14,6 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView, DeleteView
 
 from credit.models import Credit, Refinancing, Installment
-from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
 from commissions.models import Interest
 from .utils import *
@@ -40,7 +39,6 @@ class PaymentListView(LoginRequiredMixin, ListView):
         """
         Extrae los datos de los pagos que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -108,7 +106,6 @@ def make_payment_installment(request, pk):
     """
     Metodo para realizar pagos de cuotas normales y refinanciadas.
     """
-    refresh_condition()
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments_score = refinancing.installments.all().count()
@@ -130,12 +127,10 @@ def make_payment_installment(request, pk):
         payment_time = form.cleaned_data['payment_time']
         
         # Unir los valores de payment_date y payment_time en un solo objeto datetime
-        payment.payment_date = datetime.combine(payment_date, payment_time)
+        payment.payment_date = dt.combine(payment_date,payment_time)
         
         installment_ = list(installments.all())
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('cuota')}
-
-        print(form.cleaned_data)
 
         pack = dict(zip(installment_, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)

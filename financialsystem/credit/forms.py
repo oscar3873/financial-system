@@ -61,10 +61,10 @@ class CreditForm(forms.ModelForm):
 
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
-        print(kwargs)
-
+        
         self.adviser = kwargs["initial"].pop('adviser')
         super().__init__(*args, **kwargs)
+        
         self.fields['adviser'].initial = self.adviser 
 
         for field_name in self.fields:
@@ -101,7 +101,6 @@ class RefinancingForm(forms.ModelForm):
         initial=CHOICES[0],
         required= True,
         widget=forms.Select()
-
     )
 
     class Meta:
@@ -129,7 +128,7 @@ class RefinancingForm(forms.ModelForm):
                         required=True,
                         widget=forms.CheckboxInput(attrs={
                             "class": "form-check", 
-                            "value": installment.amount+installment.daily_interests, 
+                            "value": installment.amount, 
                             "data-form-id": "form_ref%s" % (credit.pk)
                         })
                     )
@@ -141,7 +140,7 @@ class RefinancingForm(forms.ModelForm):
                         required=False,
                         widget=forms.CheckboxInput(attrs={
                             "class": "form-check", 
-                            "value": installment.amount+installment.daily_interests, 
+                            "value": installment.amount, 
                             "data-form-id": "form_ref%s" % (credit.pk)})
                     )
 
@@ -195,7 +194,7 @@ class InstallmentUpdateForm(forms.ModelForm):
         }
 
 
-class InstallmentRefinancingForm(forms.ModelForm):
+class InstallmentRefinancingUpdateForm(forms.ModelForm):
     
     class Meta:
         model = InstallmentRefinancing
@@ -224,12 +223,6 @@ class InstallmentRefinancingForm(forms.ModelForm):
 #-------------------------------------------FORMS UPDATE--------------------------------
 class CreditUpdateForm(forms.ModelForm):
 
-    is_old_credit = forms.BooleanField(
-        label='¿Credito Antigüo?',
-        help_text="Tildar el campo para SI",
-        required=False
-    )
-
     interest = forms.IntegerField(
         label= "Intereses",
         required= True,
@@ -252,12 +245,10 @@ class CreditUpdateForm(forms.ModelForm):
     
     class Meta:
         model = Credit
-        fields = ["is_old_credit","amount", "interest", "installment_num", "start_date", "end_date"]
+        fields = ["amount", "interest", "installment_num", "start_date"]
         widgets ={
             'start_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
-            'end_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
         }
-        input_formats = ['%Y-%m-%d']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

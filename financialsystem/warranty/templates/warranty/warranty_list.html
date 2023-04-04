@@ -36,28 +36,22 @@
         </div>
         <div class="row mt-4">
             <h5 class=" p-4 pt-2 m-0 title">Busqueda/s</h5>
-            <div class="container p-0 mx-3 d-xl-flex bg-white border mt-4">
+            <div class="card bg-primary text-white mb-2">
+                <div class="p-2">
                 <form class="form-inline">
                     <div class="form-group col-xl-12">
-                        <span class="p-2 d-block">{{ listing_filter.form.article.label}}</span>
-                        <span class="p-2">{{ listing_filter.form.article}}</span>
-                        <span class="p-2 d-block">{{ listing_filter.form.model.label}}</span>
-                        <span class="p-2">{{ listing_filter.form.model}}</span>
-                        <span class="p-2 d-block">{{ listing_filter.form.brand.label}}</span>
-                        <span class="p-2">{{ listing_filter.form.brand}}</span>
-                        <span class="p-2 d-block">{{ listing_filter.form.state.label}}</span>
-                        <span class="p-2">{{ listing_filter.form.state}}</span>
-                        <span class="p-2 d-block">{{ listing_filter.form.client.label}}</span>
-                        <span class="p-2">{{ listing_filter.form.client}}</span>
-                        <span class="p-2 d-block">{{ listing_filter.form.purchase_papers.label}}</span>
-                        <span class="p-2">{{ listing_filter.form.purchase_papers}}</span>
-                        <span class="p-2 d-block">{{ listing_filter.form.created_at.label}}</span>
-                        <span class="p-2">{{ listing_filter.form.created_at}}</span>
-                        <button class="d-block btn btn-primary m-2" type="submit">Buscar</button>
+                        <div class="p-2">{{ listing_filter.form.article.label}}:&nbsp;{{ listing_filter.form.article}}</div>
+                        <div class="p-2">{{ listing_filter.form.model.label}}:&nbsp;{{ listing_filter.form.model}}</div>
+                        <div class="p-2">{{ listing_filter.form.brand.label}}:&nbsp;{{ listing_filter.form.brand}}</div>
+                        <div class="p-2">{{ listing_filter.form.state.label}}:&nbsp;{{ listing_filter.form.state}}</div>
+                        <div class="p-2">{{ listing_filter.form.client.label}}:&nbsp;{{ listing_filter.form.client}}</div>
+                        <div class="p-2">{{ listing_filter.form.purchase_papers.label}}:&nbsp;{{ listing_filter.form.purchase_papers}}</div>
+                        <div class="p-2">{{ listing_filter.form.created_at.label}}:&nbsp;{{ listing_filter.form.created_at}}</div>
+                        <button class="d-block btn btn-warning m-2 text-white" type="submit">Buscar</button>
                     </div>
                 </form>
             </div>
-            <div class="card-footer p-0 mx-3 w-100 p-1 bg-secondary rounded-bottom"></div>
+            </div>
         </div>
 
     </section>

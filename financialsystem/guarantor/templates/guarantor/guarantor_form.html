@@ -1,16 +1,16 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
 <main class="container my-4">
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de solicitud de servicios</h4>
+    {% include 'core/message.html' %}
+
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de garante</h4>
     <form class="d-block" method="post">
         <section class="row">
             <div class="col-md-4 order-first order-md-last">
-                {% if not is_update %}
                 <div class="form-group">
                     <label for="search-input"><h4>Buscar Cliente</h4></label>
                     <input type="text" id="search-input" class="form-control rounded p-3 box-shadow" placeholder="Buscar por Nombre, Apellido o DNI">
                 </div>
                 <ul id="search-results" class="list-group text-dark mt-3"></ul>
-                {% endif %}
             </div>
 
             <div class="col-md-8">
@@ -113,6 +113,7 @@
 <script>
     const searchInput = document.querySelector('#search-input');
     const searchResults = document.querySelector('#search-results');
+    searchResults.innerHTML = '';
 
     searchInput.addEventListener('input', (event) => {
         const searchTerm = event.target.value.trim().toLowerCase();
