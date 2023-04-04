@@ -279,7 +279,7 @@ PhoneNumberFormSetG = inlineformset_factory(
     Guarantor, 
     PhoneNumberGuarantor, 
     form = PhoneNumberFormGuarantor,
-    extra= 2,
+    extra= 3,
     can_delete= False,
 )
 
