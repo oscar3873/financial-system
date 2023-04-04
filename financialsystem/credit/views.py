@@ -53,7 +53,6 @@ def crear_credito(request):
             credit.client = client
             ask_is_old(credit, credit_form.cleaned_data['adviser'])
 
-            
             guarantor = guarantor_form.save(commit=False)
             if guarantor_form.cleaned_data["dni"]:
                 credit.guarantor = credit
