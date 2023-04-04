@@ -1,0 +1,21 @@
+#!/bin/bash
+DATE=$(date +"%Y%m%d%H%M")
+BACKUP_DIR="backups"
+BACKUP_FILE="$BACKUP_DIR/backup_$DATE.sql"
+BACKUP_FILE_COMPRESSED="$BACKUP_FILE.gz"
+
+# Leer las variables de entorno del archivo .env
+DB_USER=$(python -c "from dotenv import load_dotenv; from decouple import config; load_dotenv(); print(config('DJANGO_DATABASE_USER'))")
+DB_PASSWORD=$(python -c "from dotenv import load_dotenv; from decouple import config; load_dotenv(); print(config('DJANGO_DATABASE_PASSWORD'))")
+DB_NAME=$(python -c "from dotenv import load_dotenv; from decouple import config; load_dotenv(); print(config('DJANGO_DATABASE_NAME'))")
+DB_HOST=$(python -c "from dotenv import load_dotenv; from decouple import config; load_dotenv(); print(config('DJANGO_DATABASE_HOST'))")
+DB_PORT=$(python -c "from dotenv import load_dotenv; from decouple import config; load_dotenv(); print(config('DJANGO_DATABASE_PORT', default='3306'))")
+
+# Crear la carpeta de respaldos si no existe
+mkdir -p $BACKUP_DIR
+
+# Realizar el respaldo con mysqldump
+mysqldump -u $DB_USER -p$DB_PASSWORD --opt --single-transaction --routines --triggers --host=$DB_HOST --port=$DB_PORT $DB_NAME > $BACKUP_FILE
+
+# Comprimir el archivo de respaldo
+gzip $BACKUP_FILE

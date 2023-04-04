@@ -35,7 +35,7 @@ def crear_credito(request):
     credit_form = CreditForm(request.POST or None, initial = {'adviser':request.user.adviser})
     formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
-    
+
     if request.method == 'POST':
         if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid()  and formsetPhoneClient.is_valid() and guarantor_form.is_valid() and formsetPhoneGuarantor.is_valid():
             client = client_form.save(commit=False)
@@ -47,7 +47,7 @@ def crear_credito(request):
                 if phone_number.phone_number_c:
                     phone_number.client = client
                     phone_number.save()
-                    
+
             credit = credit_form.save(commit=False)
             credit.amount = round_to_nearest_hundred(credit.amount)
             credit.client = client
@@ -55,7 +55,7 @@ def crear_credito(request):
             if not credit.is_old_credit:
                 credit.mov = create_movement(credit, request.user.adviser)
             credit.save()
-            
+
             guarantor = guarantor_form.save(commit=False)
             if guarantor_form.cleaned_data["dni"]:
                 credit.guarantor = credit
@@ -65,12 +65,12 @@ def crear_credito(request):
                     if phone_number.phone_number_g:
                         phone_number.guarantor = guarantor
                         phone_number.save()
-            
+
             warranty = warranty_form.save(commit=False)
             if warranty_form.cleaned_data["article"]:
                 warranty.credit = credit
                 warranty.save()
-            
+
             messages.success(request, 'El cliente se ha guardado exitosamente.',"success")
             return redirect('clients:list')
     else:
@@ -84,7 +84,7 @@ def crear_credito(request):
         'credito_form': credit_form,
         'empeno_form': warranty_form,
     }
-    
+
     return render(request, 'credit/create_credit.html', context)
 
 #LISTA DE CREDITOS
@@ -97,12 +97,12 @@ class CreditListView(LoginRequiredMixin, ListView):
     template_name = 'credit/credit_list.html'
     ordering = ['-id']
     paginate_by = 5
-    
+
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    
+
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los creditos de la base de datos para usarlos en el contexto.
@@ -112,7 +112,7 @@ class CreditListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["count_credits"] = self.model.objects.all().count()
         context["credits"] = self.model.objects.all()
-        
+
         # Crear un objeto Paginator para dividir los resultados en páginas
         paginator = Paginator(context["credits"], self.paginate_by)
         page_number = self.request.GET.get('page')    # Obtener el número de página actual
@@ -121,10 +121,10 @@ class CreditListView(LoginRequiredMixin, ListView):
         page_obj = paginator.get_page(page_number)
         # Agregar la página actual al contexto
         context["credits"] = page_obj
-        
+
         context["properties"] = all_properties_credit()
         return context
-    
+
 class CreditDetailView(DetailView, LoginRequiredMixin):
     """
     Detalle	del credito.
@@ -151,7 +151,7 @@ class CreditDetailView(DetailView, LoginRequiredMixin):
 
 
 #ASOCIACION MEDIANTE CREACION DE UN CREDITO
-#------------------------------------------------------------------   
+#------------------------------------------------------------------
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 
@@ -170,7 +170,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
         iniitial = super().get_initial()
         iniitial['adviser'] = self.request.user.adviser
         return iniitial
-    
+
 
     def get_context_data(self, **kwargs):
         """
@@ -212,7 +212,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
                 warranty.save()
 
             # Validar el formulario de garante
-            garante_form = GuarantorForm(self.request.POST, prefix="guarantor")
+            garante_form = GuarantorForm(self.request.POST, prefix="credit_created")
             guarantor = garante_form.save(commit=False)
             if garante_form.cleaned_data["dni"]:
                 if garante_form.is_valid():
@@ -230,9 +230,9 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             return self.form_invalid(form)
 
 
-    
+
     def get_success_url(self) -> str:
-        """ 
+        """
         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
         """
         messages.success(self.request, 'Credito creado correctamente',"success")
@@ -240,11 +240,11 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
 
 
 #CREACION DE UN CREDITO
-#------------------------------------------------------------------     
+#------------------------------------------------------------------
 class CreditCreateTo(LoginRequiredMixin, CreateView):
     """
     Creacion de un credito para un cliente desde detail.
-    """	
+    """
     model = Credit
     form_class = CreditForm
     template_name = 'credit/credit_form.html'
@@ -267,7 +267,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
         context['formsetPhoneGuarantor'] = PhoneNumberFormSetG(instance=Guarantor(), prefix = "phone_number_guarantor")
 
         return context
-    
+
     @transaction.atomic
     def form_valid(self, form):
         """
@@ -301,7 +301,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
                 garante_form = GuarantorForm(self.request.POST, prefix="credit_created")
 
                 guarantor = garante_form.save(commit=False)
-                if garante_form.cleaned_data["dni"]:            
+                if garante_form.cleaned_data["dni"]:
                     if garante_form.is_valid():
                         credit.guarantor = guarantor
                         credit.save()
@@ -315,19 +315,19 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
             return super().form_valid(form)
         else:
             return self.form_invalid(form)
-    
+
     def get_success_url(self) -> str:
         """
         Redirecciona al listado de credito, con un mensaje de creacion exitosa.
         """
         messages.success(self.request, 'Credito creado correctamente', "success")
         return  reverse_lazy('clients:detail', kwargs=self.kwargs)
-    
+
 
 #------------------------------------------------------------------   NUEVOOO
 @login_required(login_url="/accounts/login/")
 def edit_credit(request, pk):
-    
+
     credit_original = Credit.objects.get(id=pk)
     credit_copy = copy.copy(credit_original)
     form = CreditUpdateForm(instance=credit_original)
@@ -340,7 +340,7 @@ def edit_credit(request, pk):
             if (credit_copy.end_date != credit.end_date) or (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.interest != credit.interest) or (credit_copy.installment_num != credit.installment_num):
                 credit.is_old_credit = False
                 credit.save()
-                
+
             messages.info(request,'Cambios realizados exitosamente',"info")
             return redirect('credits:list')
 
@@ -352,7 +352,7 @@ def edit_credit(request, pk):
 
 
 #------------------------------------------------------------------
-@login_required(login_url="/accounts/login/")     
+@login_required(login_url="/accounts/login/")
 def credit_delete(request, pk):
     try:
         cred = get_object_or_404(Credit, pk=pk)
@@ -363,9 +363,9 @@ def credit_delete(request, pk):
     except:
         messages.error(request, 'Hubo un error al intentar', "danger")
         return  redirect('credits:list')
-    
 
-#------------------------------------------------------------------   
+
+#------------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
 def refinance_installment (request, pk):
     """
@@ -389,9 +389,9 @@ def refinance_installment (request, pk):
                     installment.is_refinancing_installment = True
                     installment.refinance = refinancing
                     installment.save()
-                
+
     return redirect('clients:detail', pk=credit.client.pk)
-        
+
 #----------------------------------------------------------------
 class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
     """
@@ -409,7 +409,7 @@ class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['client'] = self.object.installment_ref.first().credit.client
         return context
-    
+
     def form_valid(self, form):
         if form.is_valid():
             refinance_copy = copy.copy(self.object)
@@ -418,10 +418,10 @@ class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
             if (refinance_copy.end_date != refinance.end_date) or (refinance_copy.start_date != refinance.start_date) or (refinance_copy.amount != refinance.amount) or (refinance_copy.interest != refinance.interest) or (refinance_copy.installment_num != refinance.installment_num):
                 refinance.is_new = True
         return super().form_valid(form)
-    
+
     def get_success_url(self):
         return reverse('clients:detail', args=[self.kwargs['client'].pk])
-    
+
 
 #-------------------------------------------------------------------
 def refinancing_delete(request, pk):
@@ -453,15 +453,15 @@ class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
                     form.instance.condition = 'Pagada'
 
         return super().form_valid(form)
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['installment'] = self.object
         return context
-    
+
     def get_success_url(self):
         return reverse('clients:detail', args=[self.object.refinancing.installment_ref.last().credit.client.pk])
-    
+
 #----------------------------------------------------------------
 class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
     model = Installment
@@ -471,14 +471,14 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
 
     def form_valid(self, form):
         installment = get_object_or_404(Installment, pk=self.kwargs['pk'])
         if form.is_valid():
             if not installment.payment_date and form.cleaned_data['payment_date']:
                 form.instance.condition = 'Pagada'
-                
+
             elif installment.payment_date and not form.cleaned_data['payment_date']:
                 form.instance.condition = 'A Tiempo'
 
@@ -491,11 +491,11 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
 
         return super().form_valid(form)
 
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['installment'] = self.object
         return context
-    
+
     def get_success_url(self):
         return reverse('clients:detail', args=[self.object.credit.client.pk])
