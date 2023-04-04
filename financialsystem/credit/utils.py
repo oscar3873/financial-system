@@ -32,7 +32,7 @@ def refresh_condition():
         for credit in credits_ok:
             if credit.installments.filter(condition="Vencida").count() == credit.installments.count():
                 credit.condition = "Vencido"
-                credit.is_paid = True
+                credit.is_paid = False
                 credit.save()
 
         refresh_installments_credits()
@@ -41,7 +41,6 @@ def refresh_condition():
 def for_refresh(obj_with_vencidas):
     installments = obj_with_vencidas.filter(end_date__date__lt=date.today()).exclude(condition = 'Pagada')
     for index, installment_ven in enumerate(list(installments)):
-        print(index, installments.count())
         if isinstance(installment_ven, Installment):
             credit = installment_ven.credit
             client = credit.client

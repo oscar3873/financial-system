@@ -29,7 +29,7 @@ def pay_installment(payment, installments, amount_paid):
     Metodo para pagos parciales: a travez de un monto X, realiza el pago de la cuota que encaja
     y realiza la disminucion de la cuota a pagar en caso que no supere el monto de la cuota
     """
-    for installment in installments:
+    for index, installment in enumerate(list(installments)):
         if installment.amount <= amount_paid:
             print('############PAGADA COMPLETA')
             installment.condition = 'Pagada'
@@ -40,15 +40,15 @@ def pay_installment(payment, installments, amount_paid):
             payment_create(payment, installment)
             amount_paid -= installment.amount
 
-        elif installment.is_caduced_installment and (amount_paid >= Decimal(installment.amount/Decimal(2))):
+        elif amount_paid >= Decimal(installment.amount/Decimal(2)):
             print('########## PAGO PARCIAL')
-            payment.amount = amount_paid
-            installment.amount -= payment.amount
-            
-            end_date=installment.end_date.date()
-            fifteen_later = datetime.date.today() + datetime.timedelta(days=15)
-            installment.end_date = fifteen_later
-            installment.save()
-            
-            payment_create(payment, installment)
-            amount_paid = 0
+            if installment == installments.last():
+                payment.amount = amount_paid
+                installment.amount -= payment.amount
+                
+                fifteen_later = datetime.date.today() + datetime.timedelta(days=15)
+                installment.end_date = fifteen_later
+                installment.save()
+                
+                payment_create(payment, installment)
+                amount_paid = 0

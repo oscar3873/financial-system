@@ -30,7 +30,7 @@ class PaymentForm(forms.ModelForm):
     )
 
     amount_paid = forms.DecimalField(   # AGREGA CAMPO DE PAGO PARCIAL PARA TOMAR EL MONTO QUE SE DESEA PAGAR
-        label='Pago por cantidad', 
+        label='Pago por cantidad (solo para cuotas vencidas)', 
         min_value=0,
         help_text="Recomendable pagar el 50% de la deuda",
         widget=forms.NumberInput(attrs={'class': 'form-control'})
