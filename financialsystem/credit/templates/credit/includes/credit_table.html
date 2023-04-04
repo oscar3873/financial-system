@@ -23,10 +23,14 @@
             <td class="repayment_amount">{{credit.credit_repayment_amount}}</td>
             <td class="installment_num">{{credit.installment_num}}</td>
             <td class="installments_amount">{{credit.installments.last.amount}}</td>
-            <td class="condition">
+            <td class="condition text-center">
                 {% if credit.condition == "A Tiempo" %}
-                <i class="fas fa-play-circle text-info"></i> {% elif credit.condition == "Pagado" %}
-                <i class="fas fa-check-circle text-success"></i> {% endif %}
+                <i class="fas fa-play-circle text-info"></i> 
+                {% elif credit.condition == "Pagado" %}
+                <i class="fas fa-check-circle text-success"></i> 
+                {% else %}
+                <i class="fas fa-exclamation-triangle text-danger"></i>
+                {% endif %}
             </td>
             <td class="client"><a href="{% url 'clients:detail' credit.client.pk %}">{{credit.client}}</a></td>
             <td class="adviser"><a href="{% url 'advisers:detail' credit.client.adviser.pk %}">
