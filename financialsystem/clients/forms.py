@@ -90,15 +90,15 @@ class ClientForm(forms.ModelForm):
         Validar que el correo electrónico sea válido
         """
         email = self.cleaned_data.get('email')
-
-        try:
-            validate_email(email)
-        except forms.ValidationError:
-            raise forms.ValidationError("Ingrese un correo electrónico válido")
-    
-        if Client.objects.filter(email=email).exists():
-            if Client.objects.filter(email=email).first() != self.instance:
-                raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico") 
+        if len(email) > 0:
+            try:
+                validate_email(email)
+            except forms.ValidationError:
+                raise forms.ValidationError("Ingrese un correo electrónico válido")
+        
+            if Client.objects.filter(email=email).exists():
+                if Client.objects.filter(email=email).first() != self.instance:
+                    raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico") 
         return email
 
     def __init__(self, *args, **kwargs):

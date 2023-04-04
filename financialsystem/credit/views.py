@@ -51,17 +51,9 @@ def crear_credito(request):
 
             credit = credit_form.save(commit=False)
             credit.client = client
-<<<<<<< HEAD
             ask_is_old(credit, request.user.adviser)
 
             
-=======
-            credit.is_old_credit = False
-            if not credit.is_old_credit:
-                credit.mov = create_movement(credit, request.user.adviser)
-            credit.save()
-
->>>>>>> e61fdac10d141d55c7f19d6331346d503fe392ba
             guarantor = guarantor_form.save(commit=False)
             if guarantor_form.cleaned_data["dni"]:
                 credit.guarantor = credit
@@ -117,13 +109,8 @@ class CreditListView(LoginRequiredMixin, ListView):
         create_cashregister()
         context = super().get_context_data(**kwargs)
         context["count_credits"] = self.model.objects.all().count()
-<<<<<<< HEAD
         credits = self.model.objects.all()
         
-=======
-        context["credits"] = self.model.objects.all()
-
->>>>>>> e61fdac10d141d55c7f19d6331346d503fe392ba
         # Crear un objeto Paginator para dividir los resultados en páginas
         paginator = Paginator(credits, self.paginate_by)
         page_number = self.request.GET.get('page')    # Obtener el número de página actual
