@@ -138,7 +138,8 @@ def make_payment_installment(request, pk):
 
         if count_value == 0 :
             payment.amount = installment_amount
-            pay_installment(payment, installments, abs(Decimal(form.cleaned_data["amount_paid"])))
+            installments_caduced = installments.filter(is_caduced_installment = True)
+            pay_installment(payment, installments_caduced, abs(Decimal(form.cleaned_data["amount_paid"])))
         else:
             for installment in pack.keys():
                 if pack[installment]:
