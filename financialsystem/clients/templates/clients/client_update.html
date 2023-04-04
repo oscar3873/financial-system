@@ -1,7 +1,7 @@
 <!-- crear_credito.html -->
-{% extends 'core/base.html' %} {% load crispy_forms_tags %} {% block content %}
+{% extends 'core/base.html' %} {% block content %}
 <main class="container my-4">
-    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de solicitud de servicios</h4>
+    <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Editar cliente: {{client.last_name}}, {{client.first_name}}</h4>
     <section>
         <div class="my-4 py-2">
             <form class="form" method="post">
@@ -11,7 +11,7 @@
                         <div class="card bg-primary text-white box-shadow mb-3">
                             <div class="card-body">
                                 <h5 class="title p-2">
-                                    <i class="fa-solid fa-user text-warning"></i> &nbsp; Titular
+                                    <i class="fa-solid fa-user text-warning"></i> &nbsp; Cliente
                                 </h5>
                                 <h5 class="title p-2">Informacion basica</h5>
                                 <div class="form-row">
@@ -60,7 +60,7 @@
                                 </div>
                                 <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
                                 <p>
-                                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
+                                    <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapsePNC" aria-expanded="false" aria-controls="collapsePNC">
                                       Añadir numeros de contacto
                                     </button>
                                 </p>

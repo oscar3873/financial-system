@@ -1,4 +1,5 @@
 from datetime import datetime
+import uuid
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -13,7 +14,6 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView
 from django.core.paginator import Paginator
 
-from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
 from credit.models import Credit
 from .models import Guarantor
@@ -28,7 +28,7 @@ class GuarantorListView(LoginRequiredMixin, ListView):
     model = Guarantor
     template_name = 'guarantor/guarantor_list.html'
     ordering = ['-created_at']
-    paginate_by = 4
+    paginate_by = 8
     filter_class = ListingFilter
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
@@ -39,7 +39,6 @@ class GuarantorListView(LoginRequiredMixin, ListView):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
 
         # Obtén los objetos clients filtrados
@@ -50,6 +49,7 @@ class GuarantorListView(LoginRequiredMixin, ListView):
         paginator = Paginator(filtered_guarantors.qs, self.paginate_by)
         page = self.request.GET.get('page')
         guarantors_paginated = paginator.get_page(page)
+        print(guarantors_paginated.number, page)
 
         context = super().get_context_data(**kwargs)
         # Etiqueta para el día actual
@@ -108,7 +108,6 @@ class GuarantorDetailView(LoginRequiredMixin, DetailView):
         """
         Retorna un objeto que será utilizado para renderizar la vista.
         """	
-        refresh_condition()
         return get_object_or_404(Guarantor, id=self.kwargs['pk'])
 
 #CREACION DE UNA NOTA
@@ -116,17 +115,28 @@ def guarantorCreateView(request):
     guarantor_form = GuarantorForm(request.POST or None, prefix="guarantor")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
 
+    context = {
+            'form': guarantor_form,
+            'formsetPhoneG': formsetPhoneGuarantor,
+        }
+    
     if request.method == 'POST':
         if guarantor_form.is_valid() and formsetPhoneGuarantor.is_valid():
             guarantor = guarantor_form.save(commit=False)
             guarantor.adviser = request.user.adviser
+
             # Recuperar el ID del cliente seleccionado
             selected_client_id = request.POST.get('selected_client_id')
-            # Asignar el crédito al cliente correspondiente
-            if selected_client_id != None:
-                credit = get_object_or_404(Credit, pk=selected_client_id)
-                guarantor.credit = credit
-            guarantor.save()
+
+            try:
+                credit = Credit.objects.get(pk=selected_client_id)
+                guarantor.save()
+                credit.guarantor = guarantor
+                credit.save()
+            except:
+                messages.warning(request, 'El garante debe tener un credito asociado.',"warning")
+                return render(request, 'guarantor/guarantor_form.html', context)
+
             phone_numbers = formsetPhoneGuarantor.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_g:
@@ -134,14 +144,7 @@ def guarantorCreateView(request):
                     phone_number.save()
             messages.success(request, 'El garante se ha guardado exitosamente.',"success")
             return redirect('guarantors:list')
-    else:
-        print("------------Algun formulario es invalido------------")
 
-    context = {
-        'form': guarantor_form,
-        'formsetPhoneG': formsetPhoneGuarantor,
-    }
-    
     return render(request, 'guarantor/guarantor_form.html', context)
 
 #BORRADO DE UNA NOTA

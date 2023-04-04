@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from django.contrib import messages
 
 from commissions.forms import SettingsInterestForm
-from commissions.models import Interest
+from commissions.models import *
 from django.contrib.auth.decorators import login_required
 
 
@@ -19,3 +19,11 @@ def setting_parameters(request):
             print(form.errors)
     
     return redirect('advisers:list')
+
+def delete_commission(request, pk):
+    commision = Commission.objects.get(pk=pk)
+    adviser = commision.adviser
+    if request.method == 'POST':
+        commision.delete()
+    messages.info(request, "Comision eliminada","info")
+    return redirect('advisers:detail', pk=adviser.pk)

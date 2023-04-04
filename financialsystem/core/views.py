@@ -8,7 +8,6 @@ from clients.models import Client
 
 
 from note.models import Note
-from credit.utils import refresh_condition
 from cashregister.models import CashRegister, Movement
 from cashregister.utils import create_cashregister
 
@@ -29,7 +28,6 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         """
         Extrae los datos de los modelos necesarios que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
         context = super().get_context_data(**kwargs)
         Caja = CashRegister.objects.get_or_create()

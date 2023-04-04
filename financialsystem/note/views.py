@@ -10,7 +10,6 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 
-from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
 from .models import Note
 from .forms import NoteForm

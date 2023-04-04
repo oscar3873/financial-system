@@ -3,6 +3,7 @@ from decimal import Decimal
 from django import forms
 from credit.models import Installment
 from django.utils import timezone
+from core.utils import round_to_nearest_hundred
 from payment.models import Payment
 
 class PaymentForm(forms.ModelForm):
@@ -63,7 +64,8 @@ class PaymentForm(forms.ModelForm):
         """
         super(PaymentForm, self).__init__(*args, **kwargs)
 
-        self.fields['amount_paid'].initial = Decimal((sum([installment.amount for installment in installments]))/2)
+        self.fields['amount_paid'].initial = round_to_nearest_hundred(Decimal((sum([installment.amount for installment in installments.filter(is_caduced_installment=True).exclude(is_paid_installment=True, condition="Pagada")]))/2))
+
         self.fields['payment_date'].widget= forms.DateInput(attrs={ # CAMBIO DE POSICION DEL WIDGET POR BUG (NO ACTUALIZABA FECHA)
             'class': 'form-control',
             'type': 'date',
@@ -89,7 +91,7 @@ class PaymentForm(forms.ModelForm):
                     self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installment.refinancing.pk}) # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
                     self.fields['amount_paid'].widget.attrs.update({'id': "id_amount_paid%s" % installment.refinancing.pk}) # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
  
-                attrs = {"value": (installment.amount + installment.daily_interests), "id":form}
+                attrs = {"value": (installment.amount), "id":form}
                 
 
                 self.fields['cuota_%s' % (str(installment.installment_number))] = forms.BooleanField(

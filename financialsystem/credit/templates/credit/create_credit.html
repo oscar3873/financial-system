@@ -1,5 +1,6 @@
 <!-- crear_credito.html -->
 {% extends 'core/base.html' %} {% load crispy_forms_tags %} {% block content %}
+{% include 'core/message.html' %}
 <main class="container my-4">
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de solicitud de servicios</h4>
     <section>
@@ -21,15 +22,6 @@
                                         <li class="text-danger">Hay errores en el formulario de garantes, por favor corríjalos.</li>
                                     </ul>
                                     {% endif %} {% endif %}
-                                    <!-- {% for field in cliente_form %} 
-                                        {% if field.errors %}
-                                            <ul class="errorlist">
-                                                {% for error in field.errors %}
-                                                <li class="text-danger">{{ error }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% endif %} 
-                                    {% endfor %} -->
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
@@ -137,6 +129,9 @@
                                         <span id="cuota-label">Cuotas de:</span>
                                         <h6 class="d-block mt-1 py-1 text-center text-warning font-weight-bold" id="cuota_valor" name="cuota_valor" style="font-size: 1.5rem;"></h6>
                                     </div>
+                                    <div class="form-group col-md-9">
+                                        {{credito_form.adviser.label}} {{credito_form.adviser}}<h5 class="text-danger">{{cliente_form.first_name.errors}}</h5>
+                                    </div>
                                 </div>
                             </div>
                             <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
@@ -210,10 +205,10 @@
                                 <div class="form-row">
                                     {{formsetPhoneGuarantor.management_form}} {% for phone_formG in formsetPhoneGuarantor %}
                                     <div class="form-group col-md-3">
-                                        {{phone_formG.phone_number_c.label}} {{phone_formG.phone_number_c}}
+                                        {{phone_formG.phone_number_g.label}} {{phone_formG.phone_number_g}}
                                     </div>
                                     <div class="form-group col-md-2">
-                                        {{phone_formG.phone_type_c.label}} {{phone_formG.phone_type_c}}
+                                        {{phone_formG.phone_type_g.label}} {{phone_formG.phone_type_g}}
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -334,6 +329,7 @@
             });
         }
     }
+    calcularMonto();
 </script>
 
 {% endblock %}

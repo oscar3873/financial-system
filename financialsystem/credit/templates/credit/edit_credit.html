@@ -1,34 +1,22 @@
 <!-- credit/edit_credit.html -->
 {% extends "core/base.html" %} {% block content %} {% load static %}
-{% if messages %} {% for message in messages %}
-    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
-        <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
-        <span class="font-weight-light">{{ message }}</span>
-    </div>
-{% endfor %} {% endif %}
-
-<form method="post">
-    <h1>Actualizar Credito de 
+{% include 'core/message.html' %}
+<h1>Actualizar Credito de 
         <a href="{% url 'clients:detail' client.pk %}">
             <h1>{{client}}</h1>
         </a>
     </h1>
+<form method="post">
+    {% csrf_token %}
     <div class="col-md-8">
         <div class="card bg-primary text-white box-shadow mb-3">
             <div class="card-body">
                 <h5 class="title p-2">
                     <i class="fa-solid fa-landmark text-warning"></i> &nbsp; Credito
                 </h5>
-                {% csrf_token  %}
                 <div class="form-row">
-                    <div class="form-group col-md-12">
-                        {{form.is_old_credit.label}} {{form.is_old_credit.help_text}}{{form.is_old_credit}}
-                    </div>
-                    <div class="form-group col-md-12">
+                    <div class="form-group col-md-12 mt-2">
                         {{form.start_date.label}} {{form.start_date}}
-                    </div>
-                    <div class="form-group col-md-12">
-                        {{form.end_date.label}} {{form.end_date}}
                     </div>
                     <div class="form-group col-md-12">
                         {{form.amount.label}} {{form.amount}}
@@ -39,13 +27,63 @@
                     <div class="form-group col-md-4">
                         {{form.interest.label}} {{form.interest}}
                     </div>
-                    
+                    <div class="form-group col-md-12">
+                        <span class="m-0" for="monto">Monto a Devolver:</span>
+                        <h5 class="d-block mt-1 py-1 text-center text-warning font-weight-bold" id="monto_valor" name="monto_valor" style="font-size: 2rem;"></h5>
+                        <span id="cuota-label">Cuotas de:</span>
+                        <h6 class="d-block mt-1 py-1 text-center text-warning font-weight-bold" id="cuota_valor" name="cuota_valor" style="font-size: 1.5rem;"></h6>
+                    </div>
                 </div>
             </div>
             <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
         </div>
+        <div class="text-center">
+            <button class="btn btn-success cen" type="submit">*Guardar Cambios</button>
+            <div>*Ten en cuenta que cualquier cambio en el credito hara un reseteo del todo el credito</div>
+        </div>
     </div>
-    <button type="submit">Save Changes</button>
 </form>
-  
+<script>
+    let numero_cuota = document.getElementById("id_installment_num")
+    let interes = document.getElementById("id_interest")
+    let monto = document.getElementById("id_amount")
+    let monto_a_devolver = document.getElementById("monto_valor").textContent = "Calculando ...";
+    let cuota_a_devolver = document.getElementById("cuota_valor");
+    calcularMonto()
+    numero_cuota.addEventListener("input", calcularMonto);
+    interes.addEventListener("input", calcularMonto);
+    monto.addEventListener("input", calcularMonto);
+
+    function round_to_nearest_hundred(x) {
+        if (x % 100 >= 50) {
+            return (Math.floor(x / 100) + 1) * 100;
+        } else {
+            return Math.floor(x / 100) * 100;
+        }
+    }
+
+    function calcularMonto() {
+        var installmentNum = parseInt(document.getElementById("id_installment_num").value);
+        var creditInterest = parseFloat(document.getElementById("id_interest").value);
+        var amount = parseFloat(document.getElementById("id_amount").value);
+
+        var installment_value = round_to_nearest_hundred((creditInterest / 100 * amount) / (1 - Math.pow((1 + creditInterest / 100), (-installmentNum))));
+        var monto = installmentNum * installment_value;
+
+        if (isNaN(monto)) {
+            monto = "Caculando ..."
+            document.getElementById("monto_valor").textContent = monto;
+        } else {
+            document.getElementById("monto_valor").textContent = monto.toLocaleString("es-AR", {
+                style: "currency",
+                currency: "ARS"
+            });
+            montoCuota = round_to_nearest_hundred(parseFloat((monto / installmentNum).toFixed(2)));
+            cuota_a_devolver.textContent = montoCuota.toLocaleString("es-AR", {
+                style: "currency",
+                currency: "ARS"
+            });
+        }
+    }
+</script>
   {% endblock content %}

@@ -14,7 +14,6 @@ from cashregister.models import Movement, CashRegister
 
 from braces.views import GroupRequiredMixin
 
-from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
 from commissions.forms import SettingsInterestForm
 from .models import Adviser
@@ -46,7 +45,6 @@ class AdviserListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
         """
         Extrae los datos de los asesores que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
         context = super().get_context_data(**kwargs)
 
@@ -79,7 +77,6 @@ class AdviserDetailView(LoginRequiredMixin, DetailView):
         """
         Extrae los datos de los asesores que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         context = super().get_context_data(**kwargs)
         context["settings_form"] = SettingsInterestForm(instance = Interest.objects.first())
         context["commissions"] = Commission.objects.filter(adviser=self.get_object(), is_paid=False)
@@ -100,7 +97,6 @@ def is_admin(user):
 def pay_commission(request, pk):
     '''Función que maneja la vista para pagar una comisión'''
     
-    refresh_condition()
     commission = Commission.objects.get(id=pk)
     try:
         porcentage_value = Decimal(request.POST.get('porcentage'))
@@ -122,7 +118,6 @@ def pay_commission(request, pk):
         money_type= commission.money_type
     )
     commission.save()
-    messages.error(request, "Esta comisión ya ha sido pagada.","danger")
     return redirect('advisers:detail', pk=commission.adviser.id)
 
 class AdviserUpdateView(UpdateView):

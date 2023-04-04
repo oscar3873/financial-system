@@ -41,7 +41,11 @@ class WarrantyForm(forms.ModelForm):
     purchase_papers = forms.BooleanField(
         label= 'Papeles',
         initial= False,
-    )
+        widget= forms.Select(
+            attrs={'class': 'form-control'}, 
+            choices=[(True,"SI"),(False,"NO")]
+            )
+        )
 
     detail = forms.CharField(
         label="Observaciones",

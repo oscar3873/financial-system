@@ -2,7 +2,6 @@ from datetime import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
-from credit.utils import refresh_condition
 from .utils import all_properties_mov, create_cashregister
 from .tables import MovementTable
 
@@ -61,7 +60,6 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         """
         Extrae los datos de la caja que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -179,7 +177,6 @@ class MovementListView(LoginRequiredMixin, ListView, MovementTable):
         """
         Extrae los datos de los movimientos que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
         self.object_list = self.get_queryset()
         context = super().get_context_data(**kwargs)
@@ -227,7 +224,6 @@ class MovementDetailView(LoginRequiredMixin, DetailView):
         """
         Obtiene el objeto Movimiento correspondiente al ID dado.
         """
-        refresh_condition()  # Actualiza las condiciones de la aplicación
         return get_object_or_404(Movement, id=self.kwargs['pk'])
 
 
@@ -266,7 +262,6 @@ class MovementUpdateView(UpdateView):
         """
         Función que se encarga de obtener los parámetros del formulario.
         """
-        refresh_condition()
         kwargs = super(MovementUpdateView, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs

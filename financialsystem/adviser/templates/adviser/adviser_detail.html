@@ -66,7 +66,8 @@
                     <td>{{commission.interest}}</td>
                     {% if user.is_superuser %}
                     <td>
-                        <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal{{commission.pk}}"><i class="fa-solid fa-check" onclick="setDefaultInterest('{{ commission.id }}')"></i> &nbsp;</a>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#exampleModal{{commission.pk}}"><i class="fa-solid fa-check" onclick="setDefaultInterest('{{ commission.id }}')"></i></button>
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#Delete{{commission.pk}}"><i class="fa-solid fa-trash-alt" ></i></button>
                         <!--Modal-->
                         <div class="modal fade" id="exampleModal{{commission.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{commission.pk}}" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -97,6 +98,7 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
+                                            <button class="btn btn-danger" data-toggle="modal" data-target="#Delete{{commission.pk}}">Eliminar </button>&nbsp;
                                             <button class="btn btn-success">Confirmar</button>
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                                         </div>
@@ -105,6 +107,36 @@
                             </div>
                         </div>
                         <!--End Modal-->
+                        <!--Modal Delete-->
+                        <div class="modal fade" id="Delete{{commission.pk}}" tabindex="-1" role="dialog" aria-labelledby="Delete{{commission.pk}}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content bg-primary text-white">
+                                    <form action="{% url 'advisers:delete_commission' commission.pk %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <h5 class="modal-title animate__fadeInLeft" style="animation-duration: 0.5s !important;">Eliminar Comision</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <strong><span class="text-warning">Asesor: &nbsp;{{ commission.adviser }}</span></strong>
+                                            <div>
+                                                <p><strong>Monto : <span class="text-warning">${{ commission.amount }}</span> ({{commission.interest}}% de  $ <span class="text-warning">{{commission.operation_amount}}</span> )</strong></p>
+                                                <p><strong>Tipo: <span class="text-warning">{{ commission.type }}</span></strong></p>
+                                                <p><strong>Detalle: {{ commission.detail }} </strong></p>
+                                                <p><strong>Interes: {{commission.interest}} </strong></p>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-success">Confirmar</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!--End Modal Delete-->
                     </td>
                     {% endif %}
                 </tr>
