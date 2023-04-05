@@ -28,7 +28,6 @@ from django.utils import timezone
 # Create your views here.
 
 def change_password(request):
-    
 
     if request.method == 'POST':
         password_form = CashregisterFormPassword(request.POST, instance=CashRegister.objects.first())
