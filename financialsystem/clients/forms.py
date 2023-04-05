@@ -64,13 +64,13 @@ class ClientForm(forms.ModelForm):
         first_name = self.cleaned_data.get('first_name')
         if len(first_name) < 3:
             raise forms.ValidationError("El nombre debe contener al menos 3 caracteres")
-        return str(first_name).upper()
+        return str(first_name).title()
     
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name')
         if len(last_name) < 3:
             raise forms.ValidationError("El apellido debe contener al menos 3 caracteres")
-        return str(last_name).upper()
+        return str(last_name).title()
 
     def clean_dni(self):
         """

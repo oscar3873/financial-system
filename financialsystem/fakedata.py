@@ -69,7 +69,7 @@ def create_fake_clients_and_phone_numbers(num_records):
 
         movement = Movement.objects.create(
             amount=credit.amount,
-            description=fake.text(max_nb_chars=500),
+            description=fake.text(max_nb_chars=20,),
             money_type=fake.random_element(Movement.MONEY_TYPE)[0],
             cashregister=cash_register,
             user=adviser,

@@ -20,7 +20,7 @@ def refresh_condition():
         credits_ok = Credit.objects.filter(condition='A Tiempo')
         cred_with_vencidas = credits_ok.filter(installments__end_date__date__lt=date.today())
         refinances = Refinancing.objects.filter(installments__end_date__lt=date.today())
-        print(cred_with_vencidas)
+        print("-----------------------",cred_with_vencidas,"-----------------------------")
 
         mi_lista = [cred_with_vencidas, refinances] if cred_with_vencidas and refinances else [cred_with_vencidas] if cred_with_vencidas else [refinances] if refinances else []
     
