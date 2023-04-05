@@ -17,9 +17,10 @@
                                     {% if user.is_superuser %}
                                     <button class="btn btn-danger" name="password_modal" data-toggle="modal" data-target="#Password"><i class="fa fa-cog text-white" aria-hidden="true"></i></button>
                                     <!--Auth Modal Password-->
-                                    <form method="post" action="{% url 'cashregister:change_password' %}">
                                         <div class="modal fade" id="Password" tabindex="-1" role="dialog" aria-labelledby="Password" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
+                                            <form method="post" action="{% url 'cashregister:change_password' %}">
+                                                {% csrf_token %}
+                                                <div class="modal-dialog" role="document">
                                                 <div class="modal-content bg-primary text-white">
                                                     <div class="modal-header bg-primary text-white">
                                                         <h5 class="modal-title" id="Password">Cambio de contraseña</h5>
@@ -27,18 +28,17 @@
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
-                                                    <div id='modal-body_confirmation' class="modal-body">
-                                                        {% csrf_token %}
+                                                    <div id='password-form' class="modal-body" value="{{cashregister.auth_expenses}}">
                                                         {{cash_password.auth_expenses}}
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button class="btn btn-success" type="submit" id="confirm-button">Confirmar</button>
+                                                        <button class="btn btn-success" type="submit" id="change-password">Confirmar</button>
                                                         <button type="button" class="btn btn-secondary m-2 p-2" data-dismiss="modal">Cerrar</button>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </form>
                                         </div>
-                                    </form>
                                     <!--End Auth Modal Password-->
                                     {% endif %}
                                 </h5>
