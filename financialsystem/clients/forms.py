@@ -138,7 +138,7 @@ class PhoneNumberFormClient(forms.ModelForm):
 
     class Meta:
         model = PhoneNumberClient
-        fields = ('phone_number_c', 'phone_type_c')
+        fields = ['phone_number_c', 'phone_type_c']
     
     def clean_phone_number_c(self):
         """
@@ -146,22 +146,23 @@ class PhoneNumberFormClient(forms.ModelForm):
         """	
         phone_number_c = self.cleaned_data.get('phone_number_c')
         if phone_number_c is None or phone_number_c == '':
+            print('NONE', phone_number_c, '<-')
             return None
         elif not phone_number_c.isdigit():
+            print("El número de teléfono debe contener solo dígitos")
             raise forms.ValidationError("El número de teléfono debe contener solo dígitos")
-        elif len(phone_number_c) < 8 or len(phone_number_c) > 20:
+        elif len(phone_number_c) > 0 and (len(phone_number_c) < 8 or len(phone_number_c) > 20):
+            print("El numero debe contener como minimo 8 y 15 digitos")
             raise forms.ValidationError("El numero debe contener como minimo 8 y 15 digitos")
         return phone_number_c
     
     def __init__(self, *args, **kwargs):
-        super(PhoneNumberFormClient,self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
-        # Eliminar validación requerida
-        for field in self.fields.values():
-            field.required = False
+
 
 
 #------------------------------------------------------------------
@@ -169,12 +170,4 @@ PhoneNumberFormSet = inlineformset_factory(
     Client, 
     PhoneNumberClient, 
     form = PhoneNumberFormClient,
-    extra= 3,
-    can_delete= False,
-)
-PhoneNumberFormSetUpdate = inlineformset_factory(
-    Client, 
-    PhoneNumberClient, 
-    form = PhoneNumberFormClient,
-    can_delete= False,
 )

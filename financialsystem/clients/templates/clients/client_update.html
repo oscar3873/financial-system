@@ -1,6 +1,8 @@
 <!-- crear_credito.html -->
 {% extends 'core/base.html' %} {% block content %}
 <main class="container my-4">
+    {% include 'core/message.html' %}
+
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Editar cliente: {{client.last_name}}, {{client.first_name}}</h4>
     <section>
         <div class="my-4 py-2">
@@ -66,17 +68,27 @@
                                 </p>
                                 <div class="collapse" id="collapsePNC">
                                     <div class="form-row">
-                                        {{phone_formset.management_form}} {% for phone_form in phone_formset %}
-                                        <div class="form-group col-md-3">
-                                            {{phone_form.phone_number_c.label}} {{phone_form.phone_number_c}}
-                                        </div>
-                                        <div class="form-group col-md-2">
-                                            {{phone_form.phone_type_c.label}} {{phone_form.phone_type_c}}
-                                        </div>
+                                        {{ phone_formset.management_form }}
+                                        {% for phone_form in phone_formset %}
+                                            <div class="form-group col-md-3">
+                                                {{ phone_form.id }}
+                                                    <label for="{{ phone_form.phone_number_c.auto_id }}">{{ phone_form.phone_number_c.label }}</label>
+                                                {{ phone_form.phone_number_c }}
+                                                {% for error in phone_form.phone_number_c.errors %}
+                                                    <div class="alert alert-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="form-group col-md-2">
+                                                    <label for="{{ phone_form.phone_type_c.auto_id }}">{{ phone_form.phone_type_c.label }}</label>
+                                                {{ phone_form.phone_type_c }}
+                                                {% for error in phone_form.phone_type_c.errors %}
+                                                    <div class="alert alert-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
                                         {% endfor %}
                                     </div>
-
                                 </div>
+                                
                             </div>
                             <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>
                         </div>

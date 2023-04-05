@@ -169,7 +169,7 @@ def repayment_amount_auto(instance, *args, **kwargs):
     
 
     if not credit.is_old_credit:
-        credit.end_date = (timedelta(days=30)*credit.installment_num) + credit.start_date
+        credit.end_date = (relativedelta(months=1)*credit.installment_num) + credit.start_date
         credit.amount = round_to_nearest_hundred(credit.amount)
         installment_value = round_to_nearest_hundred((Decimal(credit.interest/100)*credit.amount)/(1-pow((1+Decimal(credit.interest/100)),(- credit.installment_num))))
         repayment_amount = credit.installment_num*installment_value

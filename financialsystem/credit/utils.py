@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
 from django.http import JsonResponse
@@ -19,8 +19,7 @@ def refresh_condition():
     if Credit.objects.exists():
         credits_ok = Credit.objects.filter(condition='A Tiempo')
         cred_with_vencidas = credits_ok.filter(installments__end_date__date__lt=date.today())
-        refinances = Refinancing.objects.filter(installments__end_date__lt=date.today())
-        print(cred_with_vencidas)
+        refinances = Refinancing.objects.filter(installments__end_date__date__lt=date.today())
 
         mi_lista = [cred_with_vencidas, refinances] if cred_with_vencidas and refinances else [cred_with_vencidas] if cred_with_vencidas else [refinances] if refinances else []
     
@@ -153,4 +152,5 @@ def ask_is_old(credit, adviser):
     if not credit.is_old_credit:
         credit.mov = create_movement(credit, adviser)
     credit.is_old_credit = False
+    credit.client.adviser = adviser
     credit.save()

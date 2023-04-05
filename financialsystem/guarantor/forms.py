@@ -203,19 +203,15 @@ class GuarantorUpdateForm(forms.ModelForm):
         Validar que el correo electrónico sea válido
         """
         email = self.cleaned_data.get('email')
-
-        # Validar formato de correo electrónico
-        try:
-            validate_email(email)
-        except forms.ValidationError:
-            raise forms.ValidationError("Ingrese un correo electrónico válido")
-
-        existing_guarantor = Guarantor.objects.filter(email=email).first()
-
-        if Guarantor.objects.filter(email=email).exists():
-            if existing_guarantor != self.instance :
-                raise forms.ValidationError("El correo: %s ya esta en uso" % email)
-
+        if len(email) > 0:
+            try:
+                validate_email(email)
+            except forms.ValidationError:
+                raise forms.ValidationError("Ingrese un correo electrónico válido")
+        
+            if Guarantor.objects.filter(email=email).exists():
+                if Guarantor.objects.filter(email=email).first() != self.instance:
+                    raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico") 
         return email
 
 
@@ -261,7 +257,7 @@ class PhoneNumberFormGuarantor(forms.ModelForm):
             return None
         elif not phone_number_g.isdigit():
             raise forms.ValidationError("El número de teléfono debe contener solo dígitos")
-        elif len(phone_number_g) > 0 and (len(phone_number_g) < 8 or len(phone_number_g) > 20):
+        elif len(phone_number_g) > 0 and ((len(phone_number_g) < 8 or len(phone_number_g) > 20)):
             raise forms.ValidationError("El numero debe contener como minimo 8 y 15 digitos")
         return phone_number_g    
     
@@ -279,13 +275,13 @@ PhoneNumberFormSetG = inlineformset_factory(
     Guarantor, 
     PhoneNumberGuarantor, 
     form = PhoneNumberFormGuarantor,
-    extra= 3,
-    can_delete= False,
+    # extra= 4,
+    can_delete= True,
 )
 
 PhoneNumberFormSetGUpdate = inlineformset_factory(
     Guarantor, 
     PhoneNumberGuarantor, 
     form = PhoneNumberFormGuarantor,
-    can_delete= False,
+    can_delete= True,
 )

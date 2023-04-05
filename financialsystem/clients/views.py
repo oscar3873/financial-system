@@ -18,7 +18,7 @@ from .utils import all_properties_client
 
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 
 
@@ -135,6 +135,7 @@ class ClientListView(LoginRequiredMixin, ListView):
 def clientCreate(request):
     client_form = ClientForm(request.POST or None)
     formset_phone_client = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix="phone_number_client")
+    formset_phone_client.extra= 4
 
     if request.method == 'POST':
         if client_form.is_valid() and formset_phone_client.is_valid():
@@ -152,7 +153,6 @@ def clientCreate(request):
             return redirect('clients:list')
         else:
             messages.error(request, 'Ocurrió un error al guardar el cliente.',"danger")
-            return render(request, 'clients/client_form.html', context)
         
     context = {
         'form': client_form,
@@ -165,52 +165,41 @@ def clientCreate(request):
 
 #ACTUALIZACION DE UN CLIENTE
 #-----------------------------------------------------------------
-class ClientUpdateView(LoginRequiredMixin, UpdateView):
+def update_client(request, pk):
     """
-    Actualiza el client y sus telefonos.
+    Actualiza un cliente y sus teléfonos.
     """
-    model = Client
-    form_class = ClientForm
-    template_name_suffix = '_update'
+    client = get_object_or_404(Client, pk=pk)
+    form = ClientForm(instance=client)
+    phone_formset = PhoneNumberFormSet(instance=client)
+    phone_formset.extra = 4
 
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
+    if request.method == 'POST':
+        form = ClientForm(request.POST, instance=client)  # Update the form variable with POST data
+        phone_formset = PhoneNumberFormSet(request.POST, instance=client)
+        if form.is_valid() and phone_formset.is_valid():
+            client = form.save()
 
-    def get_context_data(self, **kwargs):
-        """
-        Extrae los datos de los clientes (telefonos) que se encuentran en la base de datos para usarlo en el contexto.
-        """
-        context = super().get_context_data(**kwargs)
-        phone_formset = PhoneNumberFormSetUpdate(self.request.POST or None, instance=self.object, max_num=4)
-        num_existing_forms = self.object.phonenumberclient_set.count()
-        if num_existing_forms > 0:
-            num_additional_forms = 4 - num_existing_forms
-            phone_formset.extra = num_additional_forms
-        context['phone_formset'] = phone_formset
-        context['form'] = ClientForm(instance=self.object)
-        context['client'] = self.object
-        return context
+            phone_numbers = phone_formset.save(commit=False)
+            for phone_number in phone_numbers:
+                if phone_number.phone_number_c:
+                    phone_number.client = client
+                    phone_number.save()
 
+            messages.success(request, 'Los datos del cliente se actualizaron correctamente.','success')
+            return redirect('clients:list')
 
+        else:
+            print('ERROR: CLIENTE-TEL', form.errors, '-', phone_formset.errors)
 
-    def form_valid(self, form):
-        """
-        Actualiza el cliente y sus telefonos.
-        """
-        response = super().form_valid(form)
-        phone_formset = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
-        phone_formset.save()
-        
-        return response
+    context = {
+        'form': form,
+        'phone_formset': phone_formset,
+        'client': client,
+    }
 
-    def get_success_url(self) -> str:
-        """
-        Obtiene la URL de redirección después de que se ha actualizado correctamente.
-        Agrega un mensaje de éxito a la cola de mensajes.
-        """	
-        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()),"success")
-        return reverse_lazy('clients:list')
+    return render(request, 'clients/client_update.html', context)
+
 
 
 #DETALLE DE CLIENTE

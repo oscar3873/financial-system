@@ -1,11 +1,10 @@
 {% extends "core/base.html" %} {% block content %} {% load static %}
 <!--Main-->
-<link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet"> {% if messages %} {% for message in messages %}
-<div class="alert alert-primary alert-dismissible" role="alert">
-    <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
-    <span class="font-weight-light">{{ message }}</span>
-</div>
-{% endfor %} {% endif %} {% if client.is_legals %}
+<link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet"> 
+
+{% include 'core/message.html' %}
+
+{% if client.is_legals %}
 <div class="alert alert-danger text-center" role="alert">
     <h1 class="font-weight-bold">CLIENTE: {{client.first_name|upper}} {{client.last_name|upper}} <br> EN LEGALES</h1>
 </div>

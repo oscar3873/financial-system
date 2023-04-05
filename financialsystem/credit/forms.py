@@ -4,7 +4,6 @@ from django import forms
 from commissions.models import Interest
 from adviser.models import Adviser
 from .models import *
-from django.forms import inlineformset_factory
 
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
@@ -255,24 +254,3 @@ class CreditUpdateForm(forms.ModelForm):
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
-
-
-
-
-#--------------------------FORMSET FOR CREDIT AND CREDIT'S INSTALMMENTS UPDATE----------------------------------------
-
-class CreditWithInstallmentsForm(forms.ModelForm):
-    class Meta:
-        model = Credit
-        fields = ['is_active', 'is_paid', 'is_old_credit', 'condition', 'interest', 'amount', 'installment_num', 'start_date', 'end_date']
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.installment_formset = InstallmentFormSet(instance=self.instance)
-
-InstallmentFormSet = inlineformset_factory(
-    Credit, 
-    Installment, 
-    form=InstallmentUpdateForm, 
-    )
-#-------------------------------------------------------------------------------------------------   

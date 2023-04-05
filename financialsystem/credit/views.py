@@ -36,6 +36,8 @@ def crear_credito(request):
     credit_form = CreditForm(request.POST or None, initial = {'adviser':request.user.adviser})
     formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
+    formsetPhoneClient.extra = 4
+    formsetPhoneGuarantor.extra = 4 
 
     if request.method == 'POST':
         if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid()  and formsetPhoneClient.is_valid() and guarantor_form.is_valid() and formsetPhoneGuarantor.is_valid():
@@ -55,7 +57,8 @@ def crear_credito(request):
 
             guarantor = guarantor_form.save(commit=False)
             if guarantor_form.cleaned_data["dni"]:
-                credit.guarantor = credit
+                guarantor.save()
+                credit.guarantor = guarantor
                 credit.save()
                 phone_numbers = formsetPhoneGuarantor.save(commit=False)
                 for phone_number in phone_numbers:
@@ -172,13 +175,16 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
-        """
+        """        
+        formset = PhoneNumberFormSetG(instance=Guarantor(), prefix="phone_number_guarantor")
+        formset.extra =4
+
         context = super().get_context_data(**kwargs)
         context['form'] = CreditForm(initial= self.get_initial())
         context['clients'] = Client.objects.all()
         context['warranty_form'] = WarrantyForm(self.request.POST or None)
         context['garante_form'] = GuarantorForm(self.request.POST or None, prefix="credit_created")
-        context['formsetPhoneGuarantor'] = PhoneNumberFormSetG(instance=Guarantor(), prefix="phone_number_guarantor")
+        context['formsetPhoneGuarantor'] = formset
 
         return context
 
@@ -194,6 +200,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             client = get_object_or_404(Client, pk=selected_client_id)
             credit = form.save(commit=False)
             credit.client = client
+            
             ask_is_old(credit, form.cleaned_data['adviser'])
 
             # Validar el formulario de garantía
@@ -209,6 +216,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             guarantor = garante_form.save(commit=False)
             if garante_form.cleaned_data["dni"]:
                 if garante_form.is_valid():
+                    guarantor.save()
                     credit.guarantor = guarantor
                     credit.save()
                 phone_numbers_form = PhoneNumberFormSetG(self.request.POST, instance=guarantor, prefix="phone_number_guarantor")
@@ -252,12 +260,15 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
         return iniitial
 
     def get_context_data(self, **kwargs):
+        formset =PhoneNumberFormSetG(instance=Guarantor(), prefix = "phone_number_guarantor")
+        formset.extra = 4 
+
         context = super().get_context_data(**kwargs)
         context['cliente_form'] = CreditForm(initial= self.get_initial())
         context['is_add'] = True
         context['warranty_form'] = WarrantyForm
         context['garante_form'] = GuarantorForm(prefix = 'credit_created')
-        context['formsetPhoneGuarantor'] = PhoneNumberFormSetG(instance=Guarantor(), prefix = "phone_number_guarantor")
+        context['formsetPhoneGuarantor'] = formset
 
         return context
 
@@ -291,6 +302,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
                 guarantor = garante_form.save(commit=False)
                 if garante_form.cleaned_data["dni"]:
                     if garante_form.is_valid():
+                        guarantor.save()
                         credit.guarantor = guarantor
                         credit.save()
                         phone_numbers_form = PhoneNumberFormSetG(self.request.POST, instance=guarantor, prefix="phone_number_guarantor")

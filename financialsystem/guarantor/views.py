@@ -114,6 +114,7 @@ class GuarantorDetailView(LoginRequiredMixin, DetailView):
 def guarantorCreateView(request):
     guarantor_form = GuarantorForm(request.POST or None, prefix="guarantor")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
+    formsetPhoneGuarantor.extra = 4
 
     context = {
             'form': guarantor_form,
@@ -157,55 +158,38 @@ def delete_guarantor(request, pk):
 
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
-class GuarantorUpdateView(LoginRequiredMixin, UpdateView):
+def update_guarantor(request, pk):
     """
-    Actualiza el client y sus telefonos.
+    Actualiza un cliente y sus teléfonos.
     """
-    model = Guarantor
-    form_class = GuarantorUpdateForm
-    template_name_suffix = '_update'
+    guarantor = get_object_or_404(Guarantor, pk=pk)
+    form = GuarantorForm(instance=guarantor)
+    phone_formset = PhoneNumberFormSetG(instance=guarantor)
+    phone_formset.extra = 4
 
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
+    if request.method == 'POST':
+        form = GuarantorForm(request.POST, instance=guarantor)  # Update the form variable with POST data
+        phone_formset = PhoneNumberFormSetG(request.POST, instance=guarantor)
+        if form.is_valid() and phone_formset.is_valid():
+            client = form.save()
 
-    def get_context_data(self, **kwargs):
-        """
-        Extrae los datos de los clientes (telefonos) que se encuentran en la base de datos para usarlo en el contexto.
-        """
-        context = super().get_context_data(**kwargs)
-        formset = PhoneNumberFormSetGUpdate(instance=self.object)
-        if self.object.phoneNumberguarantor_set.count() == 0:
-            formset = formset.extra_forms(4)
+            phone_numbers = phone_formset.save(commit=False)
+            for phone_number in phone_numbers:
+                if phone_number.phone_number_c:
+                    phone_number.guarantor = guarantor
+                    phone_number.save()
+
+            messages.success(request, 'Los datos del cliente se actualizaron correctamente.','success')
+            return redirect('guarantors:list')
+
         else:
-            formset = formset.extra_forms(0)
+            print('ERROR: CLIENTE-TEL', form.errors, '-', phone_formset.errors)
 
-        context['form'] = GuarantorUpdateForm(instance = self.object)
-        context['phone_formset'] = PhoneNumberFormSetGUpdate(instance=self.object)
+    context = {
+        'form': form,
+        'phone_formset': phone_formset,
+        'client': client,
+    }
 
-        return context
-
-    def form_invalid(self, form):
-        """
-        Muestra un error en caso de formulario invalido.
-        """
-        return super().form_invalid(form)
-    
-    def form_valid(self, form):
-        """
-        Actualiza el garante y sus telefonos.
-        """
-        response = super().form_valid(form)
-        phone_formset = PhoneNumberFormSetGUpdate(self.request.POST, instance=self.object)
-        phone_formset.save()
-        
-        return response
-
-    def get_success_url(self) -> str:
-        """
-        Obtiene la URL de redirección después de que se ha actualizado correctamente.
-        Agrega un mensaje de éxito a la cola de mensajes.
-        """	
-        messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()),"success")
-        return reverse_lazy('guarantors:list')
+    return render(request, 'guarantor/guarantor_update.html', context)
 
