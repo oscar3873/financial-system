@@ -174,11 +174,15 @@ class GuarantorUpdateView(LoginRequiredMixin, UpdateView):
         Extrae los datos de los clientes (telefonos) que se encuentran en la base de datos para usarlo en el contexto.
         """
         context = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context['phone_formset'] = PhoneNumberFormSetGUpdate(self.request.POST, instance=self.object)
+        formset = PhoneNumberFormSetGUpdate(instance=self.object)
+        if self.object.phoneNumberguarantor_set.count() == 0:
+            formset = formset.extra_forms(4)
         else:
-            context['form'] = GuarantorUpdateForm(instance = self.object)
-            context['phone_formset'] = PhoneNumberFormSetGUpdate(instance=self.object)
+            formset = formset.extra_forms(0)
+
+        context['form'] = GuarantorUpdateForm(instance = self.object)
+        context['phone_formset'] = PhoneNumberFormSetGUpdate(instance=self.object)
+
         return context
 
     def form_invalid(self, form):

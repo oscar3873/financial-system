@@ -152,7 +152,8 @@ def clientCreate(request):
             return redirect('clients:list')
         else:
             messages.error(request, 'Ocurrió un error al guardar el cliente.',"danger")
-
+            return render(request, 'clients/client_form.html', context)
+        
     context = {
         'form': client_form,
         'formsetPhoneClient': formset_phone_client,
@@ -181,20 +182,18 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         Extrae los datos de los clientes (telefonos) que se encuentran en la base de datos para usarlo en el contexto.
         """
         context = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context['phone_formset'] = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
-        else:
-            context['form'] = ClientForm(instance = self.object)
-            context['phone_formset'] = PhoneNumberFormSetUpdate(instance=self.object)
+        phone_formset = PhoneNumberFormSetUpdate(self.request.POST or None, instance=self.object, max_num=4)
+        num_existing_forms = self.object.phonenumberclient_set.count()
+        if num_existing_forms > 0:
+            num_additional_forms = 4 - num_existing_forms
+            phone_formset.extra = num_additional_forms
+        context['phone_formset'] = phone_formset
+        context['form'] = ClientForm(instance=self.object)
         context['client'] = self.object
         return context
 
-    def form_invalid(self, form):
-        """
-        Muestra un error en caso de formulario invalido.
-        """
-        return super().form_invalid(form)
-    
+
+
     def form_valid(self, form):
         """
         Actualiza el cliente y sus telefonos.

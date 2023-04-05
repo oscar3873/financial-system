@@ -287,6 +287,5 @@ PhoneNumberFormSetGUpdate = inlineformset_factory(
     Guarantor, 
     PhoneNumberGuarantor, 
     form = PhoneNumberFormGuarantor,
-    extra= 0,
     can_delete= False,
 )

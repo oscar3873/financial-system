@@ -176,6 +176,5 @@ PhoneNumberFormSetUpdate = inlineformset_factory(
     Client, 
     PhoneNumberClient, 
     form = PhoneNumberFormClient,
-    extra= 0,
     can_delete= False,
 )

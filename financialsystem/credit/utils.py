@@ -1,10 +1,8 @@
-from datetime import date, datetime, timedelta
-from decimal import Decimal
+from datetime import date
 from dateutil.relativedelta import relativedelta
 
 from django.http import JsonResponse
 
-from commissions.models import Interest
 from core.utils import round_to_nearest_special, round_to_nearest_hundred
 from cashregister.utils import create_movement
 from .models import Credit, Refinancing, Installment
@@ -22,6 +20,7 @@ def refresh_condition():
         credits_ok = Credit.objects.filter(condition='A Tiempo')
         cred_with_vencidas = credits_ok.filter(installments__end_date__date__lt=date.today())
         refinances = Refinancing.objects.filter(installments__end_date__lt=date.today())
+        print(cred_with_vencidas)
 
         mi_lista = [cred_with_vencidas, refinances] if cred_with_vencidas and refinances else [cred_with_vencidas] if cred_with_vencidas else [refinances] if refinances else []
     
@@ -40,7 +39,7 @@ def refresh_condition():
 
 def for_refresh(obj_with_vencidas):
     installments = obj_with_vencidas.filter(end_date__date__lt=date.today()).exclude(condition = 'Pagada')
-    for index, installment_ven in enumerate(list(installments)):
+    for installment_ven in installments:
         if isinstance(installment_ven, Installment):
             credit = installment_ven.credit
             client = credit.client
@@ -54,14 +53,14 @@ def for_refresh(obj_with_vencidas):
         installment_ven.is_caduced_installment = True
         resto = abs((date.today() - installment_ven.end_date.date()).days)
         if (installment_ven.start_date.date() + relativedelta(months=1)) < installment_ven.end_date.date():
-            print('############# TERMINA EL PLAZO', index)
+            print('############# TERMINA EL PLAZO')
             # fifteen_later = installment_ven.end_date - timedelta(days=15)
             installment_ven.end_date = installment_ven.lastup
 
         actualice(resto, installment_ven)
         installment_ven.save()
 
-        daily_interest = Interest.objects.all()[0].daily_interest
+        daily_interest = installment_ven.porcentage_daily_interests
 
         # DISMINUCION DE SCORE EN BASE A INTERESES DIARIOS (MIENTRAS HAYA SIDO UN CREDITO ACTUAL)
         if isinstance(credit, Credit):
