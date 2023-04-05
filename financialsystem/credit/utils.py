@@ -55,20 +55,8 @@ def for_refresh(obj_with_vencidas):
         resto = abs((date.today() - installment_ven.end_date.date()).days)
         if (installment_ven.start_date.date() + relativedelta(months=1)) < installment_ven.end_date.date():
             print('############# TERMINA EL PLAZO', index)
-            cuotas = obj_with_vencidas.filter(credit=credit)
-
-            try:
-                installment = cuotas.get(installment_number = installment_ven.installment_number+1)
-                print('########### AUMENTO OTRA CUOTA',index)
-                installment.amount = installment.amount + Decimal(installment_ven.amount)
-                installment.daily_interests = installment.daily_interests + Decimal(installment_ven.daily_interests)
-                installment.save()
-                installment_ven.condition = "Pagada"
-                installment_ven.save()
-            except :
-                print('############# ACTUALIZA CUOTA ACTUAL', index)
-                fifteen_later = installment_ven.end_date - timedelta(days=15)
-                installment_ven.end_date = fifteen_later
+            # fifteen_later = installment_ven.end_date - timedelta(days=15)
+            installment_ven.end_date = installment_ven.lastup
 
         actualice(resto, installment_ven)
         installment_ven.save()

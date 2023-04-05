@@ -223,8 +223,6 @@ def create_installments_auto(instance, created, *args, **kwargs):
 def update_installment(instance, *args, **kwargs):
     if instance.condition == 'Pagada':
         instance.is_paid_installment = True
-        if instance.payment_date.date() < instance.end_date.date():
-            instance.is_caduced_installment= False
     elif instance.condition == 'Vencida':
         instance.is_caduced_installment = True
         instance.is_paid_installment = False

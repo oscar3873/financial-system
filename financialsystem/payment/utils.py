@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from payment.models import Payment
 from credit.models import Installment
@@ -29,9 +30,9 @@ def pay_installment(payment, installments, amount_paid):
     Metodo para pagos parciales: a travez de un monto X, realiza el pago de la cuota que encaja
     y realiza la disminucion de la cuota a pagar en caso que no supere el monto de la cuota
     """
-    for i, installment in enumerate(installments):
+    for installment in installments:
         if installment.amount <= amount_paid:
-            print(f'############ Cuota {i+1} PAGADA COMPLETA')
+            print('############PAGADA COMPLETA')
             installment.condition = 'Pagada'
             installment.payment_date = payment.payment_date
             installment.save()
@@ -39,26 +40,44 @@ def pay_installment(payment, installments, amount_paid):
             payment_create(payment, installment)
             amount_paid -= installment.amount
 
-        else:
-            print(f"######### Cuota {i+1} ACUMULA MONTO A CUOTA {len(installments)}")
-            installment.amount = 0
-            installment.condition = 'Pagada'
-            installment.payment_date = payment.payment_date
-            installment.save()
-
-            payment_create(payment, installment)
-            debt = amount_paid + sum([inst.original_amount for inst in installments[i:]])
-            last_inst = installments[-1]
-            last_inst.original_amount += debt
-            fifteen_later_din(last_inst)
-            make_paid(last_inst, payment)
+        elif amount_paid >= Decimal(installment.amount/Decimal(2)):
+            print('########## PAGO PARCIAL')
+            payment.amount = amount_paid # MOVIMIENTO
+            installment.amount -= payment.amount
+            
+            fifteen_later_din(installment,False)
+            payment_create(payment, installment) # MOVIMIENTO
             amount_paid = 0
-            break
         
+        else:# SI EL RESTANTE NO SUPERA LOS 50% DE LA DEUDA
+            print("######### ACUMULA MONTO A NEXT INST.")
+            amount_base = amount_paid + installment.amount
+            amount_org = installment.amount
+            try:
+                next_inst = installments.get(installment_number = installment.installment_number+1)
+                print('########## try 1')
+                next_inst.amount += amount_base
+                print('########## try 2')
+                next_inst.original_amount += amount_org
+                print('########## try 3')
+                fifteen_later_din(next_inst)
+                print('########## try 4')
+                make_paid(installment,payment)
+                print('########## try 5')
 
-def fifteen_later_din(installment):
-    fifteen_later = datetime.date.today() + datetime.timedelta(days=15)
-    installment.end_date = fifteen_later
+            except ObjectDoesNotExist:
+                print('########### EXCEPT')
+                installment.amount += amount_base
+                installment.original_amount += amount_org
+                fifteen_later_din(installment)
+            amount_paid = 0
+
+
+
+def fifteen_later_din(installment, do=True):
+    if do:
+        fifteen_later = datetime.date.today() + datetime.timedelta(days=15)
+        installment.end_date = fifteen_later
     installment.save()
 
 def make_paid(installment,payment):
