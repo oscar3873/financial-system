@@ -52,8 +52,8 @@ class ClientListView(LoginRequiredMixin, ListView):
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
-        
+
+
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
@@ -92,7 +92,7 @@ class ClientListView(LoginRequiredMixin, ListView):
             {'label':label_month, 'value':count_clients_this_month},
             {'label':label_year, 'value':count_clients_this_year},
         ]
-        
+
         #Cantidad de datos por score
         score_counts_list = [
             {'label': 'Riesgoso', 'value': clients.filter(score_label='Riesgoso').count()},
@@ -101,7 +101,7 @@ class ClientListView(LoginRequiredMixin, ListView):
             {'label': 'Muy Bueno', 'value': clients.filter(score_label='Muy Bueno').count()},
             {'label': 'Excelente', 'value': clients.filter(score_label='Exelente').count()},
         ]
-        
+
         #Top clientes
         clients_top = Client.objects.filter(score__gt=1200)[:3]
         clients_top_credits = Client.objects.annotate(num_credits=Count('credits')).order_by('-num_credits')[:3]
@@ -115,7 +115,7 @@ class ClientListView(LoginRequiredMixin, ListView):
         context["clients"] = clients_paginated
         context["listing_filter"] = filtered_clients
         return context
-    
+
     def get_queryset(self):
         """
         Función que se encarga de obtener los parámetros del formulario.
@@ -123,13 +123,13 @@ class ClientListView(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         self.filterset = self.filter_class(self.request.GET, queryset=queryset)
         return self.filterset.qs.order_by(*self.ordering)
-    
+
     def get_success_url(self) -> str:
         """
         Función que se encarga de devolver la URL de la vista actual.
         """
         return reverse_lazy('clients:list')
-    
+
 
 
 def clientCreate(request):
@@ -141,7 +141,7 @@ def clientCreate(request):
             client = client_form.save(commit=False)
             client.adviser = request.user.adviser
             client.save()
-            
+
             phone_numbers = formset_phone_client.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_c:
@@ -153,7 +153,7 @@ def clientCreate(request):
         else:
             messages.error(request, 'Ocurrió un error al guardar el cliente.',"danger")
             return render(request, 'clients/client_form.html', context)
-        
+
     context = {
         'form': client_form,
         'formsetPhoneClient': formset_phone_client,
@@ -182,7 +182,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         Extrae los datos de los clientes (telefonos) que se encuentran en la base de datos para usarlo en el contexto.
         """
         context = super().get_context_data(**kwargs)
-        phone_formset = PhoneNumberFormSetUpdate(self.request.POST or None, instance=self.object, max_num=4)
+        phone_formset = PhoneNumberFormSetUpdate(self.request.POST or None, instance=self.object)
         num_existing_forms = self.object.phonenumberclient_set.count()
         if num_existing_forms > 0:
             num_additional_forms = 4 - num_existing_forms
@@ -201,14 +201,14 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         response = super().form_valid(form)
         phone_formset = PhoneNumberFormSetUpdate(self.request.POST, instance=self.object)
         phone_formset.save()
-        
+
         return response
 
     def get_success_url(self) -> str:
         """
         Obtiene la URL de redirección después de que se ha actualizado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
-        """	
+        """
         messages.success(self.request, '{}, realizada el {}, actualizada satisfactoriamente'.format(self.object, self.object.created_at.date()),"success")
         return reverse_lazy('clients:list')
 
@@ -226,7 +226,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-    
+
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
@@ -266,7 +266,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
             for credit in credits_active:
                 # Get the related payments for the credit, order by payment_date in descending order, and get the first three
                 last_three_normal_payments = Payment.objects.filter(installment__in=credit.installments.all()).order_by('-payment_date')[:3]
-                
+
                 refinancing_installments = Installment.objects.filter(credit=credit, refinance__isnull=False)
                 refinancing_installments_qs = list(itertools.chain(*[installment.refinance.installments.all() for installment in refinancing_installments]))
                 refinancing_installments_qs = InstallmentRefinancing.objects.filter(id__in=[installment_ref.id for installment_ref in refinancing_installments_qs])
@@ -284,7 +284,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
 
             # Add the last_three_payments_by_credit_list to the context
             context["last_three_payments_by_credit_list"] = last_three_payments_by_credit_list
-        
+
         forms_payments = []
         form_refinancings = []
         installments_by_credit = {}
@@ -314,7 +314,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
 
             installments_by_credit.setdefault(credit, []).extend(installments_list)
 
-            
+
         context["installments_available"] = True
 
         dicc = dict(zip(credits_active, forms_payments))
@@ -327,7 +327,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
             if key in installments_by_credit:
                 value.append(installments_by_credit[key])
             dicc[key] = value
-        
+
         context["client_payment"] = dicc
         return context
 
@@ -338,7 +338,7 @@ def go_legals(request, pk):
         client = Client.objects.get(pk=pk)
         client.is_legals = True if request.POST.get('go_legals') == 'true' else False
         client.save()
-    return redirect('clients:detail', pk=pk)  
+    return redirect('clients:detail', pk=pk)
 
 #BORRADO DE UN CLIENTE
 #------------------------------------------------------------------
@@ -347,27 +347,27 @@ class ClientDelete(LoginRequiredMixin, DeleteView):
     Borra un cliente.
     """
     model = Client
-    
+
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
+
     def get_success_url(self) -> str:
         """
         Obtiene la URL de redirección después de que se ha borrado correctamente.
         Agrega un mensaje de éxito a la cola de mensajes.
-        """	
+        """
         messages.warning(self.request, 'Cliente eliminado correctamente',"warning")
         return  reverse_lazy('clients:list')
 
-    
+
 #BORRADO DE NUMEROS DE UN CLIENTE
 #------------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
 def delete_phone_number(request, pk):
     """
     Borra un número de telefono de un cliente.
-    """	
+    """
     try:
         phone_number = PhoneNumberClient.objects.get(id=pk)
     except PhoneNumberClient.DoesNotExist:
@@ -387,13 +387,13 @@ class QueryView(ListView , LoginRequiredMixin):
     # Se especifica la URL de inicio de sesión y el campo de redirección
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-        
+
     def get(self, request, *args, **kwargs):
         """
         Obtiene el numero DNI ingresado en el search e intenta matchear.
         """
         dni = self.request.GET.get("search")
-        try: 
+        try:
             search = self.model.objects.get(dni=dni)
             return redirect('clients:detail', pk=search.pk) # redirecciona al detalle del cliente en caso de encontrarlo
         except :

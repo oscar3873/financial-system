@@ -6,20 +6,20 @@ from clients.models import Client, PhoneNumberClient
 #------------------------------------------------------------------
 
 class ClientForm(forms.ModelForm):
-    
+
     CIVIL_STATUS = (
         ('S','Soltero'),
         ('C', 'Casado'),
         ('V', 'Viudo'),
         ('D', 'Divorciado')
     )
-    
+
     SCORE = (
         (600 , 'Bueno (600)'),
         (400 , 'Regular (400)'),
         (200 , 'Riesgoso (200)')
     )
-    
+
     first_name = forms.CharField(
         label = 'Nombre/s',
         required=True,
@@ -53,7 +53,7 @@ class ClientForm(forms.ModelForm):
         label= "Domicilio Laboral",
         required=False,
     )
-    
+
 
     class Meta:
         model = Client
@@ -65,7 +65,7 @@ class ClientForm(forms.ModelForm):
         if len(first_name) < 3:
             raise forms.ValidationError("El nombre debe contener al menos 3 caracteres")
         return str(first_name).title()
-    
+
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name')
         if len(last_name) < 3:
@@ -84,7 +84,7 @@ class ClientForm(forms.ModelForm):
             if Client.objects.filter(dni=dni).first() != self.instance:
                 raise forms.ValidationError("Ya existe un Cliente con DNI {}".format(dni))
         return dni
-    
+
     def clean_email(self):
         """
         Validar que el correo electrónico sea válido
@@ -95,10 +95,10 @@ class ClientForm(forms.ModelForm):
                 validate_email(email)
             except forms.ValidationError:
                 raise forms.ValidationError("Ingrese un correo electrónico válido")
-        
+
             if Client.objects.filter(email=email).exists():
                 if Client.objects.filter(email=email).first() != self.instance:
-                    raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico") 
+                    raise forms.ValidationError("Ya existe un crédito asociado a este correo electrónico")
         return email
 
     def __init__(self, *args, **kwargs):
@@ -106,7 +106,7 @@ class ClientForm(forms.ModelForm):
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
-            
+
         if kwargs.get('prefix') == 'guarantor': # CLIENTES PUEDEN SER TAMBIEN GARANTES DE OTROS CLIENTES
             for field in self.fields.values():
                 field.required = False
@@ -115,13 +115,13 @@ class ClientForm(forms.ModelForm):
 #FORMULARIO PARA LA CREACION DE LOS NUMEROS DE TELEFONO
 #------------------------------------------------------------------
 class PhoneNumberFormClient(forms.ModelForm):
-    
+
     PhoneType = (
-        ('C', 'Celular'), 
+        ('C', 'Celular'),
         ('F', 'Fijo'),
         ('A', 'Alternativo')
     )
-    
+
     phone_number_c = forms.CharField(
         label = 'Telefono',
         required=False,
@@ -129,7 +129,7 @@ class PhoneNumberFormClient(forms.ModelForm):
         attrs={'type':'number'}
         )
     )
-    
+
     phone_type_c = forms.ChoiceField(
         label="Tipo",
         choices= PhoneType,
@@ -139,11 +139,11 @@ class PhoneNumberFormClient(forms.ModelForm):
     class Meta:
         model = PhoneNumberClient
         fields = ('phone_number_c', 'phone_type_c')
-    
+
     def clean_phone_number_c(self):
         """
         Validar que el número de teléfono sea válido
-        """	
+        """
         phone_number_c = self.cleaned_data.get('phone_number_c')
         if phone_number_c is None or phone_number_c == '':
             return None
@@ -152,7 +152,7 @@ class PhoneNumberFormClient(forms.ModelForm):
         elif len(phone_number_c) < 8 or len(phone_number_c) > 20:
             raise forms.ValidationError("El numero debe contener como minimo 8 y 15 digitos")
         return phone_number_c
-    
+
     def __init__(self, *args, **kwargs):
         super(PhoneNumberFormClient,self).__init__(*args, **kwargs)
 
@@ -166,15 +166,16 @@ class PhoneNumberFormClient(forms.ModelForm):
 
 #------------------------------------------------------------------
 PhoneNumberFormSet = inlineformset_factory(
-    Client, 
-    PhoneNumberClient, 
+    Client,
+    PhoneNumberClient,
     form = PhoneNumberFormClient,
     extra= 3,
     can_delete= False,
 )
 PhoneNumberFormSetUpdate = inlineformset_factory(
-    Client, 
-    PhoneNumberClient, 
+    Client,
+    PhoneNumberClient,
     form = PhoneNumberFormClient,
     can_delete= False,
+    max_num=4,
 )

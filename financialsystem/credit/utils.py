@@ -23,7 +23,7 @@ def refresh_condition():
         print("-----------------------",cred_with_vencidas,"-----------------------------")
 
         mi_lista = [cred_with_vencidas, refinances] if cred_with_vencidas and refinances else [cred_with_vencidas] if cred_with_vencidas else [refinances] if refinances else []
-    
+
         for model in mi_lista:
             for obj_with_vencidas in model:
                 for_refresh(obj_with_vencidas.installments.all())
@@ -48,7 +48,7 @@ def for_refresh(obj_with_vencidas):
         else:
             credit = installment_ven.refinancing.installment_ref.last().credit
             client = credit.client
-            installment_ven.condition = 'Vencida' 
+            installment_ven.condition = 'Vencida'
 
         installment_ven.is_caduced_installment = True
         resto = abs((date.today() - installment_ven.end_date.date()).days)
@@ -89,18 +89,18 @@ def refresh_installments_credits():
         for credit in credits_WPI: # WPI = With Paid Installments
             if credit.installments.filter(is_paid_installment=True).count() == credit.installments.count():
                 if isinstance(credit, Credit):
-                    credit.condition = 'Pagado' 
+                    credit.condition = 'Pagado'
                 else:
                     for installment in credit.installment_ref.all():
                         installment.is_paid_installment = True
                         installment.condition = 'Pagada'
                         installment.payment_date = credit.installments.last().payment_date
                         installment.save()
-                    
+
                 credit.payment_date = credit.installments.last().payment_date
                 credit.is_paid = True
                 credit.save()
-    
+
 
 def search_client(request):
     search_terms = request.GET.get('search_term').split()
@@ -109,7 +109,7 @@ def search_client(request):
         for term in search_terms:
             q_objects = Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(dni__icontains=term)
             clients = clients.filter(q_objects)
-        
+
         data = {
             'clientes': [
                 {
@@ -133,7 +133,7 @@ def search_credit(request):
         for term in search_terms:
             q_objects = Q(client__first_name__icontains=term) | Q(client__last_name__icontains=term) | Q(client__dni__icontains=term)
             credits = credits.filter(q_objects)
-        
+
         data = {
             'credits': [
                 {
@@ -153,4 +153,5 @@ def ask_is_old(credit, adviser):
     if not credit.is_old_credit:
         credit.mov = create_movement(credit, adviser)
     credit.is_old_credit = False
+    credit.adviser = adviser
     credit.save()
