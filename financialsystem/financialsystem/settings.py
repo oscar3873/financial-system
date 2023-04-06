@@ -105,8 +105,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "financialsystem.wsgi.application"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 14400
-THOUSAND_SEPARATOR = '.'
 
+
+USE_L10N = True
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = '.'
+DECIMAL_SEPARATOR = ','
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
