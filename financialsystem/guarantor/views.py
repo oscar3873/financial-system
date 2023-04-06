@@ -1,10 +1,11 @@
 from datetime import datetime
-import uuid
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from babel.dates import format_date
 from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth.decorators import login_required
+
 
 from django.urls import reverse_lazy
 
@@ -156,6 +157,22 @@ def delete_guarantor(request, pk):
     messages.warning(request, 'Garante eliminado correctamente',"warning")
     return  redirect('guarantors:list')
 
+
+#BORRAR NUMERO DE TELEFONO 
+#------------------------------------------------------------------
+@login_required(login_url="/accounts/login/")
+def delete_phone_number(request, pk):
+    """
+    Borra un número de telefono de un cliente.
+    """	
+    try:
+        phone_number = PhoneNumberGuarantor.objects.get(id=pk)
+    except PhoneNumberGuarantor.DoesNotExist:
+        return redirect('guarantors:update', pk=phone_number.guarantor.id)
+    phone_number.delete()
+    return redirect('guarantors:update', pk=phone_number.guarantor.id)
+
+
 #ACTUALIZACION DE UN MOVIMIENTO
 #------------------------------------------------------------------
 def update_guarantor(request, pk):
@@ -163,22 +180,23 @@ def update_guarantor(request, pk):
     Actualiza un cliente y sus teléfonos.
     """
     guarantor = get_object_or_404(Guarantor, pk=pk)
-    form = GuarantorForm(instance=guarantor)
+    form = GuarantorForm(instance=guarantor, prefix = 'guarantor')
     phone_formset = PhoneNumberFormSetG(instance=guarantor)
     phone_formset.extra = 4
 
     if request.method == 'POST':
-        form = GuarantorForm(request.POST, instance=guarantor)  # Update the form variable with POST data
+        form = GuarantorForm(request.POST, instance=guarantor, prefix = 'guarantor')  # Update the form variable with POST data
         phone_formset = PhoneNumberFormSetG(request.POST, instance=guarantor)
         if form.is_valid() and phone_formset.is_valid():
-            client = form.save()
+            guarantor = form.save()
 
             phone_numbers = phone_formset.save(commit=False)
             for phone_number in phone_numbers:
-                if phone_number.phone_number_c:
+                if phone_number.phone_number_g:
                     phone_number.guarantor = guarantor
                     phone_number.save()
-
+            for phone_number in phone_formset.deleted_objects:
+                phone_number.delete()
             messages.success(request, 'Los datos del cliente se actualizaron correctamente.','success')
             return redirect('guarantors:list')
 
@@ -188,7 +206,6 @@ def update_guarantor(request, pk):
     context = {
         'form': form,
         'phone_formset': phone_formset,
-        'client': client,
     }
 
     return render(request, 'guarantor/guarantor_update.html', context)

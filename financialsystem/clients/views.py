@@ -179,13 +179,16 @@ def update_client(request, pk):
         phone_formset = PhoneNumberFormSet(request.POST, instance=client)
         if form.is_valid() and phone_formset.is_valid():
             client = form.save()
+            # Delete objects marked for deletion
 
             phone_numbers = phone_formset.save(commit=False)
             for phone_number in phone_numbers:
                 if phone_number.phone_number_c:
                     phone_number.client = client
                     phone_number.save()
-
+            
+            for phone_number in phone_formset.deleted_objects:
+                phone_number.delete()
             messages.success(request, 'Los datos del cliente se actualizaron correctamente.','success')
             return redirect('clients:list')
 

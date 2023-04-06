@@ -64,13 +64,13 @@ class ClientForm(forms.ModelForm):
         first_name = self.cleaned_data.get('first_name')
         if len(first_name) < 3:
             raise forms.ValidationError("El nombre debe contener al menos 3 caracteres")
-        return str(first_name).upper()
+        return str(first_name).title()
     
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name')
         if len(last_name) < 3:
             raise forms.ValidationError("El apellido debe contener al menos 3 caracteres")
-        return str(last_name).upper()
+        return str(last_name).title()
 
     def clean_dni(self):
         """
@@ -146,13 +146,10 @@ class PhoneNumberFormClient(forms.ModelForm):
         """	
         phone_number_c = self.cleaned_data.get('phone_number_c')
         if phone_number_c is None or phone_number_c == '':
-            print('NONE', phone_number_c, '<-')
             return None
         elif not phone_number_c.isdigit():
-            print("El número de teléfono debe contener solo dígitos")
             raise forms.ValidationError("El número de teléfono debe contener solo dígitos")
         elif len(phone_number_c) > 0 and (len(phone_number_c) < 8 or len(phone_number_c) > 20):
-            print("El numero debe contener como minimo 8 y 15 digitos")
             raise forms.ValidationError("El numero debe contener como minimo 8 y 15 digitos")
         return phone_number_c
     

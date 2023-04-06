@@ -9,5 +9,6 @@ guarantor_patterns = ([
     path('update/<uuid:pk>/', update_guarantor, name='update'),
     path('delete/<uuid:pk>/', delete_guarantor, name='delete'),
     path('search_guarantor/', search_guarantor, name='buscar_creditos'),
+    path('delete/phonenumbers/<uuid:pk>/', delete_phone_number, name='delete_phone_number'),
 
 ], "guarantors")

@@ -185,5 +185,5 @@ WarrantyFormSet = inlineformset_factory(
     Warranty, 
     form = WarrantyForm,
     extra= 1,
-    can_delete= False,
+    can_delete= True,
 )
