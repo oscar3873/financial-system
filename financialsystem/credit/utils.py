@@ -152,5 +152,5 @@ def ask_is_old(credit, adviser):
     if not credit.is_old_credit:
         credit.mov = create_movement(credit, adviser)
     credit.is_old_credit = False
-    credit.client.adviser = adviser
+    credit.adviser = adviser
     credit.save()
