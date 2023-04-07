@@ -2,40 +2,36 @@
 <!--Main-->
 <main class="container my-4">
 
-    <div class="row justify-content-md-start justify-content-center">
+    <div class="row justify-content-md-start justify-content-center align-items-center">
         <div class="col-lg-4 col-12">
-            <div class="row justify-content-center">
-                <div class="col-md-5 col-12">
-                    <div class="text-center">
-                        <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">
-                            Panel de
-                            <h4 class="font-weight-bold">{{request.user.first_name}}, {{request.user.last_name}}</h4>
-                        </h4>
-                        {% if request.user.adviser.avatar %}
-                        <img src="{{request.user.adviser.avatar.url}}" alt="avatar" width="100px" height="100px" class="rounded-circle "> {% else %}
-                        <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" width="100px" height="100px" class="rounded-circle  "> {% endif %}
-                    </div>
-                </div>
-                <div class="col-lg-7 col-12 text-center">
-                    <p>Correo:<span class="font-weight-bold"> {{user.email}}</span></p>
-                    <p>Nombre de usuario:<span class="font-weight-bold"> {{user.username}}</span></p>
-                    <!--Botones de  Carga-->
-                    <div class="mb-4" role="group" aria-label="Basic example">
-                        <a class="btn btn-secondary rounded mb-2 p-3 box-shadow" href="{% url 'credits:create_credit' %}" role="button">
-                            <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                            <span>Nuevo Credito</span>
-                        </a>
-                        {% if request.user.is_superuser %}
-                        <a class="btn btn-secondary rounded mb-2 p-3 box-shadow" href="{% url 'signup' %}" role="button">
-                            <i class="fa fa-user-plus" aria-hidden="true"></i>
-                            <span>Nuevo Asesor</span>
-                        </a>
-                        {% endif %}
-                    </div>
+            <div class="row align-items-center justify-content-center">
+                <div class="d-flex align-items-center justify-content-center">
+                    {% if request.user.adviser.avatar %}
+                    <img src="{{request.user.adviser.avatar.url}}" alt="avatar" width="100px" height="100px" class="rounded-circle "> &nbsp;{% else %}
+                    <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" width="100px" height="100px" class="rounded-circle  "> &nbsp;{% endif %}
+                    <h4 class="font-weight-normal animate__fadeInLeft mb-0" style="animation-duration: 0.5s !important;">
+                        Panel de
+                    </h4>
+                    <h4 class="font-weight-bold ml-2 mb-0">{{request.user.first_name}}, {{request.user.last_name}}</h4>
                 </div>
             </div>
         </div>
-        <div class="col-lg-8 col-12">
+
+        <div class="col-lg-4 col-12">
+            <div class="row align-items-center justify-content-center">
+                <div class="d-flex justify-content-center text-center" role="group" aria-label="Basic example">
+                    <a class="btn btn-secondary rounded mb-2 p-3 box-shadow mr-2" href="/credits/create_credit/" role="button">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        <span>Nuevo Credito</span>
+                    </a>
+                    <a class="btn btn-secondary rounded mb-2 p-3 box-shadow" href="/accounts/signup/" role="button">
+                        <i class="fa fa-user-plus" aria-hidden="true"></i>
+                        <span>Nuevo Asesor</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-12">
             {% include 'core/message.html' %}
             <!--Buscador de Clientes-->
             {% include "clients/query/search.html" %}
@@ -113,7 +109,7 @@
                                     </div>
                                     <div class="text-center p-2">
                                         <a class="text-white" href="{% url 'clients:detail' installment.credit.client.pk %}"><span>{{installment}}</span></a>
-                                        <span class="font-weight-bold text-warning">Vence el {{installment.created_at|date}}</span>
+                                        <span class="font-weight-bold text-warning">Vence el {{installment.end_date|date}}</span>
                                     </div>
                                 </li>
                                 {% empty %}

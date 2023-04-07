@@ -1,9 +1,8 @@
 <!-- crear_credito.html -->
 {% extends 'core/base.html' %} {% block content %}
 <main class="container my-4">
-    {% include 'core/message.html' %}
-
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Editar cliente: {{client.last_name}}, {{client.first_name}}</h4>
+     {% include 'core/message.html' %}
     <section>
         <div class="my-4 py-2">
             <form class="form" method="post">

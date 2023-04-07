@@ -1,16 +1,10 @@
 <!-- credit/edit_credit.html -->
 {% extends "core/base.html" %} {% block content %} {% load static %}
-{% if messages %} {% for message in messages %}
-    <div class="alert alert-{{message.extra_tags}} alert-dismissible" role="alert">
-        <span type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></span>
-        <span class="font-weight-light">{{ message }}</span>
-    </div>
-{% endfor %} {% endif %}
-
 <form method="post">
     <h1>
       Actualizar Refinanciacion de <a href="{% url 'clients:detail' client.pk %}"><h1>{{client}}</h1></a>
     </h1>
+    {% include 'core/message.html' %}
     <div class="col-md-8">
         <div class="card bg-primary text-white box-shadow mb-3">
             <div class="card-body">

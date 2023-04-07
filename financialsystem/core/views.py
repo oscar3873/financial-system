@@ -51,6 +51,7 @@ class HomePageView(LoginRequiredMixin, TemplateView):
                 #Excluimos ahora si las cuotas refinanciadas porque sino me va mostrar una cuota refinanciada 
                 installments = installments.exclude(condition__in=['Pagada']).exclude(is_refinancing_installment=True).order_by("end_date")
                 installments_ref = InstallmentRefinancing.objects.filter(refinancing__in=refinancings)
+            
             # Concatenamos las dos listas en una sola
             all_installments = list(itertools.chain(installments, installments_ref))
             # Ordenamos la lista resultante por la fecha de vencimiento

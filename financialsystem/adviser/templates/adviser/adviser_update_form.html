@@ -1,10 +1,9 @@
 {% extends "core/base.html" %} {% block content %}
 <main class="container my-4">
-    {% include 'core/message.html' %}
     <div class="card bg-primary text-white">
         <div class="card-header">
             <h2>Actualizar Perfil</h2>
-        </div>
+        </div>{% include 'core/message.html' %}
         <div class="card-body bg-white text-dark">
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %} {% for field in form %}

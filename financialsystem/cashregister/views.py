@@ -157,7 +157,7 @@ class CashRegisterListView(LoginRequiredMixin, FormView, ListView):
         """
         Método que redirige al usuario a la página de inicio después de crear un nuevo movimiento.
         """
-        messages.success(self.request,"Movimiento realizado exitosamente!")
+        messages.success(self.request,"Movimiento realizado exitosamente!",'success')
         return reverse_lazy('cashregister:home')
 
 #LISTA DE MOVIMIENTOS

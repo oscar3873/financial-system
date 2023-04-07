@@ -96,11 +96,9 @@ def operation_type_validate(instance, *args, **kwargs):
     """
     if not CashRegister.objects.exists():
         instance.cashregister = CashRegister.objects.create()
-    instance.amount = round_to_nearest_hundred(abs(instance.amount))
+    instance.amount = abs(instance.amount)
     if instance.operation_mode == 'EGRESO':
         instance.amount = -instance.amount
-    print(instance.amount)
-
 
 
 pre_save.connect(operation_type_validate, sender=Movement)
