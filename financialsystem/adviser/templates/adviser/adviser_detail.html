@@ -93,7 +93,7 @@
 
                                                 <p><strong>Interes: {{ commission.interest }} </strong></p>
 
-                                                <p><strong>Interes: <input name="porcentage" type="number" step="0.01" id="porcentage{{commission.id}}" placeholder="{{commission.interest}}" oninput="calculateResult('{{ commission.operation_amount }}','{{ commission.interest }}','{{ commission.id }}')" >
+                                                <p><strong>Interes: <input required name="porcentage" type="number" step="0.01" id="porcentage{{commission.id}}" placeholder="{{commission.interest}}" oninput="calculateResult('{{ commission.operation_amount }}','{{ commission.interest }}','{{ commission.id }}')" >
                                             <p id="result{{commission.id}}"></p>
                                             </strong>
                                                 </p>
