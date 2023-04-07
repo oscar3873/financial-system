@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Group
+from django.contrib import messages
 
 from .forms import  UserCreationFormWithEmail
 from django.views.generic import CreateView
@@ -27,5 +28,6 @@ class SignupView(LoginRequiredMixin, CreateView):
             user = form.save()
             adviser_group, created = Group.objects.get_or_create(name = 'adviser_group')
             adviser_group.user_set.add(user)
+            messages.success(self.request,f'Usuario {user.first_name} creado','success')
 
         return form

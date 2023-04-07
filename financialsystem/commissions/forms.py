@@ -1,6 +1,6 @@
 from django import forms
 
-from commissions.models import Interest
+from commissions.models import Interest, Commission
 
 class SettingsInterestForm(forms.ModelForm):
 
@@ -48,3 +48,11 @@ class SettingsInterestForm(forms.ModelForm):
         # Eliminar validación requerida
         for field in self.fields.values():
             field.required = True
+
+class CommissionForm(forms.ModelForm):
+    class Meta:
+        model = Commission
+        fields = ["interest"]
+        widget = {
+            'interest': forms.NumberInput(attrs={'class': 'form-control'})
+        }

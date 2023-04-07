@@ -98,7 +98,10 @@
                                 <div class="modal-content">
                                     <form action="{% url 'warrantys:sell' warranty.pk %}" method="POST">
                                         <div class="modal-header">
-                                            <h4 class="modal-title" id="exampleModalLabel">Vender Articulo #{{warranty.pk}}</h4>
+                                            <div class="form-group">
+                                                <h4 class="modal-title" id="exampleModalLabel">Vender Articulo<h4>
+                                                {{warranty}}
+                                            </div>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>

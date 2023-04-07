@@ -79,7 +79,7 @@ class AdviserDetailView(LoginRequiredMixin, DetailView):
         """
         context = super().get_context_data(**kwargs)
         context["settings_form"] = SettingsInterestForm(instance = Interest.objects.first())
-        context["commissions"] = Commission.objects.filter(adviser=self.get_object(), is_paid=False)
+        context["commissions"] = Commission.objects.filter(adviser=self.object, is_paid=False)
         context["properties"] = commission_properties()
         return context
 

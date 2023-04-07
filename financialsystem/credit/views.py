@@ -36,8 +36,6 @@ def crear_credito(request):
     credit_form = CreditForm(request.POST or None, initial = {'adviser':request.user.adviser})
     formsetPhoneClient = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix = "phone_number_client")
     formsetPhoneGuarantor = PhoneNumberFormSetG(request.POST or None, instance=Guarantor(), prefix = "phone_number_guarantor")
-    formsetPhoneClient.extra = 4
-    formsetPhoneGuarantor.extra = 4 
 
     if request.method == 'POST':
         if client_form.is_valid() and credit_form.is_valid() and warranty_form.is_valid()  and formsetPhoneClient.is_valid() and guarantor_form.is_valid() and formsetPhoneGuarantor.is_valid():
@@ -53,7 +51,7 @@ def crear_credito(request):
 
             credit = credit_form.save(commit=False)
             credit.client = client
-            ask_is_old(credit, credit_form.cleaned_data['adviser'])
+            ask_is_old(credit, credit_form.instance.adviser)
 
             guarantor = guarantor_form.save(commit=False)
             if guarantor_form.cleaned_data["dni"]:
@@ -177,7 +175,6 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         """        
         formset = PhoneNumberFormSetG(instance=Guarantor(), prefix="phone_number_guarantor")
-        formset.extra =4
 
         context = super().get_context_data(**kwargs)
         context['form'] = CreditForm(initial= self.get_initial())
@@ -201,7 +198,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             credit = form.save(commit=False)
             credit.client = client
             
-            ask_is_old(credit, form.cleaned_data['adviser'])
+            ask_is_old(credit, form.instance.adviser)
 
             # Validar el formulario de garantía
             warranty_form = WarrantyForm(self.request.POST)
@@ -219,16 +216,19 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
                     guarantor.save()
                     credit.guarantor = guarantor
                     credit.save()
-                phone_numbers_form = PhoneNumberFormSetG(self.request.POST, instance=guarantor, prefix="phone_number_guarantor")
-                phone_numbers = phone_numbers_form.save(commit=False)
-                for phone_number in phone_numbers:
-                    if phone_number.phone_number_g:
-                        phone_number.guarantor = guarantor
-                        phone_number.save()
+                phone_numbers_form = PhoneNumberFormSetG(self.request.POST,instance=Guarantor(), prefix="phone_number_guarantor")
+                if phone_numbers_form.is_valid():
+                    phone_numbers = phone_numbers_form.save(commit=False)
+                    for phone_number in phone_numbers:
+                        if phone_number.phone_number_g:
+                            phone_number.guarantor = guarantor
+                            phone_number.save()
+                else:
+                    print(phone_numbers_form.errors)
 
             return super().form_valid(form)
         else:
-            return self.form_invalid(form)
+            print(super().errors)
 
 
 
@@ -246,7 +246,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
     """
     Creacion de un credito para un cliente desde detail.
     """
-    model = Credit
+    model = Client
     form_class = CreditForm
     template_name = 'credit/credit_form.html'
 
@@ -256,12 +256,12 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
 
     def get_initial(self) :
         iniitial = super().get_initial()
-        iniitial['adviser'] = Client.objects.get(pk=self.kwargs['pk']).adviser
+        self.client = Client.objects.get(pk=self.kwargs['pk'])
+        iniitial['adviser'] = self.client.adviser
         return iniitial
 
     def get_context_data(self, **kwargs):
         formset =PhoneNumberFormSetG(instance=Guarantor(), prefix = "phone_number_guarantor")
-        formset.extra = 4 
 
         context = super().get_context_data(**kwargs)
         context['cliente_form'] = CreditForm(initial= self.get_initial())
@@ -279,10 +279,11 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
         """
         if form.is_valid():
             # Recuperar el ID del cliente seleccionado
-            client = get_object_or_404(Client, pk=self.kwargs['pk'])
+            client = self.client
             credit = form.save(commit=False)
             credit.client = client
-            ask_is_old(credit, form.cleaned_data['adviser'])
+
+            ask_is_old(credit, form.instance.adviser)
 
             # Validar el formulario de garantía
             warranty_form = WarrantyForm(self.request.POST)
@@ -293,7 +294,7 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
 
             # Validar el formulario de garante
             selected_client_id = self.request.POST.get('selected_guarantor_id')
-            if selected_client_id != None:
+            if selected_client_id is not None:
                 guarantor = Guarantor.objects.get(pk=selected_client_id)
                 credit.guarantor = guarantor
                 credit.save()
@@ -305,16 +306,19 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
                         guarantor.save()
                         credit.guarantor = guarantor
                         credit.save()
-                        phone_numbers_form = PhoneNumberFormSetG(self.request.POST, instance=guarantor, prefix="phone_number_guarantor")
-                        phone_numbers = phone_numbers_form.save(commit=False)
-                        for phone_number in phone_numbers:
-                            if phone_number.phone_number_g:
-                                phone_number.guarantor = guarantor
-                                phone_number.save()
+                        phone_numbers_form = PhoneNumberFormSetG(self.request.POST,instance=Guarantor(), prefix="phone_number_guarantor")
+                        if phone_numbers_form.is_valid():
+                            phone_numbers = phone_numbers_form.save(commit=False)
+                            for phone_number in phone_numbers:
+                                if phone_number.phone_number_g:
+                                    phone_number.guarantor = guarantor
+                                    phone_number.save()
+                        else:
+                            print(phone_numbers_form.errors)
 
             return super().form_valid(form)
         else:
-            return self.form_invalid(form)
+            print(super().errors)
 
     def get_success_url(self) -> str:
         """
