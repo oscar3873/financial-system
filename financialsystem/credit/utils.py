@@ -37,7 +37,7 @@ def refresh_condition():
 
 
 def for_refresh(obj_with_vencidas):
-    installments = obj_with_vencidas.exclude(condition__in = ['Pagada','Refinanciada'])
+    installments = obj_with_vencidas.exclude(condition__in = ['Pagada','Refinanciada']).filter(end_date__date__lt=date.today())
     for installment_ven in installments:
         if isinstance(installment_ven, Installment):
             credit = installment_ven.credit

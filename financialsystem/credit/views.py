@@ -10,8 +10,7 @@ from django.db import transaction
 
 import copy
 
-from cashregister.utils import create_movement, create_cashregister
-from clients.filters import ListingFilter
+from cashregister.utils import create_cashregister
 
 from .utils import *
 
@@ -352,7 +351,7 @@ def edit_credit(request, pk):
         'form': form,
         'client': credit_original.client
         }
-    return render(request, 'credit/edit_credit.html', context)
+    return render(request, 'credit/credit_update.html', context)
 
 
 #------------------------------------------------------------------

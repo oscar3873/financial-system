@@ -2,8 +2,6 @@
 <!--Main-->
 <link href="{% static 'clients/css/client_detail.css' %}" rel="stylesheet"> 
 
-{% include 'core/message.html' %}
-
 {% if client.is_legals %}
 <div class="alert alert-danger text-center" role="alert">
     <h1 class="font-weight-bold">CLIENTE: {{client.first_name|upper}} {{client.last_name|upper}} <br> EN LEGALES</h1>
@@ -39,7 +37,7 @@
 {% endif %} {% else %}
 
 <main class="container my-4">
-    <!--Seccion 1-->
+    {% include 'core/message.html' %}
     <a href="{% url 'clients:update' client.pk %}">
         <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">
             <i class="fa fa-wrench text-warning" aria-hidden="true"></i>
@@ -245,8 +243,16 @@
                         <button data-card-id="{{ credit_active.id }}" class="toggle-card btn btn-sm btn-white"><i class="fas fa-chevron-up"></i></button>
                     </div>
                     <div class="card-body">
-                        <div class="row px-3 justify-content-center">
+                        <div class="row px-2 justify-content-center">
                             <div class="col-12 col-md-5">
+                                 <div class="row align-items-center">
+                                    <div class="col p-0">
+                                        <span>Asesor:</span>
+                                    </div>
+                                    <div class="col p-0">
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;">{{credit_active.adviser}}</span>
+                                    </div>
+                                </div>
                                 <div class="row align-items-center">
                                     <div class="col p-0">
                                         <span>Monto solicitado:</span>
