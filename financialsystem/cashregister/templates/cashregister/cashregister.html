@@ -375,7 +375,7 @@
     openButtons.forEach(button => {
         button.addEventListener("click", function() {
             const info = JSON.parse(this.getAttribute("data-info"));
-            const creditLink = info.credit ? `<p>
+            const creditLink = info.credit !== '-' ? `<p>
                     <a href="/credits/${info.credit_pk}" class="text-warning">
                         <strong>
                             ${info.credit}

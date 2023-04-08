@@ -87,7 +87,12 @@
 
     let amountInput = document.getElementById("id_amount");
     let enableAmountBtn = document.getElementById("enable-amount-btn");
-    const amount_value = parseFloat(`{{installment.original_amount}}`);
+
+    function parseLocalizedFloat(value) {
+        return parseFloat(value.replace(/\./g, '').replace(',', '.'));
+    }
+    const amount_value=parseLocalizedFloat(`{{installment.original_amount}}`);
+    console.log(`{{installment.original_amount}}`, amount_value);
 
     // Agregar la clase "readonly" al cargar la página
     amountInput.classList.add("readonly");
@@ -126,7 +131,7 @@
         const days_diff_end_pay = payment_date.diff(end_date, 'days');
 
         const days_diff = !isNaN(days_diff_end_pay) && days_diff_end_pay >= 0 ? days_diff_end_pay : 0.00;
-        console.log(amount_value);
+        // console.log(amount_value);
         const daily_interests = Math.round(amount_value * porcentage/100 * days_diff);
         let interest_final = roundToNearestSpecial(daily_interests).toFixed(2);
         dailyInterestsInput.value = interest_final;
