@@ -33,7 +33,7 @@ def pay_installment(request, payment, installments, amount_paid):
     SER MAYOR O IGUAL AL 50% DE LA DEUDA (INTERESES + VALOR DE CUOTA)
     """
     if not installments:
-        messages.warning(request, 'Este crédito ya cuenta con el beneficio "pausa por 15 días"', 'warning')
+        messages.warning(request, 'Este crédito no puede poseer el beneficio "pausa por 15 días"', 'warning')
         return
 
     amount_list = installments.values_list('amount', flat=True)
