@@ -375,33 +375,42 @@
     openButtons.forEach(button => {
         button.addEventListener("click", function() {
             const info = JSON.parse(this.getAttribute("data-info"));
-            offcanvas.innerHTML = `<div class="card-header">
-                <h5 class="title py-3">Movimiento</h5>
-            </div>
-            <div class="card-body">
-                <h4 class="m-0">Monto de la operacion</h4>
-                <p class="m-0 font-weight-bold text-warning" style="font-size: 2rem">${info.amount}</p>
-                <p class="m-0">Por asesor financiero</p>
-                <p><a href="/asesors/${info.userpk}" class="text-warning"><strong>${info.user}</strong></a></p>
-                <p class="m-0">Descripcion</p>
-                <p><strong>${info.description}</strong></p>
-                <p class="m-0">Credito</p>
-                <p>
+            const creditLink = info.credit ? `<p>
                     <a href="/credits/${info.credit_pk}" class="text-warning">
                         <strong>
-                        ${info.credit}
+                            ${info.credit}
                         </strong>
                     </a>
-                </p>
-                <h5 class="title pt-3">Acciones</h5>
-                <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal${info.pk}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
-                <a href="/cashregister/movements/update/${info.pk}" ><i class="fas fa-edit text-info"></i></a>
-            </div>
-            <div class="card-footer text-muted">
-                <p class="m-0">Fecha y hora de realizacion</p>
-                <p><strong>${info.created_at}</strong></p>
-            </div>
-            `
+                </p>`
+                : `<p>
+                    <strong>
+                        Sin información de crédito
+                    </strong>
+                </p>`;
+                console.log(info.credit, creditLink);
+
+            offcanvas.innerHTML = `
+                <div class="card-header">
+                    <h5 class="title py-3">Movimiento</h5>
+                </div>
+                <div class="card-body">
+                    <h4 class="m-0">Monto de la operacion</h4>
+                    <p class="m-0 font-weight-bold text-warning" style="font-size: 2rem">${info.amount}</p>
+                    <p class="m-0">Por asesor financiero</p>
+                    <p><a href="/asesors/${info.userpk}" class="text-warning"><strong>${info.user}</strong></a></p>
+                    <p class="m-0">Descripcion</p>
+                    <p><strong>${info.description}</strong></p>
+                    <p class="m-0">Credito</p>
+                    ${creditLink}
+                    <h5 class="title pt-3">Acciones</h5>
+                    <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal${info.pk}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
+                    <a href="/cashregister/movements/update/${info.pk}" ><i class="fas fa-edit text-info"></i></a>
+                </div>
+                <div class="card-footer text-muted">
+                    <p class="m-0">Fecha y hora de realizacion</p>
+                    <p><strong>${info.created_at}</strong></p>
+                </div>
+            `;
             offcanvas.classList.add("open");
             overlay.style.display = "block";
 
@@ -413,6 +422,7 @@
         overlay.style.display = "none";
     });
 </script>
+
 <script>
     function modal_funtion(button, password, is_superuser) {
 

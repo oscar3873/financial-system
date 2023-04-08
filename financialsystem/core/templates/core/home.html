@@ -5,14 +5,18 @@
     <div class="row justify-content-md-start justify-content-center align-items-center">
         <div class="col-lg-4 col-12">
             <div class="row align-items-center justify-content-center">
-                <div class="d-flex align-items-center justify-content-center">
+                <div class="d-lg-flex align-items-lg-center justify-content-lg-center">
                     {% if request.user.adviser.avatar %}
-                    <img src="{{request.user.adviser.avatar.url}}" alt="avatar" width="100px" height="100px" class="rounded-circle "> &nbsp;{% else %}
-                    <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" width="100px" height="100px" class="rounded-circle  "> &nbsp;{% endif %}
-                    <h4 class="font-weight-normal animate__fadeInLeft mb-0" style="animation-duration: 0.5s !important;">
-                        Panel de
-                    </h4>
-                    <h4 class="font-weight-bold ml-2 mb-0">{{request.user.first_name}}, {{request.user.last_name}}</h4>
+                    <div class="d-block text-center">
+                        <img src="{{request.user.adviser.avatar.url}}" alt="avatar" width="100px" height="100px" class="rounded-circle "> {% else %}
+                        <img src="/media/{{MEDIA_URL}}avatares/default.png" alt="avatar" width="100px" height="100px" class="rounded-circle  "> {% endif %}
+                    </div>
+                    <div>
+                        <h4 class="d-block text-center font-weight-normal animate__fadeInLeft mb-0" style="animation-duration: 0.5s !important;">
+                            Panel de
+                        </h4>
+                        <h4 class="font-weight-bold ml-2 mb-0">{{request.user.first_name}}, {{request.user.last_name}}</h4>
+                    </div>
                 </div>
             </div>
         </div>
