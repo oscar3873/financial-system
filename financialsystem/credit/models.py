@@ -34,7 +34,7 @@ class Credit(models.Model):
     interest = models.DecimalField(decimal_places=2, max_digits=15,default=40, help_text="Intereses de credito")
     amount = models.DecimalField(decimal_places=2, max_digits=15, help_text="Monto del Credito")
     mov = models.OneToOneField(Movement,on_delete=models.SET_NULL,null=True,blank=True)
-    adviser = models.OneToOneField(Adviser, on_delete=models.SET_NULL, null=True, blank=True, default=None)
+    adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     credit_repayment_amount = models.DecimalField(blank=True, default=0, decimal_places=2, max_digits=15, help_text="Monto de Devolucion del Credito")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="credits")
     guarantor = models.ForeignKey(Guarantor, on_delete=models.SET_NULL, blank=True, null=True, default=None, help_text="Cliente del Credito", related_name="credits_g")
