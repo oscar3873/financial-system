@@ -78,8 +78,7 @@ def for_refresh(obj_with_vencidas):
 def actualice(resto, installment_ven):
     daily_interes = round_to_nearest_special((resto * installment_ven.original_amount * installment_ven.porcentage_daily_interests/100))
     installment_ven.daily_interests = daily_interes
-    installment_ven.amount = installment_ven.original_amount + daily_interes
-    installment_ven.amount = round_to_nearest_hundred(installment_ven.amount)
+    installment_ven.amount = round_to_nearest_hundred(installment_ven.original_amount + daily_interes)
 
 
 def refresh_installments_credits():

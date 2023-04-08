@@ -227,7 +227,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
 
         refresh_condition()
         context = super().get_context_data(**kwargs)
-        context["credits"] = context["client"].credits.all()
+        context["credits"] = context["client"].credits.all().order_by("created_at")
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
         context["credits_active"] = credits_active
         context["count_credits"] = context["credits"].count()
@@ -283,8 +283,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
         for credit in credits_active:
             installments_list = []
             installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-            # refinancings = Refinancing.objects.filter(installment_ref__credit=credit)
-
+        
             forms_payments.append(PaymentForm(installments=installments) if installments else None)
             form_refinancings.append(RefinancingForm(credit=credit) if installments else None)
 
@@ -305,9 +304,6 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
                 prev_refinance = refinance
 
             installments_by_credit.setdefault(credit, []).extend(installments_list)
-
-
-        context["installments_available"] = True
 
         dicc = dict(zip(credits_active, forms_payments))
 

@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 import uuid
 
-from django.db.models.signals import post_save, pre_save, post_delete
+from django.db.models.signals import pre_save, post_delete
 from django.db import models
 
 from credit.models import Installment, InstallmentRefinancing
@@ -25,7 +25,7 @@ class Payment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     amount = models.DecimalField(help_text="Monto de Pago", default=0,max_digits=15,decimal_places=2)
     payment_date = models.DateTimeField(default=datetime.now, help_text="Fecha de Pago")
-    adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, null=True, blank=True)
+    adviser = models.ForeignKey(Adviser, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     commission_to = models.OneToOneField(Commission, on_delete=models.SET_NULL, null=True, blank=True)
     mov = models.OneToOneField(Movement, on_delete=models.CASCADE, null=True, blank=True)
     payment_method = models.CharField(max_length=20,choices=MONEY_TYPE, help_text="Metodo de Pago")

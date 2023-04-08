@@ -1,6 +1,8 @@
 import datetime
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
+
 from payment.models import Payment
 from credit.models import Installment
 
@@ -11,25 +13,34 @@ def payment_create(payment, installment):
     payment_dict = {
         'amount': payment.amount,
         'payment_date': payment.payment_date,
-        'adviser': payment._adviser,
+        'adviser': payment.adviser,
         'payment_method': payment.payment_method,
     }
     
     if isinstance(installment, Installment):
         payment_dict['installment'] = installment
-        payment_dict['detail'] = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.credit.client, payment._adviser)
+        payment_dict['detail'] = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.credit.client, payment.adviser)
     else:
         payment_dict['installment_ref'] = installment
-        payment_dict['detail'] = 'COBRO CUOTA REFINANCIADA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.refinancing.installment_ref.last().credit.client, payment._adviser)
+        payment_dict['detail'] = 'COBRO CUOTA REFINANCIADA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.refinancing.installment_ref.last().credit.client, payment.adviser)
         
     Payment.objects.create(**payment_dict)
 
 
-def pay_installment(payment, installments, amount_paid):
+def pay_installment(request, payment, installments, amount_paid):
     """
-    Metodo para pagos parciales: a travez de un monto X, realiza el pago de la cuota que encaja
-    y realiza la disminucion de la cuota a pagar en caso que no supere el monto de la cuota
+    Metodo para pagos parciales: SOLO PARA CUOTAS VENCIDAS Y EL PAGO DEBE
+    SER MAYOR O IGUAL AL 50% DE LA DEUDA (INTERESES + VALOR DE CUOTA)
     """
+    if not installments:
+        messages.warning(request, 'Este crédito ya cuenta con el beneficio "pausa por 15 días"', 'warning')
+        return
+
+    amount_list = installments.values_list('amount', flat=True)
+    if amount_paid < sum(amount_list) / 2:
+        messages.error(request, 'No puede recibir pago menor al 50% de la deuda!', 'danger')
+        return
+
     for installment in installments:
         if installment.amount <= amount_paid:
             print('############PAGADA COMPLETA')
@@ -40,47 +51,27 @@ def pay_installment(payment, installments, amount_paid):
             payment_create(payment, installment)
             amount_paid -= installment.amount
 
-        elif amount_paid >= Decimal(installment.amount/Decimal(2)):
+        elif amount_paid >= Decimal(installment.amount / Decimal(2)):
             print('########## PAGO PARCIAL')
-            payment.amount = amount_paid # MOVIMIENTO
+            payment.amount = amount_paid # PARA RELAIZAR EL MOVIMIENTO
             installment.amount -= payment.amount
-            
-            fifteen_later_din(installment,False)
-            payment_create(payment, installment) # MOVIMIENTO
-            amount_paid = 0
-        
-        else:# SI EL RESTANTE NO SUPERA LOS 50% DE LA DEUDA
-            print("######### ACUMULA MONTO A NEXT INST.")
-            amount_base = amount_paid + installment.amount
-            amount_org = installment.amount
-            try:
-                next_inst = installments.get(installment_number = installment.installment_number+1)
-                print('########## try 1')
-                next_inst.amount += amount_base
-                print('########## try 2')
-                next_inst.original_amount += amount_org
-                print('########## try 3')
-                fifteen_later_din(next_inst)
-                print('########## try 4')
-                make_paid(installment,payment)
-                print('########## try 5')
 
-            except ObjectDoesNotExist:
-                print('########### EXCEPT')
-                installment.amount += amount_base
-                installment.original_amount += amount_org
-                fifteen_later_din(installment)
+            fifteen_later_din(installment)
+            payment_create(payment, installment) # PARA RELAIZAR EL MOVIMIENTO
+
+            amount_paid = 0
+
+        else:  # SI EL RESTANTE NO SUPERA LOS 50% DE LA DEUDA
+            print("######### DISMINUYE MONTO SOBRANTE")
+            installment.amount -= amount_paid # DISMINUYE EL MONTO
+
+            fifteen_later_din(installment)
             amount_paid = 0
 
 
-
-def fifteen_later_din(installment, do=True):
-    if do:
-        fifteen_later = datetime.date.today() + datetime.timedelta(days=15)
-        installment.end_date = fifteen_later
-    installment.save()
-
-def make_paid(installment,payment):
-    installment.condition = 'Pagada'
-    installment.payment_date = payment.payment_date
+def fifteen_later_din(installment):
+    """
+    Mueve la fecha vencimiento 15 dias despues (por beneficio de pago del 50% de la deuda)
+    """
+    installment.end_date = datetime.date.today() + datetime.timedelta(days=15)
     installment.save()

@@ -246,7 +246,9 @@
                                                     "user": "{{movement.user}}", 
                                                     "userpk": "{{movement.user.pk}}", 
                                                     "operation_mode": "{{movement.get_operation_mode_display}}", 
-                                                    "pk":"{{movement.pk}}"
+                                                    "pk":"{{movement.pk}}",
+                                                    "credit":"{% if movement.credit %}{{movement.credit}}{% elif movement.payment.installment %}{{movement.payment.installment.credit}}{% elif movement.payment.installment_ref %}{{movement.payment.installment_ref.credit}}{% else %}-{% endif %}",
+                                                    "credit_pk":"{% if movement.credit %}{{movement.credit.pk}}{% elif movement.payment.installment %}{{movement.payment.installment.credit.pk}}{% elif movement.payment.installment_ref %}{{movement.payment.installment_ref.credit.pk}}{% else %}-{% endif %}"
                                                 }'>
                                                     {% if movement.amount > 0 %}
                                                     <td class="text-success animate__fadeInDown" style="animation-duration: 0.5s !important;"><strong>+{{movement.amount}}</strong></td>
@@ -383,6 +385,14 @@
                 <p><a href="/asesors/${info.userpk}" class="text-warning"><strong>${info.user}</strong></a></p>
                 <p class="m-0">Descripcion</p>
                 <p><strong>${info.description}</strong></p>
+                <p class="m-0">Credito</p>
+                <p>
+                    <a href="/credits/${info.credit_pk}" class="text-warning">
+                        <strong>
+                        ${info.credit}
+                        </strong>
+                    </a>
+                </p>
                 <h5 class="title pt-3">Acciones</h5>
                 <a type="button" class="btn" data-toggle="modal" data-target="#exampleModal${info.pk}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
                 <a href="/cashregister/movements/update/${info.pk}" ><i class="fas fa-edit text-info"></i></a>

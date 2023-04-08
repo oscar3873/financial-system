@@ -32,8 +32,14 @@
                             </div>
                         </div>
                         <p>{{form_payment.payment_method.label}} {{form_payment.payment_method}}</p>
-                        <p>{{form_payment.amount_paid.label}} {{form_payment.amount_paid}}</p>
-
+                        
+                        <button class="btn btn-secondary mt-2" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                            Pago parcial
+                        </button>
+                        <div class="collapse" id="collapseExample">
+                            <p>{{form_payment.amount_paid.label}} {{form_payment.amount_paid}}</p>
+                        </div>
+                        
                         <div class="d-flex flex-wrap align-items-center">
                             {% for field in form_payment %} {% if "cuota_" in field.html_name %}
                             <div class="form-check form-check-inline m-2">
@@ -53,28 +59,28 @@
 </main>
 <!--Pago de las cuotas-->
 <script>
-    const sum_payments = (pk) => {
-        let checkboxes_p = document.querySelectorAll(`input[type="checkbox"][id^="form_payment${pk}"]`);
-        let amountElement = document.querySelector(`#id_payment-amount${pk}`);
-        console.log(amountElement);
-        const sumar = () => {
-            let total = 0;
-            checkboxes_p.forEach(checkbox => {
-                if (checkbox.checked) {
-                    total += parseFloat(checkbox.value);
-                }
-            });
+    document.addEventListener("DOMContentLoaded", () => {
+        const sum_payments = (pk) => {
+            let checkboxes_p = document.querySelectorAll(`input[type="checkbox"][id^="form_payment${pk}"]`);
+            let amountElement = document.querySelector(`#id_payment-amount${pk}`);
+            const sumar = () => {
+                let total = 0;
+                checkboxes_p.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        total += parseFloat(checkbox.value);
+                    }
+                });
 
-            amountElement.innerHTML = total.toFixed(2);
-            amountElement.value = total.toFixed(2);
+                amountElement.innerHTML = total.toFixed(2);
+                amountElement.value = total.toFixed(2);
+            };
+
+            checkboxes_p.forEach(checkbox => {
+                checkbox.addEventListener("click", sumar);
+            });
         };
 
-        checkboxes_p.forEach(checkbox => {
-            checkbox.addEventListener("click", sumar);
-        });
-    };
-
-    document.addEventListener("DOMContentLoaded", () => {
+        
         let paymentButtons = document.querySelectorAll("[id^=paymentButton]");
         paymentButtons.forEach(paymentButton => {
             paymentButton.addEventListener("click", () => {

@@ -2,6 +2,7 @@ from datetime import datetime as dt
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.db.models import F
 
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -134,12 +135,12 @@ def make_payment_installment(request, pk):
 
         pack = dict(zip(installment_, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
-        payment._adviser = request.user.adviser
-
+        payment.adviser = request.user.adviser
+        
         if count_value == 0 :
             payment.amount = installment_amount
-            installments_caduced = installments.filter(is_caduced_installment = True)
-            pay_installment(payment, installments_caduced, abs(Decimal(form.cleaned_data["amount_paid"])))
+            installments_caduced = installments.filter(is_caduced_installment=True).filter(end_date__date__lte=F('lastup'))
+            pay_installment(request, payment, installments_caduced, abs(Decimal(form.cleaned_data["amount_paid"])))
         else:
             for installment in pack.keys():
                 if pack[installment]:
