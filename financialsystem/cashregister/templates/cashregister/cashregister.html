@@ -13,14 +13,13 @@
                         <div class="card bg-primary text-white box-shadow ">
                             <div class="card-body">
                                 <h5 class="card-title animate__fadeInDown" style="animation-duration: 0.5s !important;">
-                                    <i class="fa-solid fa-right-left text-warning"></i>&nbsp;Realizar movimiento
-                                    {% if user.is_superuser %}
+                                    <i class="fa-solid fa-right-left text-warning"></i>&nbsp;Realizar movimiento {% if user.is_superuser %}
                                     <button class="btn btn-danger" name="password_modal" data-toggle="modal" data-target="#Password"><i class="fa fa-cog text-white" aria-hidden="true"></i></button>
                                     <!--Auth Modal Password-->
-                                        <div class="modal fade" id="Password" tabindex="-1" role="dialog" aria-labelledby="Password" aria-hidden="true">
-                                            <form method="post" action="{% url 'cashregister:change_password' %}">
-                                                {% csrf_token %}
-                                                <div class="modal-dialog" role="document">
+                                    <div class="modal fade" id="Password" tabindex="-1" role="dialog" aria-labelledby="Password" aria-hidden="true">
+                                        <form method="post" action="{% url 'cashregister:change_password' %}">
+                                            {% csrf_token %}
+                                            <div class="modal-dialog" role="document">
                                                 <div class="modal-content bg-primary text-white">
                                                     <div class="modal-header bg-primary text-white">
                                                         <h5 class="modal-title" id="Password">Cambio de contraseña</h5>
@@ -38,7 +37,7 @@
                                                 </div>
                                             </div>
                                         </form>
-                                        </div>
+                                    </div>
                                     <!--End Auth Modal Password-->
                                     {% endif %}
                                 </h5>
@@ -375,19 +374,19 @@
     openButtons.forEach(button => {
         button.addEventListener("click", function() {
             const info = JSON.parse(this.getAttribute("data-info"));
-            const creditLink = info.credit ? `<p>
+            const creditLink = info.credit !== '-' ? `<p>
                     <a href="/credits/${info.credit_pk}" class="text-warning">
                         <strong>
                             ${info.credit}
                         </strong>
                     </a>
-                </p>`
-                : `<p>
+                </p>` :
+                `<p>
                     <strong>
                         Sin información de crédito
                     </strong>
                 </p>`;
-                console.log(info.credit, creditLink);
+            console.log(info.credit, creditLink);
 
             offcanvas.innerHTML = `
                 <div class="card-header">
