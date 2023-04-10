@@ -1,8 +1,9 @@
 <!-- crear_credito.html -->
 {% extends 'core/base.html' %} {% load crispy_forms_tags %} {% block content %}
-{% include 'core/message.html' %}
+
 <main class="container my-4">
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de solicitud de servicios</h4>
+    {% include 'core/message.html' %}
     <section>
         <div class="my-4 py-2">
             <form class="form" method="post" enctype="multipart/form-data">

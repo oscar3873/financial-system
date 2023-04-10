@@ -58,6 +58,7 @@ class GuarantorForm(forms.ModelForm):
         fields = "__all__"
         exclude = ["credit"]
 
+
     def clean_dni(self):
         """
         Validar que el DNI sea válido
