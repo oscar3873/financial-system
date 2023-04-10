@@ -42,19 +42,21 @@
             <td class="end_date">{{credit.end_date|date}}</td>
             {% if user.is_superuser %}
             <td>
-                <a type="button " class="btn" data-toggle="modal" data-target="#exampleModal{{credit.instance.pk}} "><i class="fas fa-trash-alt text-danger "></i> &nbsp;</a>
+                <a type="button " class="btn" data-toggle="modal" data-target="#CreditTable{{credit.pk}} "><i class="fas fa-trash-alt text-danger "></i> &nbsp;</a>
                 <!--Modal-->
-                <div class="modal fade " id="exampleModal{{credit.instance.pk}} " tabindex="-1 " role="dialog " aria-labelledby="exampleModalLabel{{credit.instance.pk}} " aria-hidden="true">
+                <div class="modal fade " id="CreditTable{{credit.pk}} " tabindex="-1 " role="dialog " aria-labelledby="CreditTablelabel{{credit.pk}} " aria-hidden="true">
                     <div class="modal-dialog " role="document ">
                         <div class="modal-content bg-primary text-white">
                             <div class="modal-header ">
-                                <h5 class="modal-title " id="exampleModalLabel ">Eliminar credito</h5>
+                                <h5 class="modal-title " id="CreditTablelabel">Eliminar credito</h5>
                             </div>
                             <form action="{% url 'credits:delete' credit.pk %} " method="POST ">
                                 {% csrf_token %}
                                 <div class="modal-body ">
                                     <span>Esta seguro que desea borrar al credito de </span>
-                                    <strong>{{ client }} </strong>?
+                                    <p><strong>{{ credit.client }} </strong>?</p>
+                                    <p>Monto Solicitado: <strong class="text-warning">{{credit.amount}}</strong></p>
+                                    <p>Cuotas: <strong class="text-warning">{{credit.installment_num}}</strong></p>
                                 </div>
                                 <div class="modal-footer ">
                                     <button class="btn btn-danger ">Si, borrar</button>
