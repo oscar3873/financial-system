@@ -17,12 +17,12 @@
                                 <h5 class="title p-2">Informacion basica</h5>
                                 <div class="form-row">
                                     <ul class="error-list">
-                                        {% for field in form %} 
+                                        {% for field in form %}
                                             {% for error in field.errors %}
-                                                <li class="text-danger">{{ error }}</li><br> 
-                                            {% endfor %} 
+                                                <li class="text-danger">{{ error }}</li><br>
+                                            {% endfor %}
                                         {% endfor %}
-                                    </ul> 
+                                    </ul>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
@@ -82,7 +82,7 @@
                                                 {{ phone_form.id }}
                                                 <label for="{{ phone_form.phone_number_c.auto_id }}">{{ phone_form.phone_number_c.label }}</label>
                                                 {{ phone_form.phone_number_c }}
-                                                
+
                                                 <label for="{{ phone_form.DELETE.auto_id }}">Selecciona para eliminar</label>
                                                 {{ phone_form.DELETE }}<h5 class="text-danger">{{phone_form.phone_number_c.errors}}</h5>
                                             </div>
@@ -90,7 +90,7 @@
                                                 <label for="{{ phone_form.phone_type_c.auto_id }}">{{ phone_form.phone_type_c.label }}</label>
                                                 {{ phone_form.phone_type_c }}
                                                 <h5 class="text-danger">{{phone_form.phone_type_c.errors}}</h5>
-                                                
+
                                             </div>
                                         {% endfor %}
                                     </div>
