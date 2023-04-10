@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, time
 from dateutil.relativedelta import relativedelta
 
 from django.http import JsonResponse
@@ -17,7 +17,7 @@ def all_properties_credit():
 
 def refresh_condition():
     if Credit.objects.exists():
-        credits_ok = Credit.objects.filter(condition='A Tiempo')
+        credits_ok = Credit.objects.exclude(condition='Pagado')
         cred_with_vencidas = credits_ok.filter(installments__end_date__date__lt=date.today()).distinct()
         refinances = Refinancing.objects.filter(installments__end_date__date__lt=date.today()).distinct()
 
@@ -50,12 +50,13 @@ def for_refresh(obj_with_vencidas):
             installment_ven.condition = 'Vencida'
 
         installment_ven.is_caduced_installment = True
-        resto = abs((date.today() - installment_ven.end_date.date()).days)
+        
         if (installment_ven.start_date.date() + relativedelta(months=1)) < installment_ven.end_date.date():
             print('############# TERMINA EL PLAZO')
-            # fifteen_later = installment_ven.end_date - timedelta(days=15)
-            installment_ven.end_date = installment_ven.lastup
+            new_end_date = datetime.combine(installment_ven.lastup, installment_ven.end_date.time())
+            installment_ven.end_date = new_end_date
 
+        resto = abs((date.today() - installment_ven.end_date.date()).days)
         actualice(resto, installment_ven)
         installment_ven.save()
 

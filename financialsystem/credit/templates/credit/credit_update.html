@@ -3,6 +3,7 @@
 <main class="container my-4">{% include 'core/message.html' %}
     <div class="form-group">
         <h1>Actualizar Crédito de <a href="{% url 'clients:detail' client.pk %}"><h1>{{client}}</h1></a></h1>
+        {% include 'core/message.html' %}
     </div>
        
     <form method="post">
@@ -25,6 +26,9 @@
                         </div>
                         <div class="form-group col-md-4">
                             {{form.interest.label}} {{form.interest}}
+                        </div>
+                        <div class="form-group col-md-4">
+                            {{form.adviser.label}} {{form.adviser}}
                         </div>
                         <div class="form-group col-md-12">
                             <span class="m-0" for="monto">Monto a Devolver:</span>

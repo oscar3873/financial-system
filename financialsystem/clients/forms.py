@@ -2,6 +2,7 @@ from django import forms
 from django.core.validators import validate_email
 from django.forms import inlineformset_factory
 from clients.models import Client, PhoneNumberClient
+from adviser.models import Adviser
 #FORMULARIO PARA LA CREACION DEL CLIENTE
 #------------------------------------------------------------------
 
@@ -54,11 +55,14 @@ class ClientForm(forms.ModelForm):
         required=False,
     )
 
+    adviser = forms.ModelChoiceField(
+        label= 'Asesor',
+        queryset= Adviser.objects.all(),
+    )
 
     class Meta:
         model = Client
-        fields = ['first_name', 'last_name', 'email', 'civil_status', 'dni', 'profession', 'address', 'score', 'job_address']
-
+        fields = ['first_name', 'last_name', 'email', 'civil_status', 'dni', 'profession', 'address', 'score', 'job_address','adviser']
 
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')

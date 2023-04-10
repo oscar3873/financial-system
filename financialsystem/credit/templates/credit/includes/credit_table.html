@@ -33,9 +33,9 @@
                 {% endif %}
             </td>
             <td class="client"><a href="{% url 'clients:detail' credit.client.pk %}">{{credit.client}}</a></td>
-            <td class="adviser"><a href="{% url 'advisers:detail' credit.client.adviser.pk %}">
-                {% if credit.client.adviser.avatar %}
-                <img src="{{credit.client.adviser.avatar.url}}" width="36px" height="36px" class="  rounded-circle"> {% else %}
+            <td class="adviser"><a href="{% url 'advisers:detail' credit.adviser.pk %}">
+                {% if credit.adviser.avatar %}
+                <img src="{{credit.adviser.avatar.url}}" width="36px" height="36px" class="  rounded-circle"> {% else %}
                 <img src="/media/{{MEDIA_URL}}avatares/default.png" width="36px" height="36px" alt="avatar" class="rounded-circle p-2  "> {% endif %}
             </a></td>
             <td class="start_date">{{credit.start_date|date}}</td>

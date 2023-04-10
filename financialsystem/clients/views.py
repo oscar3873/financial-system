@@ -23,13 +23,12 @@ from django.urls import reverse_lazy
 
 
 #CRUD CLIENT
-from django.views.generic import ListView, DetailView, DeleteView, UpdateView, CreateView
+from django.views.generic import ListView, DetailView, DeleteView
 
 #FORMS
 from .forms import *
 #MODEL
 from .models import Client, PhoneNumberClient
-from credit.models import Refinancing
 from credit.forms import RefinancingForm
 
 from payment.forms import PaymentForm
