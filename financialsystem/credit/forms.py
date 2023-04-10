@@ -49,11 +49,6 @@ class CreditForm(forms.ModelForm):
         required=False
     )
 
-    adviser = forms.ModelChoiceField(
-        label="Asesor",
-        queryset=Adviser.objects.all(),
-    )
-
     class Meta:
         model = Credit
         fields = ["is_old_credit","amount", "interest", "installment_num", "start_date", "has_pay_stub",'adviser']
@@ -242,9 +237,14 @@ class CreditUpdateForm(forms.ModelForm):
         max_value=12,
     )
     
+    adviser = forms.ModelChoiceField(
+        label= 'Asesor',
+        queryset= Adviser.objects.all(),
+    )
+
     class Meta:
         model = Credit
-        fields = ["amount", "interest", "installment_num", "start_date"]
+        fields = ["amount", "interest", "installment_num", "start_date",'adviser']
         widgets ={
             'start_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
         }

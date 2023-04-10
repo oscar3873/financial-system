@@ -19,7 +19,7 @@
     <section class="my-4">
         <div class="row">
             <div class="col-12">
-                <p>Credito realizado el <span class="font-weight-bold">{{credit.start_date}}</span> realizado por <a href="{% url 'advisers:detail' credit.client.adviser.pk %}">{{credit.client.adviser}}</a> por un monto de <span class="font-weight-bold">$ {{credit.amount}}</span>                    en <span class="font-weight-bold">{{credit.installment_num}} cuotas </span> con un monto inicial a devolver de <span class="font-weight-bold">$ {{credit.credit_repayment_amount}}</span> <span class="text-primary">(monto sin contar refinanciaciones y atrasos
+                <p>Credito realizado el <span class="font-weight-bold">{{credit.start_date}}</span> realizado por <a href="{% url 'advisers:detail' credit.adviser.pk %}">{{credit.adviser}}</a> por un monto de <span class="font-weight-bold">$ {{credit.amount}}</span>                    en <span class="font-weight-bold">{{credit.installment_num}} cuotas </span> con un monto inicial a devolver de <span class="font-weight-bold">$ {{credit.credit_repayment_amount}}</span> <span class="text-primary">(monto sin contar refinanciaciones y atrasos
                     )</span></p>
             </div>
         </div>
