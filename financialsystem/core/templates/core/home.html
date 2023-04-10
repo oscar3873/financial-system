@@ -28,10 +28,12 @@
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                         <span>Nuevo Credito</span>
                     </a>
+                    {% if request.user.is_superuser %}
                     <a class="btn btn-secondary rounded mb-2 p-3 box-shadow" href="/accounts/signup/" role="button">
                         <i class="fa fa-user-plus" aria-hidden="true"></i>
                         <span>Nuevo Asesor</span>
                     </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
