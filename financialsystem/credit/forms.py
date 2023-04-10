@@ -239,6 +239,7 @@ class CreditUpdateForm(forms.ModelForm):
     
     adviser = forms.ModelChoiceField(
         label= 'Asesor',
+        required= True,
         queryset= Adviser.objects.all(),
     )
 
