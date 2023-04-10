@@ -134,7 +134,6 @@ class ClientListView(LoginRequiredMixin, ListView):
 def clientCreate(request):
     client_form = ClientForm(request.POST or None)
     formset_phone_client = PhoneNumberFormSet(request.POST or None, instance=Client(), prefix="phone_number_client")
-    formset_phone_client.extra= 4
 
     if request.method == 'POST':
         if client_form.is_valid() and formset_phone_client.is_valid():
@@ -152,6 +151,7 @@ def clientCreate(request):
             return redirect('clients:list')
         else:
             messages.error(request, 'Ocurrió un error al guardar el cliente.',"danger")
+            print(client_form.errors, formset_phone_client.errors)
         
     context = {
         'form': client_form,
@@ -171,7 +171,6 @@ def update_client(request, pk):
     client = get_object_or_404(Client, pk=pk)
     form = ClientForm(instance=client)
     phone_formset = PhoneNumberFormSet(instance=client)
-    phone_formset.extra = 4
 
     if request.method == 'POST':
         form = ClientForm(request.POST, instance=client)  # Update the form variable with POST data
@@ -193,6 +192,7 @@ def update_client(request, pk):
 
         else:
             print('ERROR: CLIENTE-TEL', form.errors, '-', phone_formset.errors)
+
 
     context = {
         'form': form,
