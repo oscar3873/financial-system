@@ -1,6 +1,4 @@
-{% extends "core/base.html" %}
-
-{% block content %}
+{% extends "core/base.html" %} {% block content %}
 <main class="container my-4">
     <h4 class="title font-weight-normal animate__fadeInLeft" style="animation-duration: 0.5s !important;">Formulario de Cliente</h4>
     <div class="my-4 py-2">
@@ -16,40 +14,53 @@
                             <h5 class="title p-2">Informacion basica</h5>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    {{form.first_name.label}} {{form.first_name}} <h5 class="text-danger">{{form.first_name.errors}}</h5>
+                                    {{form.first_name.label}} {{form.first_name}}
+                                    <h5 class="text-danger">{{form.first_name.errors}}</h5>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    {{form.last_name.label}} {{form.last_name}}<h5 class="text-danger">{{form.last_name.errors}}</h5>
+                                    {{form.last_name.label}} {{form.last_name}}
+                                    <h5 class="text-danger">{{form.last_name.errors}}</h5>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    {{form.email.label}} {{form.email}}<h5 class="text-danger">{{form.email.errors}}</h5>
+                                    {{form.email.label}} {{form.email}}
+                                    <h5 class="text-danger">{{form.email.errors}}</h5>
                                 </div>
                                 <div class="form-group col-md-3">
-                                    {{form.dni.label}} {{form.dni}}<h5 class="text-danger">{{form.dni.errors}}</h5>
+                                    {{form.dni.label}} {{form.dni}}
+                                    <h5 class="text-danger">{{form.dni.errors}}</h5>
                                 </div>
                                 <div class="form-group col-md-3">
-                                    {{form.civil_status.label}} {{form.civil_status}}<h5 class="text-danger">{{form.civil_status.errors}}</h5>
+                                    {{form.civil_status.label}} {{form.civil_status}}
+                                    <h5 class="text-danger">{{form.civil_status.errors}}</h5>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    {{form.address.label}} {{form.address}}<h5 class="text-danger">{{form.address.errors}}</h5>
+                                    {{form.address.label}} {{form.address}}
+                                    <h5 class="text-danger">{{form.address.errors}}</h5>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    {{form.job_address.label}} {{form.job_address}}<h5 class="text-danger">{{form.job_address.errors}}</h5>
+                                    {{form.job_address.label}} {{form.job_address}}
+                                    <h5 class="text-danger">{{form.job_address.errors}}</h5>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    {{form.profession.label}} {{form.profession}}<h5 class="text-danger">{{form.profession.errors}}</h5>
+                                    {{form.profession.label}} {{form.profession}}
+                                    <h5 class="text-danger">{{form.profession.errors}}</h5>
                                 </div>
                                 <div class="form-group col-md-2">
-                                    {{form.score.label}}{{form.score}}<h5 class="text-danger">{{form.score.errors}}</h5>
+                                    {{form.score.label}}{{form.score}}
+                                    <h5 class="text-danger">{{form.score.errors}}</h5>
+                                </div>
+                                <div class="form-group col-md-2">
+                                    {{form.adviser.label}}{{form.adviser}}
+                                    <h5 class="text-danger">{{form.adviser.errors}}</h5>
                                 </div>
                             </div>
-                            
+
                             <h5 class="title p-2"><i class="fa-solid fa-phone text-warning"></i>&nbsp;Datos de Contacto</h5>
                             <div class="form-row">
                                 <ul class="error-list">
@@ -80,24 +91,24 @@
                 </div>
             </div>
             <button type="button" class="btn btn btn-success d-block box-shadow mx-auto my-4 rounded p-2" data-toggle="modal" data-target="#confirmacionModal">Registrar Crédito</button>
-                <!-- Agregar el modal -->
-                <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="confirmacionModalLabel">Confirmar registro de servicio</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            </div>
-                            <div class="modal-body">
-                                ¿Está seguro de que desea enviar el formulario del servicio?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
-                            </div>
+            <!-- Agregar el modal -->
+            <div class="modal fade" id="confirmacionModal" tabindex="-1" role="dialog" aria-labelledby="confirmacionModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmacionModalLabel">Confirmar registro de servicio</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            ¿Está seguro de que desea enviar el formulario del servicio?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success" id="enviarFormulario">Enviar</button>
                         </div>
                     </div>
                 </div>
+            </div>
         </form>
     </div>
 </main>
