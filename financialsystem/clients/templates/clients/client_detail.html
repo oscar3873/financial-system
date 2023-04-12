@@ -319,7 +319,7 @@
                                                 {% endwith %}
                                             {% endif %} 
 
-                                            {% if credit_active.installments.first.is_paid_installment and form_payment.1 %}
+                                            {% if form_payment.1 != None %}
                                             <button type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}" data-id="{{credit_active.pk}}" id="refinancingButton{{credit_active.pk}}">
                                                 <i class="fas fa-sync-alt text-info"></i> Refinanciar
                                             </button>

@@ -55,7 +55,8 @@ def pay_installment(request, payment, installments, amount_paid):
             print('########## PAGO PARCIAL')
             payment.amount = amount_paid # PARA RELAIZAR EL MOVIMIENTO
             installment.amount -= payment.amount
-
+            installment.original_amount = installment.amount # PARA ACTUALIZAR EL MONTO A DEVOLVER EN BASE AL SALDO LUEGO DEL 50%
+            installment.daily_interests = 0
             fifteen_later_din(installment)
             payment_create(payment, installment) # PARA RELAIZAR EL MOVIMIENTO
 

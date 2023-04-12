@@ -10,17 +10,22 @@
                     <form method="post">
                         {% csrf_token %}
                         <div class="form-group">
-                            <label for="id_amount">{{ form.amount.label }}</label>
+                            <label for="id_daily_interests">{{ form.amount.label }}</label> {{ form.amount}}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_amount">{{ form.original_amount.label }}</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
                                 </div>
-                                {{ form.amount }}
+                                {{ form.original_amount }}
                                 <div class="input-group-append">
                                     <button type="button" id="enable-amount-btn" class="btn btn-secondary">Editar monto</button>
                                 </div>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label for="id_daily_interests">{{ form.daily_interests.label }}</label> {{ form.daily_interests }}
                         </div>
@@ -37,10 +42,10 @@
                             <label for="id_payment_date">{{ form.payment_date.label }}</label> {{ form.payment_date }}
                         </div>
                         <div class="form-group">
-                            <label for="id_condition">{{ form.condition.label }}</label>
-                            <div class="input-group">
-                                {{ form.condition }}
-                            </div>
+                            <label for="id_lastup">{{ form.lastup.label }}</label> {{ form.lastup }}{{ form.lastup.help_text }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_condition">{{ form.condition.label }}</label> {{ form.condition }}
                         </div>
                         <button type="submit" class="btn btn-secondary"><i class="fas fa-save text-warning"></i> Guardar</button>
                     </form>
@@ -52,85 +57,90 @@
 <script src="http://momentjs.com/downloads/moment.min.js"></script>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-      function roundToNearestSpecial(x) {
-          if (x < 150) {
-              return Math.round(x / 10) * 10;
-          } else {
-              let base = Math.round(x / 100) * 100;
-              if (x - base < 50) {
-                  return base;
-              } else {
-                  return base + 100;
-              }
-          }
-      }
+    document.addEventListener("DOMContentLoaded", function() {
+        function roundToNearestSpecial(x) {
+            if (x < 150) {
+                return Math.round(x / 10) * 10;
+            } else {
+                let base = Math.round(x / 100) * 100;
+                if (x - base < 50) {
+                    return base;
+                } else {
+                    return base + 100;
+                }
+            }
+        }
 
-  let conditionSelect = document.getElementById("id_condition");
-  let refinanceMsg = document.getElementById("refinance-msg");
+    let conditionSelect = document.getElementById("id_condition");
+    let refinanceMsg = document.getElementById("refinance-msg");
 
-      conditionSelect.addEventListener("change", function() {
-          if (conditionSelect.value === "Refinanciada") {
-              refinanceMsg.style.display = "block";
-          } else {
-              refinanceMsg.style.display = "none";
-          }
-      });
-  conditionSelect.addEventListener("change", function () {
-      if (conditionSelect.value === "Refinanciada") {
-          refinanceMsg.style.display = "block";
-      } else {
-          refinanceMsg.style.display = "none";
-      }
-  });
+        conditionSelect.addEventListener("change", function() {
+            if (conditionSelect.value === "Refinanciada") {
+                refinanceMsg.style.display = "block";
+            } else {
+                refinanceMsg.style.display = "none";
+            }
+        });
+    conditionSelect.addEventListener("change", function () {
+        if (conditionSelect.value === "Refinanciada") {
+            refinanceMsg.style.display = "block";
+        } else {
+            refinanceMsg.style.display = "none";
+        }
+    });
 
-  let amountInput = document.getElementById("id_amount");
-  let enableAmountBtn = document.getElementById("enable-amount-btn");
-  const amount_value = parseFloat(`{{installment.original_amount}}`);
+    let amountInput = document.getElementById("id_original_amount");
+    let enableAmountBtn = document.getElementById("enable-amount-btn");
 
-  // Agregar la clase "readonly" al cargar la página
-  amountInput.classList.add("readonly");
-  amountInput.readOnly = true;
+    function parseLocalizedFloat(value) {
+        return parseFloat(value.replace(/\./g, '').replace(',', '.'));
+    }
+    const amount_value=parseLocalizedFloat(`{{installment.original_amount}}`);
+    console.log(`{{installment.original_amount}}`, amount_value);
 
-      // Agregar un manejador de eventos para habilitar/deshabilitar el campo de cantidad
-      enableAmountBtn.addEventListener("click", function() {
-          if (amountInput.readOnly) {
-              amountInput.classList.remove("readonly");
-              amountInput.readOnly = false;
-              enableAmountBtn.textContent = "Deshabilitar monto";
-          } else {
-              amountInput.classList.add("readonly");
-              amountInput.readOnly = true;
-              enableAmountBtn.textContent = "Editar monto";
-          }
-      });
+    // Agregar la clase "readonly" al cargar la página
+    amountInput.classList.add("readonly");
+    amountInput.readOnly = true;
 
-  // Agregar manejadores de eventos para los campos de fecha y porcentaje
-  let endDateInput = document.getElementById("id_end_date");
-  let startDateInput = document.getElementById("id_start_date");
-  let paymentDateInput = document.getElementById("id_payment_date");
-  let porcentageInput = document.getElementById("id_porcentage_daily_interests");
-  let dailyInterestsInput = document.getElementById("id_daily_interests");
-  
-  endDateInput.addEventListener("change", calculateDailyInterests);
-  startDateInput.addEventListener("change", calculateDailyInterests)
-  paymentDateInput.addEventListener("change", calculateDailyInterests);
-  porcentageInput.addEventListener("input", calculateDailyInterests);
+        // Agregar un manejador de eventos para habilitar/deshabilitar el campo de cantidad
+        enableAmountBtn.addEventListener("click", function() {
+            if (amountInput.readOnly) {
+                amountInput.classList.remove("readonly");
+                amountInput.readOnly = false;
+                enableAmountBtn.textContent = "Deshabilitar monto";
+            } else {
+                amountInput.classList.add("readonly");
+                amountInput.readOnly = true;
+                enableAmountBtn.textContent = "Editar monto";
+            }
+        });
 
-  function calculateDailyInterests() {
-      const end_date = moment(endDateInput.value).startOf('day');
-      const payment_date = moment(paymentDateInput.value || new Date()).startOf('day');
-      const porcentage = porcentageInput.value || 0;
+    // Agregar manejadores de eventos para los campos de fecha y porcentaje
+    let endDateInput = document.getElementById("id_end_date");
+    let startDateInput = document.getElementById("id_start_date");
+    let paymentDateInput = document.getElementById("id_payment_date");
+    let porcentageInput = document.getElementById("id_porcentage_daily_interests");
+    let dailyInterestsInput = document.getElementById("id_daily_interests");
+    
+    endDateInput.addEventListener("change", calculateDailyInterests);
+    startDateInput.addEventListener("change", calculateDailyInterests)
+    paymentDateInput.addEventListener("change", calculateDailyInterests);
+    porcentageInput.addEventListener("input", calculateDailyInterests);
 
-      const days_diff_end_pay = payment_date.diff(end_date, 'days');
+    function calculateDailyInterests() {
+        const end_date = moment(endDateInput.value).startOf('day');
+        const payment_date = moment(paymentDateInput.value || new Date()).startOf('day');
+        const porcentage = porcentageInput.value || 0;
 
-      const days_diff = !isNaN(days_diff_end_pay) && days_diff_end_pay >= 0 ? days_diff_end_pay : 0.00;
-      console.log(amount_value);
-      const daily_interests = Math.round(amount_value * porcentage/100 * days_diff);
-      let interest_final = roundToNearestSpecial(daily_interests).toFixed(2);
-      dailyInterestsInput.value = interest_final;
-  }
-  calculateDailyInterests();
+        const days_diff_end_pay = payment_date.diff(end_date, 'days');
+
+        const days_diff = !isNaN(days_diff_end_pay) && days_diff_end_pay >= 0 ? days_diff_end_pay : 0.00;
+        // console.log(amount_value);
+        const daily_interests = Math.round(amount_value * porcentage/100 * days_diff);
+        let interest_final = roundToNearestSpecial(daily_interests).toFixed(2);
+        dailyInterestsInput.value = interest_final;
+    }
+    calculateDailyInterests();
 });
 </script>
 

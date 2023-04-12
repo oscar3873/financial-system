@@ -402,7 +402,7 @@ class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
     """
     model = Refinancing
     template_name = 'refinance/refinance_update.html'
-    form_class = RefinancingFormUpdate
+    form_class = RefinancingUpdateForm
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
