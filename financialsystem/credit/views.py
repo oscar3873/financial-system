@@ -396,34 +396,29 @@ def refinance_installment (request, pk):
     return redirect('clients:detail', pk=credit.client.pk)
 
 #----------------------------------------------------------------
-class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Detalle de refinanciacion.
-    """
-    model = Refinancing
-    template_name = 'refinance/refinance_update.html'
-    form_class = RefinancingUpdateForm
+def edit_reference(request, pk):
+    refinance_original = Refinancing.objects.get(id=pk)
+    refinance_copy = copy.copy(refinance_original)
+    form = RefinancingUpdateForm(instance=refinance_original)
 
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['client'] = self.object.installment_ref.first().credit.client
-        return context
-
-    def form_valid(self, form):
+    if request.method == 'POST':
+        form = RefinancingUpdateForm(request.POST, instance=refinance_original)
         if form.is_valid():
-            refinance_copy = copy.copy(self.object)
             refinance = form.save(commit=False)
 
-            if (refinance_copy.end_date != refinance.end_date) or (refinance_copy.start_date != refinance.start_date) or (refinance_copy.amount != refinance.amount) or (refinance_copy.interest != refinance.interest) or (refinance_copy.installment_num != refinance.installment_num):
+            if (refinance_copy.start_date != refinance.start_date) or (refinance_copy.refinancing_repayment_amount != refinance.refinancing_repayment_amount) or (refinance_copy.interest != refinance.interest) or (refinance_copy.installment_num != refinance.installment_num):
                 refinance.is_new = True
-        return super().form_valid(form)
+                refinance.amount = refinance.refinancing_repayment_amount
+                refinance.save()
 
-    def get_success_url(self):
-        return reverse('clients:detail', args=[self.kwargs['client'].pk])
+            messages.info(request,'Cambios realizados exitosamente',"info")
+            return redirect('clients:detail', pk = refinance.credit.client.pk)
+
+    context = {
+        'form': form,
+        'client': refinance_original.credit.client
+        }
+    return render(request, 'refinance/refinance_update.html', context)
 
 
 #-------------------------------------------------------------------
@@ -445,7 +440,7 @@ class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
     redirect_field_name = 'redirect_to'
 
     def form_valid(self, form):
-        installment = get_object_or_404(Installment, pk = self.kwargs['pk'])
+        installment = get_object_or_404(InstallmentRefinancing, pk = self.kwargs['pk'])
         if form.is_valid():
             if installment.end_date.date() != form.cleaned_data['end_date'].date():
                 form.instance.daily_interests = 0

@@ -99,7 +99,8 @@ class RefinancingForm(forms.ModelForm):
 
     class Meta:
         model = Refinancing
-        fields = ["amount", "installment_num"]
+        fields = ["amount", "installment_num","start_date"]
+        labels = {"start_date": "Fecha de Inicio"}
 
 
     def __init__(self,credit,*args, **kwargs):
@@ -112,7 +113,15 @@ class RefinancingForm(forms.ModelForm):
         self.fields['amount'].widget.attrs['id'] = 'id_amount{}'.format(credit.pk)  # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
         self.fields['installment_num'].widget.attrs['id'] = 'id_installment_num{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
         self.fields['installment_amount'].widget.attrs['id'] = 'id_installment_amount{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
-        
+        self.fields['start_date'].widget= forms.DateInput(attrs={ # CAMBIO DE POSICION DEL WIDGET POR BUG (NO ACTUALIZABA FECHA)
+            'class': 'form-control',
+            'type': 'date',
+            'value': timezone.now().date()
+            },format="%Y-%m-%d")
+
+        self.fields['start_date'].widget.attrs['id'] = 'id_start_date{}'.format(credit.pk)
+        self.fields['installment_num'].widget.attrs['class'] = 'form-control'
+
         for installment in installments:
             if installment == credit.installments.first():
                 self.fields['cuota_%s' %str(installment.installment_number)] = forms.BooleanField(
@@ -143,7 +152,7 @@ class RefinancingUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Refinancing
-        fields = ["amount", "interest", "installment_num", "start_date", "end_date", "payment_date"]
+        fields = ["refinancing_repayment_amount", "interest", "installment_num", "start_date", "end_date", "payment_date"]
         widgets ={
             'start_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
             'end_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
@@ -152,7 +161,7 @@ class RefinancingUpdateForm(forms.ModelForm):
         labels = {
             'installment_num':'Numero de cuotas',
             'interest':'Interes',
-            'amount':'Monto',
+            'refinancing_repayment_amount':'Monto solicitado',
             'start_date': 'Fecha de Inicio',
             'end_date': 'Fecha de Vencimiento',
         }
@@ -206,7 +215,8 @@ class InstallmentRefinancingUpdateForm(forms.ModelForm):
         labels = {
             'amount': 'Monto',
             'end_date': 'Fecha de Vencimiento',
-            'start_date': 'Fecha de Vencimiento',
+            'original_amount': 'Valor de Cuota',
+            'start_date': 'Fecha de Inicio',
             'payment_date': 'Fecha de pago',
             'lastup': 'Fecha de Ultima actualizacion',
             'condition': 'Condición',
@@ -215,7 +225,7 @@ class InstallmentRefinancingUpdateForm(forms.ModelForm):
 
         }
         widgets = {
-            'amount': forms.NumberInput(attrs={'class': 'form-control', 'readonly':True}),
+            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'original_amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
             'porcentage_daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),

@@ -357,8 +357,11 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="row mt-3">
-                                                                    <div class="col-12">
+                                                                    <div class="col-5">
                                                                         <i class="fas fa-list-ol"></i> {{form_refinance.installment_num.label_tag}} {{form_refinance.installment_num}}
+                                                                    </div>
+                                                                    <div class="col-5">
+                                                                        <i class="fas fa-calendar-alt"></i> {{form_refinance.start_date.label_tag}} {{form_refinance.start_date}}
                                                                     </div>
                                                                 </div>
                                                                 <div class="row mt-3">
@@ -673,11 +676,15 @@
                     porcentaje = 100;
                     break;
             }
+            
             const selectorValue = parseFloat(selector.value);
-            const subtotal = round_to_nearest_hundred((sum * (porcentaje + 100) / 100).toFixed(2));
+        
+            const subtotal = round_to_nearest_hundred(sum * (1+ porcentaje / 100).toFixed(2));
             const installment_amount = round_to_nearest_hundred((subtotal / selectorValue).toFixed(2));
             const total = installment_amount * selectorValue;
 
+            console.log(subtotal, sum);
+            
             sumElement.value = `${total}`;
             installment_value.value = `${installment_amount}`;
         };

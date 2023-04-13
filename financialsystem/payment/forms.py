@@ -55,8 +55,8 @@ class PaymentForm(forms.ModelForm):
     
     class Meta:
         model = Payment
-        fields = ["amount", "payment_date", "payment_method"]
-
+        fields = ["amount", "payment_date", "payment_method","adviser"]
+        labels = {'adviser':'Asesor'}
     
     def __init__(self,installments,*args, **kwargs):
         """
@@ -64,8 +64,8 @@ class PaymentForm(forms.ModelForm):
         """
         super(PaymentForm, self).__init__(*args, **kwargs)
 
+        self.fields['adviser'].widget.attrs['class'] = 'form-control'
         self.fields['amount_paid'].initial = round_to_nearest_hundred(Decimal((sum([installment.amount for installment in installments.filter(is_caduced_installment=True).exclude(is_paid_installment=True, condition="Pagada")]))/2))
-
         self.fields['payment_date'].widget= forms.DateInput(attrs={ # CAMBIO DE POSICION DEL WIDGET POR BUG (NO ACTUALIZABA FECHA)
             'class': 'form-control',
             'type': 'date',
@@ -77,6 +77,10 @@ class PaymentForm(forms.ModelForm):
             'type': 'time',
             'value': datetime.now().time().strftime('%H:%M')
             })
+        
+
+        
+
 
         if installments.count() > 0:
             for installment in installments:

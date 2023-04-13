@@ -4,7 +4,6 @@ from django.db import models
 from clients.models import Client
 from cashregister.models import Movement
 from django.db.models.signals import post_save, pre_save, pre_delete
-from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
@@ -284,9 +283,12 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
     """
     Crea cuotas de Refinanciacion.
     """
-    if created:
+    if not instance.is_new or created:
+        try:
+            instance.installments.all().delete()
+        except: pass
         refinancing = instance
-        amount_installment = Decimal(refinancing.refinancing_repayment_amount/refinancing.installment_num)
+        amount_installment = round_to_nearest_hundred(Decimal(refinancing.refinancing_repayment_amount/refinancing.installment_num))
 
         start_date = instance.start_date
         for numberInstallments in range(refinancing.installment_num):
