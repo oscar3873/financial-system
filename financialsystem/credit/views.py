@@ -109,7 +109,7 @@ class CreditListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["count_credits"] = self.model.objects.all().count()
         credits = self.model.objects.all()
-        
+
         # Crear un objeto Paginator para dividir los resultados en páginas
         paginator = Paginator(credits, self.paginate_by)
         page_number = self.request.GET.get('page')    # Obtener el número de página actual
@@ -172,7 +172,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
-        """        
+        """
         formset = PhoneNumberFormSetG(instance=Guarantor(), prefix="phone_number_guarantor")
 
         context = super().get_context_data(**kwargs)
@@ -196,7 +196,7 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             client = get_object_or_404(Client, pk=selected_client_id)
             credit = form.save(commit=False)
             credit.client = client
-            
+
             ask_is_old(credit, form.instance.adviser)
 
             # Validar el formulario de garantía
@@ -402,7 +402,7 @@ class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
     """
     model = Refinancing
     template_name = 'refinance/refinance_update.html'
-    form_class = RefinancingFormUpdate
+    form_class = RefinancingUpdateForm
 
     #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
@@ -491,7 +491,7 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
             if installment.end_date.date() != form.cleaned_data['end_date'].date():
                 form.instance.daily_interests = 0
                 form.instance.lastup = form.instance.end_date.date()
-            
+
             if installment.end_date < installment.start_date:
                 form.instance.end_date = installment.end_date
                 form.instance.start_date = installment.start_date

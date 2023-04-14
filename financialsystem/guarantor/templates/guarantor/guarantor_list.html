@@ -95,10 +95,10 @@
                                 </thead>
                                 <tbody>
                                     {% for guarantor in guarantors %}
-                                    <tr class="open-offcanvas" onclick="showOffcanvas(`{{guarantor.id}}`)">    
+                                    <tr class="open-offcanvas" onclick="showOffcanvas(`{{guarantor.id}}`)">
                                         <div id="offcanvas{{guarantor.id}}" class="card bg-primary text-white offcanvas">
                                             <div class="card-body">
-                                                <a href="{% url 'guarantors:detail' guarantor.pk %}"><p class="m-0 text-white text-link" style="font-size: 2rem;text-decoration:none!important;">{{guarantor.first_name}} {{guarantor.last_name}}</p></a>
+                                                <p class="m-0 text-white text-link" style="font-size: 2rem;text-decoration:none!important;">{{guarantor.first_name}} {{guarantor.last_name}}</p>
                                                 <h5 class="m-0">Contacto</h5>
                                                 <ul class="list p-0">
                                                     {% if guarantor.phonenumberguarantor_set.all %}
@@ -155,16 +155,16 @@
                                                 <span>
                                                     <strong>
                                                     {% if guarantor.credits_g.all %}
-                                                        {% for credit in guarantor.credits_g.all %}    
+                                                        {% for credit in guarantor.credits_g.all %}
                                                         <a href="{% url 'clients:detail' credit.client.pk %}" class="text-warning">
                                                             {{credit}}
                                                         </a>
                                                         {% endfor %}
                                                     {% else %}
-                                                        <span>No hay registros o caducaron</span> 
+                                                        <span>No hay registros o caducaron</span>
                                                     {% endif %}
                                                     </strong>
-                                                </span>                                              
+                                                </span>
                                                 <h5 class="title pt-3">Acciones</h5>
                                                 <a type="button" class="btn" data-toggle="modal" data-target="#GuarantorDelete{{guarantor.id}}"><i class="fas fa-trash-alt text-danger"></i> &nbsp;</a>
                                                 <a href="/guarantors/update/{{guarantor.id}}" ><i class="fas fa-edit text-info"></i></a>
@@ -174,12 +174,12 @@
                                                 <p><strong>{{guarantor.created_at}}</strong></p>
                                             </div>
                                         </div>
-                                    
+
                                         <td>{{guarantor.first_name}} {{guarantor.last_name}}</td>
                                         <td>{{guarantor.dni}}</td>
 
                                         {% if guarantor.credits_g.all %}
-                                            {% if guarantor.credits_g.count > 1 %}    
+                                            {% if guarantor.credits_g.count > 1 %}
                                                 <td>{{guarantor.credits_g.first}}&nbsp; +{{guarantor.credits_g.count|add:-1}}</td>
                                             {% else %}
                                                 <td>{{guarantor.credits_g.first}}</td>
@@ -273,7 +273,7 @@
             offcanvas.classList.add("open");
             overlay.style.display = "block";
         };
-        
+
         shownow();
 
         overlay.addEventListener("click", function() {

@@ -6,67 +6,24 @@ from credit.models import Credit
 #FORMULARIO PARA LA CREACION DEL EMPEÑO
 #------------------------------------------------------------------
 class WarrantyForm(forms.ModelForm):
-    
-    ARTICLE_STATE = (
-        ('NUEVO','NUEVO'),
-        ('USADO:COMO NUEVO', 'USADO:COMO NUEVO'),
-        ('USADO:MUY BUENO', 'USADO:MUY BUENO'),
-        ('USADO:BUENO', 'USADO:BUENO'),
-        ('USADO:ACEPTABLE', 'USADO:ACEPTABLE'),
-        ('USADO:REACONDICIONADO', 'USADO:REACONDICIONADO'),
-        ('USADO:MUCHO USO', 'USADO:MUCHO USO'),
-    )
-    
-    article = forms.CharField(
-        label = 'Articulo',
-    )
-    
-    state = forms.ChoiceField(
-        choices= ARTICLE_STATE,
-        label= "Estado"
-    )
-    
-    brand = forms.CharField(
-        label= "Marca",
-    )
 
-    model = forms.CharField(
-        label= "Modelo",
-    ) 
-    
-    accessories = forms.CharField(
-        label= "Accesorios",
-    )
-
-    purchase_papers = forms.BooleanField(
-        label= 'Papeles',
-        initial= False,
-        widget= forms.Select(
-            attrs={'class': 'form-control'}, 
-            choices=[(True,"SI"),(False,"NO")]
-            )
-        )
-
-    detail = forms.CharField(
-        label="Observaciones",
-    )
 
     class Meta:
         model = Warranty
         fields = "__all__"
         exclude = ['credit','is_selled']
-    
+
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super(WarrantyForm,self).__init__(*args, **kwargs)
-        
+
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
         # Eliminar validación requerida
         for field in self.fields.values():
             field.required = False
-            
+
 
 class SellForm(forms.ModelForm):
     MONEY_TYPE = [
@@ -134,24 +91,24 @@ class WarrantyUpdateForm(forms.ModelForm):
         label="¿Esta vendido el articulo?",
         required=False
     )
-    
+
     article = forms.CharField(
         label = 'Articulo',
     )
-    
+
     state = forms.ChoiceField(
         choices= ARTICLE_STATE,
         label= "Estado"
     )
-    
+
     brand = forms.CharField(
         label= "Marca",
     )
 
     model = forms.CharField(
         label= "Modelo",
-    ) 
-    
+    )
+
     accessories = forms.CharField(
         label= "Accesorios",
     )
@@ -159,6 +116,7 @@ class WarrantyUpdateForm(forms.ModelForm):
     purchase_papers = forms.BooleanField(
         label= 'Papeles',
         initial= False,
+        required = False,
     )
 
     detail = forms.CharField(
@@ -170,19 +128,19 @@ class WarrantyUpdateForm(forms.ModelForm):
         model = Warranty
         fields = "__all__"
         exclude = ['credit']
-    
+
     #ASOCIACION DE CRYSPY FORM
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
 
 #----------------------------------------------------------------
 WarrantyFormSet = inlineformset_factory(
-    Credit, 
-    Warranty, 
+    Credit,
+    Warranty,
     form = WarrantyForm,
     extra= 1,
     can_delete= True,

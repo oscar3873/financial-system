@@ -10,17 +10,22 @@
                     <form method="post">
                         {% csrf_token %}
                         <div class="form-group">
-                            <label for="id_amount">{{ form.amount.label }}</label>
+                            <label for="id_daily_interests">{{ form.amount.label }}</label> {{ form.amount}}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="id_amount">{{ form.original_amount.label }}</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
                                 </div>
-                                {{ form.amount }}
+                                {{ form.original_amount }}
                                 <div class="input-group-append">
                                     <button type="button" id="enable-amount-btn" class="btn btn-secondary">Editar monto</button>
                                 </div>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label for="id_daily_interests">{{ form.daily_interests.label }}</label> {{ form.daily_interests }}
                         </div>
@@ -35,6 +40,9 @@
                         </div>
                         <div class="form-group">
                             <label for="id_payment_date">{{ form.payment_date.label }}</label> {{ form.payment_date }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_lastup">{{ form.lastup.label }}</label> {{ form.lastup }}{{ form.lastup.help_text }}
                         </div>
                         <div class="form-group">
                             <label for="id_condition">{{ form.condition.label }}</label>
@@ -85,7 +93,7 @@
         }
     });
 
-    let amountInput = document.getElementById("id_amount");
+    let amountInput = document.getElementById("id_original_amount");
     let enableAmountBtn = document.getElementById("enable-amount-btn");
 
     function parseLocalizedFloat(value) {

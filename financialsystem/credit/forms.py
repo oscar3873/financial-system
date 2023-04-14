@@ -139,7 +139,7 @@ class RefinancingForm(forms.ModelForm):
                     )
 
 
-class RefinancingFormUpdate(forms.ModelForm):
+class RefinancingUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Refinancing
@@ -168,11 +168,16 @@ class InstallmentUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Installment
-        fields = ['amount', 'daily_interests', 'porcentage_daily_interests', 'start_date', 'end_date', 'payment_date', 'condition']  
+        fields = ['amount', 'daily_interests', 'porcentage_daily_interests', 'start_date', 'end_date', 'payment_date', 'condition', 'original_amount', 'lastup']  
+        help_texts = {
+            'lastup': 'Uso para calculos de intereses "Desde ..."',
+        }
         labels = {
             'amount': 'Monto',
+            'original_amount': 'Valor de Cuota',
             'end_date': 'Fecha de Vencimiento',
             'start_date': 'Fecha de Inicio',
+            'lastup': 'Fecha de Ultima actualizacion',
             'payment_date': 'Fecha de pago',
             'condition': 'Condición',
             'daily_interests' : 'Intereses generados',
@@ -180,8 +185,10 @@ class InstallmentUpdateForm(forms.ModelForm):
         }
         widgets = {
             'amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'original_amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
             'porcentage_daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
+            'lastup': forms.DateInput(attrs={'class': 'form-control','type': 'date'}, format='%Y-%m-%d'),
             'payment_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'}, format='%Y-%m-%d'),
             'end_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format='%Y-%m-%d'),
             'start_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format='%Y-%m-%d'),
@@ -192,12 +199,16 @@ class InstallmentRefinancingUpdateForm(forms.ModelForm):
     
     class Meta:
         model = InstallmentRefinancing
-        fields = ['amount', 'daily_interests', 'porcentage_daily_interests', 'start_date', 'end_date', 'payment_date', 'condition']  
+        fields = ['amount', 'daily_interests', 'porcentage_daily_interests', 'start_date', 'end_date', 'payment_date', 'condition', 'original_amount', 'lastup']  
+        help_texts = {
+            'lastup': 'Uso para calculos de intereses "Desde ..."',
+        }
         labels = {
             'amount': 'Monto',
             'end_date': 'Fecha de Vencimiento',
             'start_date': 'Fecha de Vencimiento',
             'payment_date': 'Fecha de pago',
+            'lastup': 'Fecha de Ultima actualizacion',
             'condition': 'Condición',
             'daily_interests' : 'Intereses generados',
             'porcentage_daily_interests' : 'Porcentaje de interes diario'
@@ -205,8 +216,10 @@ class InstallmentRefinancingUpdateForm(forms.ModelForm):
         }
         widgets = {
             'amount': forms.NumberInput(attrs={'class': 'form-control', 'readonly':True}),
+            'original_amount': forms.NumberInput(attrs={'class': 'form-control'}),
             'daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
             'porcentage_daily_interests': forms.NumberInput(attrs={'class': 'form-control'}),
+            'lastup': forms.DateInput(attrs={'class': 'form-control','type': 'date'}, format='%Y-%m-%d'),
             'payment_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'}, format= '%Y-%m-%d'),
             'end_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format= '%Y-%m-%d'),
             'start_date': forms.DateInput(attrs={'class': 'form-control','type': 'date'},format='%Y-%m-%d'),

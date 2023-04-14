@@ -16,14 +16,14 @@ def payment_create(payment, installment):
         'adviser': payment.adviser,
         'payment_method': payment.payment_method,
     }
-    
+
     if isinstance(installment, Installment):
         payment_dict['installment'] = installment
         payment_dict['detail'] = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.credit.client, payment.adviser)
     else:
         payment_dict['installment_ref'] = installment
         payment_dict['detail'] = 'COBRO CUOTA REFINANCIADA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.refinancing.installment_ref.last().credit.client, payment.adviser)
-        
+
     Payment.objects.create(**payment_dict)
 
 
@@ -54,8 +54,9 @@ def pay_installment(request, payment, installments, amount_paid):
         elif amount_paid >= Decimal(installment.amount / Decimal(2)):
             print('########## PAGO PARCIAL')
             payment.amount = amount_paid # PARA RELAIZAR EL MOVIMIENTO
+            installment.original_amount = installment.amount # PARA ACTUALIZAR EL MONTO A DEVOLVER EN BASE AL SALDO LUEGO DEL 50%
             installment.amount -= payment.amount
-
+            installment.daily_interests = 0
             fifteen_later_din(installment)
             payment_create(payment, installment) # PARA RELAIZAR EL MOVIMIENTO
 
