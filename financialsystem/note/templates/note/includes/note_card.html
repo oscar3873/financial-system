@@ -13,9 +13,42 @@
                     {% endif %}
                     </a>
                 </h4>
-                <p class="description">{{note.content|truncatewords:20}}</p>
+                <p class="description">{{note.content|truncatewords:5}}</p>
+                <div class="text-center">
+                    <a class="btn" data-toggle="modal" data-target="#{{note.pk}}"><i class="fas fa-trash-alt text-danger"></i></a>
+                    <a href="{% url 'notes:update' note.pk %}"><i class="fas fa-edit text-info btn"></i></a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+<!--Delete Modal-->
+<div class="modal fade" id="{{note.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{note.pk}}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-primary text-white">
+            <form method="POST" action="{% url 'notes:delete' note.id %}">
+                {% csrf_token %}
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                </div>
+                <div class="modal-body">
+                    <span>Esta seguro que desea borrar </span>
+                    <p>Titulo: <span class="strong">{{ note.title }}</span></p>
+                    <p>Description: <span class="strong">{{ note.content }}</span></p>
+                    <p>Realizada el <span class="strong">{{note.created_at}}</span></p>
+                    <p>Por {{note.user}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger">Si, borrar</button>
+                    <button type="button" class="btn btn-secondary m-2 p-2" data-dismiss="modal">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--End Delete Modal-->
+
 <!-- end card -->
