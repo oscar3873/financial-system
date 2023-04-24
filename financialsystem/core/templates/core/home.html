@@ -138,7 +138,8 @@
                         <ul class="swiper-wrapper p-0 list" style="cursor: pointer;">
                             {% for note in notes %}
                             <li class="swiper-slide list-group-item border-0 m-0 p-0" style="background-color: #F5F7FA;">
-                                <link href="{% static 'note/css/note.css' %}" rel="stylesheet"> {% include "note/includes/note_card.html" %}
+                                <link href="{% static 'note/css/note.css' %}" rel="stylesheet"> 
+                                {% include "note/includes/note_card_basic.html" %}
                             </li>
                             {% empty %}
                             <li class="swiper-slide list-group-item border-0" style="min-height: 150px;">

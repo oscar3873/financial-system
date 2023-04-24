@@ -39,7 +39,36 @@
         {% if notes %}
         <h5>Notas Generales</h5>
         <div class="row">
-            {% for note in notes %} {% include "note/includes/note_card.html" %} {% endfor %}
+            {% for note in notes %} {% include "note/includes/note_card.html" %} 
+            <!--Delete Modal-->
+            <div class="modal fade" id="{{note.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{note.pk}}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content bg-primary text-white">
+                        <form method="POST" action="{% url 'notes:delete' note.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <span>Esta seguro que desea borrar </span>
+                                <p>Titulo: <span class="strong">{{ note.title }}</span></p>
+                                <p>Description: <span class="strong">{{ note.content }}</span></p>
+                                <p>Realizada el <span class="strong">{{note.created_at}}</span></p>
+                                <p>Por {{note.user}}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-danger">Si, borrar</button>
+                                <button type="button" class="btn btn-secondary m-2 p-2" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--End Delete Modal-->
+            {% endfor %}
         </div>
         {% else %}
         <h5 class="title font-weight-normal">No hay Notas Registradas</h5>
