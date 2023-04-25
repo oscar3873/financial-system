@@ -439,11 +439,14 @@
                                     <td>{{installment.end_date|date}}</td>
                                     <td>
                                         {% if installment.is_paid_installment %}
-                                        <strong><i class="fas fa-check text-success"></i></strong> {% elif installment.condition == 'A Tiempo' %}
-                                        <strong><i class="fas fa-clock text-warning"></i></strong> {% elif installment.is_caduced_installment %}
-                                        <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong> {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
-                                        <a href="{% url 'credits:refinance_detail' installment.pk %}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a> {% elif installments.1.0 %}
-                                        <a data-toggle="collapse" href="#collapseRefinancing-{{ installment.pk }}" role="button" aria-expanded="false" aria-controls="collapseRefinancing-{{ installment.pk }}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>                                        {% endif %}
+                                            <strong><i class="fas fa-check text-success"></i></strong> 
+                                        {% elif installment.condition == 'A Tiempo' %}
+                                            <strong><i class="fas fa-clock text-warning"></i></strong> 
+                                        {% elif installment.is_caduced_installment %}
+                                            <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong> 
+                                        {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
+                                            <a href="{% url 'credits:refinance_detail' installment.pk %}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a> {% elif installments.1.0 %}
+                                            <a data-toggle="collapse" href="#collapseRefinancing-{{ installment.pk }}" role="button" aria-expanded="false" aria-controls="collapseRefinancing-{{ installment.pk }}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>                                        {% endif %}
                                     </td>
                                     <td>
                                         <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
@@ -504,9 +507,12 @@
                                                     <td>{{installment_ref.end_date|date}}</td>
                                                     <td>
                                                         {% if installment_ref.condition == 'A Tiempo' %}
-                                                        <strong><i class="fas fa-clock text-warning"></i></strong> {% elif installment_ref.is_caduced_installment %}
-                                                        <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong> {% else %}
-                                                        <strong><i class="fas fa-check text-success"></i></strong> {% endif %}
+                                                            <strong><i class="fas fa-clock text-warning"></i></strong> 
+                                                        {% elif installment_ref.is_paid_installment %}
+                                                            <strong><i class="fas fa-check text-success"></i></strong> 
+                                                        {% else %}
+                                                            <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong> 
+                                                        {% endif %}
                                                     </td>
                                                     <td>
                                                         <a href="{% url 'credits:installmentRef_update' installment_ref.pk %}"><i class="fas fa-edit"></i></a>
