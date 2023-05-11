@@ -49,6 +49,13 @@ class CreditForm(forms.ModelForm):
         required=False
     )
 
+    adviser = forms.ModelChoiceField(
+        label= 'Asesor',
+        queryset= Adviser.objects.all(),
+        required=True
+    )
+
+
     class Meta:
         model = Credit
         fields = ["is_old_credit","amount", "interest", "installment_num", "start_date", "has_pay_stub",'adviser']
@@ -59,7 +66,8 @@ class CreditForm(forms.ModelForm):
         self.adviser = kwargs["initial"].pop('adviser')
         super().__init__(*args, **kwargs)
         
-        self.fields['adviser'].initial = self.adviser 
+        self.fields['adviser'].initial = self.adviser
+        self.fields['adviser'].requerid = True
 
         for field_name in self.fields:
             field = self.fields.get(field_name)
@@ -263,6 +271,7 @@ class CreditUpdateForm(forms.ModelForm):
     adviser = forms.ModelChoiceField(
         label= 'Asesor',
         queryset= Adviser.objects.all(),
+        required=True
     )
 
     class Meta:

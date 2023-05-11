@@ -36,13 +36,13 @@
                 <td>{{client.created_at|date}}</td>
             </tr>
             <!--Delete Modal-->
-            <div class="modal fade" id="exampleModal{{client.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{client.pk}}" aria-hidden="true">
+            <div class="modal fade" id="DeleteClient{{client.pk}}" tabindex="-1" role="dialog" aria-labelledby="DeleteClient{{client.pk}}" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content bg-primary text-white">
                         <form method="POST" action="{% url 'clients:delete' client.id %}">
                             {% csrf_token %}
                             <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title" id="exampleModalLabel">Eliminar Movimiento</h5>
+                                <h5 class="modal-title" id="DeleteClient">Eliminar Movimiento</h5>
                                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>

@@ -57,7 +57,6 @@ def for_refresh(obj_with_vencidas):
             installment_ven.end_date = new_end_date
 
         resto = abs((date.today() - installment_ven.lastup).days)
-        print(resto)
        # resto = abs((date.today() - installment_ven.end_date.date()).days) #RECALCULO DESDE DIA DE VENCIMIENTO HASTA EL DIA DE HOY
         actualice(resto, installment_ven)
         installment_ven.lastup = date.today()

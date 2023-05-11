@@ -36,10 +36,10 @@ def pay_installment(request, payment, installments, amount_paid):
         messages.warning(request, 'Este crédito no puede poseer el beneficio "pausa por 15 días"', 'warning')
         return
 
-    amount_list = installments.values_list('amount', flat=True)
-    if amount_paid < sum(amount_list) / 2:
-        messages.error(request, 'No puede recibir pago menor al 50% de la deuda!', 'danger')
-        return
+    # amount_list = installments.values_list('amount', flat=True)
+    # if amount_paid < sum(amount_list) / 2:
+    #     messages.error(request, 'No puede recibir pago menor al 50% de la deuda!', 'danger')
+    #     return
 
     for installment in installments:
         if installment.amount <= amount_paid:
@@ -64,9 +64,12 @@ def pay_installment(request, payment, installments, amount_paid):
 
         else:  # SI EL RESTANTE NO SUPERA LOS 50% DE LA DEUDA
             print("######### DISMINUYE MONTO SOBRANTE")
+            payment.amount = amount_paid # PARA RELAIZAR EL MOVIMIENTO
             installment.amount -= amount_paid # DISMINUYE EL MONTO
+            installment.daily_interests = max(installment.daily_interests - amount_paid, 0) # PARA ACTUALIZAR EL MONTO A DEVOLVER EN BASE AL SALDO LUEGO DEL 50%
+            installment.save()
 
-            fifteen_later_din(installment)
+            payment_create(payment, installment) # PARA RELAIZAR EL MOVIMIENTO
             amount_paid = 0
 
 

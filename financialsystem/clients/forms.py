@@ -75,7 +75,7 @@ class ClientForm(forms.ModelForm):
         if len(last_name) < 3:
             raise forms.ValidationError("El apellido debe contener al menos 3 caracteres")
         return str(last_name).title()
-        return str(last_name).title()
+        
 
     def clean_dni(self):
         """
