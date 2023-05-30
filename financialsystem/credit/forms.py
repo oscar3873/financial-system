@@ -60,7 +60,6 @@ class CreditForm(forms.ModelForm):
         min_value= 1,
         max_value=100,
         decimal_places=2,
-        initial= Decimal(Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2),
         max_digits= 6,
         required=True,
     )
@@ -73,9 +72,11 @@ class CreditForm(forms.ModelForm):
         
         self.adviser = kwargs["initial"].pop('adviser')
         super().__init__(*args, **kwargs)
-        
-        self.fields['adviser'].initial = self.adviser
+
         self.fields['adviser'].requerid = True
+
+        self.fields['adviser'].initial = self.adviser
+        self.fields['interest_daily'].initial = Decimal(Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2)
 
         for field_name in self.fields:
             field = self.fields.get(field_name)
@@ -118,7 +119,6 @@ class RefinancingForm(forms.ModelForm):
         min_value= 1,
         max_value=100,
         decimal_places=2,
-        initial=Decimal(Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2),
         max_digits= 6,
         required=True,
     )
@@ -152,6 +152,8 @@ class RefinancingForm(forms.ModelForm):
         self.fields['start_date'].widget.attrs['id'] = 'id_start_date{}'.format(credit.pk)
         self.fields['installment_num'].widget.attrs['class'] = 'form-control'
         self.fields['interest_daily'].widget.attrs['class'] = 'form-control'
+
+        self.fields['interest_daily'].initial = Decimal(Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2)
 
         for installment in installments:
             if installment == credit.installments.first():
