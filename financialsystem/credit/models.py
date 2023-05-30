@@ -206,6 +206,7 @@ def create_installments_auto(instance, created, *args, **kwargs):
             numberInstms = numberInstallments + 1
             
             credit.installments.create(
+                porcentage_daily_interests=instance._porcentage_daily_interests,
                 installment_number=numberInstms, 
                 start_date = start_date,
                 credit= credit, 
@@ -235,7 +236,6 @@ def update_installment(instance, *args, **kwargs):
         instance.is_paid_installment = False
         instance.is_caduced_installment = False    
 
-
 def delete_installment(instance, *args, **kwargs):
     try: 
         instance.refinance.delete()
@@ -248,11 +248,13 @@ def delete_credit(instance, *args, **kwargs):
             instance.mov.delete()
     except:
         pass
-
+    
 
 pre_save.connect(repayment_amount_auto, sender= Credit)
+
 pre_save.connect(update_installment, sender=Installment)
 pre_save.connect(update_installment, sender=InstallmentRefinancing)
+
 
 post_save.connect(create_installments_auto, sender= Credit)
 
@@ -283,7 +285,9 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
     """
     Crea cuotas de Refinanciacion.
     """
+    
     if not instance.is_new or created:
+        print("########AQUIIII##########")
         try:
             instance.installments.all().delete()
         except: pass
@@ -296,6 +300,7 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
             numberInstms = numberInstallments + 1
             
             refinancing.installments.create(
+                porcentage_daily_interests = instance._porcentage_daily_interests,
                 installment_number=numberInstms, 
                 start_date = start_date,
                 credit= refinancing.credit, 

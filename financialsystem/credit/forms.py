@@ -18,7 +18,7 @@ class CreditForm(forms.ModelForm):
     interest = forms.IntegerField(
         label= "Intereses",
         required= True,
-        initial= Interest.objects.first().interest_credit if not Interest.DoesNotExist else 40,
+        initial= Interest.objects.first().interest_credit if not Interest.DoesNotExist() else 40,
         min_value= 0,
         max_value= 100
     )
@@ -55,7 +55,15 @@ class CreditForm(forms.ModelForm):
         required=True
     )
 
-
+    interest_daily = forms.DecimalField(
+        label= "Interes diario",
+        min_value= 1,
+        max_value=100,
+        decimal_places=2,
+        initial= Decimal(Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2),
+        max_digits= 6,
+        required=True,
+    )
     class Meta:
         model = Credit
         fields = ["is_old_credit","amount", "interest", "installment_num", "start_date", "has_pay_stub",'adviser']
@@ -98,17 +106,30 @@ class RefinancingForm(forms.ModelForm):
     )
 
     installment_num = forms.ChoiceField(
-        label= "Numero de Cuotas",
+        label= "Num. de Cuotas",
         choices=CHOICES,
         initial=CHOICES[0],
         required= True,
         widget=forms.Select()
     )
 
+    interest_daily = forms.DecimalField(
+        label= "Interes diario",
+        min_value= 1,
+        max_value=100,
+        decimal_places=2,
+        initial=Decimal(Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2),
+        max_digits= 6,
+        required=True,
+    )
+
     class Meta:
         model = Refinancing
         fields = ["amount", "installment_num","start_date"]
-        labels = {"start_date": "Fecha de Inicio"}
+        labels = {
+            "start_date": "Fecha de Inicio",
+            "porcentage_daily_interests": "Porcentaje de interes diario"
+            }
 
 
     def __init__(self,credit,*args, **kwargs):
@@ -120,6 +141,7 @@ class RefinancingForm(forms.ModelForm):
 
         self.fields['amount'].widget.attrs['id'] = 'id_amount{}'.format(credit.pk)  # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
         self.fields['installment_num'].widget.attrs['id'] = 'id_installment_num{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
+        self.fields['interest_daily'].widget.attrs['id'] = 'id_interest_daily{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS  
         self.fields['installment_amount'].widget.attrs['id'] = 'id_installment_amount{}'.format(credit.pk)    # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
         self.fields['start_date'].widget= forms.DateInput(attrs={ # CAMBIO DE POSICION DEL WIDGET POR BUG (NO ACTUALIZABA FECHA)
             'class': 'form-control',
@@ -129,6 +151,7 @@ class RefinancingForm(forms.ModelForm):
 
         self.fields['start_date'].widget.attrs['id'] = 'id_start_date{}'.format(credit.pk)
         self.fields['installment_num'].widget.attrs['class'] = 'form-control'
+        self.fields['interest_daily'].widget.attrs['class'] = 'form-control'
 
         for installment in installments:
             if installment == credit.installments.first():
@@ -158,6 +181,14 @@ class RefinancingForm(forms.ModelForm):
 
 class RefinancingUpdateForm(forms.ModelForm):
 
+    interest_daily = forms.DecimalField(
+        label= "Interes diario",
+        min_value= 1,
+        max_value=100,
+        decimal_places=2,
+        max_digits= 6,
+        required=True,
+    )
     class Meta:
         model = Refinancing
         fields = ["refinancing_repayment_amount", "interest", "installment_num", "start_date", "end_date", "payment_date"]
@@ -167,7 +198,7 @@ class RefinancingUpdateForm(forms.ModelForm):
             'payment_date': forms.DateInput(attrs={'type': 'date'},format="%Y-%m-%d"),
         }
         labels = {
-            'installment_num':'Numero de cuotas',
+            'installment_num':'Num. de Cuotas',
             'interest':'Interes',
             'refinancing_repayment_amount':'Monto solicitado',
             'start_date': 'Fecha de Inicio',
@@ -176,6 +207,10 @@ class RefinancingUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['interest_daily'].widget.attrs['class'] = 'form-control'
+        self.fields['interest_daily'].initial = Decimal(self.instance.installments.first().porcentage_daily_interests)
+
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})
@@ -251,7 +286,7 @@ class CreditUpdateForm(forms.ModelForm):
     interest = forms.IntegerField(
         label= "Intereses",
         required= True,
-        initial= Interest.objects.first().interest_credit if not Interest.DoesNotExist else 40,
+        initial= Interest.objects.first().interest_credit if not Interest.DoesNotExist() else 40,
         min_value= 0,
         max_value= 100
     )
@@ -274,6 +309,14 @@ class CreditUpdateForm(forms.ModelForm):
         required=True
     )
 
+    interest_daily = forms.DecimalField(
+        label= "Interes diario",
+        min_value= 1,
+        max_value=100,
+        decimal_places=2,
+        max_digits= 6,
+        required=True,
+    )
     class Meta:
         model = Credit
         fields = ["amount", "interest", "installment_num", "start_date",'adviser']
@@ -283,6 +326,9 @@ class CreditUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields['interest_daily'].initial = Decimal(self.instance.installments.first().porcentage_daily_interests)
+
         for field_name in self.fields:
             field = self.fields.get(field_name)
             field.widget.attrs.update({'class': 'form-control'})

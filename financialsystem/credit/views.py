@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
 
-
+from datetime import date
 import copy
 
 from cashregister.utils import create_cashregister
@@ -50,6 +50,8 @@ def crear_credito(request):
 
             credit = credit_form.save(commit=False)
             credit.client = client
+            print(credit_form.cleaned_data["interest_daily"])
+            credit._porcentage_daily_interests = credit_form.cleaned_data["interest_daily"]
             ask_is_old(credit, credit_form.instance.adviser)
 
             guarantor = guarantor_form.save(commit=False)
@@ -155,6 +157,7 @@ from django.shortcuts import get_object_or_404
 class AssociateCreateView(CreateView, LoginRequiredMixin):
     """
     Asocia un crédito por crear a un cliente.
+    Crea creadito y busca a que cliente asociarselo.
     """
     model = Credit
     form_class = CreditForm
@@ -196,6 +199,8 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             client = get_object_or_404(Client, pk=selected_client_id)
             credit = form.save(commit=False)
             credit.client = client
+            print(form.cleaned_data["interest_daily"])
+            credit._porcentage_daily_interests = form.cleaned_data["interest_daily"]
             
             ask_is_old(credit, form.instance.adviser)
 
@@ -281,6 +286,8 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
             client = self.client
             credit = form.save(commit=False)
             credit.client = client
+            print(form.cleaned_data["interest_daily"])
+            credit._porcentage_daily_interests = form.cleaned_data["interest_daily"]
 
             ask_is_old(credit, form.instance.adviser)
 
@@ -339,10 +346,12 @@ def edit_credit(request, pk):
         form = CreditUpdateForm(request.POST, instance=credit_original)
         if form.is_valid():
             credit = form.save(commit=False)
+            credit._porcentage_daily_interests = form.cleaned_data["interest_daily"]
+            update_porcentage(credit)
 
             if (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.interest != credit.interest) or (credit_copy.installment_num != credit.installment_num):
                 credit.is_old_credit = False
-                credit.save()
+            credit.save()
 
             messages.info(request,'Cambios realizados exitosamente',"info")
             return redirect('credits:list')
@@ -392,11 +401,12 @@ def refinance_installment (request, pk):
                     installment.is_refinancing_installment = True
                     installment.refinance = refinancing
                     installment.save()
-
+    else:
+        print("PASE AQUI", form.errors)
     return redirect('clients:detail', pk=credit.client.pk)
 
 #----------------------------------------------------------------
-def edit_reference(request, pk):
+def edit_refinance(request, pk):
     refinance_original = Refinancing.objects.get(id=pk)
     refinance_copy = copy.copy(refinance_original)
     form = RefinancingUpdateForm(instance=refinance_original)
@@ -405,11 +415,13 @@ def edit_reference(request, pk):
         form = RefinancingUpdateForm(request.POST, instance=refinance_original)
         if form.is_valid():
             refinance = form.save(commit=False)
+            refinance._porcentage_daily_interests = form.cleaned_data["interest_daily"]
+            update_porcentage(refinance)
 
             if (refinance_copy.start_date != refinance.start_date) or (refinance_copy.refinancing_repayment_amount != refinance.refinancing_repayment_amount) or (refinance_copy.interest != refinance.interest) or (refinance_copy.installment_num != refinance.installment_num):
                 refinance.is_new = True
                 refinance.amount = refinance.refinancing_repayment_amount
-                refinance.save()
+            refinance.save()
 
             messages.info(request,'Cambios realizados exitosamente',"info")
             return redirect('clients:detail', pk = refinance.credit.client.pk)
@@ -442,6 +454,10 @@ class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         installment = get_object_or_404(InstallmentRefinancing, pk = self.kwargs['pk'])
         if form.is_valid():
+
+            if installment.porcentage_daily_interests != form.cleaned_data['porcentage_daily_interests']:
+                update_installments_porcentage(installment, form.cleaned_data['porcentage_daily_interests'])
+            
             if installment.end_date.date() != form.cleaned_data['end_date'].date():
                 form.instance.daily_interests = 0
                 form.instance.lastup = form.instance.end_date.date()
@@ -474,6 +490,10 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         installment = get_object_or_404(Installment, pk=self.kwargs['pk'])
         if form.is_valid():
+
+            if installment.porcentage_daily_interests != form.cleaned_data['porcentage_daily_interests']:
+                update_installments_porcentage(form.instance, form.cleaned_data['porcentage_daily_interests'])
+
             if not installment.payment_date and form.cleaned_data['payment_date']:
                 form.instance.condition = 'Pagada'
 
@@ -502,3 +522,27 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('clients:detail', args=[self.object.credit.client.pk])
+    
+
+def update_installments_porcentage(installment, new_porcentage):
+    installment.amount -= installment.daily_interests
+    installment.porcentage_daily_interests = Decimal(new_porcentage)
+    days = (date().today().date() - installment.end_date.date()).days
+
+    if installment.daily_interests > 0 and installment.porcentage_daily_interests > 0:
+        installment.daily_interests = Decimal(installment.daily_interests / installment.porcentage_daily_interests * 100)
+    elif days > 0:
+        installment.daily_interests = Decimal(installment.original_amount * Decimal(installment.porcentage_daily_interests / 100) * days)
+    else:
+        installment.daily_interests = 0
+
+    installment.amount += installment.daily_interests
+
+def update_porcentage(instance):
+    if instance._porcentage_daily_interests:
+        for instalment in instance.installments.all():
+            instalment.amount -=instalment.daily_interests
+            times = (instalment.daily_interests / (instalment.original_amount * instalment.porcentage_daily_interests))
+            instalment.daily_interests = times* (instance._porcentage_daily_interests*instalment.original_amount)
+            instalment.porcentage_daily_interests = instance._porcentage_daily_interests
+            instalment.amount += instalment.daily_interests
