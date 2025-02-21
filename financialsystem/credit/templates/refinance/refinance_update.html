@@ -20,7 +20,7 @@
                                 {{form.end_date.label}} {{form.end_date}}
                             </div>
                             <div class="form-group col-md-12">
-                                {{form.amount.label}} {{form.amount}}
+                                {{form.refinancing_repayment_amount.label}} {{form.refinancing_repayment_amount}}
                             </div>
                             <div class="form-group col-md-2">
                                 {{form.installment_num.label}} {{form.installment_num}}
@@ -28,7 +28,15 @@
                             <div class="form-group col-md-2">
                                 {{form.interest.label}} {{form.interest}}
                             </div>
-                            
+                            <div class="form-group col-md-2">
+                                {{ form.interest_daily.label }}
+                                <div class="input-group">
+                                    {{ form.interest_daily }}
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer p-1 bg-secondary box-shadow rounded-bottom"></div>

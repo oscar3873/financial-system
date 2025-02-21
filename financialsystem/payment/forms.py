@@ -30,7 +30,7 @@ class PaymentForm(forms.ModelForm):
     )
 
     amount_paid = forms.DecimalField(   # AGREGA CAMPO DE PAGO PARCIAL PARA TOMAR EL MONTO QUE SE DESEA PAGAR
-        label='Pago por cantidad (solo para cuotas vencidas)', 
+        label='Pago por cantidad (solo para cuotas vencidas)',
         min_value=0,
         help_text="Recomendable pagar el 50% de la deuda",
         widget=forms.NumberInput(attrs={'class': 'form-control'})
@@ -42,7 +42,7 @@ class PaymentForm(forms.ModelForm):
     )
 
     payment_time = forms.TimeField(
-        label="Fecha de Pago",
+        label="Hora de Pago",
         required=True
     )
 
@@ -52,31 +52,35 @@ class PaymentForm(forms.ModelForm):
         choices=MONEY_TYPE,
         required=True
     )
-    
+
     class Meta:
         model = Payment
-        fields = ["amount", "payment_date", "payment_method"]
+        fields = ["amount", "payment_date", "payment_method","adviser"]
+        labels = {'adviser':'Asesor'}
 
-    
     def __init__(self,installments,*args, **kwargs):
         """
         Formulario de Pagos. Mediante 'checkboxs', selecciona cuotas a pagar.
         """
         super(PaymentForm, self).__init__(*args, **kwargs)
 
+        self.fields['adviser'].widget.attrs['class'] = 'form-control'
         self.fields['amount_paid'].initial = round_to_nearest_hundred(Decimal((sum([installment.amount for installment in installments.filter(is_caduced_installment=True).exclude(is_paid_installment=True, condition="Pagada")]))/2))
-
         self.fields['payment_date'].widget= forms.DateInput(attrs={ # CAMBIO DE POSICION DEL WIDGET POR BUG (NO ACTUALIZABA FECHA)
             'class': 'form-control',
             'type': 'date',
             'value': timezone.now().date()
             })
-        
+
         self.fields['payment_time'].widget= forms.TimeInput(attrs={ # CAMBIO DE POSICION DEL WIDGET POR BUG (NO ACTUALIZABA HORA)
             'class': 'form-control',
             'type': 'time',
             'value': datetime.now().time().strftime('%H:%M')
             })
+
+
+
+
 
         if installments.count() > 0:
             for installment in installments:
@@ -90,9 +94,9 @@ class PaymentForm(forms.ModelForm):
                     form = "form_payment%s" % installment.refinancing.pk
                     self.fields['amount'].widget.attrs.update({'id': "id_payment-amount%s" % installment.refinancing.pk}) # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
                     self.fields['amount_paid'].widget.attrs.update({'id': "id_amount_paid%s" % installment.refinancing.pk}) # AGREGA ID PARA IDENTIFICACION EN .HTML >> JS
- 
+
                 attrs = {"value": (installment.amount), "id":form}
-                
+
 
                 self.fields['cuota_%s' % (str(installment.installment_number))] = forms.BooleanField(
                     label='Cuota %s %s' % (str(installment.installment_number), daily_interests),required=False,

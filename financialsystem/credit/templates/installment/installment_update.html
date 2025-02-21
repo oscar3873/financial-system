@@ -14,16 +14,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="id_amount">{{ form.original_amount.label }}</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
-                                </div>
-                                {{ form.original_amount }}
-                                <div class="input-group-append">
-                                    <button type="button" id="enable-amount-btn" class="btn btn-secondary">Editar monto</button>
-                                </div>
-                            </div>
+                            <label for="id_daily_interests">{{ form.original_amount.label }}</label> {{ form.original_amount }}
                         </div>
 
                         <div class="form-group">
@@ -60,7 +51,7 @@
 </div>
 <script src="http://momentjs.com/downloads/moment.min.js"></script>
 
-<script>
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         function roundToNearestSpecial(x) {
             if (x < 150) {
@@ -146,6 +137,6 @@
     }
     calculateDailyInterests();
 });
-</script>
+</script> -->
 
 {% endblock %}

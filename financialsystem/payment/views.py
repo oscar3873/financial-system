@@ -33,8 +33,8 @@ class PaymentListView(LoginRequiredMixin, ListView):
 
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
-    
-  
+
+
 
     def get_context_data(self, **kwargs):
         """
@@ -46,7 +46,7 @@ class PaymentListView(LoginRequiredMixin, ListView):
         context["count_payments"] = self.model.objects.all().count()
         context["payments"] = self.model.objects.all()
         context["properties"] = all_properties_paymnet()
-        
+
         return context
 
 #BORRADO DE UNA NOTA
@@ -60,7 +60,7 @@ class PaymentDeleteView(LoginRequiredMixin, DeleteView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-       
+
     def get_success_url(self) -> str:
         """
         Obtiene la URL de redirección después de que se ha eliminado correctamente.
@@ -74,7 +74,7 @@ class PaymentDeleteView(LoginRequiredMixin, DeleteView):
 class PaymentUpdateView(LoginRequiredMixin, UpdateView):
     """
     Actualización de un pago.
-    """	
+    """
     model = Payment
     form_class = PaymentForm
     template_name_suffix = '_update_form'
@@ -83,7 +83,7 @@ class PaymentUpdateView(LoginRequiredMixin, UpdateView):
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
-            
+
     def get_form_kwargs(self):
         """
         Función que se encarga de obtener los parámetros del formulario.
@@ -91,7 +91,7 @@ class PaymentUpdateView(LoginRequiredMixin, UpdateView):
         kwargs = super(PaymentUpdateView, self).get_form_kwargs()
         kwargs['request'] = self.request
         return kwargs
-    
+
     def get_success_url(self) -> str:
         """
         Obtiene la URL de redirección después de que se ha eliminado correctamente.
@@ -99,7 +99,7 @@ class PaymentUpdateView(LoginRequiredMixin, UpdateView):
         """
         messages.info(self.request, 'Pago actualizada satisfactoriamente',"info")
         return  reverse_lazy('payments:list')
-    
+
 #REALIZAR DE UN PAGO
 #------------------------------------------------------------------
 @login_required(login_url="/accounts/login/")
@@ -126,17 +126,17 @@ def make_payment_installment(request, pk):
         payment = form.save(commit=False)
         payment_date = form.cleaned_data['payment_date']
         payment_time = form.cleaned_data['payment_time']
-        
+
         # Unir los valores de payment_date y payment_time en un solo objeto datetime
         payment.payment_date = dt.combine(payment_date,payment_time)
-        
+
         installment_ = list(installments.all())
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('cuota')}
 
         pack = dict(zip(installment_, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
         payment.adviser = request.user.adviser
-        
+
         if count_value == 0 :
             payment.amount = installment_amount
             installments_caduced = installments.filter(is_caduced_installment=True).filter(end_date__date__lte=F('lastup'))
@@ -149,8 +149,14 @@ def make_payment_installment(request, pk):
                     installment.is_paid_installment = True
                     installment.payment_date = payment.payment_date
                     installment.save()
+                    credit = installment.credit
+                    if credit.installments.filter(is_paid_installment=True).count() == credit.installments.count():
+                        credit.condition = 'Pagado'
+                        credit.payment_date = credit.installments.last().payment_date
+                        credit.is_paid = True
+                        credit.save()
                     payment_create(payment, installment)
-            
+
             interest = Interest.objects.first()
             points_per_installments = interest.points_score_credits if isinstance(installments, Installment) else interest.points_score_refinancing
             score = round((points_per_installments/installments_score) * count_value)
@@ -158,8 +164,7 @@ def make_payment_installment(request, pk):
 
             if (client.score + score) >= 1499:
                 client.score = 1500
-                
             client.save()
-            
+
     return redirect('clients:detail', pk=client.pk)
-    
+

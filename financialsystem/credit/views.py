@@ -6,8 +6,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.db.models import Count, Prefetch
 
-
+from datetime import date
 import copy
 
 from cashregister.utils import create_cashregister
@@ -15,6 +16,7 @@ from cashregister.utils import create_cashregister
 from .utils import *
 
 from .models import Credit, Installment, InstallmentRefinancing
+from commissions.models import Interest
 from clients.models import Client
 from guarantor.models import Guarantor
 
@@ -50,6 +52,10 @@ def crear_credito(request):
 
             credit = credit_form.save(commit=False)
             credit.client = client
+            porcentage = Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2
+            if credit_form.cleaned_data['interest_daily'] >= 0:
+                porcentage = credit_form.cleaned_data['interest_daily']
+            credit._porcentage_daily_interests = porcentage
             ask_is_old(credit, credit_form.instance.adviser)
 
             guarantor = guarantor_form.save(commit=False)
@@ -88,63 +94,90 @@ def crear_credito(request):
 #------------------------------------------------------------------
 class CreditListView(LoginRequiredMixin, ListView):
     """
-    Lista de creditos.
+    Lista de créditos.
     """
     model = Credit
     template_name = 'credit/credit_list.html'
     ordering = ['-id']
-    paginate_by = 5
+    paginate_by = 10
 
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
+    def get_queryset(self):
+        """
+        Optimiza la obtención de datos con prefetch_related.
+        """
+        # Prefetch las relaciones necesarias aquí, si aplica
+        return self.model.objects.all()
 
     def get_context_data(self, **kwargs):
         """
-        Extrae los datos de los creditos de la base de datos para usarlos en el contexto.
+        Extrae los datos de los créditos optimizados para el contexto.
         """
-        refresh_condition()
+
         create_cashregister()
         context = super().get_context_data(**kwargs)
-        context["count_credits"] = self.model.objects.all().count()
-        credits = self.model.objects.all()
 
-        # Crear un objeto Paginator para dividir los resultados en páginas
+        # Evita múltiples llamadas a la base de datos para los créditos
+        credits = self.get_queryset()
         paginator = Paginator(credits, self.paginate_by)
-        page_number = self.request.GET.get('page')    # Obtener el número de página actual
+        page_number = self.request.GET.get('page')
 
-        # Obtener la página actual del objeto Paginator
+        # Solo se refrescan las condiciones en la primer pagina, esto demora pero solo tiene sentido hacerlo una vez al principio y luego las demas paginas no aplicarlo
+        # En un futuro puede ser un boton para refrescar o una tarea periodica en segundo plano cada X tiempo asi no afecta el tiempo de carga
+        #if page_number is None or page_number == "1":
+        #    refresh_condition()
         page_obj = paginator.get_page(page_number)
-        # Agregar la página actual al contexto
-        context["credits"] = page_obj
 
+        context["credits"] = page_obj
+        context["count_credits"] = paginator.count  # Más eficiente que .count() en cada request
         context["properties"] = all_properties_credit()
         return context
 
-class CreditDetailView(DetailView, LoginRequiredMixin):
+
+class CreditDetailView(LoginRequiredMixin, DetailView):
     """
-    Detalle	del credito.
+    Detalle del crédito.
     """
     model = Credit
     template_name = 'credit/credit_detail.html'
 
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
     login_url = "/accounts/login/"
     redirect_field_name = 'redirect_to'
 
     def get_context_data(self, **kwargs):
+        """
+        Optimiza las consultas para cuotas e información refinanciada.
+        """
         context = super().get_context_data(**kwargs)
-        installments = context["credit"].installments.all()
+        credit = context["credit"]
+
+        # Usar prefetch_related para cuotas relacionadas
+        installments = credit.installments.all()
+        ref_in_installments = Installment.objects.filter(
+            credit=credit, is_refinancing_installment=True
+        ).select_related('refinance')
+
+        # Optimiza la consulta a cuotas refinanciadas
+        installments_ref = []
+        for inst in ref_in_installments:
+            installments_ref.extend(inst.refinance.installments.all())
+
         context["installments"] = installments
-        ref_in_installments = Installment.objects.filter(credit=context["credit"], is_refinancing_installment=True)
-        # Crea una lista de todas las cuotas refinanciadas de los objetos en la lista ref_in_installments
-        installments_ref = [inst_ref for inst in ref_in_installments for inst_ref in inst.refinance.installments.all()]
         context["installments_ref"] = installments_ref
         return context
 
     def get_object(self):
-        return get_object_or_404(Credit, pk=self.kwargs['pk'])
+        """
+        Obtiene el objeto de manera eficiente.
+        """
+        return get_object_or_404(
+            self.model.objects.prefetch_related(
+                Prefetch('installments')  # Prefetch las relaciones necesarias
+            ),
+            pk=self.kwargs['pk']
+        )
 
 
 #ASOCIACION MEDIANTE CREACION DE UN CREDITO
@@ -155,6 +188,7 @@ from django.shortcuts import get_object_or_404
 class AssociateCreateView(CreateView, LoginRequiredMixin):
     """
     Asocia un crédito por crear a un cliente.
+    Crea creadito y busca a que cliente asociarselo.
     """
     model = Credit
     form_class = CreditForm
@@ -196,6 +230,10 @@ class AssociateCreateView(CreateView, LoginRequiredMixin):
             client = get_object_or_404(Client, pk=selected_client_id)
             credit = form.save(commit=False)
             credit.client = client
+            porcentage = Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2
+            if form.cleaned_data['interest_daily'] >= 0:
+                porcentage = form.cleaned_data['interest_daily']
+            credit._porcentage_daily_interests = porcentage
 
             ask_is_old(credit, form.instance.adviser)
 
@@ -281,6 +319,10 @@ class CreditCreateTo(LoginRequiredMixin, CreateView):
             client = self.client
             credit = form.save(commit=False)
             credit.client = client
+            porcentage = Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2
+            if form.cleaned_data['interest_daily'] >= 0:
+                porcentage = form.cleaned_data['interest_daily']
+            credit._porcentage_daily_interests = porcentage
 
             ask_is_old(credit, form.instance.adviser)
 
@@ -339,10 +381,15 @@ def edit_credit(request, pk):
         form = CreditUpdateForm(request.POST, instance=credit_original)
         if form.is_valid():
             credit = form.save(commit=False)
+            porcentage = Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2
+            if form.cleaned_data['interest_daily'] >= 0:
+                porcentage = form.cleaned_data['interest_daily']
+            credit._porcentage_daily_interests = porcentage
+            update_porcentage(form.instance)
 
             if (credit_copy.start_date != credit.start_date) or (credit_copy.amount != credit.amount) or (credit_copy.interest != credit.interest) or (credit_copy.installment_num != credit.installment_num):
                 credit.is_old_credit = False
-                credit.save()
+            credit.save()
 
             messages.info(request,'Cambios realizados exitosamente',"info")
             return redirect('credits:list')
@@ -374,7 +421,7 @@ def refinance_installment (request, pk):
     """
     Refiancia cuotas y actualiza sus estados.
     """
-    refresh_condition()
+    #refresh_condition()
     credit = get_object_or_404(Credit, id = pk)
     form = RefinancingForm(credit, request.POST or None)
     if request.method == 'POST':
@@ -385,45 +432,48 @@ def refinance_installment (request, pk):
             refinancing = form.save(commit=False)
             refinancing.credit = credit
             refinancing.is_new = True
+            porcentage = Interest.objects.first().porcentage_daily_interest if Interest.DoesNotExist() else 2
+            if form.cleaned_data['interest_daily'] >= 0:
+                porcentage = form.cleaned_data['interest_daily']
+            refinancing._porcentage_daily_interests = porcentage
             refinancing.save()
+
             for installment in pack.keys():
                 if pack[installment]:
                     installment.condition = 'Refinanciada'
                     installment.is_refinancing_installment = True
                     installment.refinance = refinancing
                     installment.save()
-
+    else:
+        print("PASE AQUI", form.errors)
     return redirect('clients:detail', pk=credit.client.pk)
 
 #----------------------------------------------------------------
-class RefinancingUpdateView(LoginRequiredMixin, UpdateView):
-    """
-    Detalle de refinanciacion.
-    """
-    model = Refinancing
-    template_name = 'refinance/refinance_update.html'
-    form_class = RefinancingUpdateForm
+def edit_refinance(request, pk):
+    refinance_original = Refinancing.objects.get(id=pk)
+    refinance_copy = copy.copy(refinance_original)
+    form = RefinancingUpdateForm(instance=refinance_original)
 
-    #CARACTERISTICAS DEL LOGINREQUIREDMIXIN
-    login_url = "/accounts/login/"
-    redirect_field_name = 'redirect_to'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['client'] = self.object.installment_ref.first().credit.client
-        return context
-
-    def form_valid(self, form):
+    if request.method == 'POST':
+        form = RefinancingUpdateForm(request.POST, instance=refinance_original)
         if form.is_valid():
-            refinance_copy = copy.copy(self.object)
             refinance = form.save(commit=False)
+            refinance._porcentage_daily_interests = form.cleaned_data['interest_daily']
+            update_porcentage(form.instance)
 
-            if (refinance_copy.end_date != refinance.end_date) or (refinance_copy.start_date != refinance.start_date) or (refinance_copy.amount != refinance.amount) or (refinance_copy.interest != refinance.interest) or (refinance_copy.installment_num != refinance.installment_num):
+            if (refinance_copy.start_date != refinance.start_date) or (refinance_copy.refinancing_repayment_amount != refinance.refinancing_repayment_amount) or (refinance_copy.interest != refinance.interest) or (refinance_copy.installment_num != refinance.installment_num):
                 refinance.is_new = True
-        return super().form_valid(form)
+                refinance.amount = refinance.refinancing_repayment_amount
+            refinance.save()
 
-    def get_success_url(self):
-        return reverse('clients:detail', args=[self.kwargs['client'].pk])
+            messages.info(request,'Cambios realizados exitosamente',"info")
+            return redirect('clients:detail', pk = refinance.credit.client.pk)
+
+    context = {
+        'form': form,
+        'client': refinance_original.credit.client
+        }
+    return render(request, 'refinance/refinance_update.html', context)
 
 
 #-------------------------------------------------------------------
@@ -445,8 +495,13 @@ class InstallmentRefUpdateView(LoginRequiredMixin, UpdateView):
     redirect_field_name = 'redirect_to'
 
     def form_valid(self, form):
-        installment = get_object_or_404(Installment, pk = self.kwargs['pk'])
+        installment = get_object_or_404(InstallmentRefinancing, pk = self.kwargs['pk'])
         if form.is_valid():
+
+            if installment.porcentage_daily_interests != form.cleaned_data['porcentage_daily_interests']:
+                print(installment.porcentage_daily_interests , form.cleaned_data['porcentage_daily_interests'])
+                update_installments_porcentage(form.instance)
+
             if installment.end_date.date() != form.cleaned_data['end_date'].date():
                 form.instance.daily_interests = 0
                 form.instance.lastup = form.instance.end_date.date()
@@ -479,6 +534,10 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         installment = get_object_or_404(Installment, pk=self.kwargs['pk'])
         if form.is_valid():
+
+            if installment.porcentage_daily_interests != form.cleaned_data['porcentage_daily_interests']:
+                update_installments_porcentage(form.instance)
+
             if not installment.payment_date and form.cleaned_data['payment_date']:
                 form.instance.condition = 'Pagada'
 
@@ -507,3 +566,29 @@ class InstallmentUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('clients:detail', args=[self.object.credit.client.pk])
+
+
+def update_installments_porcentage(instance):
+    instance.amount -= instance.daily_interests
+    days = (date().today().date() - instance.end_date.date()).days
+
+    print("porcentaje actual:",instance.porcentage_daily_interests , "porcentaje nuevo:",instance.porcentage_daily_interests)
+    print("interes actual:", instance.daily_interests)
+
+    if instance.daily_interests > 0 :
+        instance.daily_interests = Decimal((instance.original_amount * instance.porcentage_daily_interests/100) * days)
+
+    print("interes actual:", instance.daily_interests)
+    instance.porcentage_daily_interests = Decimal(instance.porcentage_daily_interests)
+    instance.amount = Decimal(instance.original_amount + instance.daily_interests)
+
+
+def update_porcentage(instance):
+    if instance._porcentage_daily_interests:
+        for instalment in instance.installments.all():
+            instalment.amount -=instalment.daily_interests
+            times = (instalment.daily_interests / (instalment.original_amount * instalment.porcentage_daily_interests))
+            instalment.daily_interests = times* (instance._porcentage_daily_interests*instalment.original_amount)
+            instalment.porcentage_daily_interests = instance._porcentage_daily_interests
+            instalment.amount += instalment.daily_interests
+            instalment.save()

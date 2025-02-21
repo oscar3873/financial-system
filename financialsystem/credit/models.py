@@ -4,7 +4,6 @@ from django.db import models
 from clients.models import Client
 from cashregister.models import Movement
 from django.db.models.signals import post_save, pre_save, pre_delete
-from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
@@ -207,6 +206,7 @@ def create_installments_auto(instance, created, *args, **kwargs):
             numberInstms = numberInstallments + 1
             
             credit.installments.create(
+                porcentage_daily_interests=instance._porcentage_daily_interests,
                 installment_number=numberInstms, 
                 start_date = start_date,
                 credit= credit, 
@@ -236,7 +236,6 @@ def update_installment(instance, *args, **kwargs):
         instance.is_paid_installment = False
         instance.is_caduced_installment = False    
 
-
 def delete_installment(instance, *args, **kwargs):
     try: 
         instance.refinance.delete()
@@ -249,11 +248,13 @@ def delete_credit(instance, *args, **kwargs):
             instance.mov.delete()
     except:
         pass
-
+    
 
 pre_save.connect(repayment_amount_auto, sender= Credit)
+
 pre_save.connect(update_installment, sender=Installment)
 pre_save.connect(update_installment, sender=InstallmentRefinancing)
+
 
 post_save.connect(create_installments_auto, sender= Credit)
 
@@ -284,9 +285,14 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
     """
     Crea cuotas de Refinanciacion.
     """
-    if created:
+    
+    if not instance.is_new or created:
+        print("########AQUIIII##########")
+        try:
+            instance.installments.all().delete()
+        except: pass
         refinancing = instance
-        amount_installment = Decimal(refinancing.refinancing_repayment_amount/refinancing.installment_num)
+        amount_installment = round_to_nearest_hundred(Decimal(refinancing.refinancing_repayment_amount/refinancing.installment_num))
 
         start_date = instance.start_date
         for numberInstallments in range(refinancing.installment_num):
@@ -294,6 +300,7 @@ def create_installmentsR_auto(instance, created, *args, **kwargs):
             numberInstms = numberInstallments + 1
             
             refinancing.installments.create(
+                porcentage_daily_interests = instance._porcentage_daily_interests,
                 installment_number=numberInstms, 
                 start_date = start_date,
                 credit= refinancing.credit, 

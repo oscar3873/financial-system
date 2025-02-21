@@ -320,7 +320,6 @@
                                             {% endif %}
 
                                             {% if form_payment.1 != None %}
-
                                             <button type="button" class="btn btn-primary p-3" data-toggle="modal" data-target="#Refinancing{{credit_active.pk}}" data-id="{{credit_active.pk}}" id="refinancingButton{{credit_active.pk}}">
                                                 <i class="fas fa-sync-alt text-info"></i> Refinanciar
                                             </button>
@@ -358,8 +357,20 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="row mt-3">
-                                                                    <div class="col-12">
+                                                                    <div class="col-4">
                                                                         <i class="fas fa-list-ol"></i> {{form_refinance.installment_num.label_tag}} {{form_refinance.installment_num}}
+                                                                    </div>
+                                                                    <div class="col-4">
+                                                                        <i class="fas fa-calendar-alt"></i> {{form_refinance.start_date.label_tag}} {{form_refinance.start_date}}
+                                                                    </div>
+                                                                    <div class="form-group col-md-4">
+                                                                        {{ form_refinance.interest_daily.label }}
+                                                                        <div class="input-group">
+                                                                            {{ form_refinance.interest_daily }}
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text">%</span>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="row mt-3">
@@ -437,11 +448,14 @@
                                     <td>{{installment.end_date|date}}</td>
                                     <td>
                                         {% if installment.is_paid_installment %}
-                                        <strong><i class="fas fa-check text-success"></i></strong> {% elif installment.condition == 'A Tiempo' %}
-                                        <strong><i class="fas fa-clock text-warning"></i></strong> {% elif installment.is_caduced_installment %}
-                                        <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong> {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
-                                        <a href="{% url 'credits:refinance_detail' installment.pk %}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a> {% elif installments.1.0 %}
-                                        <a data-toggle="collapse" href="#collapseRefinancing-{{ installment.pk }}" role="button" aria-expanded="false" aria-controls="collapseRefinancing-{{ installment.pk }}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>                                        {% endif %}
+                                            <strong><i class="fas fa-check text-success"></i></strong>
+                                        {% elif installment.condition == 'A Tiempo' %}
+                                            <strong><i class="fas fa-clock text-warning"></i></strong>
+                                        {% elif installment.is_caduced_installment %}
+                                            <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong>
+                                        {% elif installment.is_paid_installment and installment.is_refinancing_installment %}
+                                            <a href="{% url 'credits:refinance_detail' installment.pk %}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a> {% elif installments.1.0 %}
+                                            <a data-toggle="collapse" href="#collapseRefinancing-{{ installment.pk }}" role="button" aria-expanded="false" aria-controls="collapseRefinancing-{{ installment.pk }}"><strong><i class="fas fa-sync-alt text-info"></i></strong></a>                                        {% endif %}
                                     </td>
                                     <td>
                                         <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
@@ -502,9 +516,12 @@
                                                     <td>{{installment_ref.end_date|date}}</td>
                                                     <td>
                                                         {% if installment_ref.condition == 'A Tiempo' %}
-                                                        <strong><i class="fas fa-clock text-warning"></i></strong> {% elif installment_ref.is_caduced_installment %}
-                                                        <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong> {% else %}
-                                                        <strong><i class="fas fa-check text-success"></i></strong> {% endif %}
+                                                            <strong><i class="fas fa-clock text-warning"></i></strong>
+                                                        {% elif installment_ref.is_paid_installment %}
+                                                            <strong><i class="fas fa-check text-success"></i></strong>
+                                                        {% else %}
+                                                            <strong><i class="fas fa-exclamation-triangle text-danger"></i></strong>
+                                                        {% endif %}
                                                     </td>
                                                     <td>
                                                         <a href="{% url 'credits:installmentRef_update' installment_ref.pk %}"><i class="fas fa-edit"></i></a>
@@ -674,10 +691,14 @@
                     porcentaje = 100;
                     break;
             }
+
             const selectorValue = parseFloat(selector.value);
-            const subtotal = round_to_nearest_hundred((sum * (porcentaje + 100) / 100).toFixed(2));
+
+            const subtotal = round_to_nearest_hundred(sum * (1+ porcentaje / 100).toFixed(2));
             const installment_amount = round_to_nearest_hundred((subtotal / selectorValue).toFixed(2));
             const total = installment_amount * selectorValue;
+
+            console.log(subtotal, sum);
 
             sumElement.value = `${total}`;
             installment_value.value = `${installment_amount}`;

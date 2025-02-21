@@ -57,7 +57,6 @@ class ClientListView(LoginRequiredMixin, ListView):
         """
         Extrae los datos de los clientes que se encuentran en la base de datos para usarlo en el contexto.
         """
-        refresh_condition()
         create_cashregister()
 
         # Obtén los objetos clients filtrados
@@ -68,7 +67,8 @@ class ClientListView(LoginRequiredMixin, ListView):
         paginator = Paginator(filtered_clients.qs, self.paginate_by)
         page = self.request.GET.get('page')
         clients_paginated = paginator.get_page(page)
-
+        #if page is None or page == "1":
+        #    refresh_condition()
         context = super().get_context_data(**kwargs)
         # Etiqueta para el día actual
         today = timezone.now().date()
@@ -138,7 +138,7 @@ def clientCreate(request):
     if request.method == 'POST':
         if client_form.is_valid() and formset_phone_client.is_valid():
             client = client_form.save(commit=False)
-            client.adviser = request.user.adviser
+            #client.adviser = request.user.adviser
             client.save()
 
             phone_numbers = formset_phone_client.save(commit=False)
@@ -152,7 +152,7 @@ def clientCreate(request):
         else:
             messages.error(request, 'Ocurrió un error al guardar el cliente.',"danger")
             print(client_form.errors, formset_phone_client.errors)
-        
+
     context = {
         'form': client_form,
         'formsetPhoneClient': formset_phone_client,
@@ -184,7 +184,7 @@ def update_client(request, pk):
                 if phone_number.phone_number_c:
                     phone_number.client = client
                     phone_number.save()
-            
+
             for phone_number in phone_formset.deleted_objects:
                 phone_number.delete()
             messages.success(request, 'Los datos del cliente se actualizaron correctamente.','success')
@@ -224,7 +224,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
         Con Formularios de Pago y Refianciacion para realizar las respectivas actividades dentro del msimo template.
         """
 
-        refresh_condition()
+        #refresh_condition()
         context = super().get_context_data(**kwargs)
         context["credits"] = context["client"].credits.all().order_by("created_at")
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")
@@ -282,7 +282,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
         for credit in credits_active:
             installments_list = []
             installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-        
+
             forms_payments.append(PaymentForm(installments=installments) if installments else None)
             form_refinancings.append(RefinancingForm(credit=credit) if installments else None)
 

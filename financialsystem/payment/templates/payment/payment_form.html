@@ -27,16 +27,19 @@
                             <div class="form-group col-md-4">
                                 {{form_payment.payment_date.label}} {{form_payment.payment_date}}
                             </div>
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 {{form_payment.payment_time.label}} {{form_payment.payment_time}}
+                            </div>
+                            <div class="form-group col-md-5">
+                                {{form_payment.adviser.label}} {{form_payment.adviser}}
                             </div>
                         </div>
                         <p>{{form_payment.payment_method.label}} {{form_payment.payment_method}}</p>
-                        
-                        <button class="btn btn-secondary mt-2" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                            
+                        <button class="btn btn-secondary mt-2" type="button" data-toggle="collapse" data-target="#collapseExample{{credit_active.pk}}" aria-expanded="false" aria-controls="collapseExample">
                             Pago parcial
                         </button>
-                        <div class="collapse" id="collapseExample">
+                        <div class="collapse" id="collapseExample{{credit_active.pk}}">
                             <p>{{form_payment.amount_paid.label}} {{form_payment.amount_paid}}</p>
                         </div>
                         

@@ -16,14 +16,14 @@ def payment_create(payment, installment):
         'adviser': payment.adviser,
         'payment_method': payment.payment_method,
     }
-
+    
     if isinstance(installment, Installment):
         payment_dict['installment'] = installment
         payment_dict['detail'] = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.credit.client, payment.adviser)
     else:
         payment_dict['installment_ref'] = installment
         payment_dict['detail'] = 'COBRO CUOTA REFINANCIADA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.refinancing.installment_ref.last().credit.client, payment.adviser)
-
+        
     Payment.objects.create(**payment_dict)
 
 
@@ -36,10 +36,10 @@ def pay_installment(request, payment, installments, amount_paid):
         messages.warning(request, 'Este crédito no puede poseer el beneficio "pausa por 15 días"', 'warning')
         return
 
-    amount_list = installments.values_list('amount', flat=True)
-    if amount_paid < sum(amount_list) / 2:
-        messages.error(request, 'No puede recibir pago menor al 50% de la deuda!', 'danger')
-        return
+    # amount_list = installments.values_list('amount', flat=True)
+    # if amount_paid < sum(amount_list) / 2:
+    #     messages.error(request, 'No puede recibir pago menor al 50% de la deuda!', 'danger')
+    #     return
 
     for installment in installments:
         if installment.amount <= amount_paid:
@@ -54,8 +54,8 @@ def pay_installment(request, payment, installments, amount_paid):
         elif amount_paid >= Decimal(installment.amount / Decimal(2)):
             print('########## PAGO PARCIAL')
             payment.amount = amount_paid # PARA RELAIZAR EL MOVIMIENTO
-            installment.original_amount = installment.amount # PARA ACTUALIZAR EL MONTO A DEVOLVER EN BASE AL SALDO LUEGO DEL 50%
             installment.amount -= payment.amount
+            installment.original_amount = installment.amount # PARA ACTUALIZAR EL MONTO A DEVOLVER EN BASE AL SALDO LUEGO DEL 50%
             installment.daily_interests = 0
             fifteen_later_din(installment)
             payment_create(payment, installment) # PARA RELAIZAR EL MOVIMIENTO
@@ -64,9 +64,12 @@ def pay_installment(request, payment, installments, amount_paid):
 
         else:  # SI EL RESTANTE NO SUPERA LOS 50% DE LA DEUDA
             print("######### DISMINUYE MONTO SOBRANTE")
+            payment.amount = amount_paid # PARA RELAIZAR EL MOVIMIENTO
             installment.amount -= amount_paid # DISMINUYE EL MONTO
+            installment.daily_interests = max(installment.daily_interests - amount_paid, 0) # PARA ACTUALIZAR EL MONTO A DEVOLVER EN BASE AL SALDO LUEGO DEL 50%
+            installment.save()
 
-            fifteen_later_din(installment)
+            payment_create(payment, installment) # PARA RELAIZAR EL MOVIMIENTO
             amount_paid = 0
 
 

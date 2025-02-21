@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0203b15f081387a19964c5dd4e494809a1490f79a6a2ba5f7f25c115df880665"
+            "sha256": "a9f84fe5b84d686c1798499eb8285fc186637724b6a90c0447f3c9b9fa5a8b5b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -74,11 +74,11 @@
         },
         "django": {
             "hashes": [
-                "sha256:4b214a05fe4c99476e99e2445c8b978c8369c18d4dea8e22ec412862715ad763",
-                "sha256:ff56ebd7ead0fd5dbe06fe157b0024a7aaea2e0593bb3785fb594cf94dad58ef"
+                "sha256:ad33ed68db9398f5dfb33282704925bce044bef4261cd4fb59e4e7f9ae505a78",
+                "sha256:c36e2ab12824e2ac36afa8b2515a70c53c7742f0d6eaefa7311ec379558db997"
             ],
             "index": "pypi",
-            "version": "==4.1.5"
+            "version": "==4.2"
         },
         "django-bootstrap-datepicker-plus": {
             "hashes": [
@@ -184,11 +184,11 @@
         },
         "faker": {
             "hashes": [
-                "sha256:a000bba893ea502cea66d06acf14e01655a2289e4904de80faf9dbe880fa1a39",
-                "sha256:f3299679a6b23409cfe69774bbd1148324a05bd38bda041da6c302e618d7d4a0"
+                "sha256:170ead9d0d140916168b142df69c44722b8f622ced2070802d0af9c476f0cb84",
+                "sha256:977ad0b7aa7a61ed57287d6a0723a827e9d3dd1f8cc82aaf08707f281b33bacc"
             ],
             "index": "pypi",
-            "version": "==18.3.2"
+            "version": "==18.4.0"
         },
         "fontawesome": {
             "hashes": [
