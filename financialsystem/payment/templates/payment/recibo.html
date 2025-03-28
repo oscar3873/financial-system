@@ -1,0 +1,107 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Recibo FinanX</title>
+    <!-- Vinculamos el CSS externo -->
+    <link rel="stylesheet" href="{{ base_static_url }}payment/css/recibo.css">
+
+
+</head>
+
+<body>
+
+    <!-- 
+    ============================================================================
+    Recibo FinanX (HTML)
+    Autor: Oscar
+    Descripción:
+        - Maquetado idéntico al de la imagen.
+        - La parte superior (fondo azul + logo) se asume como una sola imagen "header_finanx.png".
+    ============================================================================
+    -->
+
+    <section class="recibo">
+
+        <!-- Encabezado con imagen (logo y fondo) -->
+        <header class="recibo__header">
+            <img src="{{ base_static_url }}core/img/finanx_banner.webp" alt="FinanX Soluciones Efectivas" class="recibo__header-image">
+        </header>
+
+        <!-- Título central -->
+        <h1 class="recibo__title">RECIBO</h1>
+
+        <!-- Fila superior: datos del cliente a la izquierda y datos de factura a la derecha -->
+        <div class="recibo__top-row">
+            <div class="recibo__client-info">
+                <p id="recibo__client-nombre"><b>{{client.first_name}}  {{client.last_name}}</b></p>
+                <p>DNI: {{client.dni}}</p>
+                <p>Argentina, Salta Capital</p>
+            </div>
+            <div class="recibo__invoice-info">
+                <p>Factura N° </p>
+                <p>{{payment_date}}</p>
+            </div>
+        </div>
+
+        <!-- Tabla de conceptos con encabezado verde y filas grises simulando líneas vacías -->
+        <div class="recibo__table-container">
+            <table class="recibo__table">
+                <thead>
+                    <tr>
+                        <th class="table__header-green-concepto">Concepto</th>
+                        <th id="table__header-green-total">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for installment in installments %}
+                    <tr>
+                        {% for payment in payments %}
+                            {% if payment.installment == installment or payment.installment_ref == installment %}
+                            <td>{{payment.detail}}</td>
+                            {% endif %}
+                        {% endfor %}
+                        <td>${{installment.amount}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Subtotales y total al final (alineado a la derecha) -->
+        <div class="recibo__summary">
+            <p><strong>Subtotal: ${{subtotal_amount}}</strong> </p>
+            <!-- <p><strong>IVA (0%): $0,00</strong> </p> -->
+            <!-- <p><strong>Descuento (0%): $0,00</strong> </p> -->
+            <p id="recibo__summary-total"><strong>Total: ${{total_amount}}</strong></p>
+        </div>
+
+        <!-- Pie de página con fondo azul: "¡Gracias!" a la izquierda, contacto a la derecha -->
+        <footer class="recibo__footer">
+            <div class="footer__left">
+                <h1 class="footer__thanks">¡Gracias!</h1>
+                </p>
+            </div>
+            <div class="separator"></div>
+            <div class="footer__middle">
+                <p id="footer__middle-pay-to">Páguese a</p>
+                <p>FinanX S.A.</p>
+                <p>Argentina, Salta Capital</p> 
+                <p id="footer__middle-date">Fecha de pago: {{payment_date}}</p>
+            </div>
+            <div class="separator"></div>
+            <div class="footer__right">
+                <p id="footer__contact-title">Contacto</p>
+                <p>+54 3874-349263</p>
+                <p>finanxs@gmail.com</p>
+                <p>Argentina, Salta Capital</p>
+                <p>Instagram: finanx.com</p>
+            </div>
+        </footer>
+    </section>
+</body>
+
+</html>

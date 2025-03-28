@@ -1,7 +1,11 @@
+import os
 import datetime
+from django.template.loader import get_template
+from django.http import Http404, HttpResponse
+from weasyprint import HTML
 from decimal import Decimal
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
+from django.conf import settings
 
 from payment.models import Payment
 from credit.models import Installment
@@ -24,7 +28,7 @@ def payment_create(payment, installment):
         payment_dict['installment_ref'] = installment
         payment_dict['detail'] = 'COBRO CUOTA REFINANCIADA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.refinancing.installment_ref.last().credit.client, payment.adviser)
         
-    Payment.objects.create(**payment_dict)
+    return Payment.objects.create(**payment_dict)
 
 
 def pay_installment(request, payment, installments, amount_paid):
@@ -79,3 +83,38 @@ def fifteen_later_din(installment):
     """
     installment.end_date = datetime.date.today() + datetime.timedelta(days=15)
     installment.save()
+
+def generate_pdf_receipt(request, context):
+    # Agrega la ruta absoluta a tus estáticos:
+    base_static_url = f"file://{settings.STATIC_ROOT}/"
+    context['base_static_url'] = base_static_url
+
+    template = get_template('payment/recibo.html')
+    html_string = template.render(context)
+    
+    # Usa una base_url adecuada para WeasyPrint, por ejemplo la ruta absoluta a tus estáticos:
+    html = HTML(string=html_string, base_url=base_static_url)
+    pdf = html.write_pdf()
+    with open('/tmp/recibo_debug.html', 'w') as f:
+        f.write(html_string)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="recibo.pdf"'
+    return response
+
+def download_receipt(payment):
+    """
+    Descarga el comprobante de pago si existe.
+    """
+    receipt = payment.receipt
+    print('ESTE ES EL RECIBO', receipt)
+    if not receipt or not receipt.name:  # Verifica que el recibo existe y tiene un nombre de archivo
+        raise Http404("El recibo no está disponible.")
+
+    try:
+        response = HttpResponse(receipt.open('rb'), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(receipt.name)}"'
+        return response
+    except Exception as e:
+        print(f"Error al descargar el recibo: {e}")
+        raise Http404("No se pudo descargar el recibo.")

@@ -12,7 +12,7 @@
     <div class="modal fade" id="exampleModal{{credit_active.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{credit_active.pk}}" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content bg-primary text-white">
-                <form action="{% url 'payments:make_paid' credit_active.pk %}" method="POST">
+                <form action="{% url 'payments:make_paid' credit_active.pk %}" method="POST" id="formPayment">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Registrar Pago</h5>
                         <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-success">Pagar</button>
+                        <button class="btn btn-success" id="payFormButton">Pagar</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     </div>
                 </form>
@@ -90,6 +90,13 @@
                 let pk = paymentButton.dataset.creditId;
                 sum_payments(pk);
             });
+        });
+
+        let payFormButton = document.querySelector("#payFormButton");
+        payFormButton.addEventListener("click", (e) => {
+            setTimeout(() => {
+                window.location.reload();
+            }, 10000);
         });
     });
 </script>

@@ -459,6 +459,9 @@
                                     </td>
                                     <td>
                                         <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
+                                        {% if installment.is_paid_installment %}
+                                        <a class="ml-2" href="{% url 'payments:get_receipt' installment.pk %}"><i class="fas fa-file-pdf"></i></a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% if installments.1.0 %}

@@ -1,3 +1,4 @@
+import locale
 from datetime import datetime as dt
 from decimal import Decimal
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -22,6 +23,8 @@ from .models import Payment
 from .forms import PaymentForm
 from core.utils import round_to_nearest_hundred
 
+# Configurar el locale en español
+locale.setlocale(locale.LC_TIME, 'es_ES.utf8')
 # Create your views here.
 class PaymentListView(LoginRequiredMixin, ListView):
     """
@@ -105,7 +108,7 @@ class PaymentUpdateView(LoginRequiredMixin, UpdateView):
 @login_required(login_url="/accounts/login/")
 def make_payment_installment(request, pk):
     """
-    Metodo para realizar pagos de cuotas normales y refinanciadas.
+    Método para realizar pagos de cuotas normales y refinanciadas.
     """
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
@@ -127,44 +130,100 @@ def make_payment_installment(request, pk):
         payment_date = form.cleaned_data['payment_date']
         payment_time = form.cleaned_data['payment_time']
 
-        # Unir los valores de payment_date y payment_time en un solo objeto datetime
-        payment.payment_date = dt.combine(payment_date,payment_time)
+        # Combina payment_date y payment_time en un solo objeto datetime
+        payment.payment_date = dt.combine(payment_date, payment_time)
 
-        installment_ = list(installments.all())
+        installment_list = list(installments.all())
+        # Obtén los valores de los checkboxes de cuotas
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('cuota')}
-
-        pack = dict(zip(installment_, checkboxs_by_form.values()))
+        pack = dict(zip(installment_list, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
         payment.adviser = request.user.adviser
 
-        if count_value == 0 :
+        # Variable para almacenar las cuotas involucradas en el pago
+        paid_installments = []
+        payments_list = []
+        details = []
+        total_amount = 0
+        subtotal_amount = 0
+        if count_value == 0:
             payment.amount = installment_amount
+            subtotal_amount += installment_amount
             installments_caduced = installments.filter(is_caduced_installment=True).filter(end_date__date__lte=F('lastup'))
             pay_installment(request, payment, installments_caduced, abs(Decimal(form.cleaned_data["amount_paid"])))
+            paid_installments = list(installments_caduced)
         else:
             for installment in pack.keys():
                 if pack[installment]:
                     payment.amount = round_to_nearest_hundred(installment.amount)
+                    subtotal_amount += payment.amount
                     installment.condition = 'Pagada'
                     installment.is_paid_installment = True
                     installment.payment_date = payment.payment_date
                     installment.save()
+                    paid_installments.append(installment)
+                    
                     credit = installment.credit
                     if credit.installments.filter(is_paid_installment=True).count() == credit.installments.count():
                         credit.condition = 'Pagado'
                         credit.payment_date = credit.installments.last().payment_date
                         credit.is_paid = True
                         credit.save()
-                    payment_create(payment, installment)
-
+                    new_payment = payment_create(payment, installment)
+                    payments_list.append(new_payment)
             interest = Interest.objects.first()
-            points_per_installments = interest.points_score_credits if isinstance(installments, Installment) else interest.points_score_refinancing
-            score = round((points_per_installments/installments_score) * count_value)
+            points_per_installments = (
+                interest.points_score_credits 
+                if isinstance(installments, Installment) 
+                else interest.points_score_refinancing
+            )
+            score = round((points_per_installments / installments_score) * count_value)
             client.score += score
 
             if (client.score + score) >= 1499:
                 client.score = 1500
             client.save()
+        
+        for payment in payments_list:
+            payment.detail = payment.detail.split('-')[0]
+            total_amount += payment.amount
+        # Genera el contexto para el recibo:
+        context = {
+            'client': client,
+            'payments': payments_list,
+            'installments': paid_installments,
+            'details': details,
+            'payment_date': payment_date,
+            'total_amount': total_amount,
+            'subtotal_amount': subtotal_amount,
+        }
 
+        # Luego genera y retorna el PDF para descarga:
+        return generate_pdf_receipt(request, context)
     return redirect('clients:detail', pk=client.pk)
 
+# Descargar comprobante de pago
+def get_receipt(request, pk):
+    """
+    Vista para descargar el recibo asociado a una cuota (Installment)
+    dado su id.
+    """
+    # Recupera la cuota
+    installment = [get_object_or_404(Installment, id=pk)]
+    # Se asume que existe un Payment asociado a la cuota.
+    payment = [get_object_or_404(Payment, installment=installment[0])]
+    payment[0].detail = payment[0].detail.split('-')[0]
+    # Recupera los datos del cliente a través del crédito de la cuota.
+    client = installment[0].credit.client
+    # Prepara el contexto que utilizará el template para renderizar el recibo.
+    context = {
+        'client': client,
+        'payments': payment,
+        'installments': installment,
+        'details': payment[0].detail,
+        'payment_date': payment[0].payment_date.strftime('%d de %B de %Y'),
+        'total_amount': payment[0].amount,
+        'subtotal_amount': installment[0].amount,
+    }
+    
+    return generate_pdf_receipt(request, context)
