@@ -108,12 +108,15 @@ class PaymentUpdateView(LoginRequiredMixin, UpdateView):
 @login_required(login_url="/accounts/login/")
 def make_payment_installment(request, pk):
     """
-    Método para realizar pagos de cuotas normales y refinanciadas.
+    Método para realizar pagos de cuotas normales y refinanciadas, incluyendo pagos parciales.
+    La condición de la cuota solo se cambia a 'Pagada' cuando el total de los pagos llega o excede
+    el monto de la cuota.
     """
     try:
         refinancing = get_object_or_404(Refinancing, pk=pk)
         installments_score = refinancing.installments.all().count()
         installments = refinancing.installments.exclude(condition='Pagada')
+        # Se toma el monto de la primera cuota como referencia
         installment_amount = round_to_nearest_hundred(refinancing.installments.first().amount)
         client = refinancing.installment_ref.last().credit.client
     except:
@@ -129,29 +132,50 @@ def make_payment_installment(request, pk):
         payment = form.save(commit=False)
         payment_date = form.cleaned_data['payment_date']
         payment_time = form.cleaned_data['payment_time']
-
         # Combina payment_date y payment_time en un solo objeto datetime
         payment.payment_date = dt.combine(payment_date, payment_time)
 
+        # Obtiene el monto ingresado para pago parcial, si existe; se considera 0 si no se ingresa nada.
+        amount_paid = abs(Decimal(form.cleaned_data.get("amount_paid") or 0))
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><>>>>>>', installments)
+        # Obtiene los valores de los checkboxes de cuotas
         installment_list = list(installments.all())
-        # Obtén los valores de los checkboxes de cuotas
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('cuota')}
         pack = dict(zip(installment_list, checkboxs_by_form.values()))
         count_value = list(pack.values()).count(True)
+
         payment.adviser = request.user.adviser
 
-        # Variable para almacenar las cuotas involucradas en el pago
+        # Variables para almacenar las cuotas y los pagos realizados
         paid_installments = []
         payments_list = []
-        details = []
-        total_amount = 0
         subtotal_amount = 0
+        total_amount = 0
+
+        # Caso 1: Se han seleccionado cuotas completas (checkbox marcados)
         if count_value == 0:
             payment.amount = installment_amount
             subtotal_amount += installment_amount
-            installments_caduced = installments.filter(is_caduced_installment=True).filter(end_date__date__lte=F('lastup'))
-            pay_installment(request, payment, installments_caduced, abs(Decimal(form.cleaned_data["amount_paid"])))
+            for i in installments:
+                print('Esta vencida? >>>>>>>', i.is_caduced_installment)
+                print('Fecha', i.end_date)
+            installments_caduced = [
+                i for i in installments
+                if i.is_caduced_installment and i.end_date and i.lastup and i.end_date.date() <= i.lastup
+            ]
+            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><>>>>>>', installments_caduced)
+            payments = pay_installment(
+                request,
+                payment,
+                installments_caduced,
+                abs(Decimal(form.cleaned_data["amount_paid"]))
+            )
+
+            # Guardamos las cuotas involucradas
             paid_installments = list(installments_caduced)
+
+            # Guardamos los pagos generados
+            payments_list.extend(payments)
         else:
             for installment in pack.keys():
                 if pack[installment]:
@@ -183,47 +207,93 @@ def make_payment_installment(request, pk):
             if (client.score + score) >= 1499:
                 client.score = 1500
             client.save()
-        
-        for payment in payments_list:
-            payment.detail = payment.detail.split('-')[0]
-            total_amount += payment.amount
-        # Genera el contexto para el recibo:
+
+        for pay in payments_list:
+            total_amount += pay.amount
+
+        # Se obtiene la fecha del último pago realizado para formatearla
+        if payments_list:
+            last_payment = max(payments_list, key=lambda p: p.payment_date)
+            payment_date_str = last_payment.payment_date.strftime('%d de %B de %Y')
+        else:
+            payment_date_str = payment.payment_date.strftime('%d de %B de %Y')
+
+        # Opcional: Actualizar el concepto (detail) con la función de utilidad para cada cuota
+        # Si cada pago está asociado a una cuota, se puede regenerar el concepto.
+        for pay in payments_list:
+            # Obtiene la lista de pagos asociados a la cuota del pago actual (aquí se asume que es único)
+            concept = generate_concept_text(pay.installment, payments=[pay])
+            pay.detail = concept
+
+        # Prepara el contexto para el recibo
         context = {
             'client': client,
+            'dni': str(client.dni)[-6:], 
             'payments': payments_list,
             'installments': paid_installments,
-            'details': details,
-            'payment_date': payment_date,
-            'total_amount': total_amount,
-            'subtotal_amount': subtotal_amount,
+            'payment_date': payment_date_str,
+            'total_amount': total_amount,          
+            'subtotal_amount': subtotal_amount,    
+            'amount_paid': amount_paid,            
+            'payment_detail': payment.detail,  
+            'receipt_number': payment.payment_date.strftime('%d%m%y%H%M'),    
         }
 
-        # Luego genera y retorna el PDF para descarga:
         return generate_pdf_receipt(request, context)
+
     return redirect('clients:detail', pk=client.pk)
 
 # Descargar comprobante de pago
 def get_receipt(request, pk):
     """
-    Vista para descargar el recibo asociado a una cuota (Installment)
-    dado su id.
+    Vista para descargar el recibo asociado a una o más cuotas (Installment) dado su id.
+    Si se han realizado pagos parciales, se acumulan todos los pagos asociados para reflejar
+    el total abonado hasta el momento.
     """
-    # Recupera la cuota
-    installment = [get_object_or_404(Installment, id=pk)]
-    # Se asume que existe un Payment asociado a la cuota.
-    payment = [get_object_or_404(Payment, installment=installment[0])]
-    payment[0].detail = payment[0].detail.split('-')[0]
+    installment = get_object_or_404(Installment, id=pk)
+    
+    # Recupera TODOS los pagos asociados a la cuota
+    payments = Payment.objects.filter(installment=installment).order_by('payment_date')
+    
+    # Suma los montos pagados hasta el momento
+    total_paid = payments.aggregate(total=Sum('amount'))['total'] or 0
+
+    # Acumula los detalles de cada pago (limpiando posibles datos extra)
+    details = " | ".join([p.detail.split('-')[0] for p in payments if p.detail])
+    
+    # Se utiliza la fecha del último pago para el recibo
+    last_payment = payments.latest('payment_date') if payments.exists() else None
+    payment_date_str = last_payment.payment_date.strftime('%d de %B de %Y') if last_payment else ""
+    
     # Recupera los datos del cliente a través del crédito de la cuota.
-    client = installment[0].credit.client
-    # Prepara el contexto que utilizará el template para renderizar el recibo.
+    client = installment.credit.client
+
+    # Genera el concepto usando la función de utilidad.
+    # Nota: se genera en función de la cuota y la suma de todos los pagos asociados.
+    concept = generate_concept_text(installment, payments=payments)
+    
+    # Actualiza el campo detail de cada Payment con el concepto generado.
+    # Esto permitirá que en el template se muestre el concepto esperado.
+    for payment in payments:
+        payment.detail = concept
+    
+    if payments:
+        receipt_number = payments[0].payment_date.strftime('%d%m%y%H%M')
+    else:
+        receipt_number = "N/A"  # o lo que quieras poner por defecto
+
+
+    # Prepara el contexto para el template del recibo.
     context = {
         'client': client,
-        'payments': payment,
-        'installments': installment,
-        'details': payment[0].detail,
-        'payment_date': payment[0].payment_date.strftime('%d de %B de %Y'),
-        'total_amount': payment[0].amount,
-        'subtotal_amount': installment[0].amount,
+        'dni': str(client.dni)[-6:], 
+        'payments': payments,
+        'installments': [installment],
+        'details': details,
+        'payment_date': payment_date_str,
+        'total_amount': total_paid,             # Total acumulado de pagos (parciales o completos)
+        'subtotal_amount': installment.amount,  # Monto total que corresponde a la cuota
+        'receipt_number': receipt_number
     }
     
     return generate_pdf_receipt(request, context)

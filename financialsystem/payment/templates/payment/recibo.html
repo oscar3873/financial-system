@@ -28,7 +28,7 @@
 
         <!-- Encabezado con imagen (logo y fondo) -->
         <header class="recibo__header">
-            <img src="{{ base_static_url }}core/img/finanx_banner.webp" alt="FinanX Soluciones Efectivas" class="recibo__header-image">
+            <img src="{{ base_static_url }}core/img/finanx_banner.png" alt="FinanX Soluciones Efectivas" class="recibo__header-image">
         </header>
 
         <!-- Título central -->
@@ -38,11 +38,11 @@
         <div class="recibo__top-row">
             <div class="recibo__client-info">
                 <p id="recibo__client-nombre"><b>{{client.first_name}}  {{client.last_name}}</b></p>
-                <p>DNI: {{client.dni}}</p>
+                <p>N° de Cliente: {{dni}}</p>
                 <p>Argentina, Salta Capital</p>
             </div>
             <div class="recibo__invoice-info">
-                <p>Factura N° </p>
+                <p>Factura N° {{receipt_number}}</p>
                 <p>{{payment_date}}</p>
             </div>
         </div>
@@ -58,14 +58,14 @@
                 </thead>
                 <tbody>
                     {% for installment in installments %}
-                    <tr>
                         {% for payment in payments %}
-                            {% if payment.installment == installment or payment.installment_ref == installment %}
-                            <td>{{payment.detail}}</td>
+                            {% if payment.installment.id == installment.id %}
+                            <tr>
+                                <td>{{ payment.detail }}</td>
+                                <td>${{ payment.amount }}</td>
+                            </tr>
                             {% endif %}
                         {% endfor %}
-                        <td>${{installment.amount}}</td>
-                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
