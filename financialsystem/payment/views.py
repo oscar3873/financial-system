@@ -134,10 +134,10 @@ def make_payment_installment(request, pk):
         payment_time = form.cleaned_data['payment_time']
         # Combina payment_date y payment_time en un solo objeto datetime
         payment.payment_date = dt.combine(payment_date, payment_time)
+        checked_discount = request.POST.get('promo_discount')
 
         # Obtiene el monto ingresado para pago parcial, si existe; se considera 0 si no se ingresa nada.
         amount_paid = abs(Decimal(form.cleaned_data.get("amount_paid") or 0))
-        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><>>>>>>', installments)
         # Obtiene los valores de los checkboxes de cuotas
         installment_list = list(installments.all())
         checkboxs_by_form = {key: value for key, value in form.cleaned_data.items() if key.startswith('cuota')}
@@ -154,16 +154,15 @@ def make_payment_installment(request, pk):
 
         # Caso 1: Se han seleccionado cuotas completas (checkbox marcados)
         if count_value == 0:
-            payment.amount = installment_amount
+            if checked_discount:
+                payment.amount = round_to_nearest_hundred(installment_amount) * Decimal('0.95')
+            else:
+                payment.amount = installment_amount
             subtotal_amount += installment_amount
-            for i in installments:
-                print('Esta vencida? >>>>>>>', i.is_caduced_installment)
-                print('Fecha', i.end_date)
             installments_caduced = [
                 i for i in installments
                 if i.is_caduced_installment and i.end_date and i.lastup and i.end_date.date() <= i.lastup
             ]
-            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><>>>>>>', installments_caduced)
             payments = pay_installment(
                 request,
                 payment,
@@ -179,8 +178,11 @@ def make_payment_installment(request, pk):
         else:
             for installment in pack.keys():
                 if pack[installment]:
-                    payment.amount = round_to_nearest_hundred(installment.amount)
-                    subtotal_amount += payment.amount
+                    if checked_discount:
+                        payment.amount = round_to_nearest_hundred(installment_amount) * Decimal('0.95')
+                    else:
+                        payment.amount = round_to_nearest_hundred(installment.amount)
+                    subtotal_amount += installment.amount
                     installment.condition = 'Pagada'
                     installment.is_paid_installment = True
                     installment.payment_date = payment.payment_date
@@ -211,6 +213,12 @@ def make_payment_installment(request, pk):
         for pay in payments_list:
             total_amount += pay.amount
 
+        discount = Decimal('0.00')
+        if checked_discount:
+            discount = (total_amount * Decimal('0.05')).quantize(Decimal('0.01'))  # 5% de descuento
+
+        final_total = total_amount - discount
+
         # Se obtiene la fecha del último pago realizado para formatearla
         if payments_list:
             last_payment = max(payments_list, key=lambda p: p.payment_date)
@@ -222,7 +230,7 @@ def make_payment_installment(request, pk):
         # Si cada pago está asociado a una cuota, se puede regenerar el concepto.
         for pay in payments_list:
             # Obtiene la lista de pagos asociados a la cuota del pago actual (aquí se asume que es único)
-            concept = generate_concept_text(pay.installment, payments=[pay])
+            concept = generate_concept_text(pay.installment, checked_discount, payments=[pay])
             pay.detail = concept
 
         # Prepara el contexto para el recibo
@@ -232,11 +240,13 @@ def make_payment_installment(request, pk):
             'payments': payments_list,
             'installments': paid_installments,
             'payment_date': payment_date_str,
-            'total_amount': total_amount,          
+            'total_amount': final_total,
+            'discount': discount,
             'subtotal_amount': subtotal_amount,    
             'amount_paid': amount_paid,            
             'payment_detail': payment.detail,  
             'receipt_number': payment.payment_date.strftime('%d%m%y%H%M'),    
+            'checked_discount': checked_discount,
         }
 
         return generate_pdf_receipt(request, context)
@@ -270,18 +280,22 @@ def get_receipt(request, pk):
 
     # Genera el concepto usando la función de utilidad.
     # Nota: se genera en función de la cuota y la suma de todos los pagos asociados.
-    concept = generate_concept_text(installment, payments=payments)
-    
+    concept = generate_concept_text(installment, False, payments=payments)
+    checked_discount = False
     # Actualiza el campo detail de cada Payment con el concepto generado.
     # Esto permitirá que en el template se muestre el concepto esperado.
+    discount = 0
     for payment in payments:
         payment.detail = concept
+        # Verifico si el pago es igual al 95% de la cuota
+        if payment.amount >= (installment.amount * Decimal(0.95)):
+            checked_discount = True
+            discount += (installment.amount * Decimal(0.05)).quantize(Decimal('0.01'))
     
     if payments:
         receipt_number = payments[0].payment_date.strftime('%d%m%y%H%M')
     else:
         receipt_number = "N/A"  # o lo que quieras poner por defecto
-
 
     # Prepara el contexto para el template del recibo.
     context = {
@@ -293,7 +307,9 @@ def get_receipt(request, pk):
         'payment_date': payment_date_str,
         'total_amount': total_paid,             # Total acumulado de pagos (parciales o completos)
         'subtotal_amount': installment.amount,  # Monto total que corresponde a la cuota
-        'receipt_number': receipt_number
+        'receipt_number': receipt_number,
+        'checked_discount': checked_discount,
+        'discount': discount
     }
     
     return generate_pdf_receipt(request, context)

@@ -75,7 +75,10 @@
         <div class="recibo__summary">
             <p><strong>Subtotal: ${{subtotal_amount}}</strong> </p>
             <!-- <p><strong>IVA (0%): $0,00</strong> </p> -->
-            <!-- <p><strong>Descuento (0%): $0,00</strong> </p> -->
+            
+            {% if checked_discount %}
+            <p><strong>Descuento 5%: ${{discount}}</strong> </p>
+            {% endif %}
             <p id="recibo__summary-total"><strong>Total: ${{total_amount}}</strong></p>
         </div>
 

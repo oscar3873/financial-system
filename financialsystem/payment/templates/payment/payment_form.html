@@ -35,7 +35,7 @@
                             </div>
                         </div>
                         <p>{{form_payment.payment_method.label}} {{form_payment.payment_method}}</p>
-                            
+                        <p id="p_promo_discount"><label for="promo_discount">Descuento 5%</label><input type="checkbox" name="promo_discount" id="promo_discount" class="ml-2"></p>
                         <button class="btn btn-secondary mt-2" type="button" data-toggle="collapse" data-target="#collapseExample{{credit_active.pk}}" aria-expanded="false" aria-controls="collapseExample">
                             Pago parcial
                         </button>
@@ -98,6 +98,18 @@
                 window.location.reload();
             }, 10000);
         });
+
+        let selectPaymentMethod = document.querySelector("#id_payment_method");
+        selectPaymentMethod.addEventListener('change', function(){
+            let pPromoPdiscount = document.getElementById("p_promo_discount");
+            let promoDiscountCheckbox = document.getElementById("promo_discount");
+            if(this.value == "PESOS" || this.value == "USD" || this.value == "EUR"){
+                pPromoPdiscount.classList.remove("d-none");
+            }else{
+                promoDiscountCheckbox.checked = false;
+                pPromoPdiscount.classList.add("d-none");
+            }
+        })
     });
 </script>
 

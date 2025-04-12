@@ -111,11 +111,11 @@ def update_installment_status(installment, payment_date):
     else:
         concepto = f"Pago de cuota #{installment.installment_number} ({get_installment_month_name(installment)})"
 
-def generate_concept_text(installment, payments=None):
+def generate_concept_text(installment, checked_discount, payments=None):
     """
     Devuelve un string tipo:
     - "Pago de cuota #3 (Marzo)"
-    - "Pago parcial de cuota #3 (Marzo) (75%)"
+    - "Pago parcial de cuota #3 (Marzo)"
     """
     credit = installment.credit
     cuota_n = installment.installment_number
@@ -125,8 +125,8 @@ def generate_concept_text(installment, payments=None):
     if payments:
         total_paid = sum([p.amount for p in payments])
         porcentaje = (total_paid / installment.amount) * 100
-        if porcentaje < 100:
-            return f"Pago parcial de cuota #{cuota_n} ({mes_str}))"
+        if porcentaje < 95:
+            return f"Pago parcial de cuota #{cuota_n} ({mes_str})"
     return f"Pago de cuota #{cuota_n} ({mes_str})"
 
 def generate_pdf_receipt(request, context):
