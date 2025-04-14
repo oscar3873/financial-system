@@ -151,11 +151,13 @@ def make_payment_installment(request, pk):
         payments_list = []
         subtotal_amount = 0
         total_amount = 0
+        discount = Decimal('0.00')
 
         # Caso 1: Se han seleccionado cuotas completas (checkbox marcados)
         if count_value == 0:
             if checked_discount:
                 payment.amount = round_to_nearest_hundred(installment_amount) * Decimal('0.95')
+                discount += round_to_nearest_hundred(installment_amount) * Decimal('0.05')
             else:
                 payment.amount = installment_amount
             subtotal_amount += installment_amount
@@ -180,6 +182,7 @@ def make_payment_installment(request, pk):
                 if pack[installment]:
                     if checked_discount:
                         payment.amount = round_to_nearest_hundred(installment_amount) * Decimal('0.95')
+                        discount += round_to_nearest_hundred(installment_amount) * Decimal('0.05')
                     else:
                         payment.amount = round_to_nearest_hundred(installment.amount)
                     subtotal_amount += installment.amount
@@ -213,11 +216,7 @@ def make_payment_installment(request, pk):
         for pay in payments_list:
             total_amount += pay.amount
 
-        discount = Decimal('0.00')
-        if checked_discount:
-            discount = (total_amount * Decimal('0.05')).quantize(Decimal('0.01'))  # 5% de descuento
-
-        final_total = total_amount - discount
+        final_total = total_amount
 
         # Se obtiene la fecha del último pago realizado para formatearla
         if payments_list:
@@ -288,9 +287,9 @@ def get_receipt(request, pk):
     for payment in payments:
         payment.detail = concept
         # Verifico si el pago es igual al 95% de la cuota
-        if payment.amount >= (installment.amount * Decimal(0.95)):
+        if payment.amount == round_to_nearest_hundred(installment.amount) * Decimal('0.95'):
             checked_discount = True
-            discount += (installment.amount * Decimal(0.05)).quantize(Decimal('0.01'))
+            discount += round_to_nearest_hundred(installment.amount) * Decimal(0.05).quantize(Decimal('0.01'))
     
     if payments:
         receipt_number = payments[0].payment_date.strftime('%d%m%y%H%M')
