@@ -7,12 +7,297 @@
     <meta charset="UTF-8">
     <title>Recibo FinanX</title>
     <!-- Vinculamos el CSS externo -->
-    <link rel="stylesheet" href="{{ base_static_url }}payment/css/recibo.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        @page {
+            size: A4;
+            margin: 0; /* Quita todos los márgenes */
+        }
+
+        /* Configuración general del body */
+        body {
+            font-family: "Poppins", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            background-color: #FFFFFF;
+            color: #000000;
+            padding: 0;
+            margin: 0;
+        }
+
+
+        /* Contenedor principal del recibo */
+
+        .recibo {
+            width: 100%;
+            /* Ajusta según el ancho real de tu imagen */
+            margin: 0;
+            background-color: #FFFFFF;
+        }
+
+
+        /* Encabezado: imagen que contiene el fondo y el logo */
+
+
+        .recibo__header-image {
+            width: 100%;
+            display: block;
+        }
+
+
+        /* Título "RECIBO" centrado */
+
+        .recibo__title {
+            text-align: center;
+            font-size: 24px;
+            /* Ajusta hasta que coincida con la imagen */
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+
+        /* Fila superior con datos del cliente y de la factura */
+
+        .recibo__top-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 50px 45px 50px;
+        }
+
+
+        /* Seccion invoice-info */
+
+        .recibo__invoice-info {
+            text-align: right;
+            margin-right: -15px;
+        }
+
+        .recibo__invoice-info p {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 0.5px;
+        }
+
+
+        /* Seccion client-info */
+
+        .recibo__client-info p {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 1px;
+        }
+
+
+        /* Margen para que coincidan los lineamientos de los textos */
+
+        .recibo__client-info {
+            margin-top: 25px;
+        }
+
+
+        /* Ajusta el tamaño del nombre del cliente */
+
+        #recibo__client-nombre {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+
+        /* Contenedor de la tabla de conceptos */
+
+        .recibo__table-container {
+            margin: 0 50px 20px 50px;
+        }
+
+
+        /* Tabla de conceptos */
+
+        .recibo__table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+
+        /* Cabecera verde */
+
+        .table__header-green-concepto {
+            font-weight: lighter;
+            background-color: #175d3b;
+            color: #FFFFFF;
+            padding-left: 80px;
+            border: 1px solid #ccc;
+            border-right: none;
+            padding-bottom: 8px;
+            text-align: left;
+            height: 45px;
+        }
+
+
+        #table__header-green-total {
+            font-weight: lighter;
+            background-color: #175d3b;
+            color: #FFFFFF;
+            border: 1px solid #ccc;
+            border-left: none;
+            padding-bottom: 8px;
+            padding-right: 35px;
+            height: 45px;
+        }
+
+
+        /* Celdas de la tabla */
+
+        .recibo__table td {
+            padding: 10px;
+        }
+
+
+        /* Alinea el texto a la derecha en la segunda columna */
+
+        table tr td:nth-child(2),
+        table tr th:nth-child(2) {
+            text-align: right;
+            padding-right: 25px;
+        }
+
+
+
+        /* Filas grises para líneas impares y blancas para pares */
+
+        .recibo__table tr:nth-child(odd) {
+            background-color: #ffffff;
+            /* Ajusta al gris exacto */
+            height: 40px;
+        }
+
+        .recibo__table tr:nth-child(even) {
+            background-color: #E0E0E0;
+            /* Blanco para las filas pares */
+            height: 40px;
+        }
+
+
+        /* Subtotales y total (alineado a la derecha) */
+
+        .recibo__summary {
+            margin: 0 50px 50px 20px;
+            text-align: right;
+        }
+
+        .recibo__summary p {
+            margin-bottom: 1px;
+            font-size: 10px;
+        }
+
+        /* Enfatizar el total con un tamaño mayor */
+
+        #recibo__summary-total {
+            margin-top: 4px;
+            font-size: 15.5px;
+        }
+
+
+        /* Pie de página con fondo azul */
+
+        .recibo__footer {
+            display: flex;
+            justify-content: space-around;
+            background-color: #00365f;
+            color: #FFFFFF;
+            padding: 20px 20px 60px 20px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+
+        /* Bloque izquierdo en el footer */
+
+        .footer__left {
+            align-self: center;
+            padding-right: 23px;
+            padding-left: 5px;
+            padding-top: 10px;
+        }
+
+        .separator {
+            width: 1px;
+            height: 100px;
+            background-color:#c9961a;
+        }
+
+        .footer__thanks {
+            font-size: 28px;
+            /* Ajustar según la imagen */
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .footer__left p {
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+
+        /* Bloque del medio en el footer */
+
+        .footer__middle {
+            text-align: left;
+            font-size: 10px;
+            padding-left: 24px;
+            padding-right: 15px;
+            padding-top: 5px;
+        }
+
+        .footer__middle p {
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+
+        #footer__middle-pay-to {
+            margin-bottom: 6px;
+        }
+
+        #footer__middle-date {
+            margin-top: 20px;
+        }
+
+
+        /* Bloque derecho en el footer */
+
+        .footer__right {
+            text-align: left;
+            padding-left: 17px;
+            padding-top: 5px;
+            font-weight: bold;
+        }
+
+        #footer__contact-title {
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .footer__right p {
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+
+    </style>
 
 
 </head>
 
-<body>
+<body onload="window.print()">
 
     <!-- 
     ============================================================================
@@ -28,7 +313,7 @@
 
         <!-- Encabezado con imagen (logo y fondo) -->
         <header class="recibo__header">
-            <img src="{{ base_static_url }}core/img/finanx_banner.png" alt="FinanX Soluciones Efectivas" class="recibo__header-image">
+            <img src="{{ image_url }}" alt="FinanX Soluciones Efectivas" class="recibo__header-image">
         </header>
 
         <!-- Título central -->

@@ -130,22 +130,11 @@ def generate_concept_text(installment, checked_discount, payments=None):
     return f"Pago de cuota #{cuota_n} ({mes_str})"
 
 def generate_pdf_receipt(request, context):
-    # Agrega la ruta absoluta a tus estáticos:
-    base_static_url = f"file://{settings.STATIC_ROOT}/"
-    context['base_static_url'] = base_static_url
-
+    image_url = request.build_absolute_uri('/static/core/img/finanx_banner.png')
+    context['image_url'] = image_url
     template = get_template('payment/recibo.html')
     html_string = template.render(context)
-    
-    # Usa una base_url adecuada para WeasyPrint, por ejemplo la ruta absoluta a tus estáticos:
-    html = HTML(string=html_string, base_url=base_static_url)
-    pdf = html.write_pdf()
-    with open('/tmp/recibo_debug.html', 'w') as f:
-        f.write(html_string)
-
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="recibo.pdf"'
-    return response
+    return HttpResponse(html_string)
 
 def download_receipt(payment):
     """
