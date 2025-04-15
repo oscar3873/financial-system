@@ -227,9 +227,13 @@ def make_payment_installment(request, pk):
 
         # Opcional: Actualizar el concepto (detail) con la función de utilidad para cada cuota
         # Si cada pago está asociado a una cuota, se puede regenerar el concepto.
+        print('CUOTAS', paid_installments)
         for pay in payments_list:
             # Obtiene la lista de pagos asociados a la cuota del pago actual (aquí se asume que es único)
-            concept = generate_concept_text(pay.installment, checked_discount, payments=[pay])
+            if pay.installment:
+                concept = generate_concept_text(pay.installment, checked_discount, payments=[pay])
+            else:
+                concept = generate_concept_text(pay.installment_ref, checked_discount, payments=[pay])
             pay.detail = concept
 
         # Prepara el contexto para el recibo
