@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-success" id="payFormButton">Pagar</button>
+                        <button class="btn btn-success payFormButton" id="payFormButton">Pagar</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                     </div>
                 </form>
@@ -92,14 +92,13 @@
             });
         });
 
-        let payFormButton = document.querySelector("#payFormButton");
-        payFormButton.addEventListener("click", (e) => {
+        $(".payFormButton").on("click", (e) => {
             setTimeout(() => {
                 window.location.reload();
             }, 1000);
         });
 
-        let selectPaymentMethod = document.querySelector("#id_payment_method");
+        let selectPaymentMethod = document.querySelector(".paymentMethodSelect");
         selectPaymentMethod.addEventListener('change', function(){
             let pPromoPdiscount = document.getElementById("p_promo_discount");
             let promoDiscountCheckbox = document.getElementById("promo_discount");

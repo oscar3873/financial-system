@@ -47,7 +47,7 @@ class PaymentForm(forms.ModelForm):
     )
 
     payment_method = forms.ChoiceField(
-        widget=forms.Select(attrs={'class': 'form-control m-auto'}),
+        widget=forms.Select(attrs={'class': 'form-control m-auto paymentMethodSelect'}),
         label="Forma de Pago",
         choices=MONEY_TYPE,
         required=True

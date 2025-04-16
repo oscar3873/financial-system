@@ -117,26 +117,26 @@ def generate_concept_text(installment, checked_discount, payments=None):
     - "Pago de cuota #3 (Marzo)"
     - "Pago parcial de cuota #3 (Marzo)"
     """
-    if installment.credit:
+    print('######### GENERANDO CONCEPTO DE PAGO', installment.credit)
+    if isinstance(installment, Installment) :
         credit = installment.credit
         cuota_n = installment.installment_number
         cuota_mes = credit.start_date + relativedelta(months=cuota_n - 1)
         mes_str = cuota_mes.strftime('%B')  # o '%B' si solo querés el mes
+        texto = f"Pago de cuota #{cuota_n} ({mes_str})"
     else:
-        credit = installment.refinance
+        credit = installment.credit
         cuota_n = installment.installment_number
-        cuota_mes = credit.start_date
+        cuota_mes = credit.start_date + relativedelta(months=cuota_n - 1)
         mes_str = cuota_mes.strftime('%B')
+        texto = f"Pago de cuota #{cuota_n}(refinanciada) ({mes_str})"
     
     if payments:
         total_paid = sum([p.amount for p in payments])
         porcentaje = (total_paid / installment.amount) * 100
-        if porcentaje <= 95:
+        if porcentaje < 95:
             return f"Pago parcial de cuota #{cuota_n} ({mes_str})"
-    if installment.credit:
-        return f"Pago de cuota #{cuota_n} ({mes_str})"
-    else:
-        return f"Pago de cuota #{cuota_n}(refinanciada) ({mes_str})"
+    return texto
 
 def generate_pdf_receipt(request, context):
     image_url = request.build_absolute_uri('/static/core/img/finanx_banner.png')
