@@ -15,7 +15,7 @@ from django.urls import reverse_lazy
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView, DeleteView
 
-from credit.models import Credit, Refinancing, Installment
+from credit.models import Credit, InstallmentRefinancing, Refinancing, Installment
 from cashregister.utils import create_cashregister
 from commissions.models import Interest
 from .utils import *
@@ -156,8 +156,8 @@ def make_payment_installment(request, pk):
         # Caso 1: Se han seleccionado cuotas completas (checkbox marcados)
         if count_value == 0:
             if checked_discount:
-                payment.amount = round_to_nearest_hundred(installment_amount) * Decimal('0.95')
-                discount += round_to_nearest_hundred(installment_amount) * Decimal('0.05')
+                payment.amount = round_to_nearest_hundred(installment_amount * Decimal('0.95'))
+                discount += round_to_nearest_hundred(installment_amount * Decimal('0.05'))
             else:
                 payment.amount = installment_amount
             subtotal_amount += installment_amount
@@ -181,8 +181,8 @@ def make_payment_installment(request, pk):
             for installment in pack.keys():
                 if pack[installment]:
                     if checked_discount:
-                        payment.amount = round_to_nearest_hundred(installment_amount) * Decimal('0.95')
-                        discount += round_to_nearest_hundred(installment_amount) * Decimal('0.05')
+                        payment.amount = round_to_nearest_hundred(installment_amount * Decimal('0.95'))
+                        discount += round_to_nearest_hundred(installment_amount * Decimal('0.05'))
                     else:
                         payment.amount = round_to_nearest_hundred(installment.amount)
                     subtotal_amount += installment.amount
@@ -212,11 +212,11 @@ def make_payment_installment(request, pk):
             if (client.score + score) >= 1499:
                 client.score = 1500
             client.save()
-
+        discount = round_to_nearest_hundred(discount)
         for pay in payments_list:
             total_amount += pay.amount
 
-        final_total = total_amount
+        final_total = subtotal_amount - discount
 
         # Se obtiene la fecha del último pago realizado para formatearla
         if payments_list:
@@ -257,56 +257,48 @@ def make_payment_installment(request, pk):
     return redirect('clients:detail', pk=client.pk)
 
 # Descargar comprobante de pago
-def get_receipt(request, pk):
+def get_receipt(request, pk, is_ref=False):
     """
     Vista para descargar el recibo asociado a una o más cuotas (Installment) dado su id.
     Si se han realizado pagos parciales, se acumulan todos los pagos asociados para reflejar
     el total abonado hasta el momento.
     """
-    installment = get_object_or_404(Installment, id=pk)
+    print(is_ref, type(is_ref)) 
+    if is_ref == 'True':
+        installment = get_object_or_404(InstallmentRefinancing, id=pk)
+        payments = Payment.objects.filter(installment_ref=installment).order_by('payment_date')
+    else:
+        installment = get_object_or_404(Installment, id=pk)
+        payments = Payment.objects.filter(installment=installment).order_by('payment_date')
     
-    # Recupera TODOS los pagos asociados a la cuota
-    payments = Payment.objects.filter(installment=installment).order_by('payment_date')
-    
-    # Suma los montos pagados hasta el momento
     total_paid = payments.aggregate(total=Sum('amount'))['total'] or 0
-
-    # Acumula los detalles de cada pago (limpiando posibles datos extra)
-    details = " | ".join([p.detail.split('-')[0] for p in payments if p.detail])
     
     # Se utiliza la fecha del último pago para el recibo
     last_payment = payments.latest('payment_date') if payments.exists() else None
     payment_date_str = last_payment.payment_date.strftime('%d de %B de %Y') if last_payment else ""
     
-    # Recupera los datos del cliente a través del crédito de la cuota.
     client = installment.credit.client
 
-    # Genera el concepto usando la función de utilidad.
-    # Nota: se genera en función de la cuota y la suma de todos los pagos asociados.
     concept = generate_concept_text(installment, False, payments=payments)
     checked_discount = False
-    # Actualiza el campo detail de cada Payment con el concepto generado.
-    # Esto permitirá que en el template se muestre el concepto esperado.
     discount = 0
     for payment in payments:
         payment.detail = concept
         # Verifico si el pago es igual al 95% de la cuota
-        if payment.amount == round_to_nearest_hundred(installment.amount) * Decimal('0.95'):
+        if payment.amount == round_to_nearest_hundred(installment.amount * Decimal('0.95')):
             checked_discount = True
-            discount += round_to_nearest_hundred(installment.amount) * Decimal(0.05).quantize(Decimal('0.01'))
-    
+            discount += round_to_nearest_hundred(installment.amount) * Decimal(0.05)
+    discount = round_to_nearest_hundred(discount)
     if payments:
         receipt_number = payments[0].payment_date.strftime('%d%m%y%H%M')
     else:
         receipt_number = "N/A"  # o lo que quieras poner por defecto
 
-    # Prepara el contexto para el template del recibo.
     context = {
         'client': client,
         'dni': str(client.dni)[-6:], 
         'payments': payments,
         'installments': [installment],
-        'details': details,
         'payment_date': payment_date_str,
         'total_amount': total_paid,             # Total acumulado de pagos (parciales o completos)
         'subtotal_amount': installment.amount,  # Monto total que corresponde a la cuota

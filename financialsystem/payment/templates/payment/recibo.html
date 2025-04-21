@@ -347,7 +347,7 @@
                             {% if payment.installment.installment_number == installment.installment_number or payment.installment_ref.installment_number == installment.installment_number  %}
                             <tr>
                                 <td>{{ payment.detail }}</td>
-                                <td>${{ payment.amount }}</td>
+                                <td>${{ installment.amount }}</td>
                             </tr>
                             {% endif %}
                         {% endfor %}
