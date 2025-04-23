@@ -117,13 +117,15 @@ def make_payment_installment(request, pk):
         installments_score = refinancing.installments.all().count()
         installments = refinancing.installments.exclude(condition='Pagada')
         # Se toma el monto de la primera cuota como referencia
-        installment_amount = round_to_nearest_hundred(refinancing.installments.first().amount)
+        installment_amount = round_to_nearest_hundred(installments.first().amount)
+        installment_number = installments.first().installment_number
         client = refinancing.installment_ref.last().credit.client
     except:
         credit = get_object_or_404(Credit, pk=pk)
         installments_score = credit.installments.all().count()
         installments = credit.installments.exclude(condition__in=['Refinanciada', 'Pagada'])
-        installment_amount = round_to_nearest_hundred(credit.installments.first().amount)
+        installment_amount = round_to_nearest_hundred(installments.first().amount)
+        installment_number = installments.first().installment_number
         client = credit.client
 
     form = PaymentForm(installments, request.POST or None)
@@ -153,27 +155,40 @@ def make_payment_installment(request, pk):
         total_amount = 0
         discount = Decimal('0.00')
 
-        # Caso 1: Se han seleccionado cuotas completas (checkbox marcados)
         if count_value == 0:
             if checked_discount:
                 payment.amount = round_to_nearest_hundred(installment_amount * Decimal('0.95'))
                 discount += round_to_nearest_hundred(installment_amount * Decimal('0.05'))
             else:
                 payment.amount = installment_amount
+            
+            print('Cuota seleccionada', installment_number)
+            print('Monto a pagar', installment_amount)
             subtotal_amount += installment_amount
+            print('Subtotal', subtotal_amount)
+            
             installments_caduced = [
                 i for i in installments
                 if i.is_caduced_installment and i.end_date and i.lastup and i.end_date.date() <= i.lastup
             ]
+            if len(installments_caduced) > 0:
+                installments_for_payment = installments_caduced
+            else:
+                installments_for_payment = installments
+                
             payments = pay_installment(
                 request,
                 payment,
-                installments_caduced,
+                installments_for_payment,
                 abs(Decimal(form.cleaned_data["amount_paid"]))
             )
 
             # Guardamos las cuotas involucradas
-            paid_installments = list(installments_caduced)
+            for payment in payments:
+                if payment.installment:
+                    paid_installments.append(payment.installment)
+                else:
+                    paid_installments.append(payment.installment_ref)
 
             # Guardamos los pagos generados
             payments_list.extend(payments)
@@ -228,13 +243,6 @@ def make_payment_installment(request, pk):
         # Opcional: Actualizar el concepto (detail) con la función de utilidad para cada cuota
         # Si cada pago está asociado a una cuota, se puede regenerar el concepto.
         print('CUOTAS', paid_installments)
-        for pay in payments_list:
-            # Obtiene la lista de pagos asociados a la cuota del pago actual (aquí se asume que es único)
-            if pay.installment:
-                concept = generate_concept_text(pay.installment, checked_discount, payments=[pay])
-            else:
-                concept = generate_concept_text(pay.installment_ref, checked_discount, payments=[pay])
-            pay.detail = concept
 
         # Prepara el contexto para el recibo
         context = {
@@ -279,15 +287,14 @@ def get_receipt(request, pk, is_ref=False):
     
     client = installment.credit.client
 
-    concept = generate_concept_text(installment, False, payments=payments)
     checked_discount = False
     discount = 0
     for payment in payments:
-        payment.detail = concept
         # Verifico si el pago es igual al 95% de la cuota
         if payment.amount == round_to_nearest_hundred(installment.amount * Decimal('0.95')):
             checked_discount = True
             discount += round_to_nearest_hundred(installment.amount) * Decimal(0.05)
+            
     discount = round_to_nearest_hundred(discount)
     if payments:
         receipt_number = payments[0].payment_date.strftime('%d%m%y%H%M')
@@ -301,7 +308,7 @@ def get_receipt(request, pk, is_ref=False):
         'installments': [installment],
         'payment_date': payment_date_str,
         'total_amount': total_paid,             # Total acumulado de pagos (parciales o completos)
-        'subtotal_amount': installment.amount,  # Monto total que corresponde a la cuota
+        'subtotal_amount': installment.amount if installment.condition == 'Pagada' else total_paid,  # Monto total que corresponde a la cuota
         'receipt_number': receipt_number,
         'checked_discount': checked_discount,
         'discount': discount

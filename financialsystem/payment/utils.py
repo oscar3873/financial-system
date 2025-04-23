@@ -21,14 +21,16 @@ def payment_create(payment, installment):
         'payment_date': payment.payment_date,
         'adviser': payment.adviser,
         'payment_method': payment.payment_method,
+        'partial': payment.partial,
     }
     
     if isinstance(installment, Installment):
         payment_dict['installment'] = installment
-        payment_dict['detail'] = 'COBRO CUOTA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.credit.client, payment.adviser)
+        payment_dict['detail'] = generate_concept_text(installment, payments=[payment])
+
     else:
         payment_dict['installment_ref'] = installment
-        payment_dict['detail'] = 'COBRO CUOTA REFINANCIADA %s - CLIENTE %s - ASESOR %s' % (installment.installment_number,installment.refinancing.installment_ref.last().credit.client, payment.adviser)
+        payment_dict['detail'] = generate_concept_text(installment, payments=[payment])
         
     return Payment.objects.create(**payment_dict)
 
@@ -45,31 +47,39 @@ def pay_installment(request, payment, installments, amount_paid):
     payments = []
 
     for installment in installments:
+        print('######### CUOTA', installment.installment_number)
+        print('######### MONTO A PAGAR', installment.amount)
+        print('######### FECHA DE VENCIMIENTO', installment.end_date)
         if installment.amount <= amount_paid:
             print('############PAGADA COMPLETA')
+            amount_paid -= installment.amount
+            
             installment.condition = 'Pagada'
             installment.payment_date = payment.payment_date
-            installment.save()
-
             new_payment = payment_create(payment, installment)
-            payments.append(new_payment)
-            amount_paid -= installment.amount
 
-        elif amount_paid >= Decimal(installment.amount / Decimal(2)):
+            installment.amount = installment.original_amount
+            print('######### CUOTA PAGADA', installment.amount)
+            installment.save()
+            payments.append(new_payment)
+
+        elif amount_paid >= Decimal(installment.original_amount / Decimal(2)):
             print('########## PAGO PARCIAL')
             payment.amount = amount_paid  # PARA RELAIZAR EL MOVIMIENTO
+            payment.partial = True  # PARA RELAIZAR EL MOVIMIENTO
+            installment.payment_date = payment.payment_date
             installment.amount -= payment.amount
-            installment.original_amount = installment.amount
             installment.daily_interests = 0
             fifteen_later_din(installment)
 
             new_payment = payment_create(payment, installment)
             payments.append(new_payment)
             amount_paid = 0
-
         else:
             print("######### DISMINUYE MONTO SOBRANTE")
+            installment.payment_date = payment.payment_date
             payment.amount = amount_paid
+            payment.partial = True
             installment.amount -= amount_paid
             installment.daily_interests = max(installment.daily_interests - amount_paid, 0)
             installment.save()
@@ -77,6 +87,8 @@ def pay_installment(request, payment, installments, amount_paid):
             new_payment = payment_create(payment, installment)
             payments.append(new_payment)
             amount_paid = 0
+        if amount_paid <= 0:
+            break
 
     return payments
 
@@ -111,13 +123,12 @@ def update_installment_status(installment, payment_date):
     else:
         concepto = f"Pago de cuota #{installment.installment_number} ({get_installment_month_name(installment)})"
 
-def generate_concept_text(installment, checked_discount, payments=None):
+def generate_concept_text(installment, payments=None):
     """
     Devuelve un string tipo:
     - "Pago de cuota #3 (Marzo)"
     - "Pago parcial de cuota #3 (Marzo)"
     """
-    print('######### GENERANDO CONCEPTO DE PAGO', installment.credit)
     if isinstance(installment, Installment) :
         credit = installment.credit
         cuota_n = installment.installment_number

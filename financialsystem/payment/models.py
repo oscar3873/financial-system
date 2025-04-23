@@ -32,7 +32,8 @@ class Payment(models.Model):
     detail = models.CharField(max_length=150, null=True, blank=True)
     installment = models.ForeignKey(Installment, on_delete=models.CASCADE, null=True, blank=True, related_name='payments')
     installment_ref = models.ForeignKey(InstallmentRefinancing, on_delete=models.CASCADE, null=True, blank=True, related_name='payments')
-
+    partial = models.BooleanField(default=False, help_text="Pago Parcial")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

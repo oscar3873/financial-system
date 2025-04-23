@@ -346,8 +346,23 @@
                         {% for payment in payments %}
                             {% if payment.installment.installment_number == installment.installment_number or payment.installment_ref.installment_number == installment.installment_number  %}
                             <tr>
-                                <td>{{ payment.detail }}</td>
-                                <td>${{ installment.amount }}</td>
+                                <td>{{ payment.detail }}
+                                    {% if payment.partial %}
+                                        <span>(parcial)</span>
+                                    {% endif %}
+                                </td>
+                                {% if installments|length == 1 and payments|length > 1 or payment.partial %}
+                                <td>${{ payment.amount }}
+                                    
+                                </td>
+                                {% else %}
+                                <td>${{ installment.amount }}
+                                    {% if payment.partial %}
+                                        <br>
+                                        <span style="font-size: 10px;">(parcial)</span>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
                             </tr>
                             {% endif %}
                         {% endfor %}

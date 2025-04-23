@@ -459,7 +459,7 @@
                                     </td>
                                     <td>
                                         <a href="{% url 'credits:installment_update' installment.pk %}"><i class="fas fa-edit"></i></a>
-                                        {% if installment.is_paid_installment %}
+                                        {% if installment.payment_date %}
                                         <a class="ml-2" href="{% url 'payments:get_receipt' installment.pk False %}" target="_blank"><i class="fas fa-file-pdf"></i></a>
                                         {% endif %}
                                     </td>
@@ -528,7 +528,7 @@
                                                     </td>
                                                     <td>
                                                         <a href="{% url 'credits:installmentRef_update' installment_ref.pk %}"><i class="fas fa-edit"></i></a>
-                                                        {% if installment_ref.is_paid_installment %}
+                                                        {% if installment_ref.payment_date %}
                                                         <a class="ml-2" href="{% url 'payments:get_receipt' installment_ref.pk True %}" target="_blank"><i class="fas fa-file-pdf"></i></a>
                                                         {% endif %}
                                                     </td>
