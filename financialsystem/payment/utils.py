@@ -22,6 +22,7 @@ def payment_create(payment, installment):
         'adviser': payment.adviser,
         'payment_method': payment.payment_method,
         'partial': payment.partial,
+        'checked_discount': payment.checked_discount,
     }
     
     if isinstance(installment, Installment):
@@ -49,17 +50,15 @@ def pay_installment(request, payment, installments, amount_paid):
     for installment in installments:
         print('######### CUOTA', installment.installment_number)
         print('######### MONTO A PAGAR', installment.amount)
-        print('######### FECHA DE VENCIMIENTO', installment.end_date)
         if installment.amount <= amount_paid:
             print('############PAGADA COMPLETA')
             amount_paid -= installment.amount
-            
+            payment.amount = installment.amount
             installment.condition = 'Pagada'
             installment.payment_date = payment.payment_date
             new_payment = payment_create(payment, installment)
 
             installment.amount = installment.original_amount
-            print('######### CUOTA PAGADA', installment.amount)
             installment.save()
             payments.append(new_payment)
 
@@ -68,10 +67,14 @@ def pay_installment(request, payment, installments, amount_paid):
             payment.amount = amount_paid  # PARA RELAIZAR EL MOVIMIENTO
             payment.partial = True  # PARA RELAIZAR EL MOVIMIENTO
             installment.payment_date = payment.payment_date
-            installment.amount -= payment.amount
+            print(' ######### MONTO A PAGAR', installment.amount)
+            installment.amount -= amount_paid
+            print(' ######### MONTO A RESTANTE', installment.amount)
             installment.daily_interests = 0
-            fifteen_later_din(installment)
-
+            if installment.is_caduced_installment:
+                fifteen_later_din(installment)
+            else:    
+                installment.save()
             new_payment = payment_create(payment, installment)
             payments.append(new_payment)
             amount_paid = 0
@@ -141,12 +144,7 @@ def generate_concept_text(installment, payments=None):
         cuota_mes = credit.start_date + relativedelta(months=cuota_n - 1)
         mes_str = cuota_mes.strftime('%B')
         texto = f"Pago de cuota #{cuota_n}(refinanciada) ({mes_str})"
-    
-    if payments:
-        total_paid = sum([p.amount for p in payments])
-        porcentaje = (total_paid / installment.amount) * 100
-        if porcentaje < 95:
-            return f"Pago parcial de cuota #{cuota_n} ({mes_str})"
+        
     return texto
 
 def generate_pdf_receipt(request, context):

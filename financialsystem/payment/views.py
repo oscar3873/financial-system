@@ -154,18 +154,16 @@ def make_payment_installment(request, pk):
         subtotal_amount = 0
         total_amount = 0
         discount = Decimal('0.00')
-
+        show_payments = False
         if count_value == 0:
+            show_payments = True
             if checked_discount:
-                payment.amount = round_to_nearest_hundred(installment_amount * Decimal('0.95'))
-                discount += round_to_nearest_hundred(installment_amount * Decimal('0.05'))
+                payment.amount = round_to_nearest_hundred(amount_paid * Decimal('0.95'))
+                discount += round_to_nearest_hundred(amount_paid * Decimal('0.05'))
+                payment.checked_discount = True
             else:
-                payment.amount = installment_amount
+                payment.amount = amount_paid
             
-            print('Cuota seleccionada', installment_number)
-            print('Monto a pagar', installment_amount)
-            subtotal_amount += installment_amount
-            print('Subtotal', subtotal_amount)
             
             installments_caduced = [
                 i for i in installments
@@ -185,11 +183,12 @@ def make_payment_installment(request, pk):
 
             # Guardamos las cuotas involucradas
             for payment in payments:
+                subtotal_amount += payment.amount
                 if payment.installment:
                     paid_installments.append(payment.installment)
                 else:
                     paid_installments.append(payment.installment_ref)
-
+            
             # Guardamos los pagos generados
             payments_list.extend(payments)
         else:
@@ -204,6 +203,8 @@ def make_payment_installment(request, pk):
                     installment.condition = 'Pagada'
                     installment.is_paid_installment = True
                     installment.payment_date = payment.payment_date
+                    if installment.amount != installment.original_amount:
+                        installment.amount = installment.original_amount
                     installment.save()
                     paid_installments.append(installment)
                     
@@ -214,6 +215,7 @@ def make_payment_installment(request, pk):
                         credit.is_paid = True
                         credit.save()
                     new_payment = payment_create(payment, installment)
+                    show_payments = True
                     payments_list.append(new_payment)
             interest = Interest.objects.first()
             points_per_installments = (
@@ -258,6 +260,7 @@ def make_payment_installment(request, pk):
             'payment_detail': payment.detail,  
             'receipt_number': payment.payment_date.strftime('%d%m%y%H%M'),    
             'checked_discount': checked_discount,
+            'show_payments': show_payments,
         }
 
         return generate_pdf_receipt(request, context)
@@ -288,13 +291,13 @@ def get_receipt(request, pk, is_ref=False):
     client = installment.credit.client
 
     checked_discount = False
-    discount = 0
+    discounted_amount = 0
     for payment in payments:
-        # Verifico si el pago es igual al 95% de la cuota
-        if payment.amount == round_to_nearest_hundred(installment.amount * Decimal('0.95')):
+        if payment.checked_discount:
             checked_discount = True
-            discount += round_to_nearest_hundred(installment.amount) * Decimal(0.05)
-            
+            discounted_amount += payment.amount * Decimal(0.05)
+            discount = round_to_nearest_hundred(discounted_amount)
+                
     discount = round_to_nearest_hundred(discount)
     if payments:
         receipt_number = payments[0].payment_date.strftime('%d%m%y%H%M')
@@ -311,7 +314,7 @@ def get_receipt(request, pk, is_ref=False):
         'subtotal_amount': installment.amount if installment.condition == 'Pagada' else total_paid,  # Monto total que corresponde a la cuota
         'receipt_number': receipt_number,
         'checked_discount': checked_discount,
-        'discount': discount
+        'discount': discount,
     }
     
     return generate_pdf_receipt(request, context)

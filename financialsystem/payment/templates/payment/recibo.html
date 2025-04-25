@@ -292,6 +292,10 @@
             margin-bottom: 3px;
         }
 
+        .text-danger {
+            color:rgb(160, 18, 18);
+        }
+
     </style>
 
 
@@ -352,15 +356,24 @@
                                     {% endif %}
                                 </td>
                                 {% if installments|length == 1 and payments|length > 1 or payment.partial %}
-                                <td>${{ payment.amount }}
-                                    
-                                </td>
-                                {% else %}
-                                <td>${{ installment.amount }}
-                                    {% if payment.partial %}
-                                        <br>
-                                        <span style="font-size: 10px;">(parcial)</span>
+                                <td>
+                                    ${{ payment.amount }}
+                                    {% if payment.checked_discount %}
+                                    <br>
+                                    <small class="text-danger">-${{ payment.discount }}</small>
                                     {% endif %}
+                                </td>
+                                
+                                {% else %}
+                                <td>
+                                    
+                                    {% if show_payments %}
+                                    ${{ payment.amount }}
+                                    
+                                    {% else %}
+                                    ${{ installment.amount }}
+                                    {% endif %}
+                                    
                                 </td>
                                 {% endif %}
                             </tr>
