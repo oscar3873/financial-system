@@ -34,6 +34,7 @@ class Payment(models.Model):
     installment_ref = models.ForeignKey(InstallmentRefinancing, on_delete=models.CASCADE, null=True, blank=True, related_name='payments')
     partial = models.BooleanField(default=False, help_text="Pago Parcial")
     checked_discount = models.BooleanField(default=False, help_text="Descuento chequeado")
+    discounted_amount = models.DecimalField(default=0, max_digits=15, decimal_places=2, help_text="Monto descontado")
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

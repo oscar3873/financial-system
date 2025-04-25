@@ -282,23 +282,29 @@ def get_receipt(request, pk, is_ref=False):
         installment = get_object_or_404(Installment, id=pk)
         payments = Payment.objects.filter(installment=installment).order_by('payment_date')
     
-    total_paid = payments.aggregate(total=Sum('amount'))['total'] or 0
     
     # Se utiliza la fecha del último pago para el recibo
     last_payment = payments.latest('payment_date') if payments.exists() else None
     payment_date_str = last_payment.payment_date.strftime('%d de %B de %Y') if last_payment else ""
     
     client = installment.credit.client
-
+    discount = 0
     checked_discount = False
     discounted_amount = 0
     for payment in payments:
         if payment.checked_discount:
             checked_discount = True
-            discounted_amount += payment.amount * Decimal(0.05)
+            payment.discounted_amount = round_to_nearest_hundred(payment.amount * Decimal(0.05))
+            discounted_amount += payment.discounted_amount
+
             discount = round_to_nearest_hundred(discounted_amount)
                 
     discount = round_to_nearest_hundred(discount)
+    if checked_discount:
+        total_paid = payments.aggregate(total=Sum('amount'))['total'] - discount
+    else:
+        total_paid = payments.aggregate(total=Sum('amount'))['total'] or 0
+
     if payments:
         receipt_number = payments[0].payment_date.strftime('%d%m%y%H%M')
     else:
