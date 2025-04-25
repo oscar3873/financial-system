@@ -292,10 +292,13 @@
             margin-bottom: 3px;
         }
 
-        .text-success {
-            color: #28a745;
+        .text-danger {
+            color: #c91a1a;
         }
-
+        #disclaimer{
+            margin-left: 30px;
+            justify-self: start;
+        }
     </style>
 
 
@@ -357,11 +360,10 @@
                                 </td>
                                 {% if installments|length == 1 and payments|length > 1 or payment.partial %}
                                 <td>
-                                    ${{ payment.amount }}
-                                    {% if payment.checked_discount and is_payment == False %}
-                                    <br>
-                                    <small class="text-success">-${{ payment.discounted_amount }}</small>
+                                    {% if payment.checked_discount and is_get_receipt %}
+                                    <small class="text-danger">*</small>
                                     {% endif %}
+                                    ${{ payment.amount }}
                                 </td>
                                 
                                 {% else %}
@@ -393,6 +395,8 @@
             <p><strong>Descuento 5%: <span class="text-success">${{discount}}</span></strong> </p>
             {% endif %}
             <p id="recibo__summary-total"><strong>Total: ${{total_amount}}</strong></p>
+            <p id="disclaimer"><span class="text-danger">*</span> Este pago recibió el beneficio de descuento del 5%</p>
+
         </div>
 
         <!-- Pie de página con fondo azul: "¡Gracias!" a la izquierda, contacto a la derecha -->

@@ -245,7 +245,6 @@ def make_payment_installment(request, pk):
         # Opcional: Actualizar el concepto (detail) con la función de utilidad para cada cuota
         # Si cada pago está asociado a una cuota, se puede regenerar el concepto.
         print('CUOTAS', paid_installments)
-
         # Prepara el contexto para el recibo
         context = {
             'client': client,
@@ -261,6 +260,7 @@ def make_payment_installment(request, pk):
             'receipt_number': payment.payment_date.strftime('%d%m%y%H%M'),    
             'checked_discount': checked_discount,
             'show_payments': show_payments,
+            'is_get_receipt': False
         }
 
         return generate_pdf_receipt(request, context)
@@ -294,16 +294,13 @@ def get_receipt(request, pk, is_ref=False):
     for payment in payments:
         if payment.checked_discount:
             checked_discount = True
-            payment.discounted_amount = round_to_nearest_hundred(payment.amount * Decimal(0.05))
+            payment.discounted_amount = payment.amount * Decimal(0.05)
             discounted_amount += payment.discounted_amount
 
             discount = round_to_nearest_hundred(discounted_amount)
                 
     discount = round_to_nearest_hundred(discount)
-    if checked_discount:
-        total_paid = payments.aggregate(total=Sum('amount'))['total'] - discount
-    else:
-        total_paid = payments.aggregate(total=Sum('amount'))['total'] or 0
+    subtotal = payments.aggregate(total=Sum('amount'))['total'] or 0
 
     if payments:
         receipt_number = payments[0].payment_date.strftime('%d%m%y%H%M')
@@ -316,11 +313,12 @@ def get_receipt(request, pk, is_ref=False):
         'payments': payments,
         'installments': [installment],
         'payment_date': payment_date_str,
-        'total_amount': total_paid,             # Total acumulado de pagos (parciales o completos)
-        'subtotal_amount': installment.amount if installment.condition == 'Pagada' else total_paid,  # Monto total que corresponde a la cuota
+        'total_amount': installment.amount if installment.condition == 'Pagada' else subtotal - discount,           # Total acumulado de pagos (parciales o completos)
+        'subtotal_amount': subtotal,  # Monto total que corresponde a la cuota
         'receipt_number': receipt_number,
         'checked_discount': checked_discount,
         'discount': discount,
+        'is_get_receipt': True,
     }
     
     return generate_pdf_receipt(request, context)
