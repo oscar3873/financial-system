@@ -395,7 +395,11 @@
             <p><strong>Descuento 5%: <span class="text-success">${{discount}}</span></strong> </p>
             {% endif %}
             <p id="recibo__summary-total"><strong>Total: ${{total_amount}}</strong></p>
+            
+            {% if checked_discount and is_get_receipt %}
             <p id="disclaimer"><span class="text-danger">*</span> Este pago recibió el beneficio de descuento del 5%</p>
+            {% endif %}
+                
 
         </div>
 
