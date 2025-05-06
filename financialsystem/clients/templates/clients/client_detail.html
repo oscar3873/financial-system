@@ -406,25 +406,39 @@
                                 <!-- Swiper -->
                                 <div class="swiper SwiperExpiration">
                                     <div class="swiper-wrapper">
-                                        {% for last_three_payments in last_three_payments_by_credit_list %} {% for payment in last_three_payments %}
-                                        <div class="swiper-slide" style="height: auto; overflow: hidden;">
-                                            <div class="card bg-primary text-white box-shadow" style="overflow: hidden;">
-                                                <div class="card-body">
-                                                    <h5 class="title text-center">
-                                                        <i class="fas fa-check text-warning"></i> Ultimos pagos
-                                                    </h5>
+                                        {% for item in credits_with_payments %}
+                                            {% with credit=item.credit payments=item.payments %}
+                                                
+                                                {% if credit == credit_active %}
+                                                    <!-- Otros datos del crédito como asesor, monto, etc. -->
+                                                    {% for payment in payments %}
+                                                        <div class="swiper-slide" style="height: auto; overflow: hidden;">
+                                                            <div class="card bg-primary text-white box-shadow" style="overflow: hidden;">
+                                                                <div class="card-body">
+                                                                    <h5 class="title text-center">
+                                                                        <i class="fas fa-check text-warning"></i> Últimos pagos
+                                                                    </h5>
 
-                                                    {% if payment.installment %}
-                                                    <p class="text-center"><span>{{payment.installment}}</span></p>
-                                                    {% else %}
-                                                    <p class="text-center"><span>{{payment.installment_ref}}</span></p>
-                                                    {% endif %}
-                                                    <p>Pagado el <span class=" font-weight-bold text-warning">{{ payment.payment_date }}</span></p>
-                                                    <p>Monto: <span class=" font-weight-bold text-warning"> $ {{ payment.amount }}</span></p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {% endfor %} {% endfor %}
+                                                                    {% if payment.installment %}
+                                                                        <p class="text-center"><span>{{ payment.installment }}</span></p>
+                                                                    {% else %}
+                                                                        <p class="text-center"><span>{{ payment.installment_ref }}</span></p>
+                                                                    {% endif %}
+
+                                                                    <p>Pagado el <span class=" font-weight-bold text-warning">
+                                                                        {{ payment.payment_date|date:"j \\d\\e F \\d\\e Y \\a \\l\\a\\s H:i" }}
+                                                                    </span></p>
+
+                                                                    <p>Monto: <span class=" font-weight-bold text-warning"> 
+                                                                        $ {{ payment.amount|floatformat:2 }}
+                                                                    </span></p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% endfor %}
                                     </div>
                                     <div class="swiper-pagination"></div>
                                 </div>

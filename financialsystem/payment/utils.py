@@ -135,13 +135,13 @@ def generate_concept_text(installment, payments=None):
     if isinstance(installment, Installment) :
         credit = installment.credit
         cuota_n = installment.installment_number
-        cuota_mes = credit.start_date + relativedelta(months=cuota_n - 1)
+        cuota_mes = credit.start_date + relativedelta(months=cuota_n)
         mes_str = cuota_mes.strftime('%B')  # o '%B' si solo querés el mes
         texto = f"Pago de cuota #{cuota_n} ({mes_str})"
     else:
         credit = installment.credit
         cuota_n = installment.installment_number
-        cuota_mes = credit.start_date + relativedelta(months=cuota_n - 1)
+        cuota_mes = credit.start_date + relativedelta(months=cuota_n)
         mes_str = cuota_mes.strftime('%B')
         texto = f"Pago de cuota #{cuota_n}(refinanciada) ({mes_str})"
         

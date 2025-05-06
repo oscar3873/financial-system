@@ -252,30 +252,40 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
             next_three_installments = next_installments[:3]
 
             context['next_three_installments'] = next_three_installments
-
-            last_three_payments_by_credit_list = []
+            credits_with_payments = []
             for credit in credits_active:
-                # Get the related payments for the credit, order by payment_date in descending order, and get the first three
-                last_three_normal_payments = Payment.objects.filter(installment__in=credit.installments.all()).order_by('-payment_date')[:3]
+                # Últimos 3 pagos normales
+                last_three_normal_payments = Payment.objects.filter(
+                    installment__in=credit.installments.all()
+                ).order_by('-payment_date')[:3]
 
-                refinancing_installments = Installment.objects.filter(credit=credit, refinance__isnull=False)
-                refinancing_installments_qs = list(itertools.chain(*[installment.refinance.installments.all() for installment in refinancing_installments]))
-                refinancing_installments_qs = InstallmentRefinancing.objects.filter(id__in=[installment_ref.id for installment_ref in refinancing_installments_qs])
+                # Cuotas de refinanciamiento relacionadas
+                refinancing_installments = Installment.objects.filter(
+                    credit=credit, refinance__isnull=False
+                )
+                refinancing_installments_qs = list(itertools.chain(
+                    *[installment.refinance.installments.all() for installment in refinancing_installments]
+                ))
 
-                last_three_refinancing_payments = Payment.objects.filter(installment_ref__in=refinancing_installments_qs.all()).order_by('-payment_date')[:3]
-                # Combine the lists of payments and sort them by payment_date in descending order
-                combined_payments = sorted(list(itertools.chain(last_three_refinancing_payments, last_three_normal_payments)), key=lambda x: x.payment_date, reverse=True)
+                last_three_refinancing_payments = Payment.objects.filter(
+                    installment_ref__in=refinancing_installments_qs
+                ).order_by('-payment_date')[:3]
 
+                # Combinamos y ordenamos todos los pagos
+                combined_payments = sorted(
+                    list(itertools.chain(last_three_refinancing_payments, last_three_normal_payments)),
+                    key=lambda x: x.payment_date,
+                    reverse=True
+                )[:3]
 
-                # Get the first three payments from the combined list
-                last_three_payments = combined_payments[:3]
+                # Agregamos cada crédito con sus últimos pagos
+                credits_with_payments.append({
+                    "credit": credit,
+                    "payments": combined_payments
+                })
 
-                # Append the last three payments to the list for this credit
-                last_three_payments_by_credit_list.append(last_three_payments)
-
-            # Add the last_three_payments_by_credit_list to the context
-            context["last_three_payments_by_credit_list"] = last_three_payments_by_credit_list
-
+            # Mandamos una sola lista al contexto
+            context["credits_with_payments"] = credits_with_payments
         forms_payments = []
         form_refinancings = []
         installments_by_credit = {}
