@@ -73,7 +73,8 @@ def pay_installment(request, payment, installments, amount_paid):
             installment.daily_interests = 0
             if installment.is_caduced_installment:
                 fifteen_later_din(installment)
-            else:    
+            else:
+                installment.end_date = installment.end_date + datetime.timedelta(days=15)    
                 installment.save()
             new_payment = payment_create(payment, installment)
             payments.append(new_payment)
