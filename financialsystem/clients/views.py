@@ -8,12 +8,14 @@ from django.db.models import Count
 from django.core.paginator import Paginator
 
 from babel.dates import format_date
+
 from .filters import ListingFilter
 from credit.utils import refresh_condition
 from cashregister.utils import create_cashregister
 from credit.models import Installment
 from credit.models import InstallmentRefinancing
 from payment.models import Payment
+from payment.utils import update_after_fifteen_days
 from .utils import all_properties_client
 
 from django.utils import timezone
@@ -225,6 +227,7 @@ class ClientDetailView (LoginRequiredMixin, DetailView):
         """
 
         #refresh_condition()
+        update_after_fifteen_days()
         context = super().get_context_data(**kwargs)
         context["credits"] = context["client"].credits.all().order_by("created_at")
         credits_active = context["credits"].filter(is_active=True).order_by("created_at")

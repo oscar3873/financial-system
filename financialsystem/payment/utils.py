@@ -11,6 +11,7 @@ from dateutil.relativedelta import relativedelta
 
 from payment.models import Payment
 from credit.models import Installment
+from credit.utils import actualice
 
 def all_properties_paymnet():
     return ['Monto','Forma de Pago','Detalle','Fecha']
@@ -71,11 +72,7 @@ def pay_installment(request, payment, installments, amount_paid):
             installment.amount -= amount_paid
             print(' ######### MONTO A RESTANTE', installment.amount)
             installment.daily_interests = 0
-            if installment.is_caduced_installment:
-                fifteen_later_din(installment)
-            else:
-                installment.end_date = installment.end_date + datetime.timedelta(days=15)    
-                installment.save()
+            fifteen_later_din(installment)
             new_payment = payment_create(payment, installment)
             payments.append(new_payment)
             amount_paid = 0
@@ -102,8 +99,28 @@ def fifteen_later_din(installment):
     """
     Mueve la fecha vencimiento 15 dias despues (por beneficio de pago del 50% de la deuda)
     """
-    installment.end_date = datetime.date.today() + datetime.timedelta(days=15)
+    if not installment.original_end_date:
+        installment.original_end_date = installment.end_date
+    if installment.is_caduced_installment:
+        installment.end_date = datetime.date.today() + datetime.timedelta(days=15)
+    else:
+        installment.end_date = installment.end_date + datetime.timedelta(days=15)    
     installment.save()
+    
+def update_after_fifteen_days():
+    hoy = datetime.date.today()
+    qs = Installment.objects.filter(
+        original_end_date__isnull=False,
+        end_date__lte=hoy  # ya pasaron los 15 días
+    )
+    for inst in qs:
+        # días de mora sobre lastup hasta hoy:
+        resto = abs((hoy - inst.lastup).days)
+        actualice(resto, inst)
+        # revertir fecha a la original
+        inst.end_date = inst.original_end_date
+        inst.lastup = hoy
+        inst.save(update_fields=['daily_interests','amount','end_date','lastup'])
     
 def get_installment_month_name(installment):
     """

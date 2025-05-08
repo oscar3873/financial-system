@@ -110,6 +110,7 @@ class Installment(models.Model):
     porcentage_daily_interests = models.DecimalField(blank=False, decimal_places=2, max_digits=20, null=True, default=2, help_text="Intereses diarios")
     start_date = models.DateTimeField(default=date, null=True)
     end_date = models.DateTimeField(null=True, default=None)
+    original_end_date = models.DateTimeField(null=True, default=None)
     payment_date = models.DateTimeField(help_text="Fecha de Pago", null=True, blank=True)
     condition = models.CharField(max_length=15,choices=CONDITION, default='A Tiempo')
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="installments", help_text="Credito de la cuota")
