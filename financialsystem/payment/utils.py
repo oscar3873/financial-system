@@ -119,6 +119,7 @@ def update_after_fifteen_days():
         actualice(resto, inst)
         # revertir fecha a la original
         inst.end_date = inst.original_end_date
+        inst.original_end_date = None
         inst.lastup = hoy
         inst.save(update_fields=['daily_interests','amount','end_date','lastup'])
     
