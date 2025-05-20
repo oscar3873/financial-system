@@ -148,6 +148,7 @@ class InstallmentRefinancing(models.Model):
     payment_date = models.DateTimeField(verbose_name="Fecha de Pago",blank=True, null=True)
     start_date = models.DateTimeField(default=date, verbose_name='Fecha de Inicio')
     end_date = models.DateTimeField(verbose_name='Fecha de Vencimiento',blank=True, null=True, default=None)
+    original_end_date = models.DateTimeField(null=True, default=None)
     lastup = models.DateField(null=True) #PARA CALCULO DE INTERESES DIARIOS
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
